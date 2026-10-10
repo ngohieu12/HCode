@@ -153,6 +153,9 @@ const viVN: Record<string, string> = {
   "workflows.hub.history.empty": "Chưa có lần chạy nào.",
   "workflows.hub.history.open": "Mở lần chạy",
   "workflows.hub.artifacts.latest": "Sản phẩm mới nhất",
+  "settings.interfaceMode": "Chế độ giao diện",
+  "settings.interfaceMode.coding": "Lập trình",
+  "settings.interfaceMode.office": "Văn phòng",
 };
 
 export default viVN;

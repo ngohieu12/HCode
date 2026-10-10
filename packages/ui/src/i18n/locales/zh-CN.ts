@@ -2802,8 +2802,6 @@ const zhCN: Record<string, string> = {
   "settings.modelProvider.codingPlan.productsEmptyDescription":
     "{provider} 当前没有返回可购买的编程套餐。",
   "settings.modelProvider.codingPlan.dynamicUnsupportedTitle": "暂未接入动态套餐",
-  "settings.modelProvider.codingPlan.dynamicUnsupportedDescription":
-    "应用内订阅目前只接入 Z.ai / BigModel 编程套餐。",
   "settings.modelProvider.codingPlan.priceUnavailable": "价格暂不可用",
   "settings.modelProvider.codingPlan.systemBusy": "系统繁忙，请稍后再试。",
   "settings.modelProvider.codingPlan.subscriptionBusy": "订阅繁忙",
@@ -2812,8 +2810,6 @@ const zhCN: Record<string, string> = {
     "当前存在未完成订单，请先完成或取消后再发起新的购买。",
   "settings.modelProvider.codingPlan.paymentTimeout":
     "支付仍在处理中，请完成支付后重新检查编程套餐状态。",
-  "settings.modelProvider.codingPlan.zaiOverseasPaymentRequired":
-    "Z.ai 海外套餐需要通过 PayPal 或 Z.ai 官方支付页完成，不能使用支付宝签约流程。",
   "settings.modelProvider.codingPlan.paypalSetupRequired": "请先完成 PayPal 授权后再继续支付。",
   "settings.modelProvider.codingPlan.paypalApproveUrlMissing": "PayPal 授权链接为空，请稍后重试。",
   "settings.modelProvider.codingPlan.paypalUnsupported": "当前账号或地区暂不支持 PayPal 支付。",
@@ -2826,7 +2822,6 @@ const zhCN: Record<string, string> = {
   "settings.modelProvider.codingPlan.securityVerificationCancelled": "已取消安全验证。",
   "settings.modelProvider.codingPlan.securityVerificationFailed": "安全验证失败，请稍后重试。",
   "settings.modelProvider.codingPlan.start.loginEnable": "连接后启用",
-  "settings.modelProvider.codingPlan.start.loginTrial": "连接 Z.ai",
   "settings.modelProvider.codingPlan.start.enabled": "已启用",
   "settings.modelProvider.codingPlan.start.freeBadge": "Free",
   "settings.modelProvider.codingPlan.start.freeEquityTitle": "体验计划",
@@ -2944,8 +2939,6 @@ const zhCN: Record<string, string> = {
   "settings.modelProvider.codingPlan.enterprise.pendingOrderProductMissing":
     "未找到待支付订单对应的套餐，请刷新套餐后重试。",
   "settings.modelProvider.codingPlan.overseasPayment.title": "{product} overseas payment",
-  "settings.modelProvider.codingPlan.overseasPayment.description":
-    "Amount due: {price}. Choose PayPal or continue on the official Z.ai payment page.",
   "settings.modelProvider.codingPlan.overseasPayment.paypal": "PayPal",
   "settings.modelProvider.codingPlan.overseasPayment.paypalDescription":
     "Open PayPal authorization, then return here to continue.",
@@ -3026,8 +3019,6 @@ const zhCN: Record<string, string> = {
   "settings.modelProvider.codingPlan.overseasPayment.accountPolicyBetween": " and ",
   "settings.modelProvider.codingPlan.overseasPayment.policyLink": "Policy",
   "settings.modelProvider.codingPlan.overseasPayment.accountPolicySuffix": ".",
-  "settings.modelProvider.codingPlan.overseasPayment.authorizationPrefix":
-    "You agree that Z.ai will charge your card the above amount now and on a recurring basis according to your subscription plan until you cancel in accordance with our ",
   "settings.modelProvider.codingPlan.overseasPayment.authorizationTermsLink": "terms",
   "settings.modelProvider.codingPlan.overseasPayment.authorizationSuffix": ".",
   "settings.modelProvider.codingPlan.paymentDialog.agreementPrefix": "同意",
@@ -3167,8 +3158,6 @@ const zhCN: Record<string, string> = {
   "settings.modelProvider.modelsPlaceholder": "每行一个模型名称",
   "settings.modelProvider.modelsCount": "{count} 个模型",
   "settings.modelProvider.presetTitle": "智谱",
-  "settings.modelProvider.presetDescription":
-    "内置 Z.ai 与 BigModel 供应商，支持通过 OAuth 辅助完成配置。",
   "settings.modelProvider.presetEmpty": "尚未同步，请先完成 OAuth 登录。",
   "settings.modelProvider.customTitle": "自定义供应商",
   "settings.modelProvider.refresh": "刷新",
@@ -3274,8 +3263,6 @@ const zhCN: Record<string, string> = {
   "settings.usage.entitlementPolicyHint":
     "套餐额度为当前说明口径，平台策略可能调整，最新数值以用量说明页面为准。",
   "settings.usage.entitlementLoginRequired": "需要先登录",
-  "settings.usage.entitlementNotConfigured":
-    "未找到可查询额度的 Z.ai / BigModel 编程套餐账号。请先连接编程套餐账号。",
   "settings.usage.entitlementStatusActive": "已开通",
   "settings.usage.entitlementStatusError": "异常",
   "settings.usage.entitlementStatusLoading": "加载中",
@@ -3418,8 +3405,6 @@ const zhCN: Record<string, string> = {
   "settings.usage.tokenTotal": "Token 消耗总量",
   "settings.usage.timesUnit": "次",
   "settings.usage.codingPlanNotConfiguredTitle": "尚未连接编程套餐",
-  "settings.usage.codingPlanNotConfiguredDescription":
-    "请先在模型设置中连接 Z.ai 或 BigModel 编程套餐，即可查看套餐额度、模型用量和工具用量。",
   "settings.usage.codingPlanCurrentConnectionTitle": "当前连接方式未使用编程套餐",
   "settings.usage.codingPlanCurrentConnectionDescription":
     "将当前工作区模型连接方式切换为个人套餐或团队套餐后，即可在这里查看对应额度和用量。",

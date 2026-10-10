@@ -102,3 +102,31 @@
   - 深色主题下应用背景与侧栏为纯黑，面板与卡片颜色不变。
   - 未验证：真实 Windows/macOS/Linux 图标缓存、DMG 与 NSIS 安装界面需要打包后人工确认。
   - 已知限制：`packages/desktop/build/icon_installer.png` 的 H 背景由 Z 区域的列/行填充得到，放大后可能看到极轻微的色块边界，需人工确认。
+
+## 8. 编程 / 办公模式切换移到侧栏顶部
+
+- 规则：界面模式切换（编程 / 办公）不再位于侧栏底部账户菜单的子菜单，而是侧栏最上方的第一组控件，位于「新建任务」之前，始终可见。
+- 状态所有者：store 的 `interfaceMode`（`packages/ui/src/store/`），与设置页共用同一值，不新增状态。
+- 唯一所有者：`packages/ui/src/WorkspaceInterfaceModeSwitch.tsx`；挂载于 `packages/ui/src/WorkspaceSidebar.tsx`。账户菜单（`WorkspaceSidebarFooter.tsx`）不再包含该子菜单。
+- 文案：`settings.interfaceMode.coding` / `settings.interfaceMode.office`；越南语为「Lập trình」/「Văn phòng」。
+- 验收：
+  - 侧栏顶部显示两个按钮，当前模式高亮（`aria-pressed`）。
+  - 点击切换后立即生效，设置页显示的模式同步变化。
+  - 账户菜单中不再有「界面模式」子菜单。
+
+## 9. 清理用户可见的 Z.ai / ZCode 文案
+
+- 规则：
+  - 删除 i18n 中已无任何代码引用的 Coding Plan / Z.ai 文案键（`settings.modelProvider.codingPlan.start.loginTrial`、`...dynamicUnsupportedDescription`、`...zaiOverseasPaymentRequired`、`...overseasPayment.description`、`...overseasPayment.authorizationPrefix`、`settings.usage.entitlementNotConfigured`、`settings.usage.codingPlanNotConfiguredDescription`、`settings.modelProvider.presetDescription`），en-US 与 zh-CN 同步删除。
+  - 桌面端用户可见的 `ZCode` 文案改为 `HCode`：浏览器后端名称（`HCode In-app Browser`）与 Computer Use 权限错误提示。
+- 保留（有实际影响，不在本次清理范围）：
+  - 数据目录与路径：`.zcode/v2`、`ZCode Dev`、`zcode-embedded-browser` 等旧目录名，改动会丢失用户数据。
+  - 本地存储键：`zcode-theme`、`zcode-interface-mode` 等，改动会重置用户设置。
+  - 协议与内部标识：`x-zcode-*` 请求头、`ZCode Protocol/1`、`@zcode/*` 包名、`IZCode*` 等类型名。
+  - 所有权标记：Linux 桌面文件 `Comment=ZCode Desktop App`，用于识别旧安装，改动会导致无法清理。
+  - 错误码键：`zcode.error.*`，与运行时错误匹配。
+  - CLI 中的 Z.AI 登录命令与文本（`apps/zcode-cli/packages/cli`）、插件 `plugin.json` 的 `author: Z.ai`：属于 CLI 登录流程与随包插件元数据，需单独评估后再移除。
+  - `WelcomeScreen` 与 `LoginApiKeyForm` 中仍引用的 `login.oauth.button.zai`、`login.apiKey.provider.zai`：对应代码路径尚未移除。
+- 验收：
+  - 桌面端浏览器名称与 Computer Use 权限错误不再出现 `ZCode` 文案。
+  - 上述删除的键在 en-US 与 zh-CN 中都不存在，且没有代码引用它们。

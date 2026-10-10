@@ -66,6 +66,7 @@ import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { NewTaskButtonGroup } from "@/NewTaskButtonGroup.js";
 import { selectWorkspaceZCodeState, useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
 import { useZCodeStore } from "@/store/StoreProvider.js";
+import { WorkspaceInterfaceModeSwitch } from "@/WorkspaceInterfaceModeSwitch.js";
 import { useTabStore } from "@/store/TabStoreProvider.js";
 import { isWorkspaceReadOnly, isWorkspaceTab, type WorkspaceTabState } from "@/store/tabStore.js";
 import { useWorkspaceTaskLists } from "@/hooks/useWorkspaceTaskLists.js";
@@ -851,6 +852,7 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
           aria-hidden={isFileTreeOpen}
         >
           <div className={cn("flex flex-col gap-1 px-2", isWindowsDesktop ? "py-2" : "py-3")}>
+            <WorkspaceInterfaceModeSwitch />
             <WorkspaceNewTaskTooltip disabledReason={workspaceReadOnlyReason}>
               <NewTaskButtonGroup
                 disabled={workspaceReadOnly}
