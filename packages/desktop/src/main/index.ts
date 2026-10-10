@@ -2014,8 +2014,10 @@ app.whenReady().then(async () => {
   // 启动自动更新检查（后台执行，不阻塞主界面）
   // Preview 身份无论连接哪个后端都不自动更新：stable feed 上只分发正式 ZCode 安装包，
   // 不向 Preview 渠道提供更新。
+  // HCode 尚未配置自己的更新 feed：当前 manifest 端点（默认 zcode.z.ai）只返回 ZCode 安装包，
+  // 若放开会让 HCode 下载并安装 ZCode 包。因此在 HCode 配置独立 feed 之前全部关闭自动更新与手动检查。
   void initAutoUpdater({
-    enabled: ZCODE_PRODUCT_FLAVOR === "production",
+    enabled: false,
     onBeforeQuitAndInstall: async () => {
       notifyStabilityLifecycle("update_install");
       await prepareAppQuit("auto-update quitAndInstall", "update-install");

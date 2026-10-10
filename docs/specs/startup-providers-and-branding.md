@@ -130,3 +130,10 @@
 - 验收：
   - 桌面端浏览器名称与 Computer Use 权限错误不再出现 `ZCode` 文案。
   - 上述删除的键在 en-US 与 zh-CN 中都不存在，且没有代码引用它们。
+
+## 10. 自动更新暂时关闭（HCode 尚无独立 feed）
+
+- 规则：`initAutoUpdater` 固定 `enabled: false`（`packages/desktop/src/main/index.ts`）。自动轮询与手动检查都被关闭，更新按钮不会发起请求。
+- 原因：更新 manifest 请求的是 `DEFAULT_ZCODE_ENDPOINT_ORIGIN`（`https://zcode.z.ai`）下的 `/api/v1/releases/electron/manifest`，只携带 `platform`、`device_mid`、`channel`，不带应用身份。服务端返回的是 ZCode 的安装包，界面文案却显示 HCode，所以 HCode 可能会安装 ZCode。
+- 恢复条件：HCode 配置独立的 manifest 端点（或服务端按 appId 区分），并在 spec 中更新本节。
+- 验收：启动后日志出现 `auto-update disabled for this desktop product flavor`，且没有对 zcode.z.ai 的 manifest 请求。
