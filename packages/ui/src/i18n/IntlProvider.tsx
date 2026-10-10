@@ -9,7 +9,7 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 import type { Locale, LocalePreference } from "@zcode/shared";
-import { DEFAULT_LOCALE } from "@zcode/shared";
+import { DEFAULT_LOCALE, resolveLocaleFromSystemLanguage } from "@zcode/shared";
 import type { BroadcastMessage, IBroadcastService, ISettingService } from "@zcode/services";
 import {
   readNavigatorLanguage,
@@ -18,11 +18,14 @@ import {
 } from "@/lib/browserEnvironment.js";
 import zhCN from "./locales/zh-CN.js";
 import enUS from "./locales/en-US.js";
+import viVN from "./locales/vi-VN.js";
 
 /** 语言 → 翻译消息映射 */
 const MESSAGES: Record<Locale, Record<string, string>> = {
   "zh-CN": zhCN,
   "en-US": enUS,
+  // 越南语只翻译了一部分；缺失的键先用英文兜底，避免界面直接显示 message id 或中文。
+  "vi-VN": { ...enUS, ...viVN },
 };
 
 /** 简易 intl 工具：根据 id 查找翻译，支持 {key} 占位符替换 */
@@ -164,7 +167,7 @@ export function ZCodeIntlProvider({
       return DEFAULT_LOCALE;
     }
 
-    return language.toLowerCase().startsWith("zh") ? "zh-CN" : "en-US";
+    return resolveLocaleFromSystemLanguage(language);
   }, []);
   const resolveSystemLocale = useCallback(async (): Promise<Locale> => {
     const resolvedLocale = await resolveHostSystemLocale?.();

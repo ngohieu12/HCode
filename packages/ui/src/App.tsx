@@ -828,29 +828,27 @@ export function App({
   const [openAutomationTab, setOpenAutomationTab] = useState<NonNullable<
     AutomationsNavigationTarget["automationTab"]
   > | null>(null);
-  const [pluginStoreReturnScopeKey, setPluginStoreReturnScopeKey] = useState("user");
-  const [pluginStoreOpenVersion, setPluginStoreOpenVersion] = useState(0);
   const handleNavigateToTaskMain = useCallback(() => {
     setWorkspaceMainView("chat");
   }, []);
-  const { preserveNextSettingsExit } = useWorkspaceMainViewSettingsExit({
+  useWorkspaceMainViewSettingsExit({
     isWorkspaceVisible,
     workspaceMainView,
     onExitSettings: handleNavigateToTaskMain,
   });
-  const handleNavigateToAutomationsMain = useCallback((target: AutomationsNavigationTarget) => {
-    setOpenAutomationId(target.automationId ?? null);
-    setOpenAutomationTab(target.automationTab ?? null);
-    setWorkspaceMainView("automations");
-  }, []);
-  const handleNavigateToPluginStoreMain = useCallback(() => {
-    // 通用入口没有 scope 上下文，默认回到 User；Settings 显式带 scope 的入口会在
-    // 导航完成后覆盖这次默认值，避免沿用上一次 Workspace scope。
-    setPluginStoreReturnScopeKey("user");
-    setPluginStoreOpenVersion((version) => version + 1);
-    preserveNextSettingsExit();
-    setWorkspaceMainView("plugin-store");
-  }, [preserveNextSettingsExit]);
+  const handleNavigateToAutomationsMain = useCallback(
+    (target: AutomationsNavigationTarget) => {
+      if (target.automationTab === "workflow") {
+        // 工作流已迁入设置页：定时任务主视图不再承接这个标签，改为打开设置页的「工作流」分区。
+        handleOpenSettingsSection("workflow");
+        return;
+      }
+      setOpenAutomationId(target.automationId ?? null);
+      setOpenAutomationTab(target.automationTab ?? null);
+      setWorkspaceMainView("automations");
+    },
+    [handleOpenSettingsSection],
+  );
   const handleOpenAutomationConsumed = useCallback(() => {
     setOpenAutomationId(null);
     setOpenAutomationTab(null);
@@ -858,7 +856,6 @@ export function App({
   const {
     handleSelectTask,
     handleOpenAutomations,
-    handleOpenPluginStore,
     handleTaskNavBack,
     handleTaskNavForward,
     canGoBack,
@@ -872,22 +869,14 @@ export function App({
     activateTabByPath,
     onNavigateToTask: handleNavigateToTaskMain,
     onNavigateToAutomations: handleNavigateToAutomationsMain,
-    onNavigateToPluginStore: handleNavigateToPluginStoreMain,
   });
   const handleOpenPluginStoreForScope = useCallback(
     (_target: PluginStoreOpenTarget = {}) => {
-      // Workspace Marketplace 已收敛为全局入口。兼容旧事件中的 Workspace key，但返回
-      // 目标统一归一为 User，避免旧 sessionStorage/同窗口事件把设置页带回失效 scope。
-      const returnScopeKey = "user";
-      if (workspaceMainView === "plugin-store") {
-        setPluginStoreReturnScopeKey(returnScopeKey);
-        setPluginStoreOpenVersion((version) => version + 1);
-        return;
-      }
-      handleOpenPluginStore();
-      setPluginStoreReturnScopeKey(returnScopeKey);
+      // 插件市场已迁入设置页，入口统一切到「插件市场」分区。Workspace scope 已收敛为全局，
+      // 旧事件中的 scope 不再使用；具体 intent 由 requestPluginStoreOpen 的 pendingTarget 在分区挂载时消费。
+      handleOpenSettingsSection("pluginStore");
     },
-    [handleOpenPluginStore, workspaceMainView],
+    [handleOpenSettingsSection],
   );
   useEffect(
     () => addPluginStoreOpenListener(handleOpenPluginStoreForScope),
@@ -937,16 +926,6 @@ export function App({
   const handleSelectNextConversation = useCallback(() => {
     handleSelectAdjacentConversation("next");
   }, [handleSelectAdjacentConversation]);
-  const handleManageInstalledPlugins = useCallback(() => {
-    setPendingSettingsPluginIntent("plugins", {
-      origin: "plugin-store",
-      scopeKey: pluginStoreReturnScopeKey,
-    });
-    openSettingsTab();
-  }, [openSettingsTab, pluginStoreReturnScopeKey]);
-  const handlePrimaryNavigationBack =
-    workspaceMainView === "plugin-store" ? handleManageInstalledPlugins : handleTaskNavBack;
-  const canPrimaryNavigationBack = workspaceMainView === "plugin-store" || canTaskNavBack;
   const shellPanelIds = useMemo(() => ["sidebar", "content"], []);
 
   useAppKeyboard({
@@ -962,9 +941,7 @@ export function App({
     toggleSidePane: () => runVisibleWorkspaceCommand(handleToggleSidePane),
     previousConversation: handleSelectPreviousConversation,
     nextConversation: handleSelectNextConversation,
-    navigateBack: canPrimaryNavigationBack
-      ? () => runVisibleWorkspaceCommand(handlePrimaryNavigationBack)
-      : null,
+    navigateBack: canTaskNavBack ? () => runVisibleWorkspaceCommand(handleTaskNavBack) : null,
     navigateForward: canTaskNavForward
       ? () => runVisibleWorkspaceCommand(handleTaskNavForward)
       : null,
@@ -1126,14 +1103,12 @@ export function App({
         services={services}
         workspaceReadOnlyReason={workspaceReadOnlyReason}
         workspaceMainView={workspaceMainView}
-        pluginStoreOpenVersion={pluginStoreOpenVersion}
         openAutomationId={openAutomationId}
         openAutomationTab={openAutomationTab}
         onWorkspaceMainViewChange={setWorkspaceMainView}
         onOpenAutomationConsumed={handleOpenAutomationConsumed}
         handleOpenAutomations={handleOpenAutomations}
         handleOpenPluginStore={handleOpenPluginStoreForScope}
-        handleManageInstalledPlugins={handleManageInstalledPlugins}
         onConnectRemote={onConnectRemote}
         onSelectRemoteProject={onSelectRemoteProject}
         onCancelRemoteProject={onCancelRemoteProject}

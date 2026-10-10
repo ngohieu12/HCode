@@ -18,6 +18,8 @@ import {
   WandSparkles,
   Keyboard,
   FileSearch,
+  Store,
+  Workflow,
 } from "lucide-react";
 import { isSettingsSectionEnabled, type SettingsSectionId } from "@/lib/settingsNavigation.js";
 import type { Theme } from "@/useTheme.js";
@@ -91,6 +93,13 @@ const BASE_SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
     titleId: "settings.plugins.title",
     groupId: "agentCapabilities",
   },
+  // 插件市场原为 workspace 主视图，迁入设置页后与「插件」并列，便于从已安装列表直接跳转。
+  {
+    id: "pluginStore",
+    icon: Store,
+    titleId: "workspace.openPluginsSettings",
+    groupId: "agentCapabilities",
+  },
   {
     id: "mcp",
     icon: Cable,
@@ -107,6 +116,13 @@ const BASE_SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
     id: "commands",
     icon: Terminal,
     titleId: "settings.commands.title",
+    groupId: "agentCapabilities",
+  },
+  // 工作流原为定时任务页的一个标签；迁入设置页。入口仍受动态工作流灰度控制。
+  {
+    id: "workflow",
+    icon: Workflow,
+    titleId: "automations.pageTab.workflow",
     groupId: "agentCapabilities",
   },
   {
@@ -161,23 +177,30 @@ const BASE_SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
 // 兼容既有只读消费者：默认配置代表不带桌面平台能力的 Web 视图；
 // macOS/Windows/Linux 必须继续通过 createSettingsPageConfig 动态加入 Computer Use。
 export const SETTINGS_SECTIONS = BASE_SETTINGS_SECTIONS.filter(
-  (section) => section.id !== "computerUse" && isSettingsSectionEnabled(section.id),
+  (section) =>
+    section.id !== "computerUse" &&
+    section.id !== "workflow" &&
+    isSettingsSectionEnabled(section.id),
 );
 
 interface SettingsPageConfigOptions {
   isDesktop?: boolean;
   isMacDesktop?: boolean;
   isWindowsDesktop?: boolean;
+  /** 动态工作流灰度；关闭时工作流分区不出现在设置页。 */
+  showWorkflow?: boolean;
 }
 
 export function createSettingsPageConfig({
   isDesktop = false,
   isMacDesktop = false,
   isWindowsDesktop = false,
+  showWorkflow = false,
 }: SettingsPageConfigOptions = {}) {
   const showComputerUse = isDesktop || isMacDesktop || isWindowsDesktop;
   const settingsSections = BASE_SETTINGS_SECTIONS.filter((section) => {
     if (section.id === "computerUse" && !showComputerUse) return false;
+    if (section.id === "workflow" && !showWorkflow) return false;
     return isSettingsSectionEnabled(section.id);
   });
   const settingsSectionGroups = BASE_SETTINGS_SECTION_GROUPS.map((group) => ({

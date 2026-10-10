@@ -606,7 +606,7 @@ body {
 .theme-zai-dark {
   --animated-gradient-text-strong: rgba(255, 255, 255, 1);
   --animated-gradient-text-soft: rgba(255, 255, 255, 0.22);
-  --color-background: #161616;
+  --color-background: #000000;
   --color-background-win-alt: #2b2b2b;
   --color-background-alt: color-mix(in oklab, var(--color-background-win-alt) 60%, transparent);
   --color-brand: #ffffff;
@@ -627,7 +627,7 @@ body {
   --color-selected: rgba(255, 255, 255, 0.1);
   --color-header: #202020;
   --color-panel: #202020;
-  --color-sidebar: #161616;
+  --color-sidebar: #000000;
   --color-surface: rgba(255, 255, 255, 0.05);
   --color-surface-hover: rgba(255, 255, 255, 0.1);
   --color-card: #2b2b2b;

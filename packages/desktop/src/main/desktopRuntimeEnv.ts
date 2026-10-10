@@ -55,12 +55,23 @@ function isTruthyRuntimeEnvOverride(name: string): boolean {
   return value === "1" || value === "true" || value === "yes" || value === "on";
 }
 
+// 运行时身份名（数据目录、单实例锁、遥测 app name）保持历史值 ZCode，
+// 改成 HCode 会让升级后的用户找不到原有会话与设置，因此与界面显示名分开维护。
 // e2e 运行的是生产构建，默认会和本机正式版 ZCode 共用 app name / userData，
 // 触发 Electron 单实例锁后只激活已有窗口，Chromedriver 无法接管测试进程。
 // 这里允许测试显式隔离运行时身份，正常桌面/远控路径保持原来的默认值。
+// 正式版/Preview 的数据目录随 HCode 身份隔离：与 ZCode 共用 userData 会触发同一单实例锁并共享会话库。
+// 开发态保持 ZCode Dev，避免本地已有开发数据被切走。
 export const runtimeApplicationName =
   readRuntimeEnvOverride("ZCODE_DESKTOP_APPLICATION_NAME") ??
-  (isLocalDevelopmentRuntime ? "ZCode Dev" : isPreviewPackagedRuntime ? "ZCode Preview" : "ZCode");
+  (isLocalDevelopmentRuntime ? "ZCode Dev" : isPreviewPackagedRuntime ? "HCode Preview" : "HCode");
+// Linux 桌面入口、图标与可执行文件名保持一致，并按产品区分，避免覆盖已安装的 ZCode 入口。
+export const runtimeLinuxExecutableName = isPreviewPackagedRuntime ? "hcode-preview" : "hcode";
+// 面向用户的应用名（窗口标题、About、进程标题）。与 runtimeApplicationName 解耦，
+// 仅影响显示，不改变 userData 路径。
+export const runtimeDisplayName =
+  readRuntimeEnvOverride("ZCODE_DESKTOP_APPLICATION_NAME") ??
+  (isLocalDevelopmentRuntime ? "HCode Dev" : isPreviewPackagedRuntime ? "HCode Preview" : "HCode");
 // Electron 的 app.getPath("home") 不一定跟随测试进程里的 HOME 覆盖。
 // e2e 默认工作区依赖 home 路径，因此提供显式覆盖，避免测试写到开发者真实 ~/ZCodeProject。
 export const runtimeHomePath = readRuntimeEnvOverride("ZCODE_DESKTOP_HOME_DIR");

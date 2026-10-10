@@ -72,7 +72,7 @@ export interface SystemInfo {
 }
 
 /** 支持的语言 */
-export type Locale = "zh-CN" | "en-US";
+export type Locale = "zh-CN" | "en-US" | "vi-VN";
 
 /** 界面语言偏好；system 表示跟随当前运行端系统语言。 */
 export type LocalePreference = "system" | Locale;
@@ -106,8 +106,23 @@ export interface IntegratedTerminalShellOption {
   source: "system" | "path";
 }
 
-/** 默认语言 */
-export const DEFAULT_LOCALE: Locale = "zh-CN";
+/** 默认语言：界面默认使用越南语。 */
+export const DEFAULT_LOCALE: Locale = "vi-VN";
+
+/**
+ * 系统语言 → 界面语言。英文系统使用 en-US，其余（包括中文系统）使用默认语言，
+ * 界面不再因为系统是中文而切到中文。
+ */
+export function resolveLocaleFromSystemLanguage(language: string): Locale {
+  return language.trim().toLowerCase().startsWith("en") ? "en-US" : DEFAULT_LOCALE;
+}
+
+/**
+ * 只支持中英文的外部页面、接口与 webview 使用：越南语界面回落到英文。
+ */
+export function toZhEnLocale(locale: Locale): "zh-CN" | "en-US" {
+  return locale === "zh-CN" ? "zh-CN" : "en-US";
+}
 
 // ── Workspace / Tab ──
 

@@ -48,7 +48,7 @@ import {
   startSimplifiedFeedbackSubmission,
 } from "@/feedback/feedbackSubmitSubmission.js";
 import type { IFeedbackService } from "@zcode/services";
-import type { IPlatformService } from "@zcode/shared";
+import { toZhEnLocale, type IPlatformService } from "@zcode/shared";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { useTabStore } from "@/store/TabStoreProvider.js";
 import { selectWorkspaceZCodeState, useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
@@ -265,7 +265,7 @@ export function FeedbackSubmitForm({
         ticketSeverity,
         ticketModule,
         modelContext,
-        locale,
+        locale: toZhEnLocale(locale),
         copy: submissionCopy,
         formatMessage: intl.formatMessage,
         onTicketCreated: shouldCloseOnTicketCreated

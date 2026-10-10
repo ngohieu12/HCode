@@ -477,7 +477,7 @@ function LoginPanelLogo() {
     // 登录 logo 壳是固定深色底，边框不能跟随浅色主题 token，否则浅色主题下边框过重。
     <div
       className="relative mb-1 flex size-16 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,#000000_0%,#151718_100%)] text-[#ffffff] shadow-lg/20 before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:border before:border-[rgba(255,255,255,0.1)]"
-      aria-label="ZCode"
+      aria-label="HCode"
       role="img"
     >
       <ZCodeAboutLogo className="h-auto w-10" />
@@ -537,8 +537,8 @@ function getProviderPriority(provider: OAuthProviderMeta): number {
 }
 
 function resolveVisibleLoginProviders(providers: OAuthProviderMeta[]): OAuthProviderMeta[] {
-  // ZAI / BigModel 现在共享 App 登录事实源，未登录时登录入口必须同时展示两个入口。
-  // 不能临时隐藏 BigModel，否则用户无法主动选择 BigModel 作为 active provider。
+  // 登录入口只展示 oauthService 返回的已启用 provider（adapter.meta.enabled）。
+  // 当前仅 Z.ai 默认启用；BigModel 默认关闭，由 services 层的 OAuth 运行时配置统一控制。
   return [...providers].sort((left, right) => {
     return getProviderPriority(left) - getProviderPriority(right);
   });

@@ -155,7 +155,7 @@ import {
   resolveRemoteAssetDirs,
   resolveZCodeEndpointEnvBaseOrigin,
   desktopRuntimeEnv,
-  runtimeApplicationName,
+  runtimeDisplayName,
   runtimeHomePath,
   runtimeSessionDataPath,
   runtimeUserDataPath,
@@ -258,7 +258,7 @@ if (!app.isPackaged && process.env.ZCODE_DISABLE_FIXED_REMOTE_DEBUGGING_PORT !==
   app.commandLine.appendSwitch("remote-debugging-port", "9229");
 }
 
-app.setName(runtimeApplicationName);
+app.setName(runtimeDisplayName);
 if (runtimeHomePath) {
   app.setPath("home", runtimeHomePath);
 }
@@ -271,7 +271,7 @@ if (!shouldUseElectronDefaultUserDataPath) {
   app.setPath("userData", runtimeUserDataPath);
   app.setPath("sessionData", runtimeSessionDataPath);
 }
-process.title = runtimeApplicationName;
+process.title = runtimeDisplayName;
 
 process.on("unhandledRejection", (reason) => {
   logger.error("unhandledRejection:", reason);
@@ -1989,6 +1989,7 @@ app.whenReady().then(async () => {
   installFinderOpenFolderWorkflow({
     platform: process.platform,
     locale: currentApplicationLocale,
+    productName: runtimeDisplayName,
     homeDir: app.getPath("home"),
     logger,
   });
@@ -1998,6 +1999,7 @@ app.whenReady().then(async () => {
     argv: process.argv,
     isDefaultApp: Boolean(process.defaultApp),
     locale: currentApplicationLocale,
+    productName: runtimeDisplayName,
     logger,
   });
   try {
@@ -2107,6 +2109,7 @@ app.whenReady().then(async () => {
       installFinderOpenFolderWorkflow({
         platform: process.platform,
         locale: currentApplicationLocale,
+        productName: runtimeDisplayName,
         homeDir: app.getPath("home"),
         logger,
       });
@@ -2118,6 +2121,7 @@ app.whenReady().then(async () => {
         argv: process.argv,
         isDefaultApp: Boolean(process.defaultApp),
         locale: currentApplicationLocale,
+        productName: runtimeDisplayName,
         logger,
       });
       configureDockMenu(

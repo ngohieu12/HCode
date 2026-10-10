@@ -33,9 +33,9 @@ and [`scripts/remote-native-search-tools-config.mjs`](../../../scripts/remote-na
 
 Remote packaging uses `resolveRemoteNativeSearchPrebuiltPlan` to retain the
 deployed macOS rg13 contract. Its component versions come from the same plan as
-the extracted archives; the default Desktop / SEA / server-cli plan continues to use rg14.
+the extracted archives; the default Desktop / SEA plan continues to use rg14.
 
-Desktop, CLI SEA, server-cli staging and remote asset packaging resolve these
+Desktop, CLI SEA and remote asset packaging resolve these
 archives relative to the repository, independently of the current working
 directory. Native search preparation does not download archives or fall back to
 a mirror. Other build dependencies retain their own preparation steps.
@@ -54,7 +54,7 @@ node scripts/prepare-native-search-tools.mjs --platform linux --arch x64 --outpu
 # Package the CLI, including the prepared target tools.
 pnpm build:sea
 
-# Verify archives, server-cli staging, SEA assets, and remote component packaging.
+# Verify archives, SEA assets, and remote component packaging.
 node --test scripts/native-search-tools.test.mjs
 ```
 

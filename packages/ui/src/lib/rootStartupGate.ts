@@ -41,7 +41,10 @@ export function shouldShowRootStartupLoading(state: RootStartupLoadingVisibility
 }
 
 export function shouldEnableProviderAvailabilityLoginEntryGuard(): boolean {
-  return true;
+  // 桌面端启动不再因为“未登录且没有可用 Provider”或缺少 providerFamilyDomain 而自动打开
+  // WelcomeScreen（Z.AI / BigModel 登录页）。启动直接进入工作区；需要登录时仍可通过
+  // 设置页或侧边栏的登录入口手动进入，JWT 失效的重新登录提示也保持不变。
+  return false;
 }
 
 export function shouldResolveProviderStartupState(state: ProviderStartupResolutionState): boolean {

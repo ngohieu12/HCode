@@ -4,13 +4,7 @@ import { join } from "node:path";
 import { spawn } from "node:child_process";
 import type { Locale } from "@zcode/shared";
 
-const WORKFLOW_NAME = "Open in ZCode.workflow";
-const WORKFLOW_BUNDLE_ID = "dev.zcode.app.finder-open-workflow";
-const WORKFLOW_VERSION = "5";
-const SERVICES_MENU_LABELS: Record<Locale, string> = {
-  "zh-CN": "在ZCode中打开",
-  "en-US": "Open in ZCode",
-};
+const WORKFLOW_VERSION = "6";
 
 const workflowScript = `first=""
 for item in "$@"; do
@@ -35,12 +29,23 @@ function escapeXml(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function getServicesMenuLabel(locale: Locale): string {
-  return SERVICES_MENU_LABELS[locale] ?? SERVICES_MENU_LABELS["en-US"];
+// 每个产品使用独立的 Services 条目（workflow 目录名与 bundle id 都带产品名），
+// 否则 HCode 会覆盖 ZCode 已安装的 Finder 服务，两者无法并存。
+function getWorkflowName(productName: string): string {
+  return `Open in ${productName}.workflow`;
 }
 
-function buildInfoPlist(locale: Locale): string {
-  const servicesMenuName = escapeXml(getServicesMenuLabel(locale));
+function getWorkflowBundleId(productName: string): string {
+  const slug = productName.trim().toLowerCase().replace(/\s+/g, "-");
+  return `dev.hcode.app.finder-open-workflow-${slug}`;
+}
+
+function getServicesMenuLabel(locale: Locale, productName: string): string {
+  return locale === "zh-CN" ? `在${productName}中打开` : `Open in ${productName}`;
+}
+
+function buildInfoPlist(locale: Locale, productName: string): string {
+  const servicesMenuName = escapeXml(getServicesMenuLabel(locale, productName));
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -51,7 +56,7 @@ function buildInfoPlist(locale: Locale): string {
   <key>CFBundleExecutable</key>
   <string></string>
   <key>CFBundleIdentifier</key>
-  <string>${WORKFLOW_BUNDLE_ID}</string>
+  <string>${getWorkflowBundleId(productName)}</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundleName</key>
@@ -248,6 +253,8 @@ function refreshMacServicesIndex(): void {
 export function installFinderOpenFolderWorkflow(options: {
   platform: NodeJS.Platform;
   locale: Locale;
+  // 产品显示名（如 HCode / HCode Preview），决定 Services 条目名称和安装目录。
+  productName: string;
   homeDir?: string;
   logger: { info: (...args: unknown[]) => void; warn: (...args: unknown[]) => void };
   refreshServicesIndex?: () => void;
@@ -257,7 +264,7 @@ export function installFinderOpenFolderWorkflow(options: {
   }
 
   const servicesDir = join(options.homeDir ?? homedir(), "Library", "Services");
-  const workflowDir = join(servicesDir, WORKFLOW_NAME);
+  const workflowDir = join(servicesDir, getWorkflowName(options.productName));
   const contentsDir = join(workflowDir, "Contents");
   const resourcesDir = join(contentsDir, "Resources");
   const infoPlistPath = join(contentsDir, "Info.plist");
@@ -267,7 +274,10 @@ export function installFinderOpenFolderWorkflow(options: {
   try {
     mkdirSync(resourcesDir, { recursive: true });
 
-    const infoChanged = writeFileIfChanged(infoPlistPath, buildInfoPlist(options.locale));
+    const infoChanged = writeFileIfChanged(
+      infoPlistPath,
+      buildInfoPlist(options.locale, options.productName),
+    );
     const workflowContent = buildDocumentWorkflow();
     const workflowChanged = writeFileIfChanged(documentWorkflowPath, workflowContent);
     // 用户 Automator workflow 通常读取 Contents/document.wflow；
