@@ -61,7 +61,10 @@ function V4ComposerModeSwitchImpl({
   const modeShortcutLabel = useShortcutCommandLabel("cycleSessionMode");
   const modes = getZCodeAgentAvailableModes();
   const permissions = modes.filter((mode) => mode.id !== "plan");
-  const selected = permissions.find((mode) => mode.id === draftConfig?.mode);
+  // 新菜单隐藏 Edit，但历史草稿仍可回显，不能因候选变化隐藏整个权限入口。
+  const selected =
+    permissions.find((mode) => mode.id === draftConfig?.mode) ??
+    (draftConfig?.mode === "edit" ? { id: "edit", name: "Edit" } : undefined);
   const label = (mode: (typeof modes)[number]) =>
     getModeOptionDisplayLabel(intl, displayProvider, { value: mode.id, name: mode.name });
   const plan = modes.find((mode) => mode.id === "plan")!;
