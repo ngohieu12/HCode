@@ -1,10 +1,15 @@
+import {
+  CODE_PREVIEW_DARK_THEME,
+  CODE_PREVIEW_LIGHT_THEME,
+  CODE_PREVIEW_SHIKI_THEMES,
+} from "@/lib/codePreviewSettings.js";
 /*
  * Derived from vercel/ai-elements (packages/elements/src/message.tsx).
  * Copyright 2023 Vercel, Inc. Licensed under Apache-2.0.
  * Modified by ZCode: local integration, formatting and adaptations.
  * See THIRD-PARTY-NOTICES.md in the repository root for license and provenance.
  */
-"use client";
+("use client");
 
 import { Button } from "../ui/button.js";
 import { ButtonGroup, ButtonGroupText } from "../ui/button-group.js";
@@ -839,19 +844,16 @@ const messageDefaultRemarkPlugins: PluggableList = Object.entries(defaultRemarkP
   },
 );
 
-function resolveMessageCodeTheme(
-  theme: Theme,
-  codePreviewSettings: { lightTheme: BundledTheme; darkTheme: BundledTheme },
-): BundledTheme {
+function resolveMessageCodeTheme(theme: Theme): BundledTheme {
   if (theme === "system" && typeof window !== "undefined") {
     return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? codePreviewSettings.darkTheme
-      : codePreviewSettings.lightTheme;
+      ? CODE_PREVIEW_DARK_THEME
+      : CODE_PREVIEW_LIGHT_THEME;
   }
 
   return theme === "dark" || theme === "zai-dark"
-    ? codePreviewSettings.darkTheme
-    : codePreviewSettings.lightTheme;
+    ? CODE_PREVIEW_DARK_THEME
+    : CODE_PREVIEW_LIGHT_THEME;
 }
 
 export function buildMessageStreamdownRenderKey(params: {
@@ -1384,18 +1386,8 @@ export const MessageResponse = memo(
       }),
       [renderStreaming, streamdownMode, targetMarkdown.length],
     );
-    const codeBlockTheme = useMemo(
-      () => resolveMessageCodeTheme(theme, codePreviewSettings),
-      [codePreviewSettings, theme],
-    );
-    const shikiTheme = useMemo(
-      () =>
-        [codePreviewSettings.lightTheme, codePreviewSettings.darkTheme] as [
-          BundledTheme,
-          BundledTheme,
-        ],
-      [codePreviewSettings.lightTheme, codePreviewSettings.darkTheme],
-    );
+    const codeBlockTheme = useMemo(() => resolveMessageCodeTheme(theme), [theme]);
+    const shikiTheme = CODE_PREVIEW_SHIKI_THEMES;
     const streamdownRenderKey = useMemo(() => {
       return (
         buildMessageStreamdownRenderKey({

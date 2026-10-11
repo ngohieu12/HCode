@@ -56,6 +56,27 @@ export interface TreemappingSidePaneTab {
   source?: TreemappingSidePaneSource;
 }
 
+export interface FileTreeSidePaneTarget {
+  workspacePath: string;
+  workspaceName: string;
+  workspaceIdentity?: string;
+  workspaceRemoteSessionId?: string;
+  revealPath?: string;
+  temporaryExternalDirectory?: boolean;
+}
+
+/** 文件树 tab 是 workspace 级单例，id 固定，重复打开只替换 target。 */
+export const FILE_TREE_SIDE_PANE_TAB_ID = "file-tree";
+
+export interface FileTreeSidePaneTab {
+  id: typeof FILE_TREE_SIDE_PANE_TAB_ID;
+  type: "file-tree";
+  ownerTaskId?: string | null;
+  workspaceKey?: string | null;
+  openedAt?: number;
+  target: FileTreeSidePaneTarget;
+}
+
 export interface WhiteboardSidePaneTab {
   id: string;
   type: "whiteboard";
@@ -519,6 +540,7 @@ export type WorkspaceSidePaneTab =
   | GitSidePaneTab
   | CodeViewerSidePaneTab
   | TreemappingSidePaneTab
+  | FileTreeSidePaneTab
   | WhiteboardSidePaneTab
   | ModelTrajectorySidePaneTab
   | DeveloperToolsSidePaneTab
@@ -1055,6 +1077,7 @@ const WORKSPACE_GLOBAL_SIDE_PANE_TAB_TYPES = new Set<WorkspaceSidePaneTab["type"
   "git",
   "developer-tools",
   "treemapping",
+  "file-tree",
 ]);
 
 function isWorkspaceGlobalSidePaneTab(tab: WorkspaceSidePaneTab): boolean {
@@ -1558,6 +1581,19 @@ export function activateGitSidePane(
   current: WorkspaceSidePaneState | null,
 ): WorkspaceSidePaneState {
   return activateSidePaneTab(current, createGitSidePaneTab());
+}
+
+/** 打开或激活文件树 tab；target 变化时整体替换，保证树的根与 reveal 路径与最近一次点击一致。 */
+export function openFileTreeSidePane(
+  current: WorkspaceSidePaneState | null,
+  target: FileTreeSidePaneTarget,
+): WorkspaceSidePaneState {
+  return activateSidePaneTab(current, {
+    id: FILE_TREE_SIDE_PANE_TAB_ID,
+    type: "file-tree",
+    openedAt: Date.now(),
+    target,
+  });
 }
 
 export function openWhiteboardSidePane(

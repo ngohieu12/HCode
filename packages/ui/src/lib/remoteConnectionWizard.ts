@@ -126,6 +126,9 @@ export function buildRemoteTarget(
           container: dockerContainer,
         },
       };
+    case "server":
+      // 当前 UI 没有 server 连接表单，表单不会产生此 kind；空结果会落到调用方的通用连接失败提示。
+      return {};
     case "wsl": {
       const wslUser = snapshot.wslUser?.trim();
       if (wslUser && !isValidWslUser(wslUser)) {

@@ -149,6 +149,11 @@ export interface WorkspaceZCodeUIState {
   /** 当前 workspace 激活中的 task */
   activeTaskId: string | null;
   /**
+   * 用户通过「关闭会话」主动收起了当前会话：主区显示空态而不是草稿输入框。
+   * 仅由 closeActiveConversation 置位；选中会话或新建草稿时清除。仅内存态，不持久化。
+   */
+  conversationClosed: boolean;
+  /**
    * ZCode Agent 的 workspace 初始化状态。
    *
    * 单 ZCode Agent 迁移后继续按 provider 分桶会保留多份已经不会再被真实运行时更新的旧状态，
@@ -221,6 +226,8 @@ export interface ZCodeSessionStoreState {
   getWorkspaceState: (workspacePath: string, workspaceIdentity?: string) => WorkspaceZCodeUIState;
 
   setActiveTaskId: (workspacePath: string, id: string | null, workspaceIdentity?: string) => void;
+  /** 关闭当前会话（仅从主区移开，不归档不删除，也不创建草稿）。 */
+  closeActiveConversation: (workspacePath: string, workspaceIdentity?: string) => void;
   promoteGroupedDraftTask: (
     workspacePath: string,
     taskId: string,
@@ -513,6 +520,7 @@ export function createDefaultWorkspaceState(
 ): WorkspaceZCodeUIState {
   return {
     activeTaskId: null,
+    conversationClosed: false,
     workspaceInit: { ...DEFAULT_WORKSPACE_INIT_STATE },
     draftRuntime: { status: "idle", error: null },
     draftSessionId: null,

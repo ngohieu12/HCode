@@ -64,7 +64,7 @@ export function useCuaComposerEntry({
   // 默认隐藏：只有显式存过 false 才展示。
   // 用 !== false 而不是 === true，是因为 settings 未加载（null）或老用户缺该字段时都应按
   // 隐藏处理——若反过来默认展示，新用户会先闪一下按钮再消失，且后台白跑一轮权限查询。
-  const hiddenBySettings = settings?.computerUseComposerEntryHidden !== false;
+  const hiddenBySettings = settings?.computerUseComposerEntryHidden === true;
 
   const plugins = usePluginManagementStore((state) => state.plugins);
   const togglingPluginId = usePluginManagementStore((state) => state.togglingPluginId);

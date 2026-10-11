@@ -5,16 +5,30 @@
  * 后所有消费方自动重算；不引入独立的 store/广播通道。
  */
 import { useMemo } from "react";
-import { type ShortcutCommandId } from "@zcode/shared";
+import {
+  DEFAULT_COMPOSER_ENTER_BEHAVIOR,
+  type ComposerEnterBehavior,
+  type ShortcutCommandId,
+} from "@zcode/shared";
 import { useSettings } from "@/hooks/useSettingService.js";
 import { resolveEffectiveShortcutBindings, type EffectiveShortcutBindings } from "./bindings.js";
 import { formatShortcutBindingLabel } from "./label.js";
+
+/** 当前输入框 Enter 模式；未写入设置时取默认（Enter 换行）。 */
+export function useComposerEnterBehavior(): ComposerEnterBehavior {
+  const { settings } = useSettings();
+  return settings?.composerEnterBehavior ?? DEFAULT_COMPOSER_ENTER_BEHAVIOR;
+}
 
 /** 当前生效的快捷键表（默认 + 用户覆盖合并后的只读视图）。 */
 export function useEffectiveShortcutBindings(): EffectiveShortcutBindings {
   const { settings } = useSettings();
   const overrides = settings?.shortcutBindings;
-  return useMemo(() => resolveEffectiveShortcutBindings(overrides), [overrides]);
+  const composerEnterBehavior = settings?.composerEnterBehavior ?? DEFAULT_COMPOSER_ENTER_BEHAVIOR;
+  return useMemo(
+    () => resolveEffectiveShortcutBindings(overrides, composerEnterBehavior),
+    [overrides, composerEnterBehavior],
+  );
 }
 
 /**

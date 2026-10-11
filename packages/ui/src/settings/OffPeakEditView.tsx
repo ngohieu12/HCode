@@ -37,11 +37,9 @@ import {
 import { SettingsBreadcrumbReporter } from "@/settings/SettingsHeaderBreadcrumb.js";
 import { OffPeakEditActionsMenu } from "@/settings/OffPeakEditActionsMenu.js";
 import { OffPeakHistoryTab } from "@/settings/OffPeakHistoryTab.js";
-import { AutomationSwitchToggle } from "@/settings/AutomationSwitchToggle.js";
 import { cn } from "@/components/lib/utils.js";
 import { SETTINGS_FRAME_CONTENT_CLASSNAME } from "@/settings/SettingsPageParts.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
-import { useSettings } from "@/hooks/useSettingService.js";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog.js";
 import {
   AUTOMATION_DEFAULT_MODE,
@@ -131,7 +129,6 @@ export function OffPeakEditView({
   showToast = toast,
 }: OffPeakEditViewProps) {
   const { intl } = useZCodeIntl();
-  const { settings, update: updateSettings } = useSettings();
   const confirmDialog = useConfirmDialog();
   const localWorkspaceOptions = useAutomationProjectOptions();
   const preferredLocalWorkspace =
@@ -287,7 +284,6 @@ export function OffPeakEditView({
     if (confirmed) onBack();
   }, [confirmDialog, dirty, intl, onBack]);
 
-  const keepAwake = settings?.keepAwakeWhileRunning ?? false;
   // queued/paused 全字段可编辑；running 起锁定编辑、终态只读。
   const readOnly = Boolean(editing && editing.status !== "queued" && editing.status !== "paused");
   readOnlyRef.current = readOnly;
@@ -396,23 +392,6 @@ export function OffPeakEditView({
         </div>
       ) : null}
 
-      <div className="flex min-w-0 flex-wrap items-center gap-4 sm:flex-nowrap">
-        <div className="flex shrink-0 items-center gap-2">
-          <AutomationSwitchToggle
-            checked={keepAwake}
-            ariaLabel={intl.formatMessage({
-              id: "offPeak.form.keepAwakeLabel",
-            })}
-            onChange={(value) => void updateSettings({ keepAwakeWhileRunning: value })}
-            color="blue"
-            size="sm"
-          />
-          <span className="text-ui-base text-foreground-subtle">
-            {intl.formatMessage({ id: "offPeak.form.keepAwakeLabel" })}
-          </span>
-        </div>
-      </div>
-
       {/* Settings/History 分段 tab（左）+ 创建按钮（右上）；与定时任务编辑页同款分段样式。 */}
       <div className="flex items-center justify-between">
         <AutomationSettingsHistoryTabs
@@ -456,15 +435,6 @@ export function OffPeakEditView({
           </div>
         ) : null}
       </div>
-
-      {editing && tab === "settings" ? (
-        <div className="flex min-h-11 items-center gap-3 rounded-[10px] bg-surface px-3 py-3 text-ui-base leading-5 text-foreground-subtle sm:py-0">
-          <span className="flex size-5 shrink-0 items-center justify-center" aria-hidden="true">
-            <AutomationInfoIcon className="size-4" aria-hidden="true" />
-          </span>
-          {intl.formatMessage({ id: "offPeak.keepAwakeBanner" })}
-        </div>
-      ) : null}
 
       {tab === "history" ? (
         <OffPeakHistoryTab

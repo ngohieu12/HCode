@@ -1776,6 +1776,7 @@ function ConversationTimelineImpl({
         >
           {renderUnits.length === 0 && !headerSlot ? (
             <div
+              data-centered-draft={centeredEmptyLayout ? "true" : undefined}
               className={cn(
                 centeredEmptyLayout
                   ? "flex w-full max-w-2xl shrink-0 items-center justify-center"

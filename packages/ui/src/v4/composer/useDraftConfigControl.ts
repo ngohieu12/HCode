@@ -240,7 +240,7 @@ export function useDraftConfigControl(params: {
         modelSelection: next.modelSelection,
         // 用户已经显式改选，不能再由导入时等待的默认初始化覆盖。
         ...(current.initializeFromNewTask
-          ? { mode: mode.success ? mode.data : "build", initializeFromNewTask: undefined }
+          ? { mode: mode.success ? mode.data : "yolo", initializeFromNewTask: undefined }
           : {}),
       }));
     },

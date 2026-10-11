@@ -1,5 +1,5 @@
 /* oxlint-disable eslint(max-lines) */
-import { ArrowLeft, Rocket, type LucideIcon } from "lucide-react";
+import { ArrowLeft, type LucideIcon } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -16,7 +16,9 @@ import type {
   UsageEntitlementSnapshot,
   UserInfo,
   ZCodeInteractionBehavior,
+  ComposerEnterBehavior,
 } from "@zcode/shared";
+import { DEFAULT_COMPOSER_ENTER_BEHAVIOR } from "@zcode/shared";
 import {
   BUILTIN_MODEL_PROVIDER_IDS,
   TID_SETTINGS_BACK_BUTTON,
@@ -41,7 +43,6 @@ import {
   consumeInitialSettingsSection,
   consumePendingSettingsPluginOrigin,
   consumePendingSettingsPluginScopeKey,
-  consumePendingSettingsPluginTab,
   consumePendingSettingsModelProviderTarget,
   consumePendingSettingsUsageTab,
   resolveSettingsSection,
@@ -108,6 +109,7 @@ import {
   resolveSettingsSectionForPlatform,
 } from "./settingsPageHelpers.js";
 import { AppearanceSectionContent } from "./settingsCodePreview.js";
+import { AccountSettingsGroup } from "./settings/AccountSettingsGroup.js";
 import type { SettingsSectionId } from "@/lib/settingsNavigation.js";
 import { requestPluginStoreOpen, type PluginStoreOpenTarget } from "@/lib/pluginStoreNavigation.js";
 import {
@@ -325,7 +327,6 @@ export function SettingsPage({
     writeLastSettingsSectionPreference(visibleInitialSection);
     return visibleInitialSection;
   });
-  const [pluginTab, setPluginTab] = useState(() => consumePendingSettingsPluginTab());
   const [pluginNavigationOrigin, setPluginNavigationOrigin] = useState(() =>
     consumePendingSettingsPluginOrigin(),
   );
@@ -342,12 +343,8 @@ export function SettingsPage({
   const [settingsBreadcrumbItems, setSettingsBreadcrumbItems] = useState<
     readonly SettingsBreadcrumbItem[]
   >([]);
-  const interfaceMode = useZCodeStore((state) => state.interfaceMode);
-  const setInterfaceMode = useZCodeStore((state) => state.setInterfaceMode);
   const theme = useZCodeStore((state) => state.theme);
   const setTheme = useZCodeStore((state) => state.setTheme);
-  const codePreviewSettings = useZCodeStore((state) => state.codePreviewSettings);
-  const setCodePreviewSettings = useZCodeStore((state) => state.setCodePreviewSettings);
   const uiFontSizePx = useZCodeStore((state) => state.uiFontSizePx);
   const setUiFontSizePx = useZCodeStore((state) => state.setUiFontSizePx);
   const notificationEnabled = useZCodeStore((state) => state.notificationEnabled);
@@ -596,8 +593,6 @@ export function SettingsPage({
         : "app",
     );
   }, [selectedUsageCodingPlanSource, usageActiveTab, usageCodingPlanSources]);
-  const setNewUserOnboardingOpen = useZCodeStore((state) => state.setNewUserOnboardingOpen);
-  const requestOnboardingDialog = () => setNewUserOnboardingOpen(true);
   const setActiveSettingsSection = useCallback(
     (section: SettingsSectionId, fallbackSection: SettingsSectionId = activeSection) => {
       const resolvedSection = resolveSettingsSection(section, fallbackSection);
@@ -676,7 +671,6 @@ export function SettingsPage({
   );
   const selectDirectory = useSelectDirectory();
   const services = useServices();
-  const onboardingRecordService = services.onboardingRecordService;
   const localHostServices = useBaseWorkspaceServices();
   const { settings: sharedSettings, update: updateSharedSettings } = useSettings();
   const memoryWorkspaceDisplayNames = useMemo(() => {
@@ -693,7 +687,7 @@ export function SettingsPage({
     }
     return [...names];
   }, [sharedSettings?.recentProjects, workspaceTabs]);
-  const memoryEnabled = sharedSettings?.memoryEnabled === true;
+  const memoryEnabled = sharedSettings?.memoryEnabled ?? true;
   const nativeSearchEnhancementsEnabled = sharedSettings?.nativeSearchEnhancementsEnabled !== false;
   const askUserQuestionAutoResolutionEnabled =
     sharedSettings?.askUserQuestionAutoResolutionEnabled !== false;
@@ -711,7 +705,7 @@ export function SettingsPage({
   const [httpProxyCaCertPath, setHttpProxyCaCertPath] = useState("");
   const [embeddedBrowserAllowInsecureCertificates, setEmbeddedBrowserAllowInsecureCertificates] =
     useState(false);
-  const [taskAutoArchiveEnabled, setTaskAutoArchiveEnabled] = useState(false);
+  const [taskAutoArchiveEnabled, setTaskAutoArchiveEnabled] = useState(true);
   const [taskAutoArchiveOlderThanDays, setTaskAutoArchiveOlderThanDays] = useState(7);
   const [closeToTrayOnWindows, setCloseToTrayOnWindows] = useState(true);
   const [
@@ -721,10 +715,10 @@ export function SettingsPage({
   const [receivePreviewUpdates, setReceivePreviewUpdates] = useState(false);
   const [autoDownloadAndInstallUpdates, setAutoDownloadAndInstallUpdates] = useState(false);
   const [messageStreamShowReasoning, setMessageStreamShowReasoning] = useState(true);
-  const [messageStreamShowTodos, setMessageStreamShowTodos] = useState(false);
+  const [messageStreamShowTodos, setMessageStreamShowTodos] = useState(true);
   const [toolGroupingExploreEnabled, setToolGroupingExploreEnabled] = useState(true);
   const [toolGroupingTerminalEnabled, setToolGroupingTerminalEnabled] = useState(true);
-  const [toolGroupingChangesEnabled, setToolGroupingChangesEnabled] = useState(false);
+  const [toolGroupingChangesEnabled, setToolGroupingChangesEnabled] = useState(true);
   const [zcodeInteractionBehavior, setZCodeInteractionBehavior] =
     useState<ZCodeInteractionBehavior>("queue");
   const [defaultHomeDir, setDefaultHomeDir] = useState("");
@@ -767,7 +761,6 @@ export function SettingsPage({
           setUsageActiveTab(detail.usageTab);
         }
         if (resolveSettingsSection(section) === "plugin" && detail?.pluginTab) {
-          setPluginTab(detail.pluginTab);
           setPluginNavigationOrigin(detail.pluginOrigin);
           setPluginScopeKey(detail.pluginScopeKey);
         } else if (resolveSettingsSection(section) !== "plugin") {
@@ -796,7 +789,7 @@ export function SettingsPage({
         setEmbeddedBrowserAllowInsecureCertificates(
           settings.embeddedBrowserAllowInsecureCertificates ?? false,
         );
-        setTaskAutoArchiveEnabled(settings.taskAutoArchiveEnabled ?? false);
+        setTaskAutoArchiveEnabled(settings.taskAutoArchiveEnabled ?? true);
         setTaskAutoArchiveOlderThanDays(settings.taskAutoArchiveOlderThanDays ?? 7);
         setCloseToTrayOnWindows(settings.closeToTrayOnWindows ?? true);
         setDesktopChromiumHardwareAccelerationEnabled(
@@ -805,10 +798,10 @@ export function SettingsPage({
         setReceivePreviewUpdates(settings.receivePreviewUpdates ?? false);
         setAutoDownloadAndInstallUpdates(settings.autoDownloadAndInstallUpdates ?? false);
         setMessageStreamShowReasoning(settings.messageStreamShowReasoning ?? true);
-        setMessageStreamShowTodos(settings.messageStreamShowTodos ?? false);
+        setMessageStreamShowTodos(settings.messageStreamShowTodos ?? true);
         setToolGroupingExploreEnabled(settings.toolGroupingExploreEnabled ?? true);
         setToolGroupingTerminalEnabled(settings.toolGroupingTerminalEnabled ?? true);
-        setToolGroupingChangesEnabled(settings.toolGroupingChangesEnabled ?? false);
+        setToolGroupingChangesEnabled(settings.toolGroupingChangesEnabled ?? true);
         setZCodeInteractionBehavior(settings.zcodeInteractionBehavior ?? "queue");
       })
       .catch(() => {});
@@ -838,10 +831,10 @@ export function SettingsPage({
       return;
     }
     setMessageStreamShowReasoning(sharedSettings.messageStreamShowReasoning ?? true);
-    setMessageStreamShowTodos(sharedSettings.messageStreamShowTodos ?? false);
+    setMessageStreamShowTodos(sharedSettings.messageStreamShowTodos ?? true);
     setToolGroupingExploreEnabled(sharedSettings.toolGroupingExploreEnabled ?? true);
     setToolGroupingTerminalEnabled(sharedSettings.toolGroupingTerminalEnabled ?? true);
-    setToolGroupingChangesEnabled(sharedSettings.toolGroupingChangesEnabled ?? false);
+    setToolGroupingChangesEnabled(sharedSettings.toolGroupingChangesEnabled ?? true);
     setZCodeInteractionBehavior(sharedSettings.zcodeInteractionBehavior ?? "queue");
     setReceivePreviewUpdates(sharedSettings.receivePreviewUpdates ?? false);
     setAutoDownloadAndInstallUpdates(sharedSettings.autoDownloadAndInstallUpdates ?? false);
@@ -946,12 +939,6 @@ export function SettingsPage({
         trigger: "switch",
         operation: async () => {
           await updateSharedSettings({ memoryEnabled: enabled });
-          // 手动修改反向回写 record，换号同步不会复活旧值；失败不阻塞开关。
-          await onboardingRecordService
-            ?.updateRecordPreferences({ memoryEnabled: enabled })
-            .catch((cause: unknown) => {
-              console.warn("[settings] 回写引导记录失败", String(cause));
-            });
         },
         completed: {
           resultSource: "shared_settings",
@@ -1279,6 +1266,18 @@ export function SettingsPage({
     },
     [updateSharedSettings],
   );
+  const handleComposerEnterBehaviorChange = useCallback(
+    async (behavior: ComposerEnterBehavior) => {
+      await runSettingsActionAsync({
+        featureId: "settings.conversation",
+        action: "change_composer_enter_behavior",
+        trigger: "select",
+        operation: () => updateSharedSettings({ composerEnterBehavior: behavior }),
+        completed: { resultSource: "shared_settings", valueAfter: behavior },
+      });
+    },
+    [updateSharedSettings],
+  );
   const handleFooterLocaleChange = useCallback(
     (value: string) => {
       if (value === "system") {
@@ -1319,34 +1318,6 @@ export function SettingsPage({
       }
     },
     [setTheme],
-  );
-  const handleCodePreviewSettingsChange = useCallback(
-    (patch: Parameters<typeof setCodePreviewSettings>[0]) => {
-      const [key] = Object.keys(patch);
-      const action =
-        key === "lightTheme"
-          ? "change_code_light_theme"
-          : key === "darkTheme"
-            ? "change_code_dark_theme"
-            : key === "showLineNumbers"
-              ? "toggle_code_line_numbers"
-              : key === "wrapLongLines"
-                ? "toggle_code_line_wrap"
-                : "change_code_font_size";
-      const value = Object.values(patch)[0];
-      return runUserAction({
-        input: { featureId: "settings.appearance", action, trigger: "select" },
-        operation: () => setCodePreviewSettings(patch),
-        completed: {
-          resultSource: "local_commit",
-          ...(typeof value === "boolean"
-            ? { stateAfter: value ? ("enabled" as const) : ("disabled" as const) }
-            : { valueAfter: String(value) }),
-        },
-        failureStage: "local_commit",
-      });
-    },
-    [setCodePreviewSettings],
   );
   const activeSectionMeta = settingsSections.find((section) => section.id === activeSection);
   // 灰度裁决异步到达：sections 列表可能在挂载后变化（如 computerUse 区被灰度移除）。
@@ -1523,45 +1494,15 @@ export function SettingsPage({
                     );
                   })}
                 </div>
-
-                <SettingsSidebarButton
-                  icon={Rocket}
-                  label={intl.formatMessage({ id: "settings.onboarding" })}
-                  className="mt-4 border border-dashed border-border hover:border-border-hover"
-                  onClick={() => {
-                    runUserAction({
-                      input: {
-                        featureId: "settings.navigation",
-                        action: "open_onboarding",
-                        trigger: "button",
-                      },
-                      operation: requestOnboardingDialog,
-                      completed: { resultSource: "local_commit" },
-                      failureStage: "dialog_open",
-                    });
-                  }}
-                >
-                  <span className="text-ui-base text-foreground">
-                    {intl.formatMessage({ id: "settings.onboarding" })}
-                  </span>
-                </SettingsSidebarButton>
               </nav>
 
               <div className="max-lg:hidden">
                 <WorkspaceSidebarFooter
-                  theme={theme}
-                  localeMenuValue={localePreference}
-                  onLocaleChange={handleFooterLocaleChange}
-                  onThemeChange={handleFooterThemeChange}
                   onSettingsButtonClick={onBack}
-                  onUsageClick={handleOpenUsageSettings}
-                  onUpgradeClick={handleOpenCodingPlanUpgradeSettings}
-                  onLogin={onLogin}
-                  onLogout={onLogout}
+                  // 设置页内账户按钮不再弹菜单，统一跳到“通用”分区里的账户分组。
+                  onAccountClick={() => setActiveSettingsSection("general")}
                   settingsButtonMode="back"
                   user={user}
-                  // 头像菜单是 WorkspaceSidebarFooter 的共享菜单，Settings 场景不能丢失桌面平台能力。
-                  // 之前这里没透传 isDesktop，导致同一个头像菜单在设置页缺少界面缩放入口。
                   isDesktop={isDesktop}
                 />
               </div>
@@ -1670,17 +1611,26 @@ export function SettingsPage({
                       </div>
                       <div className="space-y-8">
                         {activeSection === "general" ? (
+                          <AccountSettingsGroup
+                            user={user}
+                            workspacePath={activeWorkspacePath ?? undefined}
+                            workspaceIdentity={activeWorkspaceIdentity}
+                            onLogin={onLogin}
+                            onLogout={onLogout}
+                            onOpenUsage={handleOpenUsageSettings}
+                            onUpgrade={handleOpenCodingPlanUpgradeSettings}
+                          />
+                        ) : null}
+                        {activeSection === "general" ? (
                           <GeneralSectionContent
                             localePreference={localePreference}
-                            interfaceMode={interfaceMode}
-                            setInterfaceMode={setInterfaceMode}
                             isDesktop={isDesktop}
                             isWindowsDesktop={isWindowsDesktop}
                             platform={platform}
                             notificationEnabled={notificationEnabled}
                             notificationSoundEnabled={notificationSoundEnabled}
                             closeToTrayOnWindows={closeToTrayOnWindows}
-                            keepAwakeWhileRunning={sharedSettings?.keepAwakeWhileRunning ?? false}
+                            keepAwakeWhileRunning={sharedSettings?.keepAwakeWhileRunning ?? true}
                             desktopChromiumHardwareAccelerationEnabled={
                               desktopChromiumHardwareAccelerationEnabled
                             }
@@ -1783,26 +1733,18 @@ export function SettingsPage({
                               handleToolGroupingChangesEnabledChange
                             }
                             onZCodeInteractionBehaviorChange={handleZCodeInteractionBehaviorChange}
+                            composerEnterBehavior={
+                              sharedSettings?.composerEnterBehavior ??
+                              DEFAULT_COMPOSER_ENTER_BEHAVIOR
+                            }
+                            onComposerEnterBehaviorChange={handleComposerEnterBehaviorChange}
                             onAskUserQuestionAutoResolutionEnabledChange={
                               handleAskUserQuestionAutoResolutionEnabledChange
-                            }
-                            onOpenOnboardingDialog={() =>
-                              runUserAction({
-                                input: {
-                                  featureId: "settings.navigation",
-                                  action: "open_onboarding",
-                                  trigger: "button",
-                                },
-                                operation: requestOnboardingDialog,
-                                completed: { resultSource: "local_commit" },
-                                failureStage: "dialog_open",
-                              })
                             }
                           />
                         ) : activeSection === "appearance" ? (
                           <AppearanceSectionContent
-                            codePreviewSettings={codePreviewSettings}
-                            setCodePreviewSettings={handleCodePreviewSettingsChange}
+                            isDesktop={Boolean(isDesktop)}
                             theme={theme}
                             setTheme={(nextTheme) => handleFooterThemeChange(nextTheme)}
                             uiFontSizePx={uiFontSizePx}
@@ -1856,7 +1798,6 @@ export function SettingsPage({
                             isDesktop={Boolean(isDesktop)}
                             isMacDesktop={Boolean(isMacDesktop)}
                             isWindowsDesktop={Boolean(isWindowsDesktop)}
-                            initialTab={pluginTab}
                             initialScopeKey={pluginScopeKey}
                             workspacePath={activeWorkspacePath}
                             workspaceIdentity={activeWorkspaceIdentity}

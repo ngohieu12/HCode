@@ -188,7 +188,7 @@ export function DesktopTopOverlay({
           <div
             aria-hidden={!isNewTaskButtonVisible}
             className={cn(
-              "inline-flex overflow-hidden transition-[opacity,width] duration-300 ease-out",
+              "inline-flex overflow-hidden transition-[opacity,width] duration-150 ease-[cubic-bezier(0.2,0,0,1)]",
               isNewTaskButtonVisible ? "w-7 opacity-100" : "pointer-events-none w-0 opacity-0",
             )}
           >

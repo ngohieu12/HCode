@@ -115,7 +115,7 @@ export function AnimatedTerminalPanel({
         // 禁用隐藏终端面板的 resize target，避免用户从边缘把 terminal 拖出来。
         disabled={isResizeDisabled}
         className={cn(
-          "transition-opacity duration-200 ease-out",
+          "transition-opacity duration-150 ease-[cubic-bezier(0.2,0,0,1)]",
           isVisible ? "opacity-100" : "pointer-events-none opacity-0",
         )}
       >

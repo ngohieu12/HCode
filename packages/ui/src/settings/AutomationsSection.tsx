@@ -38,7 +38,6 @@ import { Spinner } from "@/components/ui/spinner.js";
 import { toast as showToast, type ToastOptions } from "@/components/ui/toast.js";
 import { cn } from "@/components/lib/utils.js";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";
-import { AutomationScheduledTemplateIcon } from "@/settings/AutomationScheduledTemplateIcon.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { useServices } from "@/hooks/useServices.js";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog.js";
@@ -89,7 +88,6 @@ import {
   AutomationContinueIcon,
   AutomationCreateDropdown,
   AutomationEditActionIcon,
-  AutomationKeepAwakeNotice,
   AutomationMoreHorizontalIcon,
   AutomationPauseActionIcon,
   AutomationPausedIcon,
@@ -118,10 +116,7 @@ import {
 } from "@/lib/automationTelemetry.js";
 import {
   materializeOffPeakTemplateDraft,
-  materializeScheduledTemplateDraft,
   resolveOffPeakTemplateText,
-  resolveAutomationTemplateText,
-  type ScheduledAutomationTemplate,
 } from "@/settings/automationTemplateCatalog.js";
 import { useAutomationTemplates } from "@/settings/useAutomationTemplates.js";
 import type { AutomationsNavigationTab } from "@/lib/taskNavigationHistory.js";
@@ -259,14 +254,13 @@ function resolveAutomationTemplateVisibility({
   tab: AutomationsTab;
 }): {
   showOffPeakTemplates: boolean;
-  showScheduledTemplates: boolean;
 } {
+  // 定时模板区块已移除，这里只保留闲时模板的显示规则。
   // 移除 All tab 后空首页仍默认落在 Scheduled，导致闲时模板被 tab 条件误隐藏。
-  // 无任务时恢复两类模板并列展示；有任务后继续由 Scheduled / Idle tab 分流。
+  // 无任务时展示闲时模板；有任务后由 Idle tab 分流。
   const showAllTemplates = !hasAnyTasks;
   return {
     showOffPeakTemplates: offPeakCreationEnabled && (showAllTemplates || tab === "idle"),
-    showScheduledTemplates: showAllTemplates || tab === "scheduled",
   };
 }
 
@@ -504,7 +498,7 @@ export function AutomationsSection({
   const providerSettingsView =
     providerSettingsRead.state.status === "ready" ? providerSettingsRead.state.view : null;
   const { status: entryStatus, label: entryLabel, retry: retryEntry } = useCodingPlanEntryGate();
-  const { settings: sharedSettings, update: updateSharedSettings } = useSettings();
+  const { settings: sharedSettings } = useSettings();
   useOffPeakEligibility(sharedSettings, providerSettingsView?.revision);
 
   const automations = useAutomationManagementStore((state) => state.automations);
@@ -600,12 +594,12 @@ export function AutomationsSection({
     tab === "scheduled" ? automations.length > 0 : offPeakTasks.length > 0;
   const visibleAutomations = filterAutomationsByStatus(automations, statusFilter);
   const visibleOffPeakTasks = filterOffPeakTasksByStatus(offPeakTasks, statusFilter);
-  const { showOffPeakTemplates, showScheduledTemplates } = resolveAutomationTemplateVisibility({
+  const { showOffPeakTemplates } = resolveAutomationTemplateVisibility({
     hasAnyTasks,
     offPeakCreationEnabled,
     tab,
   });
-  const hasVisibleTemplates = showOffPeakTemplates || showScheduledTemplates;
+  const hasVisibleTemplates = showOffPeakTemplates;
   const showTaskTemplateSeparator = hasVisibleTaskCards && hasVisibleTemplates;
   const [loadedWorkspaceKey, setLoadedWorkspaceKey] = useState<string | null>(null);
   // 相对时间基准;刷新列表时更新,避免频繁 setInterval。
@@ -940,21 +934,6 @@ export function AutomationsSection({
     onCreateViaChat,
     showAutomationCreateLimitToast,
   ]);
-
-  const handleUseTemplate = useCallback(
-    (template: ScheduledAutomationTemplate) => {
-      if (automationCreateLimitReached) {
-        showAutomationCreateLimitToast();
-        return;
-      }
-      const draft = materializeScheduledTemplateDraft(template, locale);
-      setView({
-        mode: "create",
-        draft,
-      });
-    },
-    [automationCreateLimitReached, locale, showAutomationCreateLimitToast],
-  );
 
   // 创建/编辑整页提交:创建可指定目标项目;编辑锁定原项目。
   const handleEditSubmit = useCallback(
@@ -1510,19 +1489,6 @@ export function AutomationsSection({
           )}
         >
           <div className="flex w-full flex-col gap-4">
-            {/* keep-awake 是全局开关（与设置页「常规」镜像），定时任务运行会话同样受益，
-               在定时/闲时两个 tab 都展示。列表态放在任务卡之前，空态保持大空卡在前。 */}
-            {hasAnyTasks ? (
-              <AutomationKeepAwakeNotice
-                checked={sharedSettings?.keepAwakeWhileRunning ?? false}
-                onChange={(value) =>
-                  void updateSharedSettings({
-                    keepAwakeWhileRunning: value,
-                  })
-                }
-              />
-            ) : null}
-
             {/* 去掉 All 混排视图后两类任务不再共用统一 grid；保留该锚点标记任务区起点。 */}
             <div data-automations-task-grid className="contents">
               {offPeakVisible && tab !== "scheduled" && offPeakTasks.length > 0 ? (
@@ -1768,18 +1734,6 @@ export function AutomationsSection({
                 </div>
               )}
             </div>
-
-            {/* 空态保持唤醒提示条位于大空卡之后。 */}
-            {!hasAnyTasks ? (
-              <AutomationKeepAwakeNotice
-                checked={sharedSettings?.keepAwakeWhileRunning ?? false}
-                onChange={(value) =>
-                  void updateSharedSettings({
-                    keepAwakeWhileRunning: value,
-                  })
-                }
-              />
-            ) : null}
           </div>
 
           {/* 真实任务卡与模板不能只靠空白分区：需要分割线；
@@ -1888,63 +1842,6 @@ export function AutomationsSection({
                       <div key={template.id} className="h-full">
                         {card}
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-          ) : null}
-
-          {/* Scheduled task template：Client Scenes 候选目录；点击只预填新建整页。闲时任务 tab 不显示。 */}
-          {showScheduledTemplates ? (
-            <section
-              data-automations-scheduled-templates
-              aria-busy={automationTemplates.loading}
-              className="flex w-full flex-col gap-4"
-            >
-              <h2 className="text-ui-base font-medium leading-5 text-foreground-subtle">
-                {intl.formatMessage({ id: "automations.moreIdeas" })}
-              </h2>
-              {automationTemplates.loading ? (
-                <AutomationTemplateSkeletonGrid
-                  label={intl.formatMessage({ id: "common.loading" })}
-                />
-              ) : automationTemplates.scheduled.length === 0 ? (
-                <div
-                  data-automation-template-empty-state
-                  className="flex min-h-[114px] w-full items-center justify-center rounded-xl border border-card-border bg-background p-3 text-center text-ui-base font-normal text-foreground-subtlest"
-                >
-                  {intl.formatMessage({ id: "automations.templates.unavailable" })}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {automationTemplates.scheduled.map((template) => {
-                    return (
-                      <button
-                        key={template.id}
-                        type="button"
-                        onClick={() => handleUseTemplate(template)}
-                        className="group flex min-h-[114px] flex-col gap-2 overflow-hidden rounded-xl border border-card-border bg-background p-3 text-left transition-colors hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
-                      >
-                        <div className="flex min-w-0 items-center gap-1 text-foreground">
-                          <span className="flex size-5 shrink-0 items-center justify-center">
-                            <AutomationScheduledTemplateIcon
-                              iconName={template.iconName}
-                              name={template.icon}
-                            />
-                          </span>
-                          <span className="truncate text-ui-base font-medium leading-5 text-foreground">
-                            {resolveAutomationTemplateText(template.title, locale)}
-                          </span>
-                        </div>
-                        {/* 定时模板首次实现时把周期时间拼进标题行，和闲时模板的底部时间层级不一致。 */}
-                        <p className="line-clamp-2 flex-1 text-ui-base font-normal leading-5 text-foreground-subtle">
-                          {resolveAutomationTemplateText(template.description, locale)}
-                        </p>
-                        <div className="text-ui-base font-normal leading-5 text-foreground-subtle">
-                          {describeAutomationCardSchedule({ cronExpr: template.cronExpr }, intl)}
-                        </div>
-                      </button>
                     );
                   })}
                 </div>

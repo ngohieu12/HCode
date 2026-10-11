@@ -25,14 +25,14 @@ const meta = {
   provider: "glm",
 };
 
-test("current task metadata is accepted without upgrading third-party Agent identities", () => {
+test("current task metadata is accepted and legacy third-party Agent identities normalize to ZCode Agent", () => {
   assert.equal(zcodeTaskMetaSchema.parse(meta).provider, "glm");
   for (const provider of ["claude", "codex", "gemini", "opencode"]) {
-    assert.equal(zcodeTaskMetaSchema.safeParse({ ...meta, provider }).success, false, provider);
+    assert.equal(zcodeTaskMetaSchema.parse({ ...meta, provider }).provider, "glm", provider);
   }
 });
 
-test("obsolete Agent settings are stripped without dropping current user preferences", () => {
+test("obsolete Agent settings normalize to ZCode Agent without dropping current user preferences", () => {
   const settings = {
     enabledBuiltinAgentCliProviders: ["claude", "codex"],
     localePreference: "en-US",
@@ -40,7 +40,7 @@ test("obsolete Agent settings are stripped without dropping current user prefere
   for (const schema of [appSettingsSchema, appSettingsPatchSchema]) {
     const parsed = schema.parse(settings);
     assert.equal(parsed.localePreference, "en-US");
-    assert.equal("enabledBuiltinAgentCliProviders" in parsed, false);
+    assert.deepEqual(parsed.enabledBuiltinAgentCliProviders, ["glm"]);
   }
 });
 

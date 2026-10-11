@@ -79,6 +79,8 @@ export function formatRemoteWorkspaceTargetSubtitle(
     }
     case "docker":
       return `Docker · ${target.container}`;
+    case "server":
+      return `Server · ${target.name?.trim() || target.url}`;
   }
 }
 
@@ -92,6 +94,8 @@ export function formatRemoteWorkspaceHeaderHostLabel(
       return formatWslRemoteTargetAuthority(target);
     case "docker":
       return `docker:${target.container}`;
+    case "server":
+      return target.url;
   }
 }
 
@@ -131,6 +135,8 @@ function getRemoteWorkspaceAuthorityKey(target: RemoteTarget | RemoteTargetSnaps
     }
     case "docker":
       return ["docker", target.container].join(":");
+    case "server":
+      return ["server", target.serverId?.trim() || target.url.trim()].join(":");
   }
 }
 
@@ -214,6 +220,15 @@ function createRemoteTargetSnapshot(
         kind: "docker",
         container: target.container,
       };
+    case "server":
+      // 当前 UI 不创建 server 连接；token 不写入快照（与 SSH 密码同样不落盘），这里只保留可展示的字段。
+      return {
+        kind: "server",
+        url: target.url,
+        ...(target.name?.trim() ? { name: target.name.trim() } : {}),
+        ...(target.workspacePath?.trim() ? { workspacePath: target.workspacePath.trim() } : {}),
+        ...(target.serverId?.trim() ? { serverId: target.serverId.trim() } : {}),
+      };
   }
 }
 
@@ -249,6 +264,15 @@ export function createRemoteTargetFromSnapshot(
       return {
         kind: "docker",
         container: snapshot.container,
+      };
+    case "server":
+      // 快照不携带 token，恢复后需要重新提供凭据；当前 UI 不创建 server 连接。
+      return {
+        kind: "server",
+        url: snapshot.url,
+        ...(snapshot.name ? { name: snapshot.name } : {}),
+        ...(snapshot.workspacePath ? { workspacePath: snapshot.workspacePath } : {}),
+        ...(snapshot.serverId ? { serverId: snapshot.serverId } : {}),
       };
   }
 }

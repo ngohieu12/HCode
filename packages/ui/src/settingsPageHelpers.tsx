@@ -1,5 +1,6 @@
 /* oxlint-disable eslint(max-lines) -- settings helper 聚合多个设置分组；终端、网络与自动归档多侧能力暂时超过行数限制。 */
 import type {
+  ComposerEnterBehavior,
   IntegratedTerminalShellOption,
   IntegratedTerminalShellSelection,
   LocalePreference,
@@ -29,9 +30,6 @@ import { Button } from "@/components/ui/button.js";
 import { SettingsBadge, SettingsGroupCard, SettingsRow } from "@/settings/SettingsPageParts.js";
 import { DataBaseDirControl } from "@/settings/DataBaseDirControl.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
-import { useOptionalServices } from "@/hooks/useServices.js";
-import { ProactiveSuggestionsSetting } from "@/settings/ProactiveSuggestionsSetting.js";
-import { normalizeInterfaceMode, type InterfaceMode } from "@/lib/interfaceMode.js";
 import {
   createSettingsPageConfig,
   resolveSettingsSectionForPlatform,
@@ -44,15 +42,14 @@ export { createSettingsPageConfig, resolveSettingsSectionForPlatform };
 
 const TASK_AUTO_ARCHIVE_DAY_OPTIONS = [3, 7, 14, 30] as const;
 const ZCODE_INTERACTION_BEHAVIOR_OPTIONS: readonly ZCodeInteractionBehavior[] = ["queue", "guide"];
+const COMPOSER_ENTER_BEHAVIOR_OPTIONS: readonly ComposerEnterBehavior[] = ["newline", "send"];
 
 export function GeneralSectionContent({
   localePreference,
-  interfaceMode = "coding",
-  setInterfaceMode = () => {},
   notificationEnabled,
   notificationSoundEnabled,
   closeToTrayOnWindows,
-  keepAwakeWhileRunning = false,
+  keepAwakeWhileRunning = true,
   desktopChromiumHardwareAccelerationEnabled = true,
   receivePreviewUpdates,
   autoDownloadAndInstallUpdates,
@@ -104,13 +101,12 @@ export function GeneralSectionContent({
   onToolGroupingTerminalEnabledChange,
   onToolGroupingChangesEnabledChange,
   onZCodeInteractionBehaviorChange,
+  composerEnterBehavior = "newline",
+  onComposerEnterBehaviorChange = async () => {},
   onAskUserQuestionAutoResolutionEnabledChange = async () => {},
   onModelIoFullRetentionEnabledChange = async () => {},
-  onOpenOnboardingDialog,
 }: {
   localePreference: LocalePreference;
-  interfaceMode?: InterfaceMode;
-  setInterfaceMode?: (mode: InterfaceMode) => void;
   notificationEnabled: boolean;
   notificationSoundEnabled: boolean;
   closeToTrayOnWindows: boolean;
@@ -143,6 +139,8 @@ export function GeneralSectionContent({
   toolGroupingTerminalEnabled: boolean;
   toolGroupingChangesEnabled: boolean;
   zcodeInteractionBehavior: ZCodeInteractionBehavior;
+  composerEnterBehavior?: ComposerEnterBehavior;
+  onComposerEnterBehaviorChange?: (behavior: ComposerEnterBehavior) => Promise<void>;
   askUserQuestionAutoResolutionEnabled?: boolean;
   modelIoFullRetentionEnabled?: boolean;
   onDataBaseDirChange: (dir: string) => Promise<void>;
@@ -169,10 +167,8 @@ export function GeneralSectionContent({
   onZCodeInteractionBehaviorChange: (behavior: ZCodeInteractionBehavior) => Promise<void>;
   onAskUserQuestionAutoResolutionEnabledChange?: (enabled: boolean) => Promise<void>;
   onModelIoFullRetentionEnabledChange?: (enabled: boolean) => Promise<void>;
-  onOpenOnboardingDialog: () => void;
 }) {
   const { intl } = useZCodeIntl();
-  const hasServices = Boolean(useOptionalServices());
   // 部分 SSR 单测会用精简 props 直接渲染本组件，新增终端设置项后旧 helper 未必同步传值。
   // 这里把运行时缺省值兜到“继承系统 profile”，避免 undefined.trim() 把无关测试打断。
   const [localTerminalFontFamily, setLocalTerminalFontFamily] = useState(terminalFontFamily);
@@ -317,37 +313,6 @@ export function GeneralSectionContent({
             </Select>
           }
         />
-      </SettingsGroupCard>
-
-      <SettingsGroupCard>
-        <SettingsRow
-          controlLayout="wide"
-          label={intl.formatMessage({ id: "settings.interfaceMode" })}
-          description={intl.formatMessage({ id: "settings.interfaceMode.description" })}
-          control={
-            <Select
-              value={interfaceMode}
-              onValueChange={(value) => setInterfaceMode(normalizeInterfaceMode(value))}
-            >
-              <SelectTrigger
-                size="lg"
-                className="w-full min-w-0 sm:w-64"
-                aria-label={intl.formatMessage({ id: "settings.interfaceMode" })}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="coding">
-                  {intl.formatMessage({ id: "settings.interfaceMode.coding" })}
-                </SelectItem>
-                <SelectItem value="office">
-                  {intl.formatMessage({ id: "settings.interfaceMode.office" })}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          }
-        />
-        {hasServices ? <ProactiveSuggestionsSetting /> : null}
       </SettingsGroupCard>
 
       <SettingsGroupCard>
@@ -698,6 +663,33 @@ export function GeneralSectionContent({
           }
         />
         <SettingsRow
+          label={intl.formatMessage({ id: "settings.composerEnterBehavior" })}
+          description={intl.formatMessage({
+            id: "settings.composerEnterBehaviorDescription",
+          })}
+          control={
+            <Select
+              value={composerEnterBehavior}
+              onValueChange={(value) => {
+                void onComposerEnterBehaviorChange(value as ComposerEnterBehavior);
+              }}
+            >
+              <SelectTrigger size="lg" className="w-[260px] min-w-0 justify-between">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {COMPOSER_ENTER_BEHAVIOR_OPTIONS.map((behavior) => (
+                  <SelectItem key={behavior} value={behavior}>
+                    {intl.formatMessage({
+                      id: `settings.composerEnterBehavior.option.${behavior}`,
+                    })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          }
+        />
+        <SettingsRow
           label={intl.formatMessage({
             id: "settings.askUserQuestionAutoResolution",
           })}
@@ -867,20 +859,6 @@ export function GeneralSectionContent({
               onDataBaseDirChange={onDataBaseDirChange}
               onSelectDataBaseDir={onSelectDataBaseDir}
             />
-          }
-        />
-      </SettingsGroupCard>
-
-      <SettingsGroupCard>
-        <SettingsRow
-          label={intl.formatMessage({ id: "settings.onboarding" })}
-          description={intl.formatMessage({
-            id: "settings.onboardingDescription",
-          })}
-          control={
-            <Button type="button" size="lg" variant="outline" onClick={onOpenOnboardingDialog}>
-              {intl.formatMessage({ id: "settings.onboardingOpen" })}
-            </Button>
           }
         />
       </SettingsGroupCard>

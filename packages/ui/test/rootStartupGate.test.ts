@@ -22,7 +22,6 @@ test("disabled startup login guard does not keep the startup gate waiting", () =
   assert.equal(
     shouldShowRootStartupLoading({
       isDesktop: true,
-      welcomeScreenOpen: false,
       isResolvingStartupAuthState: false,
       isResolvingProviderStartupState: false,
       isRestoring: false,

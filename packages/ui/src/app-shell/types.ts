@@ -28,7 +28,7 @@ import type {
   OpenScopedWorkflowWorkspaceSideTabRequest,
   WorkspaceSidePaneState,
 } from "@/lib/workspaceSidePane.js";
-import type { TreemappingSidePaneTab } from "@/lib/workspaceSidePane.js";
+import type { TreemappingSidePaneTab, FileTreeSidePaneTarget } from "@/lib/workspaceSidePane.js";
 import type { WorkspaceZCodeUIState } from "@/store/zcodeSessionStore.js";
 import type { RemoteConnectionLogEntry } from "@/hooks/useRemoteConnectionLogs.js";
 import type { Theme } from "@/useTheme.js";
@@ -46,6 +46,7 @@ import type { AutomationsNavigationTab, OpenAutomationsMain } from "@/lib/taskNa
 
 export interface WorkspaceShellZCodeState {
   activeTaskId: WorkspaceZCodeUIState["activeTaskId"];
+  conversationClosed: WorkspaceZCodeUIState["conversationClosed"];
   draftFocusVersion: WorkspaceZCodeUIState["draftFocusVersion"];
   modelSwitchPending: WorkspaceZCodeUIState["modelSwitchPending"];
   modelSwitchStage: WorkspaceZCodeUIState["modelSwitchStage"];
@@ -127,7 +128,6 @@ export interface WorkspaceShellLayoutProps extends Omit<AppProps, "baseFeedbackS
   onWorkspaceMainViewChange: (view: WorkspaceMainView) => void;
   onOpenAutomationConsumed: () => void;
   handleOpenAutomations: OpenAutomationsMain;
-  handleOpenPluginStore: () => void;
   workspaceShellZCodeState: WorkspaceShellZCodeState;
   theme: Theme;
   isMacFullscreen: boolean;
@@ -241,6 +241,7 @@ export interface WorkspaceShellLayoutProps extends Omit<AppProps, "baseFeedbackS
   handleToggleSidePane: () => void;
   handleOpenBrowserUrl: (url: string) => void;
   handleOpenCodeViewer: (source: CodeViewerSource) => void;
+  handleOpenFileTree: (target: FileTreeSidePaneTarget) => void;
   handleAutoOpenAssistantPptx: (request: AssistantPreviewCardsAutoOpenRequest) => void;
   handleOpenBackgroundBash: (request: OpenBackgroundBashSideTabRequest) => void;
   handleOpenSubagentSession: (request: OpenScopedSubagentSideTabRequest) => void;

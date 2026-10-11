@@ -1,5 +1,8 @@
 /** English translations */
 const enUS: Record<string, string> = {
+  "conversation.close": "Close conversation",
+  "conversation.closed.title": "No conversation open",
+  "conversation.closed.description": "Pick a conversation from the sidebar, or start a new one.",
   "startPlan.recommendation.subagentDescription":
     "Your Start Plan has quota available for {model}. Switch this subagent’s model to the Start Plan?",
   "startPlan.recommendation.preferenceSaveFailed":
@@ -16,18 +19,8 @@ const enUS: Record<string, string> = {
   "occupationOnboarding.coding": "Coding mode",
   "occupationOnboarding.codingDescription":
     "I want to see code, command output, and change details throughout the development process.",
-  "occupationOnboarding.officeMode": "Office mode",
-  "occupationOnboarding.officeModeDescription":
-    "I focus on task progress and results, without needing code, command output, or other technical details.",
-  "chat.officeSuggestions.setting": "Proactive task suggestions",
-  "chat.officeSuggestions.settingDescription": "Available only in Office mode.",
   "chat.plugins.browseMarketplace": "Browse plugin marketplace",
   "chat.plugins.loadError": "Could not load plugins. Reopen the menu to try again.",
-  "chat.officeSuggestions.saveError": "Could not save suggestions settings. Please try again.",
-  "chat.officeSuggestions.refresh": "Show more",
-  "chat.officeSuggestions.closeTitle": "Turn off task suggestions?",
-  "chat.officeSuggestions.closeDescription": "You can turn them on again in Settings.",
-  "chat.officeSuggestions.closeError": "Could not turn off suggestions. Please try again.",
   "occupationOnboarding.suggestionsHeading": "Suggested tasks",
   "occupationOnboarding.infrastructure": "QA / Operations / Security",
   "occupationOnboarding.product": "Product / Project / Solutions",
@@ -2008,12 +2001,6 @@ const enUS: Record<string, string> = {
   "settings.nav.appearanceDescription": "Theme, UI font size, and code presentation",
   "settings.themeCardTitle": "Theme",
   "settings.themeCardDescription": "Use light, dark, or follow the system setting",
-  "chat.empty.greeting.office": "What's on your plate today? Leave it to me.",
-  "settings.interfaceMode": "Interface mode",
-  "settings.interfaceMode.office": "Office mode",
-  "settings.interfaceMode.coding": "Coding mode",
-  "settings.interfaceMode.description":
-    "Office mode focuses on summaries and results. Coding mode shows commands, output, and code changes.",
   "chat.toolCall.execute.conciseCompleted": "Ran a command",
   "chat.contextOptimization.started": "Optimizing conversation",
   "chat.contextOptimization.skipped": "No conversation optimization needed",
@@ -2074,7 +2061,6 @@ const enUS: Record<string, string> = {
   "settings.shortcuts.command.toggleTerminal": "Toggle Terminal",
   "settings.shortcuts.command.previousConversation": "Previous Task",
   "settings.shortcuts.command.nextConversation": "Next Task",
-  "settings.shortcuts.command.toggleInterfaceMode": "Toggle coding/office mode",
   "settings.shortcuts.command.openOnboarding": "Toggle onboarding",
   "settings.shortcuts.command.navigateBack": "Navigate Back",
   "settings.shortcuts.command.navigateForward": "Navigate Forward",
@@ -2089,6 +2075,15 @@ const enUS: Record<string, string> = {
   "settings.shortcuts.command.resetZoom": "Reset Zoom",
   "settings.appearance.interfaceTitle": "Interface Setting",
   "settings.appearance.interfaceDescription": "Choose the app theme and interface text size.",
+  "settings.account.title": "Account",
+  "settings.account.description": "Plan, usage and sign-in status for this HCode account.",
+  "settings.account.notLoggedIn": "Not signed in",
+  "settings.account.usageDescription": "Check usage and remaining quota for your current plan.",
+  "settings.account.open": "Open",
+  "settings.account.planLabel": "Plan",
+  "settings.account.upgradeDescription": "View plan options or renew your coding plan.",
+  "settings.appearance.zoomDescription":
+    "Make the whole interface larger or smaller. Shortcuts still work.",
   "settings.appearance.codeTitle": "Code settings",
   "settings.appearance.codeDescription":
     "Choose code themes, font size, and display options independently from the interface font size.",
@@ -2224,6 +2219,11 @@ const enUS: Record<string, string> = {
     "While HCode is running, add follow-up actions to the queue or guide them to run after the next tool call.",
   "settings.zcodeInteractionBehavior.option.queue": "Queue",
   "settings.zcodeInteractionBehavior.option.guide": "Guide",
+  "settings.composerEnterBehavior": "Enter key behavior",
+  "settings.composerEnterBehaviorDescription":
+    "Choose whether Enter inserts a new line (Ctrl/Cmd+Enter sends) or sends the prompt (Shift+Enter inserts a new line).",
+  "settings.composerEnterBehavior.option.newline": "Enter for new line",
+  "settings.composerEnterBehavior.option.send": "Enter to send prompt",
   "settings.askUserQuestionAutoResolution": "Automatically continue questions",
   "settings.askUserQuestionAutoResolutionDescription":
     "When enabled, Agent questions automatically continue after 5 minutes without an answer. When disabled, current and future questions wait for your response.",
@@ -6340,7 +6340,6 @@ const enUS: Record<string, string> = {
   "automations.statusFilter.completed": "Completed",
   "automations.statusFilter.failed": "Failed",
   "automations.statusFilter.empty": "No tasks match this filter",
-  "offPeak.keepAwakeBanner": "Keep your computer awake while HCode is running a chat.",
   "offPeak.sectionTitle": "Idle-time tasks",
   "offPeak.createButton": "Create idle-time task",
   "offPeak.templates.sectionTitle": "Idle-time task template",
@@ -6407,9 +6406,6 @@ const enUS: Record<string, string> = {
   "offPeak.thought.enabled": "Enabled",
   "offPeak.thought.off": "Off",
   "offPeak.thought.nothink": "No thinking",
-  "offPeak.form.keepAwakeLabel": "Keep your computer running",
-  "offPeak.form.keepAwakeHint":
-    "Prevent idle sleep (desktop-wide switch; also available under Settings → General).",
   "offPeak.tab.settings": "Settings",
   "offPeak.tab.history": "History",
   "offPeak.history.empty": "No history yet.",
@@ -6768,8 +6764,6 @@ const enUS: Record<string, string> = {
     "Computer Use is not yet supported on Linux desktops. Switch to a local macOS or Windows workspace.",
   "settings.computerUse.unsupported.badge": "Unavailable here",
   "settings.computerUse.unsupported.group": "Unavailable built-in capabilities",
-  "scheduledPreview.keepAwakeEnabled": "Keep awake enabled",
-  "scheduledPreview.keepAwakeDisabled": "Keep awake disabled",
   "scheduledPreview.toast.running": "Running “{title}”…",
   "scheduledPreview.toast.view": "View",
   "scheduledPreview.addSchedule": "Add schedule",

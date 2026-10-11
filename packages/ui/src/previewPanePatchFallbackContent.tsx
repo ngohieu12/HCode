@@ -1,3 +1,4 @@
+import { CODE_PREVIEW_DARK_THEME, CODE_PREVIEW_LIGHT_THEME } from "@/lib/codePreviewSettings.js";
 import { useMemo } from "react";
 import { DiffViewer } from "@/components/ui/diff-viewer.js";
 import { HighlightedLightweightDiffPreview } from "@/components/ui/highlighted-lightweight-diff-preview.js";
@@ -27,7 +28,7 @@ export function PatchFallbackContent({
     [highlightPath, patch],
   );
   const highlightTheme =
-    resolvedTheme === "dark" ? codePreviewSettings.darkTheme : codePreviewSettings.lightTheme;
+    resolvedTheme === "dark" ? CODE_PREVIEW_DARK_THEME : CODE_PREVIEW_LIGHT_THEME;
 
   if (plainTextFallbackLines) {
     // @pierre/diffs 的 PatchDiff 只支持单文件 patch。日志里出现过多文件
@@ -52,8 +53,8 @@ export function PatchFallbackContent({
       patch={patch}
       diffClassName="block"
       fontSizePx={codePreviewSettings.fontSizePx}
-      lightTheme={codePreviewSettings.lightTheme}
-      darkTheme={codePreviewSettings.darkTheme}
+      lightTheme={CODE_PREVIEW_LIGHT_THEME}
+      darkTheme={CODE_PREVIEW_DARK_THEME}
       themeType={resolvedTheme}
     />
   );

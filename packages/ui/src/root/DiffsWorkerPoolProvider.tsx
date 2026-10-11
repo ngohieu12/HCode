@@ -6,8 +6,6 @@ import {
 } from "@pierre/diffs/react";
 import { createDiffsWorkerHighlighterOptions } from "@/lib/diffsHighlighterEngine.js";
 import { logger } from "@/logger.js";
-import { DEFAULT_CODE_PREVIEW_SETTINGS } from "@/store/index.js";
-import { useZCodeStore } from "@/store/StoreProvider.js";
 
 function createDiffsWorker(): Worker {
   return new Worker(new URL("../workers/diffs.worker.ts", import.meta.url), {
@@ -60,17 +58,9 @@ function WorkerRenderOptionsSync({
 }
 
 export function DiffsWorkerPoolProvider({ children }: { children: ReactNode }) {
-  const codePreviewSettings = useZCodeStore(
-    (state) => state.codePreviewSettings ?? DEFAULT_CODE_PREVIEW_SETTINGS,
-  );
-
   const highlighterOptions = useMemo<WorkerInitializationRenderOptions>(
-    () =>
-      createDiffsWorkerHighlighterOptions({
-        lightTheme: codePreviewSettings.lightTheme,
-        darkTheme: codePreviewSettings.darkTheme,
-      }),
-    [codePreviewSettings.darkTheme, codePreviewSettings.lightTheme],
+    () => createDiffsWorkerHighlighterOptions(),
+    [],
   );
 
   const poolSize = useMemo(() => resolveWorkerPoolSize(), []);

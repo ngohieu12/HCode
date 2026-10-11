@@ -233,6 +233,21 @@ function resolveActiveTaskConfigOptionsOnSwitch(
 
 export function createWorkspaceSlice(set: SetFn) {
   return {
+    closeActiveConversation: (workspacePath: string, workspaceIdentity?: string) => {
+      set((state) =>
+        updateWorkspaceState(
+          state,
+          workspacePath,
+          (current) => ({
+            ...current,
+            activeTaskId: null,
+            conversationClosed: true,
+          }),
+          workspaceIdentity,
+        ),
+      );
+    },
+
     setActiveTaskId: (workspacePath: string, id: string | null, workspaceIdentity?: string) => {
       set((state) => {
         const workspaceUpdate = updateWorkspaceState(
@@ -264,6 +279,7 @@ export function createWorkspaceSlice(set: SetFn) {
               taskUnreadByTaskId: restTaskUnreadByTaskId,
               optimisticTaskListByTaskId: nextOptimisticTaskListByTaskId,
               activeTaskId: id,
+              conversationClosed: false,
               // grouped 的 New task 草稿行只是当前草稿态锚点。
               // 一旦用户选中真实 task，就代表离开这个临时实体，必须立刻清掉，避免侧栏留下不可操作的假行。
               groupedDraftTask: id ? null : current.groupedDraftTask,
@@ -590,6 +606,7 @@ export function createWorkspaceSlice(set: SetFn) {
             return {
               ...current,
               activeTaskId: null,
+              conversationClosed: false,
               groupedDraftTask: nextGroupedDraftTask,
               draftCreateSource:
                 options?.createSource ?? (options?.groupedDraftPlacement ? "group" : "session"),

@@ -1,3 +1,4 @@
+import { CODE_PREVIEW_DARK_THEME, CODE_PREVIEW_LIGHT_THEME } from "@/lib/codePreviewSettings.js";
 import { useMemo } from "react";
 import type { GitDiffResult } from "@zcode/shared";
 import { ChevronDownIcon, CopyIcon, FolderOpenIcon, ListTreeIcon } from "lucide-react";
@@ -173,8 +174,8 @@ export function GitPaneChangeCard({
                 patch={diffState.patch}
                 diffClassName="block"
                 fontSizePx={codePreviewSettings.fontSizePx}
-                lightTheme={codePreviewSettings.lightTheme}
-                darkTheme={codePreviewSettings.darkTheme}
+                lightTheme={CODE_PREVIEW_LIGHT_THEME}
+                darkTheme={CODE_PREVIEW_DARK_THEME}
                 themeType={resolvedTheme}
               />
             </div>
@@ -189,8 +190,8 @@ export function GitPaneChangeCard({
                 newFile={multiFileDiffFiles.newFile}
                 diffClassName="block"
                 fontSizePx={codePreviewSettings.fontSizePx}
-                lightTheme={codePreviewSettings.lightTheme}
-                darkTheme={codePreviewSettings.darkTheme}
+                lightTheme={CODE_PREVIEW_LIGHT_THEME}
+                darkTheme={CODE_PREVIEW_DARK_THEME}
                 themeType={resolvedTheme}
               />
             </div>

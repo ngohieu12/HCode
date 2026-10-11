@@ -71,8 +71,6 @@ interface CreateQuickPickCommandsOptions {
   isSidebarVisible: boolean;
   isLoggedIn: boolean;
   supportsEmbeddedBrowser?: boolean;
-  supportsTerminal?: boolean;
-  supportsReview?: boolean;
   themeTarget: "dark" | "light";
   shortcuts: {
     newTask: string;
@@ -89,8 +87,6 @@ export function createQuickPickCommands({
   isSidebarVisible,
   isLoggedIn,
   supportsEmbeddedBrowser = true,
-  supportsTerminal = true,
-  supportsReview = true,
   themeTarget,
   shortcuts,
   handlers,
@@ -289,10 +285,5 @@ export function createQuickPickCommands({
     });
   }
 
-  return commands.filter(
-    (command) =>
-      (supportsTerminal ||
-        (command.id !== "toggle-terminal" && command.id !== "add-terminal-tab")) &&
-      (supportsReview || command.id !== "add-review-tab"),
-  );
+  return commands;
 }

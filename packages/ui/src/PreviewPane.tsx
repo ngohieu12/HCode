@@ -1,3 +1,4 @@
+import { CODE_PREVIEW_DARK_THEME, CODE_PREVIEW_LIGHT_THEME } from "@/lib/codePreviewSettings.js";
 import type { MarkdownSelectionTarget } from "@/lib/conversationSelectionReference.js";
 /* eslint-disable max-lines -- PreviewPane 当前同时承载文件读取、图片与 Office 预览、markdown/code 渲染和顶部路径面包屑；后续需按 header/body 边界继续拆分。 */
 import {
@@ -561,8 +562,7 @@ export function PreviewPane({
   });
   const previousRenderHeavyContentRef = useRef(renderHeavyContent);
   const resolvedTheme = resolveTheme(theme);
-  const codeTheme =
-    resolvedTheme === "dark" ? codePreviewSettings.darkTheme : codePreviewSettings.lightTheme;
+  const codeTheme = resolvedTheme === "dark" ? CODE_PREVIEW_DARK_THEME : CODE_PREVIEW_LIGHT_THEME;
   const imageSource = useMemo(() => resolvePreviewPaneImageSource(source), [source]);
   const mediaSource = useMemo(() => resolvePreviewPaneMediaSource(source), [source]);
   const pdfSource = useMemo(() => resolvePreviewPanePdfSource(source), [source]);

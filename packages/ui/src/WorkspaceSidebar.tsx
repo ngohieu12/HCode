@@ -41,7 +41,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import type { Locale, RemoteTarget, UserInfo, ZCodeTaskMeta } from "@zcode/shared";
+import type { RemoteTarget, UserInfo, ZCodeTaskMeta } from "@zcode/shared";
 import {
   TID_CONVERSATION_NEW_TASK,
   TID_CONVERSATION_SECTION,
@@ -65,8 +65,7 @@ import {
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { NewTaskButtonGroup } from "@/NewTaskButtonGroup.js";
 import { selectWorkspaceZCodeState, useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
-import { useZCodeStore } from "@/store/StoreProvider.js";
-import { WorkspaceInterfaceModeSwitch } from "@/WorkspaceInterfaceModeSwitch.js";
+import { setPendingSettingsSection } from "@/lib/settingsNavigation.js";
 import { useTabStore } from "@/store/TabStoreProvider.js";
 import { isWorkspaceReadOnly, isWorkspaceTab, type WorkspaceTabState } from "@/store/tabStore.js";
 import { useWorkspaceTaskLists } from "@/hooks/useWorkspaceTaskLists.js";
@@ -91,10 +90,7 @@ import {
   type WorkspaceTaskVisibleLimitByKey,
 } from "@/lib/workspaceTaskPagination.js";
 import { partitionWorkspaceTabsByPurpose } from "@/lib/workspacePurpose.js";
-import type { Theme } from "@/useTheme.js";
 import type { RemoteConnectionLogEntry } from "@/hooks/useRemoteConnectionLogs.js";
-import type { CodeViewerSource } from "@/lib/codeViewer.js";
-import { WorkspaceFileTree } from "@/WorkspaceFileTree.js";
 import { WorkspaceArchivedTasksFlatSection } from "@/WorkspaceArchivedTasksFlatSection.js";
 import { WorkspaceSidebarFooter } from "@/WorkspaceSidebarFooter.js";
 import { WorkspacePinnedTasksSection } from "@/WorkspacePinnedTasksSection.js";
@@ -110,7 +106,6 @@ import {
 } from "@/WorkspaceSidebar/taskGroupTogglePresentation.js";
 import { WorkspacePurposeSection } from "@/WorkspaceSidebar/WorkspacePurposeSection.js";
 import { cn } from "@/components/lib/utils.js";
-import { useCodingPlanUpgradeDialog } from "@/settings/CodingPlanUpgradeDialogProvider.js";
 import {
   resolveWorkspaceDragGlobalIndices,
   resolveWorkspaceDragExpanded,
@@ -179,11 +174,6 @@ function WorkspaceDragOverlay({ tab, width }: { tab: WorkspaceTabState; width: n
   );
 }
 
-export interface SidebarFileTreeOpenRequest {
-  id: number;
-  target: SidebarFileTreeTarget;
-}
-
 function resolveSidebarTaskViewMode(params: { showArchivedTasks: boolean }): SidebarTaskViewMode {
   // 侧栏任务区只有「项目」视图；归档是独立的显示状态。
   if (params.showArchivedTasks) {
@@ -194,24 +184,17 @@ function resolveSidebarTaskViewMode(params: { showArchivedTasks: boolean }): Sid
 
 export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   workspacePath,
-  workspaceRemoteSessionId,
-  activePreviewPath,
   onSelectTask,
   onStartDraftInWorkspace,
-  onOpenCodeViewer,
-  onOpenBrowserUrl,
-  fileTreeOpenRequest,
+  onOpenFileTree,
   onCreateTask,
   onCreateConversationTask,
   onOpenFolderFromWorkspaceMenu,
   onOpenRemoteWorkspace,
-  theme,
   onConnectRemote: _onConnectRemote,
   onSelectRemoteProject: _onSelectRemoteProject,
   onCancelRemoteProject: _onCancelRemoteProject,
   onReconnectRemoteWorkspace,
-  onLogout,
-  onLogin,
   user,
   reconnectingRemoteWorkspaceKeys,
   remoteWorkspaceErrorByWorkspaceKey,
@@ -231,11 +214,8 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   onOpenCommandCenter,
   onOpenAutomations,
   automationsActive = false,
-  onFileTreeOpenChange,
 }: {
   workspacePath: string;
-  workspaceRemoteSessionId?: string;
-  activePreviewPath?: string | null;
   onSelectTask: (
     targetWorkspacePath: string,
     taskId: string,
@@ -244,14 +224,11 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
     expectedUnreadAt?: number,
   ) => void;
   onStartDraftInWorkspace: (targetWorkspacePath: string, targetWorkspaceIdentity?: string) => void;
-  onOpenCodeViewer?: (source: CodeViewerSource) => void;
-  onOpenBrowserUrl?: (url: string) => void;
-  fileTreeOpenRequest?: SidebarFileTreeOpenRequest | null;
+  onOpenFileTree?: (target: SidebarFileTreeTarget) => void;
   onCreateTask: (request?: CreateTaskRequest) => void;
   onCreateConversationTask: () => void;
   onOpenFolderFromWorkspaceMenu: () => void;
   onOpenRemoteWorkspace?: () => void;
-  theme: Theme;
   onConnectRemote: (options: RemoteTarget, requestId?: string) => Promise<string>;
   onSelectRemoteProject: (
     sessionId: string,
@@ -260,8 +237,6 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   ) => Promise<void>;
   onCancelRemoteProject: (sessionId: string) => Promise<void>;
   onReconnectRemoteWorkspace: (workspaceKey: string) => Promise<void>;
-  onLogout?: () => void;
-  onLogin?: () => void;
   user?: UserInfo | null;
   reconnectingRemoteWorkspaceKeys: string[];
   remoteWorkspaceErrorByWorkspaceKey: Record<string, string>;
@@ -281,9 +256,8 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   onOpenCommandCenter: () => void;
   onOpenAutomations?: () => void;
   automationsActive?: boolean;
-  onFileTreeOpenChange?: (open: boolean) => void;
 }) {
-  const { intl, localePreference, setLocalePreference } = useZCodeIntl();
+  const { intl } = useZCodeIntl();
   const handleTaskRowSelect = useCallback(
     (
       targetWorkspacePath: string,
@@ -303,7 +277,6 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
     },
     [onSelectTask],
   );
-  const { openCodingPlanUpgrade } = useCodingPlanUpgradeDialog();
   const workspaceIdentity = useTabStore((state) => {
     if (!state.activeTabId) {
       return undefined;
@@ -324,7 +297,6 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
         id: "workspaceSidebar.unavailableLocalDirectory",
       })
     : undefined;
-  const setTheme = useZCodeStore((state) => state.setTheme);
   const commandCenterShortcutLabel = useShortcutCommandLabel("openCommandCenter");
   const tabs = useTabStore((state) => state.tabs);
   const activateTab = useTabStore((state) => state.activateTab);
@@ -354,8 +326,6 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   const [archivedActionsContainer, setArchivedActionsContainer] = useState<HTMLDivElement | null>(
     null,
   );
-  const [isFileTreeOpen, setIsFileTreeOpen] = useState(false);
-  const [fileTreeTarget, setFileTreeTarget] = useState<SidebarFileTreeTarget | null>(null);
   const [taskOrganizeBy] = useState<TaskOrganizeBy>(() => readSidebarTaskPreferences().organizeBy);
   const [taskSortBy, setTaskSortBy] = useState<TaskSortBy>(
     () => readSidebarTaskPreferences().sortBy,
@@ -410,19 +380,6 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   const lastStableTaskGroupTogglePresentationRef =
     useRef<SidebarTaskGroupTogglePresentation | null>(null);
   useEffect(() => {
-    if (!fileTreeOpenRequest) {
-      return;
-    }
-    setFileTreeTarget(fileTreeOpenRequest.target);
-    setIsFileTreeOpen(true);
-  }, [fileTreeOpenRequest]);
-  useEffect(() => {
-    onFileTreeOpenChange?.(isFileTreeOpen);
-  }, [isFileTreeOpen, onFileTreeOpenChange]);
-  useEffect(() => {
-    return () => onFileTreeOpenChange?.(false);
-  }, [onFileTreeOpenChange]);
-  useEffect(() => {
     persistSidebarTaskPreferences({
       organizeBy: taskOrganizeBy,
       sortBy: taskSortBy,
@@ -467,7 +424,6 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  const localeMenuValue = localePreference === "system" ? "system" : localePreference;
   const workspaceTaskLists = useWorkspaceTaskLists({
     workspaceTabs: projectWorkspaceTabs,
     activeWorkspacePath: workspacePath,
@@ -491,10 +447,12 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
       increaseWorkspaceTaskVisibleLimit(current, workspaceKey),
     );
   }, []);
-  const handleOpenWorkspaceFileTree = useCallback((target: SidebarFileTreeTarget) => {
-    setFileTreeTarget(target);
-    setIsFileTreeOpen(true);
-  }, []);
+  const handleOpenWorkspaceFileTree = useCallback(
+    (target: SidebarFileTreeTarget) => {
+      onOpenFileTree?.(target);
+    },
+    [onOpenFileTree],
+  );
   const workspaceScrollMaskStyle = useMemo<CSSProperties>(() => {
     const baseStyle: CSSProperties = { overflowAnchor: "none" };
     if (!showWorkspaceTopMask && !showWorkspaceBottomMask) {
@@ -562,49 +520,15 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
     [activeWorkspaceDragId, projectWorkspaceTabs],
   );
 
-  const handleThemeChange = useCallback(
-    (value: string) => {
-      if (
-        value === "light" ||
-        value === "dark" ||
-        value === "zai-light" ||
-        value === "zai-dark" ||
-        value === "system"
-      ) {
-        setTheme(value);
-      }
-    },
-    [setTheme],
-  );
-
-  const handleLocaleChange = useCallback(
-    (value: string) => {
-      if (value === "system") {
-        setLocalePreference("system");
-        return;
-      }
-      if (value === "zh-CN" || value === "en-US") {
-        setLocalePreference(value as Locale);
-      }
-    },
-    [setLocalePreference],
-  );
+  // 账户按钮不再弹菜单：直接打开设置页的“通用”分区，账户分组位于其顶部。
+  const handleOpenAccountSettings = useCallback(() => {
+    setPendingSettingsSection("general");
+    openSettingsTab();
+  }, [openSettingsTab]);
 
   const handleOpenAutomationsMain = useCallback(() => {
     onOpenAutomations?.();
   }, [onOpenAutomations]);
-  const handleOpenCodingPlanUpgrade = useCallback(
-    (
-      providerId: string,
-      funnelContext?: import("@/lib/codingPlanFunnelTelemetry.js").CodingPlanFunnelContext,
-    ) => {
-      openCodingPlanUpgrade({
-        providerId,
-        funnelContext,
-      });
-    },
-    [openCodingPlanUpgrade],
-  );
   const activeTaskId = useZCodeSessionStore(
     (state) =>
       // Web 远程控制从全局 task 入口进入远端 workspace 时，会先按
@@ -844,15 +768,8 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
     >
       <div className="h-12 [app-region:drag]"></div>
       <div className="relative flex-1 min-h-0 overflow-hidden">
-        <div
-          className={cn(
-            "absolute inset-0 flex min-h-0 flex-col transition-transform duration-200 ease-out",
-            isFileTreeOpen && "-translate-x-full pointer-events-none",
-          )}
-          aria-hidden={isFileTreeOpen}
-        >
+        <div className="absolute inset-0 flex min-h-0 flex-col">
           <div className={cn("flex flex-col gap-1 px-2", isWindowsDesktop ? "py-2" : "py-3")}>
-            <WorkspaceInterfaceModeSwitch />
             <WorkspaceNewTaskTooltip disabledReason={workspaceReadOnlyReason}>
               <NewTaskButtonGroup
                 disabled={workspaceReadOnly}
@@ -934,10 +851,7 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
                   activeTaskId={activeTaskId}
                   taskSortBy={taskSortBy}
                   onSelectTask={handleTaskRowSelect}
-                  onOpenFileTree={(target) => {
-                    setFileTreeTarget(target);
-                    setIsFileTreeOpen(true);
-                  }}
+                  onOpenFileTree={handleOpenWorkspaceFileTree}
                 />
               ) : null}
               <div className="flex min-h-0 flex-col gap-3 px-2">
@@ -1180,55 +1094,13 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
 
           <WorkspaceSidebarFooter
             className="pr-3"
-            theme={theme}
-            localeMenuValue={localeMenuValue}
-            onLocaleChange={handleLocaleChange}
-            onThemeChange={handleThemeChange}
             onSettingsButtonClick={openSettingsTab}
-            onUsageClick={openSettingsTab}
-            onUpgradeClick={handleOpenCodingPlanUpgrade}
-            onLogin={onLogin}
-            onLogout={onLogout}
+            onAccountClick={handleOpenAccountSettings}
             user={user}
             workspacePath={workspacePath}
             workspaceIdentity={workspaceIdentity}
-            workspaceRemoteSessionId={workspaceRemoteSessionId}
-            activeTaskId={activeTaskId}
             isDesktop={isDesktop}
           />
-        </div>
-        <div
-          className={cn(
-            "absolute inset-0 transition-transform duration-200 ease-out",
-            isFileTreeOpen ? "translate-x-0" : "translate-x-full pointer-events-none",
-          )}
-          aria-hidden={!isFileTreeOpen}
-        >
-          {fileTreeTarget ? (
-            <WorkspaceFileTree
-              workspacePath={fileTreeTarget.workspacePath}
-              workspaceName={fileTreeTarget.workspaceName}
-              workspaceIdentity={fileTreeTarget.workspaceIdentity}
-              workspaceRemoteSessionId={fileTreeTarget.workspaceRemoteSessionId}
-              revealPath={fileTreeTarget.revealPath}
-              temporaryExternalDirectory={fileTreeTarget.temporaryExternalDirectory}
-              canOpenLocalFileManager={isDesktop}
-              activePreviewPath={activePreviewPath}
-              onClose={() => setIsFileTreeOpen(false)}
-              onOpenBrowserUrl={isDesktop ? onOpenBrowserUrl : undefined}
-              onOpenPreview={(source) => {
-                // 文件树可以查看非当前 workspace 的文件。
-                // 预览 source 携带 workspace 作用域，PreviewPane 才能用正确 host 读取远程文件；
-                // 同时不切换当前 workspace，避免"Add to chat"丢给错误的 composer。
-                onOpenCodeViewer?.({
-                  ...source,
-                  workspacePath: fileTreeTarget.workspacePath,
-                  workspaceIdentity: fileTreeTarget.workspaceIdentity,
-                  workspaceRemoteSessionId: fileTreeTarget.workspaceRemoteSessionId,
-                });
-              }}
-            />
-          ) : null}
         </div>
       </div>
     </aside>

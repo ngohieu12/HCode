@@ -20,6 +20,7 @@ import {
   isSamePhysicalBinding,
 } from "@/shortcuts/conflicts.js";
 import { formatShortcutBindingLabel } from "@/shortcuts/label.js";
+import { useComposerEnterBehavior } from "@/shortcuts/useShortcutBindings.js";
 import {
   resolveEffectiveShortcutBindings,
   setShortcutRecordingActive,
@@ -46,7 +47,12 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
   const savingRef = useRef(false);
 
   const overrides = settings?.shortcutBindings;
-  const effective = useMemo(() => resolveEffectiveShortcutBindings(overrides), [overrides]);
+  // composer 两条命令的默认键随 Enter 模式变化；冲突检测与恢复默认都要按同一模式计算
+  const composerEnterBehavior = useComposerEnterBehavior();
+  const effective = useMemo(
+    () => resolveEffectiveShortcutBindings(overrides, composerEnterBehavior),
+    [overrides, composerEnterBehavior],
+  );
   const commandLabel = useCallback(
     (commandId: ShortcutCommandId) =>
       intl.formatMessage({ id: `settings.shortcuts.command.${commandId}` }),
@@ -59,7 +65,7 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
     const keyBinding = keySearch.binding;
     return SHORTCUT_COMMANDS.filter((entry) => {
       // 这些快捷键保留注册和冲突检测，但不在用户可见列表中展示。
-      if (entry.id === "openOnboarding" || entry.id === "toggleInterfaceMode") return false;
+      if (entry.id === "openOnboarding") return false;
       const matchesText =
         !keyword ||
         entry.id.toLowerCase().includes(keyword) ||
@@ -93,19 +99,27 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
   /** 追加一条（占位行录第一条也走这里：生效列表为空时等价于写入第一条）。 */
   const appendBinding = useCallback(
     (commandId: ShortcutCommandId, binding: string) => {
-      void persistBindings(buildShortcutOverridesAfterAppend(overrides, commandId, binding));
+      void persistBindings(
+        buildShortcutOverridesAfterAppend(overrides, commandId, binding, composerEnterBehavior),
+      );
     },
-    [overrides, persistBindings],
+    [overrides, persistBindings, composerEnterBehavior],
   );
 
   /** 替换生效列表第 bindingIndex 条（覆盖整组替换语义，须写完整生效列表）。 */
   const replaceBindingAt = useCallback(
     (commandId: ShortcutCommandId, bindingIndex: number, binding: string) => {
       void persistBindings(
-        buildShortcutOverridesWithBindingAt(overrides, commandId, bindingIndex, binding),
+        buildShortcutOverridesWithBindingAt(
+          overrides,
+          commandId,
+          bindingIndex,
+          binding,
+          composerEnterBehavior,
+        ),
       );
     },
-    [overrides, persistBindings],
+    [overrides, persistBindings, composerEnterBehavior],
   );
 
   /**
@@ -118,10 +132,11 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
       const next = buildShortcutOverridesAfterSteal(overrides, commandId, binding, {
         mode: recording?.mode,
         bindingIndex: recording?.bindingIndex,
+        composerEnterBehavior,
       });
       void persistBindings(next);
     },
-    [overrides, persistBindings, recording],
+    [overrides, persistBindings, recording, composerEnterBehavior],
   );
 
   /** 操作列垃圾桶「清除」= 清空该命令全部绑定 = 未分配：覆盖写显式空数组，不回退默认
@@ -143,10 +158,11 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
       if (overrides?.[commandId] === undefined) {
         return;
       }
-      const defaultBinding = getDefaultShortcutBindings(commandId)[0];
+      const defaultBinding = getDefaultShortcutBindings(commandId, composerEnterBehavior)[0];
       if (defaultBinding) {
         const conflict = checkShortcutBindingConflict(commandId, defaultBinding, overrides, {
           menuChannelReserved: !isDesktop,
+          composerEnterBehavior,
         });
         if (conflict?.kind === "occupied" && conflict.ownerCommandId) {
           toast(
@@ -162,7 +178,7 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
       delete next[commandId];
       void persistBindings(next);
     },
-    [overrides, persistBindings, isDesktop, intl, commandLabel],
+    [overrides, persistBindings, isDesktop, intl, commandLabel, composerEnterBehavior],
   );
 
   // 「全部恢复默认」是破坏性操作（清空全部自定义键位覆盖），复用全局确认弹窗（Promise 式）防一键误触
@@ -203,6 +219,7 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
     setRecording,
     effective,
     overrides,
+    composerEnterBehavior,
     isDesktop,
     clearBinding,
     appendBinding,

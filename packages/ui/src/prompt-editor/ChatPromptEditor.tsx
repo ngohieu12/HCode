@@ -29,6 +29,7 @@ import { appendWorkspaceFileMentionToComposer } from "@/lib/workspaceFileCompose
 import { usePromptEditorDragState } from "@/prompt-editor/usePromptEditorDragState.js";
 import { ChatPromptActionMenu } from "@/prompt-editor/ChatPromptActionMenu.js";
 import { useComposerToolbarFit } from "@/prompt-editor/useComposerToolbarFit.js";
+import { useShortcutCommandLabel } from "@/shortcuts/useShortcutBindings.js";
 
 function runAfterFrame(callback: () => void) {
   if (typeof requestAnimationFrame === "function") {
@@ -151,6 +152,8 @@ export function ChatPromptEditor({
 }) {
   const { intl } = useZCodeIntl();
   const toolbarRef = useComposerToolbarFit();
+  // 发送键提示随 Enter 模式变化（换行模式为 Ctrl/Cmd+Enter，发送模式为 Enter）
+  const sendShortcutLabel = useShortcutCommandLabel("composerSend");
   const internalInputApiRef = useRef<LexicalChatInputHandle | null>(null);
   const resolvedInputApiRef = inputApiRef ?? internalInputApiRef;
   const [internalTriggerPanelContainer, setInternalTriggerPanelContainer] =
@@ -432,7 +435,10 @@ export function ChatPromptEditor({
             ) : null}
             {betweenCancelAndSubmitAction}
             {submitControl ?? (
-              <ControlHintTooltip title={submitLabel} shortcut={enterSubmits ? "Enter" : undefined}>
+              <ControlHintTooltip
+                title={submitLabel}
+                shortcut={enterSubmits && sendShortcutLabel ? sendShortcutLabel : undefined}
+              >
                 <Button
                   type="submit"
                   size="icon-md"

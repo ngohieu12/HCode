@@ -5,6 +5,9 @@
  * 未翻译的键由 IntlProvider 回退到英文文案，不会回退到中文。
  */
 const viVN: Record<string, string> = {
+  "conversation.close": "Đóng hội thoại",
+  "conversation.closed.title": "Không có hội thoại nào đang mở",
+  "conversation.closed.description": "Chọn một hội thoại ở thanh bên hoặc tạo hội thoại mới.",
   "common.loading": "Đang tải...",
   "common.listSeparator": ", ",
   "common.generating": "Đang tạo...",
@@ -33,6 +36,16 @@ const viVN: Record<string, string> = {
   "sidebar.settings.locale.en-US": "English",
   "sidebar.settings.locale.zh-CN": "Tiếng Trung (giản thể)",
   "sidebar.settings.interfaceZoom": "Thu phóng giao diện",
+  "settings.account.title": "Tài khoản",
+  "settings.account.description":
+    "Gói dịch vụ, mức sử dụng và trạng thái đăng nhập của tài khoản HCode.",
+  "settings.account.notLoggedIn": "Chưa đăng nhập",
+  "settings.account.usageDescription": "Xem mức sử dụng và hạn mức còn lại của gói hiện tại.",
+  "settings.account.open": "Mở",
+  "settings.account.planLabel": "Gói dịch vụ",
+  "settings.account.upgradeDescription": "Xem các gói dịch vụ hoặc gia hạn gói Coding Plan.",
+  "settings.appearance.zoomDescription":
+    "Phóng to hoặc thu nhỏ toàn bộ giao diện. Phím tắt vẫn hoạt động.",
   "sidebar.settings.theme.light": "Giao diện sáng",
   "sidebar.settings.theme.zai-light": "Giao diện sáng",
   "sidebar.settings.theme.zai-dark": "Giao diện tối",
@@ -153,9 +166,11 @@ const viVN: Record<string, string> = {
   "workflows.hub.history.empty": "Chưa có lần chạy nào.",
   "workflows.hub.history.open": "Mở lần chạy",
   "workflows.hub.artifacts.latest": "Sản phẩm mới nhất",
-  "settings.interfaceMode": "Chế độ giao diện",
-  "settings.interfaceMode.coding": "Lập trình",
-  "settings.interfaceMode.office": "Văn phòng",
+  "settings.composerEnterBehavior": "Phím Enter trong ô nhập",
+  "settings.composerEnterBehaviorDescription":
+    "Chọn Enter để xuống dòng (Ctrl/Cmd+Enter để gửi) hoặc Enter để gửi prompt (Shift+Enter để xuống dòng).",
+  "settings.composerEnterBehavior.option.newline": "Enter để xuống dòng",
+  "settings.composerEnterBehavior.option.send": "Enter để gửi prompt",
 };
 
 export default viVN;

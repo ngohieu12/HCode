@@ -3,6 +3,8 @@
 .husky
 .worktree
 .vscode
+.codex
+.claude
 .agents
 
 node_modules
@@ -17,6 +19,7 @@ node_modules
 dogfood-output
 docs/electron
 docs/webdriverio
+packages/desktop/.e2e-home
 packages/desktop/bundled-agents
 packages/desktop/bundled-resources
 packages/desktop/bundled-tools

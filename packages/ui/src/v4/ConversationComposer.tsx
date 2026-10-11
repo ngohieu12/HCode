@@ -105,7 +105,7 @@ import {
   type ChatComposerAttachment,
 } from "@/lib/chatAttachments.js";
 import { resolveChatPlaceholderKey } from "@/lib/chatPlaceholder.js";
-import { resolveChatEnterShortcut } from "@/lib/mobileTextInput.js";
+import { useShortcutCommandLabel } from "@/shortcuts/useShortcutBindings.js";
 import { appendPromptHistoryEntry } from "@/lib/promptHistory.js";
 import {
   persistPromptHistoryEntries,
@@ -606,7 +606,9 @@ function ConversationComposerImpl({
   const primaryModifierPressed = usePrimaryFollowupModifier();
   const appleKeyboardPlatform = isAppleKeyboardPlatform();
   const enterSubmits = true;
-  const sendShortcut = resolveChatEnterShortcut({ enterSubmits });
+  // 发送键提示取生效表 composerSend 的首个绑定，与实际发送键一致（换行模式 Ctrl/Cmd+Enter，发送模式 Enter）
+  const sendShortcutLabel = useShortcutCommandLabel("composerSend");
+  const sendShortcut = sendShortcutLabel || undefined;
   const updateText = useCallback(
     (next: string) => {
       textRef.current = next;
@@ -2198,6 +2200,7 @@ function ConversationComposerImpl({
     <div
       data-testid={TID_V4_COMPOSER}
       data-input-routing={mode}
+      data-centered-draft={centered ? "true" : undefined}
       aria-hidden={isBlockedByInteraction ? true : undefined}
       style={isBlockedByInteraction ? { display: "none" } : undefined}
       className={cn(

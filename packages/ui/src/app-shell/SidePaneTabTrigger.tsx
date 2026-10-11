@@ -312,6 +312,10 @@ export function SidePaneTabIcon({ tab }: { tab: WorkspaceSidePaneTab }) {
     return <FileDiffIcon className="size-3.5" />;
   }
 
+  if (tab.type === "file-tree") {
+    return <ListTreeIcon className="size-3.5" />;
+  }
+
   if (tab.type === "treemapping") {
     return <MapIcon className="size-3.5" />;
   }
@@ -518,6 +522,10 @@ export function getSidePaneTabTitle(
 
   if (tab.type === "git") {
     return formatMessage({ id: "sidePane.review" });
+  }
+
+  if (tab.type === "file-tree") {
+    return tab.target.workspaceName || formatMessage({ id: "workspaceFileTree.title" });
   }
 
   if (tab.type === "treemapping") {

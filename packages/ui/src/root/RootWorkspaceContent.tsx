@@ -143,8 +143,6 @@ export function RootWorkspaceContent({
                 onSelectRemoteProject={handleSelectRemoteProject}
                 onCancelRemoteProject={handleCancelRemoteProject}
                 onReconnectRemoteWorkspace={handleReconnectRemoteWorkspace}
-                onLogout={handleLogout}
-                onLogin={onLogin}
                 user={user}
                 reconnectingRemoteWorkspaceKeys={reconnectingRemoteWorkspaceKeys}
                 remoteWorkspaceErrorByWorkspaceKey={remoteWorkspaceErrorByWorkspaceKey}

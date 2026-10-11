@@ -1,6 +1,6 @@
+import { CODE_PREVIEW_DARK_THEME, CODE_PREVIEW_LIGHT_THEME } from "@/lib/codePreviewSettings.js";
 import type { HighlighterTypes } from "@pierre/diffs";
 import type { WorkerInitializationRenderOptions } from "@pierre/diffs/react";
-import type { BundledTheme } from "shiki";
 
 /**
  * @pierre/diffs 默认使用 shiki 的 JavaScript 正则引擎（shiki-js）。该引擎把 TextMate
@@ -12,19 +12,12 @@ import type { BundledTheme } from "shiki";
  */
 export const DIFFS_PREFERRED_HIGHLIGHTER: HighlighterTypes = "shiki-wasm";
 
-interface DiffsHighlighterThemeSettings {
-  lightTheme: BundledTheme;
-  darkTheme: BundledTheme;
-}
-
 /** diff worker 池初始化参数；主线程兜底渲染与 worker 必须使用同一个引擎选择。 */
-export function createDiffsWorkerHighlighterOptions(
-  settings: DiffsHighlighterThemeSettings,
-): WorkerInitializationRenderOptions {
+export function createDiffsWorkerHighlighterOptions(): WorkerInitializationRenderOptions {
   return {
     theme: {
-      light: settings.lightTheme,
-      dark: settings.darkTheme,
+      light: CODE_PREVIEW_LIGHT_THEME,
+      dark: CODE_PREVIEW_DARK_THEME,
     },
     // 不同 patch 的逐词差异计算会额外占用主线程；先沿用库默认阈值，
     // 后续可基于慢日志再单独收紧，避免一次改动引入“高亮信息突然消失”的回归。

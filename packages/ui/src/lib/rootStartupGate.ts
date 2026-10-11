@@ -7,7 +7,6 @@ interface RootStartupGateState {
 
 interface RootStartupLoadingVisibilityState extends RootStartupGateState {
   isDesktop: boolean | undefined;
-  welcomeScreenOpen: boolean;
 }
 
 interface FallbackWorkspaceCreateState {
@@ -35,15 +34,13 @@ export function shouldBlockRootRender(state: RootStartupGateState): boolean {
 }
 
 export function shouldShowRootStartupLoading(state: RootStartupLoadingVisibilityState): boolean {
-  // 登录入口是启动门禁的结果，不是可继续被门禁遮挡的后台状态。
-  // 如果 WelcomeScreen 已经打开，继续返回启动 loading 会把未登录用户卡在黑屏 logo。
-  return Boolean(state.isDesktop) && !state.welcomeScreenOpen && shouldBlockRootRender(state);
+  // 登录入口已移除，启动门禁只等待 provider / 工作区恢复完成。
+  return Boolean(state.isDesktop) && shouldBlockRootRender(state);
 }
 
 export function shouldEnableProviderAvailabilityLoginEntryGuard(): boolean {
-  // 桌面端启动不再因为“未登录且没有可用 Provider”或缺少 providerFamilyDomain 而自动打开
-  // WelcomeScreen（Z.AI / BigModel 登录页）。启动直接进入工作区；需要登录时仍可通过
-  // 设置页或侧边栏的登录入口手动进入，JWT 失效的重新登录提示也保持不变。
+  // 桌面端启动不再因为“未登录且没有可用 Provider”而打开登录页。应用直接进入工作区，
+  // 用户在设置中自行配置 API Key（BYOK）。登录页与 Z.AI 登录入口已删除。
   return false;
 }
 

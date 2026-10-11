@@ -28,7 +28,7 @@ function CollapsibleContent({
     >
       <div
         className={cn(
-          "transition-none duration-300 ease-in-out",
+          "transition-none duration-200 ease-in-out",
           "group-data-[state=open]/collapsible-content:animate-in group-data-[state=open]/collapsible-content:fade-in-0",
           "group-data-[state=closed]/collapsible-content:animate-out group-data-[state=closed]/collapsible-content:fade-out-0 group-data-[state=closed]/collapsible-content:[animation-fill-mode:forwards]",
         )}
