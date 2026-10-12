@@ -169,7 +169,8 @@ function resolveServerWorkspaces(options: HttpServerOptions): ServerRemoteWorksp
   if (options.workspaces) {
     return options.workspaces;
   }
-  const workspacePath = readTrimmedEnv("ZCODE_SERVER_WORKSPACE") || process.cwd();
+  // Web 客户端已从仓库移除，ZCODE_SERVER_WORKSPACE 没有消费者；默认工作区固定为进程工作目录。
+  const workspacePath = process.cwd();
   return [
     {
       path: workspacePath,
