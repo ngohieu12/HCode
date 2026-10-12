@@ -1,22 +1,22 @@
-# ZCode
+# HCode
 
 <div align="center">
-  <img src="public/logo/icons/1024x1024.png" alt="ZCode" width="128" height="128" />
+  <img src="public/logo/icons/1024x1024.png" alt="HCode" width="128" height="128" />
 </div>
 <p align="center">
   <a href="https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=47ag983c-8fcb-4d6d-814b-5395193a712c&amp;qr_code=true">Feishu community</a> ·
   <a href="https://discord.gg/z9aBcQXZQ3">Discord</a>
 </p>
 <p align="center">
-  <a href="README.md">简体中文</a> | English
+  <a href="README.md">Tiếng Việt</a> | English
 </p>
 
-ZCode is an AI coding workspace with desktop, browser, and terminal interfaces. This repository contains the clients, backend services, shared UI, and Agent CLI and runtime source code.
+HCode is an AI coding workspace with desktop, browser, and terminal interfaces. This repository contains the clients, backend services, shared UI, and Agent CLI and runtime source code.
 
 ## Updates
 
-- 2026-10-10: Updated to ZCode v3.15.1.
-- 2026-9-23: Updated to ZCode v3.14.3.
+- 2026-10-10: Updated to HCode v3.15.1.
+- 2026-9-23: Updated to HCode v3.14.3.
 
 ## Setup
 
@@ -61,7 +61,7 @@ Set `ZCODE_DATA_BASE_DIR` to use a separate development data directory. For exam
 ZCODE_DATA_BASE_DIR="$HOME/.zcode-dev-home" pnpm dev:desktop:test
 ```
 
-### ZCode CLI distribution
+### HCode CLI distribution
 
 The command-line distribution includes the TUI and Agent behind one `zcode` command. With no arguments it starts the TUI; all other arguments go to the existing Agent CLI. It runs locally and does not require Electron.
 
@@ -126,7 +126,7 @@ pnpm bundle:desktop -- --help
 
 The default target is macOS arm64, and the default output directory is `packages/desktop/dist/`. `--os` accepts `mac`, `win`, or `linux`; `--arch` accepts `x64` or `arm64`. Packaging and signing require the tools and configuration for the target platform.
 
-### ZCode CLI distribution
+### HCode CLI distribution
 
 Run `pnpm build:zcode` to build the CLI/TUI and Agent, collect the TUI native libraries, workers, and runtime dependencies, then assemble the distribution. Running the distribution still requires Node.js; use the version specified in `mise.toml`.
 

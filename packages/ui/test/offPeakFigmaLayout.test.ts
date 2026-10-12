@@ -108,7 +108,8 @@ describe("idle-time task Figma layout contracts", () => {
     expect(dockStart).toBeGreaterThanOrEqual(0);
     // 首页入口暂时下线；组件与布局契约继续保留备用。
     expect(dockSource).not.toContain("<OffPeakNewTaskEntry");
-    expect(dockSource).toContain("<ConversationDraftSuggestedPromptsContainer");
+    // 草稿页推荐提示词（prompt 模板）已整体移除，dock 只保留 composer。
+    expect(dockSource).not.toContain("<ConversationDraftSuggestedPromptsContainer");
     expect(sessionPaneSource).not.toContain(
       'import { OffPeakNewTaskEntry } from "@/v4/OffPeakNewTaskEntry.js"',
     );

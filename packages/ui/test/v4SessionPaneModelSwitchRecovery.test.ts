@@ -238,12 +238,6 @@ vi.mock("@/v4/OffPeakNewTaskEntry.js", () => ({
   OffPeakNewTaskEntry: () => null,
 }));
 
-// 同理隔离推荐提示词容器：它通过 useWorkspaceServicesResolution 依赖 TabStoreProvider，
-// 而本文件只验证草稿 provider/model 恢复链路，不提供 Tab store。
-vi.mock("@/v4/ConversationDraftSuggestedPromptsContainer.js", () => ({
-  ConversationDraftSuggestedPromptsContainer: () => null,
-}));
-
 vi.mock("@/hooks/useServices.js", () => ({
   useOptionalServices: () => null,
   useServices: () => ({

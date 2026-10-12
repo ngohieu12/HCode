@@ -13,7 +13,6 @@ const VIEWPORT_SELECTOR = "[data-side-pane-tabs-viewport]";
 const CONTENT_SELECTOR = "[data-side-pane-tabs-content]";
 const ADD_TRIGGER_SELECTOR = "[data-side-pane-add-tab-trigger]";
 const TOOLTIP_SELECTOR = '[data-slot="tooltip-content"]';
-const DRAFT_SUGGESTED_PROMPTS_SLOT_SELECTOR = '[data-v4-draft-suggested-prompts-slot="true"]';
 
 function expectedWorkspacePanelRadiusPx(): number {
   if (process.platform === "win32") return 5;
@@ -53,15 +52,6 @@ describe("Side Pane Tab responsive interactions", () => {
     }
     expect(await $(`[data-testid="${TID_WORKSPACE_TITLE}"]`).isExisting()).toBe(false);
     expect(await readHeaderBorderBottomColor()).toBe("rgba(0, 0, 0, 0)");
-    expect(
-      await browser.execute((slotSelector) => {
-        const slot = document.querySelector<HTMLElement>(slotSelector);
-        if (!slot) return null;
-        const style = window.getComputedStyle(slot);
-        return { height: style.height, position: style.position };
-      }, DRAFT_SUGGESTED_PROMPTS_SLOT_SELECTOR),
-    ).toEqual({ height: "32px", position: "static" });
-
     const sidePaneToggle = await $(`[data-testid="${TID_SIDE_PANE_TOGGLE}"]`);
     await sidePaneToggle.waitForClickable({ timeout: 10_000 });
     const originalWidth = await browser.execute(

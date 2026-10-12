@@ -181,7 +181,6 @@ export function AppView(props: {
       },
       h(ContentPane, {
         id: "main-transcript",
-        animateEmptyLogo: !props.options.noColor,
         copy: props.copy,
         focused: false,
         messages: transcriptMessages,

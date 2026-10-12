@@ -1,7 +1,6 @@
 import { useKeyboard } from "@mbears/opentui-react";
 import { getZCodeCopy } from "@zcode/i18n";
 import React from "react";
-import { EmptyTranscriptLogo } from "./app-empty-transcript.js";
 import { palette } from "./app-model.js";
 import type { TuiOptions } from "./types.js";
 
@@ -24,7 +23,6 @@ export function TuiStartupScreen({
   return h(
     "box",
     { style: { flexDirection: "column", width: "100%", height: "100%", padding: 1 } },
-    h(EmptyTranscriptLogo),
     h("text", { style: { fg: palette.muted } }, options.workspaceDirectory),
     h("text", { style: { fg: palette.text } }, getZCodeCopy(options.locale).tui.terminal.starting),
   );

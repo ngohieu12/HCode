@@ -5,7 +5,6 @@
   --highspeed-sidebar-model-gradient: linear-gradient(90deg, #4830c8 0%, #6041ff 50%, #8955db 100%);
   --highspeed-sidebar-card-surface: #fafafa;
   --highspeed-sidebar-card-outline: var(--color-border);
-  --highspeed-share-card-light-background-opacity: 1;
   --highspeed-share-card-dark-background-opacity: 0;
   --color-highspeed-share-card-view-border: rgb(0 0 0 / 18%);
   --color-highspeed-share-card-view-start: rgb(255 255 255 / 6%);
@@ -46,7 +45,6 @@
   --highspeed-sidebar-model-gradient: linear-gradient(90deg, #9b85ff 0%, #b09aff 50%, #ceacff 100%);
   --highspeed-sidebar-card-surface: transparent;
   --highspeed-sidebar-card-outline: transparent;
-  --highspeed-share-card-light-background-opacity: 0;
   --highspeed-share-card-dark-background-opacity: 1;
   --color-highspeed-share-card-view-border: rgb(255 255 255 / 44%);
   --color-highspeed-share-foreground: #e7e4ed;
@@ -108,11 +106,6 @@
   object-fit: cover;
 }
 
-.highspeed-sidebar-share-card__background--light {
-  /* 底图原尺寸为 230x96；随槽位等比裁切并保持圆角，前景内容不缩放。 */
-  opacity: var(--highspeed-share-card-light-background-opacity);
-}
-
 .highspeed-sidebar-share-card__background--dark {
   opacity: var(--highspeed-share-card-dark-background-opacity);
 }
@@ -123,20 +116,6 @@
   width: 100%;
   height: 100%;
   color: var(--color-highspeed-share-foreground);
-}
-
-.highspeed-sidebar-share-card__title {
-  position: absolute;
-  top: 14px;
-  left: 12px;
-  color: var(--color-highspeed-share-foreground);
-}
-
-.highspeed-sidebar-share-card__wordmark {
-  display: block;
-  width: 52px;
-  height: auto;
-  opacity: 0.6;
 }
 
 .highspeed-sidebar-share-card__model {

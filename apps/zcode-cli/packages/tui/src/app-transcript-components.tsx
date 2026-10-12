@@ -2,7 +2,6 @@ import React from "react";
 import type { TuiCopy } from "@zcode/i18n";
 import type { Message } from "./app-model.js";
 import { palette } from "./app-model.js";
-import { EmptyTranscriptLogo } from "./app-empty-transcript.js";
 import { DEFAULT_TUI_COPY } from "./app-locale.js";
 import { MarkdownText } from "./app-markdown.js";
 import { ThoughtTranscriptPartView } from "./app-thought-components.js";
@@ -19,7 +18,6 @@ const h = React.createElement as (
 const USER_MESSAGE_VERTICAL_PADDING = 1;
 
 export function ContentPane({
-  animateEmptyLogo = false,
   copy = DEFAULT_TUI_COPY,
   expandedWorkflowRunIds,
   emptyText,
@@ -29,7 +27,6 @@ export function ContentPane({
   terminalWidth = 100,
   workflowCardsByToolCallId,
 }: {
-  animateEmptyLogo?: boolean;
   copy?: TuiCopy;
   expandedWorkflowRunIds?: ReadonlySet<string>;
   emptyText?: string;
@@ -72,12 +69,11 @@ export function ContentPane({
         },
       },
     },
+    // 旧品牌（ZCODE）字符画标志已移除：空会话不再渲染品牌标记，只在有 emptyText 时显示提示。
     ...(messages.length === 0
-      ? [
-          emptyText
-            ? h("text", { key: "empty", style: { fg: palette.muted } }, emptyText)
-            : h(EmptyTranscriptLogo, { animated: animateEmptyLogo, key: "empty-transcript-logo" }),
-        ]
+      ? emptyText
+        ? [h("text", { key: "empty", style: { fg: palette.muted } }, emptyText)]
+        : []
       : messages.map((message, index) =>
           h(MessageRow, {
             copy,

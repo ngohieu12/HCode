@@ -255,7 +255,6 @@ function createWorkspaceShellProps() {
     activeTraceId: null,
     allowOpenWorkspace: false,
     allowRemoteWorkspace: false,
-    appLogoUrl: "",
     browserNavigationRequest: null,
     browserRestoreUrls: {},
     canGoBack: false,

@@ -2,12 +2,10 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { CopyIcon, EyeIcon, XIcon, ZapIcon } from "lucide-react";
 import { animate, motion, useReducedMotion } from "motion/react";
 import shareCardDarkBackgroundUrl from "@/assets/highspeed/share-card.svg";
-import shareCardLightBackgroundUrl from "@/assets/highspeed/share-card-light.svg";
 import shareDialogNoiseUrl from "@/assets/highspeed/share-dialog-noise.png";
 import shareDialogNoiseLightUrl from "@/assets/highspeed/share-dialog-noise-light.png";
-import zaiLogoUrl from "@/assets/highspeed/zai-logo.png";
+import appLogoUrl from "@/assets/highspeed/app-logo.png";
 import { Button } from "@/components/ui/button.js";
-import { ZCodeWordmarkLogo } from "@/components/ui/ZCodeAboutLogo.js";
 import {
   Dialog,
   DialogClose,
@@ -56,15 +54,8 @@ export function HighspeedShareNoticeCard({
           role="group"
         >
           {/* Bug 原因：旧实现把设计稿背景拆成多个近似图层，主题切换时容易重复叠加或丢失描边。
-           * 直接使用设计交付的完整主题底图，前景元素仍按 Figma 坐标独立渲染。 */}
-          <img
-            src={shareCardLightBackgroundUrl}
-            alt=""
-            aria-hidden="true"
-            draggable={false}
-            className="highspeed-sidebar-share-card__background highspeed-sidebar-share-card__background--light"
-            data-highspeed-card-background="light"
-          />
+           * 直接使用设计交付的完整主题底图，前景元素仍按 Figma 坐标独立渲染。
+           * 浅色主题曾用独立底图叠加旧品牌 Z 水印，品牌更名后该图层已整体移除（浅色卡面由 CSS 承载）。 */}
           <img
             src={shareCardDarkBackgroundUrl}
             alt=""
@@ -74,9 +65,6 @@ export function HighspeedShareNoticeCard({
             data-highspeed-card-background="dark"
           />
           <div className="highspeed-sidebar-share-card__content">
-            <div className="highspeed-sidebar-share-card__title" role="img" aria-label="ZCode">
-              <ZCodeWordmarkLogo className="highspeed-sidebar-share-card__wordmark" />
-            </div>
             <Button
               type="button"
               variant="ghost"
@@ -234,7 +222,7 @@ export function HighspeedShareDialog({
           <div className="highspeed-share-dialog__header">
             <div className="highspeed-share-dialog__brand">
               <span className="highspeed-share-dialog__logo" aria-hidden="true">
-                <img src={zaiLogoUrl} alt="" draggable={false} />
+                <img src={appLogoUrl} alt="" draggable={false} />
               </span>
               <span className="highspeed-share-dialog__benefit">
                 {intl.formatMessage({ id: "globalNotice.highspeed.badge" })}

@@ -4091,36 +4091,26 @@ nodes:
 
   - id: "surface.new-task-suggested-prompts"
     kind: "ui-surface"
-    label: "New Task draft suggested prompt prefill"
+    status: "removed"
+    label: "[Removed] New Task draft suggested prompt prefill"
     aliases:
       - "draft suggested prompts"
       - "recommended prompt pills"
       - "New Task 推荐提示词"
       - "草稿页推荐提示词"
     docs:
-      - "docs/ui/conversation-draft-suggested-prompts.md"
+      - "docs/specs/startup-providers-and-branding.md"
     codeSeeds:
-      - symbol: "getRecommendedPromptPool"
-        file: "packages/ui/src/v4/featureSuggestedPrompts.ts"
-      - symbol: "getRecommendedPromptsForPane"
-        file: "packages/ui/src/v4/featureSuggestedPromptRotation.ts"
-      - symbol: "ConversationDraftSuggestedPrompts"
-        file: "packages/ui/src/v4/ConversationDraftSuggestedPrompts.tsx"
-      - symbol: "ConversationDraftSuggestedPromptsContainer"
-        file: "packages/ui/src/v4/ConversationDraftSuggestedPromptsContainer.tsx"
-      - symbol: "buildDraftSuggestedPromptPrefill"
-        file: "packages/ui/src/v4/draftSuggestedPromptPrefill.ts"
-      - symbol: "mapClientScenesToDraftSuggestedPromptItems"
-        file: "packages/ui/src/v4/draftSuggestedPromptItems.ts"
       - symbol: "SessionPane"
         file: "packages/ui/src/v4/SessionPane.tsx"
+    invariants:
+      - "The draft bottom dock renders only the composer; the Client Scenes draft-suggestion scene and the whole suggested-prompt/plugin-flow component family are deleted, not hidden."
 
   - id: "service.client-scenes"
     kind: "service"
     label: "ZCode Client Scenes option source"
     aliases:
       - "clientScenesService"
-      - "draft-suggestion scene"
       - "scheduled-task scene"
       - "off-peak-task scene"
       - "推荐提示词配置"

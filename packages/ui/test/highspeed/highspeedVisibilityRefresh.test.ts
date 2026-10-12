@@ -97,10 +97,6 @@ vi.mock("@/v4/OffPeakNewTaskEntry.js", () => ({
   OffPeakNewTaskEntry: () => null,
 }));
 
-vi.mock("@/v4/ConversationDraftSuggestedPromptsContainer.js", () => ({
-  ConversationDraftSuggestedPromptsContainer: () => null,
-}));
-
 vi.mock("@/hooks/useServices.js", () => ({
   useServices: () => ({
     botsService: mocks.botsService,

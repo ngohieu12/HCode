@@ -332,3 +332,50 @@
   - 测试期望对齐本分支默认值：Memory、消息流 Todo、工具分组 Changes 新装默认开启；Computer Use 入口默认展示；Enter 默认换行（Ctrl/Cmd+Enter 发送）。
 - 暂不包含（需单独决定）：上游 UI（web 远程控制侧栏、Shell、v4 会话、留白行 UI 等）；内置 provider 目录（本分支 BYOK，`config/provider/zcode-builtin.json` 保持空 providers）；上游 BigModel OAuth 默认启用（本分支保持关闭）。
 - 验收：`pnpm typecheck` 通过；`apps/zcode-cli` 各包 typecheck 通过；`pnpm lint` 0 错误；`packages/ui` 测试全部通过（node:test 方式运行）；`packages/shared` 测试仅余 PRT-026（依赖未包含的 `docs/monitoring` 文档）。
+
+## 30. Xoá prompt mẫu (prompt template) khỏi trang New task
+
+> Mục này được viết bằng tiếng Việt theo yêu cầu chuyển tài liệu sang tiếng Việt.
+
+- Bối cảnh: trang New task (draft) hiển thị một hàng chip prompt mẫu ngay dưới ô nhập (`Weekly Summary`, `Error Fix`, `PPT Creation`, `Idle-time task`…). Người dùng yêu cầu xoá prompt mẫu.
+- Quy tắc: trang draft chỉ còn lời chào theo giờ + ô nhập (composer). Không còn truy vấn Client Scenes cho scene `draft-suggestion`, không còn chip gợi ý và không còn luồng tự cài/bật plugin khi bấm chip.
+- Phạm vi xoá (xoá hẳn, không ẩn):
+  - UI: `packages/ui/src/v4/ConversationDraftSuggestedPrompts.tsx`, `ConversationDraftSuggestedPromptsContainer.tsx`, `ConversationDraftSuggestedPluginFlow.tsx`.
+  - Dữ liệu và hook: `draftSuggestedPromptItems.ts`, `draftSuggestedPromptPrefill.ts`, `useDraftSuggestedPromptItems.ts`, `useDraftSuggestedPluginActionPopover.ts`, `officeSuggestedPrompts.ts` (pool prompt mẫu cũ, đã không còn nơi dùng).
+  - Telemetry: `packages/ui/src/lib/promptTemplateTelemetry.ts` (sự kiện `prompt_template_ck`).
+  - Điểm render: `packages/ui/src/v4/SessionPane.tsx` — bỏ khối `<ConversationDraftSuggestedPromptsContainer />` khỏi `conversationBottomDockContent` cùng import tương ứng.
+  - i18n: 20 khoá `chat.draft.suggestedPrompt.*` trong `en-US.ts` và `zh-CN.ts` (`vi-VN.ts` chưa từng có các khoá này).
+  - Test: xoá `v4ConversationDraftSuggestedPrompts.test.ts`, `v4ConversationDraftSuggestedPromptsContainer.test.ts`, `draftSuggestedPromptItems.test.ts`, `draftSuggestedPromptPrefill.test.ts`, `promptTemplateTelemetry.test.ts`; gỡ mock/khẳng định liên quan trong `offPeakFigmaLayout.test.ts`, `highspeedVisibilityRefresh.test.ts`, `v4SessionPaneComposerContinuity.test.ts`, `v4SessionPaneLayoutParity.test.ts`, `v4SessionPaneModelSwitchRecovery.test.ts` và `packages/desktop/test/e2e/ui-shell/side-pane-tabs-responsive-interactions.test.ts` (selector `data-v4-draft-suggested-prompts-slot`).
+  - Tham chiếu: `zcode-feature-graph.yaml` đánh dấu node `surface.new-task-suggested-prompts` là `status: "removed"`.
+- Giữ nguyên: `IClientScenesService` và các scene `scheduled-task` / `off-peak-task` vẫn dùng cho trang Automations và `OffPeakNewTaskEntry`; `ConversationDraftEmptyState` (lời chào theo giờ) không đổi.
+- Nghiệm thu: trang New task không còn hàng chip prompt mẫu; `pnpm typecheck`, `pnpm lint` và test UI không còn tham chiếu tới module đã xoá. Lưu ý: phiên soạn này không có `node_modules` trong sandbox nên chưa chạy được typecheck/lint/test — cần chạy lại trên máy có môi trường.
+
+## 31. Bỏ placeholder ở ô nhập (composer) và đổi tên sản phẩm trong README
+
+- Bối cảnh: ô nhập chat hiển thị văn bản gợi ý động (`Ask HCode anything, @ to add context, / for commands or capabilities` và các biến thể theo trạng thái). Người dùng yêu cầu bỏ placeholder. Đồng thời README còn dùng tên cũ `ZCode`.
+- Quy tắc: ô nhập không còn văn bản gợi ý ở mọi trạng thái (draft mới, đang xử lý, hỏi tiếp, và bản mobile remote); `ContentEditable` của Lexical luôn nhận `placeholder: null`.
+- Phạm vi xoá:
+  - `packages/ui/src/lib/chatPlaceholder.ts` (`resolveChatPlaceholderKey`, `shouldDeferChatPlaceholder`) và `packages/ui/test/chatPlaceholder.test.ts`.
+  - `packages/ui/src/v4/ConversationComposer.tsx`: bỏ `placeholder`, `compactMobilePlaceholder` và prop `compactPlaceholder` truyền xuống editor.
+  - `packages/ui/src/prompt-editor/ChatPromptEditor.tsx` và `packages/ui/src/LexicalChatInput.tsx`: bỏ prop `placeholder` / `compactPlaceholder` cùng nhánh render placeholder.
+  - i18n: 5 khoá `chat.placeholder.newTask` / `newTaskMobile` / `followUpAsk` / `followUpQueue` / `loading` trong `en-US.ts`, `zh-CN.ts`.
+- Giữ nguyên: `avoidIosInputFocusZoom` (chống zoom iOS trên mobile remote) và `resolveMobileInputTextSizeClassName`; các placeholder khác (tìm kiếm, model, quyền…) không đổi.
+- Tài liệu: `README.md` (tiếng Việt) và `README.en.md` dùng tên sản phẩm `HCode`; giữ nguyên định danh kỹ thuật: lệnh `zcode`, gói `@zcode/*`, biến `ZCODE_*`, thư mục `apps/zcode-cli`, `~/.zcode`, `dist/zcode/`.
+- Nghiệm thu: ô nhập không còn câu gợi ý; README không còn chuỗi `ZCode` cho tên sản phẩm. Chưa chạy được `pnpm typecheck` / `pnpm lint` / test trong phiên soạn (sandbox không có `node_modules`).
+
+## 32. Bỏ logo chữ Z khỏi sản phẩm (app branding)
+
+- Bối cảnh: sau khi đổi tên sản phẩm sang HCode, các bề mặt app-brand vẫn còn dùng mark chữ Z của ZCode (khởi động, thanh tiêu đề, About, thẻ chia sẻ Highspeed, TUI và bộ icon cài đặt).
+- Quy tắc: mọi mark app-brand chữ Z bị xoá hoặc thay bằng H; **giữ nguyên** icon provider Z.AI (nhận diện nhà cung cấp, không phải branding của app).
+- Phạm vi xoá/thay:
+  - `packages/ui/src/root/RootStartupLoading.tsx`: xoá `ZCodeStartupLogo` / `ZCodeStartupLogoBadge` (SVG `viewBox 0 0 256 218`); khối chờ khởi động dùng vòng xoay trung tính (`LoaderIcon`, giữ nguyên khung 96px + gradient + viền mảnh như cũ). Test `packages/ui/test/rootStartupLoading.test.ts` cập nhật theo.
+  - `packages/desktop/src/renderer/index.html`: HTML loading shell thay SVG Z bằng `.startup-logo-spinner` (giữ `startup-logo-pop`, thêm `startup-logo-spin`).
+  - `packages/desktop/src/main/aboutWindow.ts`: xoá `<div class="app-icon">` + SVG Z (và CSS `.app-icon` / `.app-logo`); About chỉ còn tên, phiên bản, dòng tối ưu hoá và bản quyền. Test `packages/desktop/test/about.test.ts` chuyển sang khẳng định âm (`not.toContain("class=\"app-logo\"")`, `not.toContain("viewBox=\"0 0 256 218\"")`).
+  - `packages/ui/src/DesktopTopOverlay.tsx` + `packages/ui/src/app-shell/{types.ts,WorkspaceShellLayout.tsx}` + `packages/ui/src/App.tsx`: bỏ prop `appLogoUrl` và ảnh logo; nút mở/đóng sidebar dùng `PanelLeftClose/PanelLeftOpen` trên mọi nền tảng (Windows/Linux trước đây hiển thị logo khi chưa hover). Test `workspaceShellRemoteMobileLayout.test.ts` bỏ `appLogoUrl: ""`.
+  - `packages/ui/src/WorkspaceSidebar/WorkspaceSidebarCollapsedRail.tsx`: bỏ logo, chỉ giữ icon mở sidebar; xoá `packages/ui/src/WindowsTopLeftLogo.tsx` và chỗ dùng trong `SettingsPage.tsx`.
+  - `packages/ui/src/highspeed/HighspeedShareNoticeCard.tsx` + `highspeed-share.css`: xoá `ZCodeWordmarkLogo` (file `packages/ui/src/components/ui/ZCodeAboutLogo.tsx` bị xoá hoàn toàn), xoá lớp nền `share-card-light.svg` (chứa watermark Z nằm ngoài khung 230x96) và watermark Z trong `share-card.svg`; logo trong dialog dùng `assets/highspeed/app-logo.png` mới (H) thay `zai-logo.png` (đã xoá). Token `--highspeed-share-card-light-background-opacity` không còn nơi dùng nên cũng xoá.
+  - TUI: xoá `apps/zcode-cli/packages/tui/src/app-empty-transcript.tsx` (ASCII `ZCODE_LOGO_LINES` + `EmptyTranscriptLogo`), bỏ chỗ dùng trong `app-startup.tsx`, `app-transcript-components.tsx` (`animateEmptyLogo`) và `app-view.tsx`; test `tests/tui-app.test.ts`, `tests/tui.unit.test.ts` cập nhật (khẳng định không còn ký tự `███████╗` / `╚══════╝`).
+  - Icon cài đặt: `packages/desktop/build/` — chữ Z trắng trong `icon.png`, `icon_windows.png`, `icon_installer.png`, `icons/*` được thay bằng H cùng bbox/độ dày nét; `icon.ico`, `icon_installer.ico`, `icon.icns`, `icon_installer.icns` được dựng lại; `dmg_background.png` / `dmg_background@2x.png` đổi wordmark `ZCODE` → `HCODE`; `public/logo/icons/*` và `public/icon_512@2x.png` vốn đã là H sau PR #2 (không đổi).
+  - Provider asset: `packages/ui/src/assets/provider-icons/model-provider-zai-app.png` là bản sao byte-for-byte của icon app (theo quyết định trước đây), nay refresh theo `icons/128x128.png` mới; ghi chú provenance trong `model-provider-logo-sources.json` cập nhật. `logo-zai.svg` (icon provider Z.AI qua `lib/oauthProviderIcon.tsx`) giữ nguyên; `logo-zai-square.svg` không còn nơi dùng nên xoá.
+- Giữ nguyên: tên nhận diện kỹ thuật (`zcode`, `@zcode/*`, `ZCODE_*`, `apps/zcode-cli`, `~/.zcode`), theme `.theme-zai-dark`, và các chuỗi i18n `globalNotice.highspeed.*` vẫn gọi sản phẩm là `ZCode` (copy marketing của gói Coding Plan — chưa nằm trong yêu cầu lần này).
+- Nghiệm thu: repo không còn tham chiếu tới các symbol/asset đã xoá (đã quét `ZCodeStartupLogo`, `ZCodeAboutLogo`, `ZCodeWordmarkLogo`, `WindowsTopLeftLogo`, `appLogoUrl`, `share-card-light`, `zai-logo.png`, `logo-zai-square`, `EmptyTranscriptLogo`, `ZCODE_LOGO_LINES`, dấu path `217.732` / `0.130127`); mọi artifact icon đọc được và hiển thị H. Chưa chạy được `pnpm typecheck` / `pnpm lint` / test trong phiên soạn (sandbox không có `node_modules`).

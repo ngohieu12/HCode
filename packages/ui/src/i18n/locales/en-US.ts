@@ -4843,30 +4843,6 @@ const enUS: Record<string, string> = {
   "chat.empty.greeting.afternoon": "Good afternoon! Leave the rest to me.",
   "chat.empty.greeting.evening": "Evening, nice work today",
   "chat.empty.greeting.lateNight": "It's late—remember to take care of yourself.",
-  "chat.draft.suggestedPrompt.recentCommits": "Review commits from the last 7 days",
-  "chat.draft.suggestedPrompt.recentCommits.prompt":
-    "Review Git commits from the last 7 days in this workspace, summarize the main changes, and identify potential risks.",
-  "chat.draft.suggestedPrompt.createPdf": "Create a PDF",
-  "chat.draft.suggestedPrompt.createPdf.prompt":
-    "Create a PDF document based on the contents of the current workspace.",
-  "chat.draft.suggestedPrompt.plugin.documentSkills": "Document Skills",
-  "chat.draft.suggestedPrompt.plugin.github": "Github",
-  "chat.draft.suggestedPrompt.pluginUnavailable":
-    "{pluginLabel} plugin is not enabled or installed",
-  "chat.draft.suggestedPrompt.pluginFlow.installing": "Installing the plugin…",
-  "chat.draft.suggestedPrompt.pluginFlow.enabling": "Enabling the plugin…",
-  "chat.draft.suggestedPrompt.pluginFlow.checking": "Checking plugin status…",
-  "chat.draft.suggestedPrompt.pluginFlow.installConfirmation": "Install {pluginLabel} Plugin",
-  "chat.draft.suggestedPrompt.pluginFlow.enableConfirmation": "Enable {pluginLabel} Plugin",
-  "chat.draft.suggestedPrompt.pluginFlow.confirm": "Confirm",
-  "chat.draft.suggestedPrompt.pluginFlow.installSucceeded": "Installation successful",
-  "chat.draft.suggestedPrompt.pluginFlow.installFailed": "Plugin installation failed",
-  "chat.draft.suggestedPrompt.pluginFlow.installFailureToast":
-    "Could not install {pluginLabel}: {error}",
-  "chat.draft.suggestedPrompt.pluginFlow.installTimedOut": "Installation timed out",
-  "chat.draft.suggestedPrompt.pluginFlow.installReturnedEmpty": "No installed plugin was returned",
-  "chat.draft.suggestedPrompt.pluginFlow.enableSucceeded": "Plugin enabled successfully",
-  "chat.draft.suggestedPrompt.pluginFlow.enableFailed": "Plugin enable failed",
   "chat.empty.workspaceMenu": "Choose workspace",
   "chat.empty.selectProject": "Select project",
   "chat.empty.workOutsideProject": "Work outside a project",
@@ -4884,12 +4860,6 @@ const enUS: Record<string, string> = {
   "chat.emptyResult.title": "No visible output",
   "chat.emptyResult.description":
     "This task finished without any chat content. It may have been stopped before the model produced a response.",
-  "chat.placeholder.newTask":
-    "Ask HCode anything, @ to add context, / for commands or capabilities",
-  "chat.placeholder.newTaskMobile": "Ask HCode anything…",
-  "chat.placeholder.followUpAsk": "Ask for follow-up changes",
-  "chat.placeholder.followUpQueue": "Keep typing to queue follow-up changes",
-  "chat.placeholder.loading": "Initializing task...",
   "chat.attachments.dragHint": "Drop to add attachments",
   "chat.composer.workspaceFileDragHint": "Drop to mention this file or folder",
   "chat.send": "Send",

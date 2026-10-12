@@ -108,7 +108,6 @@ import {
   isVideoChatComposerAttachment,
   type ChatComposerAttachment,
 } from "@/lib/chatAttachments.js";
-import { resolveChatPlaceholderKey } from "@/lib/chatPlaceholder.js";
 import { useShortcutCommandLabel } from "@/shortcuts/useShortcutBindings.js";
 import { appendPromptHistoryEntry } from "@/lib/promptHistory.js";
 import {
@@ -658,12 +657,11 @@ function ConversationComposerImpl({
   const primaryModifierPressed = usePrimaryFollowupModifier();
   const appleKeyboardPlatform = isAppleKeyboardPlatform();
   const enterSubmits = true;
-  // 手机远控的 iOS 防缩放与紧凑占位符（ours 保持桌面 Enter 发送语义，仅保留视口分支）。
+  // 手机远控的 iOS 防缩放（ours 保持桌面 Enter 发送语义，仅保留视口分支）。
   const avoidIosInputFocusZoom = shouldAvoidIosInputFocusZoom({
     isMobileTextInputViewport,
     isWebRemoteControl,
   });
-  const compactMobilePlaceholder = isWebRemoteControl && isMobileTextInputViewport;
   // 发送键提示取生效表 composerSend 的首个绑定，与实际发送键一致（换行模式 Ctrl/Cmd+Enter，发送模式 Enter）
   const sendShortcutLabel = useShortcutCommandLabel("composerSend");
   const sendShortcut = sendShortcutLabel || undefined;
@@ -1692,15 +1690,6 @@ function ConversationComposerImpl({
     };
   }, [listenAddToChatEvents, updateText, workspaceIdentity, workspacePath]);
 
-  // 动态 placeholder（旧 chatViewPlaceholder 语义）：无历史 → newTask；
-  // 有历史空闲 → followUpAsk；有历史处理中 → followUpQueue。
-  const placeholder = intl.formatMessage({
-    id: resolveChatPlaceholderKey({
-      hasHistoryMessages: (snapshot?.rows.totalCount ?? 0) > 0,
-      isTaskProcessing: canStop,
-      compactNewTask: compactMobilePlaceholder,
-    }),
-  });
   const sendTooltipTitle = intl.formatMessage({
     id: mode === "enqueue" ? "chat.queue.enqueue" : "chat.send",
   });
@@ -2392,7 +2381,6 @@ function ConversationComposerImpl({
           workspaceIdentity={workspaceIdentity}
           taskId={sessionId}
           skillCatalogSessionId={skillCatalogSessionId}
-          placeholder={placeholder}
           disabled={disabled || mode === "reject"}
           submitting={pending}
           submitDisabled={pending || !routingAllowsSend || !attachmentsReady || !submissionReady}
@@ -2419,7 +2407,6 @@ function ConversationComposerImpl({
           inputApiRef={inputApiRef}
           promptHistory={promptHistory}
           avoidIosInputFocusZoom={avoidIosInputFocusZoom}
-          compactPlaceholder={compactMobilePlaceholder}
           // Bugfix 原因：命令目录必须完整来自 CLI workspace slash catalog；UI 只在
           // secondary pane 按产品能力隐藏 goal，不再追加任何内建命令或别名。
           excludedSlashCommandNames={suppressGoalCommands ? ["goal"] : undefined}

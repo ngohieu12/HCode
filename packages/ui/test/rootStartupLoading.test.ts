@@ -1,24 +1,24 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { RootStartupLoading, ZCodeStartupLogoBadge } from "@/root/RootStartupLoading.js";
+import * as startupLoadingModule from "@/root/RootStartupLoading.js";
+import { RootStartupLoading } from "@/root/RootStartupLoading.js";
 
 describe("RootStartupLoading", () => {
-  it("引导使用静态品牌图标时保留外观但不渲染呼吸动画", () => {
-    const html = renderToStaticMarkup(createElement(ZCodeStartupLogoBadge, { animated: false }));
-    expect(html).toContain("<svg");
-    expect(html).toContain("linear-gradient");
-    expect(html).not.toContain("<animate");
-  });
-  it("启动阻塞态使用整体呼吸的 ZCode SVG 而不是可见 loading 文案", () => {
+  it("启动阻塞态用中性加载指示替代旧品牌图标，且不渲染可见 loading 文案", () => {
     const html = renderToStaticMarkup(createElement(RootStartupLoading, { label: "加载中..." }));
 
     expect(html).toContain('data-testid="root-startup-loading"');
     expect(html).toContain('aria-label="加载中..."');
-    expect(html).toContain("<svg");
-    expect(html).toContain('attributeName="opacity"');
-    expect(html).toContain('values="1;0.4;1"');
+    expect(html).toContain("animate-spin");
     expect(html).toContain("bg-background");
+    expect(html).not.toContain("<animate");
+    expect(html).not.toContain("viewBox=\"0 0 256 218\"");
     expect(html).not.toContain(">加载中...<");
+  });
+
+  it("不再导出旧品牌标志组件", () => {
+    expect("ZCodeStartupLogoBadge" in startupLoadingModule).toBe(false);
+    expect("ZCodeStartupLogo" in startupLoadingModule).toBe(false);
   });
 });

@@ -1,5 +1,4 @@
 import { PanelLeftOpen } from "lucide-react";
-import appLogoUrl from "@/assets/provider-icons/logo-zai.svg";
 import { Button } from "@/components/ui/button.js";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
@@ -26,19 +25,14 @@ export function WorkspaceSidebarCollapsedRail({
               type="button"
               variant="ghost"
               size="icon-md"
-              className="group relative overflow-hidden rounded-lg"
+              className="rounded-lg"
               onClick={onToggleSidebar}
               aria-label={intl.formatMessage({
                 id: "workspaceSidebar.toggleSidebar",
               })}
             >
-              <img
-                src={appLogoUrl}
-                alt="HCode"
-                className="size-5 transition-opacity group-hover:opacity-0"
-                draggable={false}
-              />
-              <PanelLeftOpen className="absolute size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+              {/* 旧品牌图标已移除，收起态轨道只保留展开侧边栏的图标。 */}
+              <PanelLeftOpen className="size-4" />
             </Button>
           </ControlHintTooltip>
         </div>
