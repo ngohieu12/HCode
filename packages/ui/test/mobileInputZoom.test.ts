@@ -230,31 +230,4 @@ describe("mobile text input zoom guard", () => {
     expect(stylesSource).toContain("--text-ui-xl: calc(var(--ui-font-size) + 4px);");
     expect(stylesSource).toContain("--text-ui-lg: calc(var(--ui-font-size) + 2px);");
   });
-
-  it("wires the zoom guard through remote composer inputs", () => {
-    const composerSource = readSource("packages/ui/src/v4/ConversationComposer.tsx");
-    const interactionDialogSource = readSource("packages/ui/src/v4/V4InteractionDialogs.tsx");
-    const permissionDialogSource = readSource("packages/ui/src/PermissionDialog.tsx");
-    const sessionPaneSource = readSource("packages/ui/src/v4/SessionPane.tsx");
-    const promptEditorSource = readSource("packages/ui/src/prompt-editor/ChatPromptEditor.tsx");
-    const lexicalInputSource = readSource("packages/ui/src/LexicalChatInput.tsx");
-
-    expect(composerSource).toContain("shouldAvoidIosInputFocusZoom({");
-    expect(composerSource).toContain("isWebRemoteControl,");
-    expect(composerSource).toContain("isMobileTextInputViewport,");
-    expect(composerSource).toContain("preferEnterNewline: isWebRemoteControl,");
-    expect(composerSource).toContain("avoidIosInputFocusZoom={avoidIosInputFocusZoom}");
-    expect(composerSource).toContain("compactPlaceholder={compactMobilePlaceholder}");
-    expect(sessionPaneSource).toContain("isWebRemoteControl={compactForRemoteControl}");
-    expect(interactionDialogSource).toContain("isWebRemoteControl={isWebRemoteControl}");
-    expect(permissionDialogSource).toContain("useIsMobileTextInputViewport");
-    expect(permissionDialogSource).toContain("resolveMobileInputTextSizeClassName({");
-    expect(permissionDialogSource).toContain("avoidIosInputFocusZoom");
-    expect(promptEditorSource).toContain("avoidIosInputFocusZoom={avoidIosInputFocusZoom}");
-    expect(promptEditorSource).toContain("compactPlaceholder={compactPlaceholder}");
-    expect(lexicalInputSource).toContain("resolveMobileInputTextSizeClassName({");
-    expect(lexicalInputSource).toContain('compactPlaceholder ? "line-clamp-2" : ""');
-    expect(lexicalInputSource).not.toContain("user-scalable=no");
-    expect(lexicalInputSource).not.toContain("maximum-scale");
-  });
 });

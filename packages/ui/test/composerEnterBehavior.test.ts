@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import {
   COMPOSER_ENTER_PRESET_BINDINGS,
   DEFAULT_COMPOSER_ENTER_BEHAVIOR,

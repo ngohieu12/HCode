@@ -381,6 +381,7 @@ describe("createLocalServices remote authority", () => {
     const [{ createLocalServices, disposeServiceResources }, { IClientScenesService }] =
       await Promise.all([import("../src/node.js"), import("../src/index.js")]);
     const services = createLocalServices({
+      zcodeBuiltinProviderConfigFilePath: writeZCodeBuiltinProviderConfig(home),
       hostApiNetworkTransport: transport,
       serviceAuthorityMode: "desktop-attached-remote",
     });

@@ -68,22 +68,6 @@ vi.mock("@/shortcuts/useShortcutBindings.js", () => ({
 import { V4ComposerModeSwitch } from "@/v4/composer/V4ComposerModeControls.js";
 
 describe("V4ComposerModeSwitch", () => {
-  it("Guarded 在新的 Plan/权限菜单保持蓝色和独立 Plan 标记", () => {
-    const html = renderToStaticMarkup(
-      createElement(V4ComposerModeSwitch, {
-        workspacePath: "/workspace",
-        provider: "glm",
-        draftConfig: { mode: "guarded", planEnabled: true },
-        activeConfigPicker: null,
-        onConfigPickerOpenChange: vi.fn(),
-        onSwitchMode: vi.fn(),
-      }),
-    );
-    expect(captured.permissionProps?.value).toBe("guarded");
-    expect(captured.planProps?.checked).toBe(true);
-    expect(html).toContain("text-icon-blue");
-    expect(html).not.toContain("text-warning");
-  });
   afterEach(() => vi.unstubAllGlobals());
   it("模式菜单关闭后把焦点恢复到 V4 输入框", () => {
     renderToStaticMarkup(

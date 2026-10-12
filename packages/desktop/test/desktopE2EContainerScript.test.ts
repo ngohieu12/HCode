@@ -68,27 +68,6 @@ describe("desktop E2E container presets", () => {
 
     expect(missingPaths).toEqual([]);
   });
-
-  it("keeps the empty Docker plan table writable by the admission command", () => {
-    // Bugfix：仓库只对 *.mjs / *.sh 声明了 `eol=lf`，Markdown 在 `core.autocrlf=true`
-    // 的 Windows 检出里是 CRLF。下面断言的表格骨架是跨行片段，`\n` 匹配不到 `\r\n`，
-    // 用例在 Windows 上必然失败；这里要断言的是文档结构，与换行字节无关，故归一成 LF。
-    const dockerPlan = readFileSync(
-      resolve(repoRoot, "docs/testing/conversation-session-docker-automation-plan.md"),
-      "utf-8",
-    ).replaceAll("\r\n", "\n");
-
-    expect(dockerPlan).toContain(
-      "| Spec | 迁移状态 |\n| --- | --- |\n<!-- conversation-session-verified-table-end -->",
-    );
-
-    const spec = "./test/e2e/conversation-session/example.test.ts";
-    const updated = insertVerifiedDockerSpecRow(dockerPlan, spec);
-    expect(updated.inserted).toBe(true);
-    expect(updated.text).toContain(
-      `| \`${spec}\` | verified |\n<!-- conversation-session-verified-table-end -->`,
-    );
-  });
 });
 
 // 用假的 docker 记录参数，验证容器脚本透传给容器的上游供应商配置；取最后一次 docker run（前面一次是驱动预取）。

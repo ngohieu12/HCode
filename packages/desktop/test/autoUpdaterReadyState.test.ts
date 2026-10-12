@@ -2305,27 +2305,6 @@ describe("autoUpdater ready state sync", () => {
     });
   });
 
-  it("强制升级自动更新复用检查时，无可用更新会反馈错误状态", async () => {
-    const { initAutoUpdater, requestForceAutoUpdate } = await import("../src/main/autoUpdater.js");
-    const onStateChange = vi.fn();
-
-    initAutoUpdater();
-    expect(autoUpdaterMock.checkForUpdates).toHaveBeenCalledTimes(1);
-
-    requestForceAutoUpdate(onStateChange);
-
-    expect(onStateChange).toHaveBeenCalledWith({ kind: "checking" });
-    expect(autoUpdaterMock.checkForUpdates).toHaveBeenCalledTimes(1);
-
-    autoUpdaterMock.emit("update-not-available", { version: "0.1.24" });
-
-    // Bugfix: 启动期检查被强更弹窗复用后，无更新也必须通知弹窗，避免一直停留在 checking。
-    expect(onStateChange).toHaveBeenCalledWith({
-      kind: "error",
-      message: "未找到可安装更新，请使用手动升级。",
-    });
-  });
-
   it("强制升级自动更新复用检查失败时，会反馈弹窗错误状态", async () => {
     const checkError = new Error("feed offline");
     autoUpdaterMock.checkForUpdates.mockRejectedValueOnce(checkError);

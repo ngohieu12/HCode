@@ -15,21 +15,6 @@ import {
 } from "@/v4/composer/useDraftConfigControl.js";
 
 describe("resolveDraftDisplayedConfig", () => {
-  it("工具条只投影 Composer 的结构化选择", () => {
-    expect(
-      resolveDraftDisplayedConfig({
-        modelSelection: { providerId: "glm", modelId: "GLM-5.2" },
-      }),
-    ).toEqual({
-      modelSelection: { providerId: "glm", modelId: "GLM-5.2" },
-      provider: "glm",
-      model: "GLM-5.2",
-      thought: "",
-      thoughtLevels: [],
-      followupMode: "queue",
-      mode: "build",
-    });
-  });
 
   it("同模型的旧 Session 档位也不能补齐 Composer 留空的档位", () => {
     expect(

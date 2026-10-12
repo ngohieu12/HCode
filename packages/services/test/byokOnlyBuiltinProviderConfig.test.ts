@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import test from "node:test";
+import { test } from "vitest";
 
 // 应用为 BYOK 纯化：随包内置 Provider 不再包含任何模板、账号计划或 Z.AI/BigModel 相关规则。
 // 用户只能自行填写 API Key 添加 Provider。该测试直接读取随包基线文件。

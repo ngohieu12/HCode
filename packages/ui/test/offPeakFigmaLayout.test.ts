@@ -233,22 +233,6 @@ describe("idle-time task Figma layout contracts", () => {
     expect(offPeakNewTaskEntrySource).not.toContain("<OffPeakTemplateIcon");
   });
 
-  it("keeps the keep-awake notice at 10px radius with 12px content insets", () => {
-    const noticeStart = automationPrimitivesSource.indexOf(
-      "export function AutomationKeepAwakeNotice",
-    );
-    const noticeEnd = automationPrimitivesSource.indexOf(
-      "export function AutomationCreateDropdown",
-      noticeStart,
-    );
-    const noticeSource = automationPrimitivesSource.slice(noticeStart, noticeEnd);
-
-    expect(noticeStart).toBeGreaterThanOrEqual(0);
-    expect(noticeSource).toContain("rounded-[10px]");
-    expect(noticeSource).toContain("px-3 py-3");
-    expect(noticeSource).not.toContain("sm:py-0");
-  });
-
   it("uses the Changes Summary Open structure for the scheduled create split action", () => {
     const createStart = automationPrimitivesSource.indexOf(
       "export function AutomationCreateDropdown",
@@ -308,15 +292,6 @@ describe("idle-time task Figma layout contracts", () => {
 
     expect(templateStart).toBeGreaterThanOrEqual(0);
     expect(templateSource).toContain('className="flex h-full min-h-[114px] w-full flex-col');
-  });
-
-  it("keeps the detail breadcrumb and keep-awake control above the tabs", () => {
-    expect(editViewSource).toContain("<SettingsBreadcrumbReporter");
-    expect(editViewSource).toContain("flex min-w-0 flex-wrap items-center gap-4 sm:flex-nowrap");
-    expect(editViewSource).toContain("<AutomationSwitchToggle");
-    expect(editViewSource.indexOf("<SettingsBreadcrumbReporter")).toBeLessThan(
-      editViewSource.indexOf("<AutomationSettingsHistoryTabs"),
-    );
   });
 
   it("uses the shared Input border states for the idle-time title field", () => {

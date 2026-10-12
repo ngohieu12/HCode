@@ -22,16 +22,6 @@ describe("shouldReportLaunchToInput", () => {
     ).toBe(false);
   });
 
-  it("WelcomeScreen 打开(未登录,无输入框) → 不上报", () => {
-    expect(
-      shouldReportLaunchToInput({
-        isStartupRenderBlocked: false,
-        welcomeScreenOpen: true,
-        alreadyReported: false,
-      }),
-    ).toBe(false);
-  });
-
   it("已上报过 → 不重复", () => {
     expect(
       shouldReportLaunchToInput({

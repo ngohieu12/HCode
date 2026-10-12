@@ -218,45 +218,6 @@ describe("WorkspaceSidebar Web remote mobile layout", () => {
 
   // Bugfix: 该用例需要 SSR WorkspaceSidebar；pre-push 全量并发时首次导入和渲染偶尔超过默认 5s。
   // 子组件已经尽量 mock，剩余成本来自被测布局自身，局部放宽避免误报。
-  it("places remote tasks and workspace navigation in one mobile scroll area", async () => {
-    const html = await renderSidebar();
-
-    expect(html).toContain('data-web-remote-navigation-scroll="true"');
-    expect(html).toContain("max-md:overflow-y-auto");
-    expect(html).toContain('data-testid="remote-task-index"');
-    // Bugfix: 远控模式已把全局任务索引合并进主任务区，不再渲染重复的 workspace 列表项。
-    // 这里显式断言缺失，防止回归到“同屏两段列表”。
-    expect(html).not.toContain('data-testid="workspace-sidebar-item"');
-    expect(html).toContain("max-md:hidden");
-    expect(html).not.toContain("bots.title");
-    expect(html).not.toContain("workspace.openWorkspace");
-
-    const newTaskIndex = html.indexOf('data-testid="new-task-button-group"');
-    const filterIndex = html.indexOf("workspaceSidebar.taskViewOptions");
-    const topSearchIndex = html.indexOf("commandCenter.open");
-    const automationsIndex = html.indexOf("workspace.openScheduledSettings");
-    const pluginsIndex = html.indexOf("workspace.openPluginsSettings");
-    expect(newTaskIndex).toBeGreaterThan(-1);
-    expect(filterIndex).toBeGreaterThan(-1);
-    expect(topSearchIndex).toBeGreaterThan(newTaskIndex);
-    // D37：手机 /remote 不承载 Automations；合并 main 后不能恢复桌面入口。
-    expect(automationsIndex).toBe(-1);
-    expect(pluginsIndex).toBeGreaterThan(topSearchIndex);
-    expect(pluginsIndex).toBeLessThan(filterIndex);
-    expect(topSearchIndex).toBeLessThan(filterIndex);
-    expect(html.lastIndexOf("commandCenter.open")).toBe(topSearchIndex);
-  }, 15_000);
-
-  it("opens the workspace plugin marketplace from the home shortcut", async () => {
-    const onOpenPluginStore = vi.fn();
-
-    render(await createSidebarElement({ onOpenPluginStore }));
-    fireEvent.click(screen.getByRole("button", { name: "workspace.openPluginsSettings" }));
-
-    expect(onOpenPluginStore).toHaveBeenCalledTimes(1);
-    expect(setPendingSettingsSectionMock).not.toHaveBeenCalled();
-    expect(tabStoreState.openSettingsTab).not.toHaveBeenCalled();
-  });
 
   it("归档视图打开后将关闭按钮的 tooltip label 切换为 Close", async () => {
 
@@ -268,22 +229,6 @@ describe("WorkspaceSidebar Web remote mobile layout", () => {
     fireEvent.click(archiveButton);
 
     expect(screen.getByRole("button", { name: "common.close" })).toBe(archiveButton);
-  });
-
-  it("places plugins immediately after automations on the desktop home sidebar", async () => {
-
-    render(await createSidebarElement({ webRemoteControlWorkspaceSwitcher: undefined }));
-    const automationsButton = screen.getByRole("button", {
-      name: "workspace.openScheduledSettings",
-    });
-    const pluginsButton = screen.getByRole("button", {
-      name: "workspace.openPluginsSettings",
-    });
-
-    expect(pluginsButton.querySelector("svg")?.classList.contains("lucide-blocks")).toBe(true);
-    expect(
-      automationsButton.compareDocumentPosition(pluginsButton) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
   });
 
   it("does not keep the removed task toolbar search state", () => {

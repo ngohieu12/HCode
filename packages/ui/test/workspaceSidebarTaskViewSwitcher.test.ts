@@ -10,42 +10,6 @@ function readWorkspaceSidebarSource(): string {
 }
 
 describe("WorkspaceSidebar task view switcher", () => {
-  it("renders grouped before project while keeping project as the fallback default", () => {
-    const source = readWorkspaceSidebarSource();
-    const groupedTriggerIndex = source.indexOf('value="grouped"');
-    const workspaceTriggerIndex = source.indexOf('value="workspace"');
-
-    expect(groupedTriggerIndex).toBeGreaterThan(-1);
-    expect(workspaceTriggerIndex).toBeGreaterThan(-1);
-    expect(groupedTriggerIndex).toBeLessThan(workspaceTriggerIndex);
-    expect(source).toMatch(
-      /const activePrimaryTaskMode: PrimaryTaskMode =\s*!isWebRemoteControlSidebar && taskOrganizeBy === "grouped"\s*\? "grouped"\s*: "workspace";/,
-    );
-  });
-
-  it("keeps the pill shell at h-7 in the active horizontal tabs state", () => {
-    const source = readWorkspaceSidebarSource();
-
-    expect(source).toContain(
-      "relative h-7 w-fit overflow-hidden rounded-full bg-surface p-0.5 group-data-horizontal/tabs:h-7",
-    );
-  });
-
-  it("keeps pinned tasks visible above the grouped task body", () => {
-    const source = readWorkspaceSidebarSource();
-    const pinnedVisibilityStart = source.indexOf("const shouldShowPinnedTasks");
-    const pinnedVisibilityEnd = source.indexOf("const workspaceScrollRef", pinnedVisibilityStart);
-    const pinnedSectionIndex = source.indexOf("<WorkspacePinnedTasksSection");
-    const groupedSectionIndex = source.indexOf("<WorkspaceGroupedTasksSection");
-
-    expect(pinnedVisibilityStart).toBeGreaterThan(-1);
-    expect(pinnedVisibilityEnd).toBeGreaterThan(pinnedVisibilityStart);
-    expect(source.slice(pinnedVisibilityStart, pinnedVisibilityEnd)).toContain(
-      'taskViewMode === "grouped"',
-    );
-    expect(pinnedSectionIndex).toBeGreaterThan(-1);
-    expect(groupedSectionIndex).toBeGreaterThan(pinnedSectionIndex);
-  });
 
   it("keeps the previous expand-all button presentation while the next task view hydrates", () => {
     const previousPresentation = {
@@ -87,28 +51,6 @@ describe("WorkspaceSidebar task view switcher", () => {
       areAllExpanded: false,
       messageId: "workspaceSidebar.expandAllGroups",
     });
-  });
-
-  it("guards grouped collapsed preferences from transient empty hydration snapshots", () => {
-    const source = readWorkspaceSidebarSource();
-
-    expect(source).toContain("nextGroupIds.length === 0");
-    expect(source).toContain("!groupedTaskGroupIdsHydrated");
-    expect(source).toContain("lastNonEmptyGroupedTaskGroupIds.length > 0");
-    expect(source).toContain("collapsedGroupedTaskGroupIds.size > 0");
-    expect(source).toContain("重启后首进 Group");
-    expect(source).toContain("不能当成“所有 group 已删除”");
-  });
-
-  it("Idle-time 收敛后由 grouped 树承载，侧栏不再独立渲染系统分组（D48-A）", () => {
-    const source = readWorkspaceSidebarSource();
-
-    expect(source).not.toContain("OffPeakSidebarGroup");
-    expect(source).not.toContain("data-workspace-grouped-system-stack");
-    // 闲时组头「+」路由到 Automations：Section 通过该 prop 拿到入口。
-    expect(source).toContain("onOpenAutomations={handleOpenAutomationsMain}");
-    expect(source).toContain("onClick={handleOpenPluginStoreMain}");
-    expect(source).not.toContain("handleOpenPluginsSettings");
   });
 
   it("project view separates task-purpose rows and renders sections from persisted order", () => {

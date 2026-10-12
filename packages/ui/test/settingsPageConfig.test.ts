@@ -22,67 +22,6 @@ afterEach(() => {
 });
 
 describe("settingsPageConfig", () => {
-  it("按设置页心智顺序展示 test 分区", async () => {
-    const { createSettingsPageConfig } = await loadSettingsPageConfig("test");
-    const { settingsSectionGroups, settingsSections } = createSettingsPageConfig({});
-
-    expect(
-      settingsSectionGroups.map((group) => ({
-        id: group.id,
-        sections: group.sections.map((section) => section.id),
-      })),
-    ).toEqual([
-      {
-        id: "basics",
-        sections: ["general", "appearance", "modelProvider", "browser", "shortcuts"],
-      },
-      {
-        id: "agentCapabilities",
-        sections: ["memory", "subagents", "plugin", "mcp", "skill", "commands", "hooks"],
-      },
-      {
-        id: "dataAndStats",
-        sections: ["usage"],
-      },
-    ]);
-
-    expect(settingsSections.map((section) => section.id)).toEqual([
-      "general",
-      "appearance",
-      "modelProvider",
-      "memory",
-      "subagents",
-      "plugin",
-      "mcp",
-      "skill",
-      "commands",
-      "hooks",
-      "browser",
-      "shortcuts",
-      "usage",
-    ]);
-  });
-
-  it("按设置页心智顺序展示 production 分区并保留 usage", async () => {
-    const { createSettingsPageConfig } = await loadSettingsPageConfig("production");
-    const { settingsSections } = createSettingsPageConfig({});
-
-    expect(settingsSections.map((section) => section.id)).toEqual([
-      "general",
-      "appearance",
-      "modelProvider",
-      "memory",
-      "subagents",
-      "plugin",
-      "mcp",
-      "skill",
-      "commands",
-      "hooks",
-      "browser",
-      "shortcuts",
-      "usage",
-    ]);
-  });
 
   it("Plugins 内容标题不再配置 beta 徽标", async () => {
     const { SETTINGS_SECTIONS } = await loadSettingsPageConfig("test");

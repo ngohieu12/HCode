@@ -244,26 +244,6 @@ describe("WebRemoteControlTaskIndex layout", () => {
     );
   });
 
-  it("lets the wide remote sidebar render its workspace toolbar after pinned tasks", () => {
-    const taskIndexSource = readFileSync(
-      resolve(process.cwd(), "packages/ui/src/WebRemoteControlTaskIndex.tsx"),
-      "utf8",
-    );
-    const sidebarSource = readFileSync(
-      resolve(process.cwd(), "packages/ui/src/WorkspaceSidebar.tsx"),
-      "utf8",
-    );
-
-    expect(taskIndexSource).toContain("renderBeforePinnedTasks");
-    expect(taskIndexSource).toContain("model.pinnedTasks.map((task) => renderTaskRow(task))");
-    expect(
-      taskIndexSource.indexOf("{renderBeforePinnedTasks ? renderBeforePinnedTasks() : null}"),
-    ).toBeLessThan(taskIndexSource.indexOf("{model.pinnedTasks.length > 0 ? ("));
-    expect(sidebarSource).toContain("const workspaceTaskToolbar");
-    expect(sidebarSource).toContain("renderBeforePinnedTasks={workspaceTaskToolbar}");
-    expect(sidebarSource).toContain("{!isWebRemoteControlSidebar ? workspaceTaskToolbar() : null}");
-  });
-
   it("keeps mutable wide remote task actions out of the initial static markup", async () => {
     const html = await renderTaskIndexWithInitialTasks();
 

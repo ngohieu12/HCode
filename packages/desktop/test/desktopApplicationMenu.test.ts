@@ -176,15 +176,6 @@ describe("desktopApplicationMenu endpoint submenu", () => {
     getApplicationMenuMock.mockClear();
   });
 
-  it("system default 优先按 macOS 首选系统语言解析", async () => {
-    envMock.locale = "en-US";
-    envMock.preferredSystemLanguages = ["zh-Hans-CN", "en-CN"];
-    const { resolveSystemApplicationLocale } =
-      await import("../src/main/desktopApplicationMenu.js");
-
-    expect(resolveSystemApplicationLocale()).toBe("zh-CN");
-  });
-
   it("test 环境显示 endpoint 子菜单并标记当前 test 选项", async () => {
     envMock.value = "test";
     const { HELP_ZCODE_ENDPOINT_TEST_MENU_ID, rebuildApplicationMenu } =

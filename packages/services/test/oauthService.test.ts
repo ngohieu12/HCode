@@ -11,7 +11,7 @@ import {
   type OAuthTokenSet,
   type OAuthUserProfile,
 } from "@zcode/shared";
-import { BIGMODEL_OAUTH_PROVIDER_CONFIG } from "../src/oauth/providers/bigmodelProviderConfig.js";
+import { createBigModelProviderRuntimeConfig } from "../src/oauth/providers/bigmodelProviderConfig.js";
 import { ZAI_OAUTH_PROVIDER_CONFIG } from "../src/oauth/providers/zaiProviderConfig.js";
 import { ZaiProviderAdapter } from "../src/oauth/providers/zaiProviderAdapter.js";
 import type { ICredentialService } from "../src/credential/credential.js";
@@ -22,6 +22,11 @@ import { OAuthCredentialRepo } from "../src/oauth/repo/oauthCredentialRepo.js";
 import { AccountProviderApiKeyResolver } from "../src/model-provider/accountProviderApiKeyResolver.js";
 import { createAccountProjectTokenClient } from "../src/model-provider/accountProjectTokenClient.js";
 import { resolveAccountTeamPlanRuntimeApiKey } from "../src/model-provider/accountProviderTeamPlanRequestKey.js";
+
+// 测试期望值取自运行时配置（BigModel 默认关闭，这里显式开启以读取端点）。
+const BIGMODEL_OAUTH_PROVIDER_CONFIG = createBigModelProviderRuntimeConfig({
+  BIGMODEL_OAUTH_ENABLED: "true",
+});
 
 const DESKTOP_OAUTH_CALLBACK_URI = "zcode://oauth/callback";
 
@@ -123,6 +128,8 @@ function createBigModelService(
   return new OAuthService(credentialServiceStub, {
     env: {
       ...cleanProcessEnv,
+      // BigModel OAuth 默认关闭（见 bigmodelProviderConfig.ts），这些用例需显式开启
+      BIGMODEL_OAUTH_ENABLED: "true",
       BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
     },
     apiClient: createMockApiClient(vi.fn<typeof fetch>()),
@@ -942,6 +949,7 @@ describe("oauthService", () => {
         new OAuthService(credentialServiceStub, {
           env: {
             ...process.env,
+            BIGMODEL_OAUTH_ENABLED: "true",
             BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
           },
         }),
@@ -999,6 +1007,7 @@ describe("oauthService", () => {
     const service = createBigModelService({
       env: {
         ...cleanProcessEnv,
+        BIGMODEL_OAUTH_ENABLED: "true",
         BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
         ZCODE_ENV: "test",
         ZAI_OAUTH_CLIENT_ID: "client_P8X5CMWmlaRO9gyO-KSqtg",
@@ -1020,6 +1029,7 @@ describe("oauthService", () => {
     const service = createBigModelService({
       env: {
         ...cleanProcessEnv,
+        BIGMODEL_OAUTH_ENABLED: "true",
         BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
         ZCODE_ENV: "test",
       },
@@ -1035,6 +1045,7 @@ describe("oauthService", () => {
     const service = createBigModelService({
       env: {
         ...cleanProcessEnv,
+        BIGMODEL_OAUTH_ENABLED: "true",
         BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
         ZCODE_ENV: "test",
       },
@@ -1050,6 +1061,7 @@ describe("oauthService", () => {
     const service = createBigModelService({
       env: {
         ...process.env,
+        BIGMODEL_OAUTH_ENABLED: "true",
         BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
         ZCODE_ENV: "production",
       },
@@ -1142,6 +1154,7 @@ describe("oauthService", () => {
     const service = createBigModelService({
       env: {
         ...cleanProcessEnv,
+        BIGMODEL_OAUTH_ENABLED: "true",
         BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
         ZCODE_ENV: "test",
       },
@@ -1252,6 +1265,7 @@ describe("oauthService", () => {
       apiClient: createMockApiClient(fetchMock),
       env: {
         ...process.env,
+        BIGMODEL_OAUTH_ENABLED: "true",
         BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
         ZCODE_BASE_URL: "https://zcode.z.ai",
       },
@@ -1289,6 +1303,7 @@ describe("oauthService", () => {
       apiClient: createMockApiClient(fetchMock),
       env: {
         ...process.env,
+        BIGMODEL_OAUTH_ENABLED: "true",
         BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
         ZAI_BUSINESS_BASE_URL: "https://api.z.ai",
       },
@@ -1984,6 +1999,7 @@ describe("oauthService", () => {
       apiClient: createMockApiClient(fetchMock),
       env: {
         ...process.env,
+        BIGMODEL_OAUTH_ENABLED: "true",
         BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
         ZCODE_BASE_URL: "https://zcode.z.ai",
       },
@@ -2009,6 +2025,7 @@ describe("oauthService", () => {
       apiClient: createMockApiClient(fetchMock),
       env: {
         ...cleanProcessEnv,
+        BIGMODEL_OAUTH_ENABLED: "true",
         BIGMODEL_OAUTH_APP_SECRET: "unit-test-secret",
         ZCODE_ENV: "test",
       },
@@ -2351,7 +2368,7 @@ describe("oauthService", () => {
     const fetchMock = vi.fn<typeof fetch>();
     const service = createBigModelService({
       apiClient: createMockApiClient(fetchMock),
-      env: {} as NodeJS.ProcessEnv,
+      env: { BIGMODEL_OAUTH_ENABLED: "true" } as NodeJS.ProcessEnv,
     });
     const { state } = await service.startOAuth(BIGMODEL_PROVIDER_ID);
 

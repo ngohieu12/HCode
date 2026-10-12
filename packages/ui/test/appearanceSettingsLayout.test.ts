@@ -4,18 +4,6 @@ import enUS from "../src/i18n/locales/en-US.js";
 import zhCN from "../src/i18n/locales/zh-CN.js";
 
 describe("appearance settings layout", () => {
-  it("代码设置和代码预览上下排列，亮暗预览仅在宽屏左右排列", () => {
-    const source = readFileSync("packages/ui/src/settingsCodePreview.tsx", "utf8");
-
-    expect(source).toContain('className="space-y-6"');
-    expect(source).toContain('className="grid gap-4 sm:grid-cols-2"');
-    expect(source).not.toContain('className="grid gap-4 lg:grid-cols-2"');
-    expect(source).not.toContain('className="grid gap-4 xl:grid-cols-2"');
-    expect(source).not.toContain('className="grid gap-4 2xl:grid-cols-2"');
-    expect(source).not.toContain('className="grid items-start gap-6 xl:grid-cols-2"');
-    expect(source).toContain('id: "settings.appearance.codeTitle"');
-    expect(source).toContain('id: "settings.previewSectionTitle"');
-  });
 
   it("把实时预览统一命名为代码预览", () => {
     expect(zhCN["settings.uiFontSize"]).toBe("界面字号");

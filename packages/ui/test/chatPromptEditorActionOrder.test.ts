@@ -3,6 +3,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { ChatPromptEditor } from "@/prompt-editor/ChatPromptEditor.js";
 
+vi.mock("@/shortcuts/useShortcutBindings.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/shortcuts/useShortcutBindings.js")>()),
+  // 测试隔离：快捷键标签不依赖 ServiceProvider。
+  useShortcutCommandLabel: () => "",
+}));
+
 vi.mock("@/ControlHintTooltip.js", () => ({
   ControlHintTooltip: ({ children }: { children: ReactNode }) => children,
 }));

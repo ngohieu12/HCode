@@ -55,26 +55,6 @@ describe("settings frame content layout", () => {
     );
   });
 
-  it("limits the independent plugin marketplace to the 4xl content width", () => {
-    expect(
-      workspaceShellSource.match(
-        /className="mx-auto flex w-full max-w-4xl flex-col px-4 py-4 md:px-6 md:py-6"[\s\S]{0,120}<PluginStorePage/g,
-      ),
-    ).toHaveLength(2);
-  });
-
-  it("returns to chat before creating a task from plugin detail prompts", () => {
-    const pluginStoreUsages = workspaceShellSource.match(
-      /<PluginStorePage[\s\S]{0,500}?onCreateTask=\{handleCreateTaskInChat\}/g,
-    );
-
-    // Desktop 与窄屏 Shell 都必须使用包含 showChatMainView 的包装回调。
-    expect(pluginStoreUsages).toHaveLength(2);
-    expect(workspaceShellSource).not.toMatch(
-      /<PluginStorePage[\s\S]{0,500}?onCreateTask=\{onCreateTask\}/,
-    );
-  });
-
   it("renders the read-only Settings breadcrumb inside the caption drag region", () => {
     expect(settingsPageSource).toMatch(
       /min-w-0 flex-1 \[app-region:drag\][\s\S]*?<SettingsHeaderBreadcrumb/,

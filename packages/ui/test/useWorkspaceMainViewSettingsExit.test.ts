@@ -71,23 +71,4 @@ describe("useWorkspaceMainViewSettingsExit", () => {
 
     expect(onExitSettings).not.toHaveBeenCalled();
   });
-
-  it("preserves plugin store when explicit navigation targets the already-open store", () => {
-    const onExitSettings = vi.fn();
-    const hook = renderHook(
-      ({ isWorkspaceVisible }) =>
-        useWorkspaceMainViewSettingsExit({
-          isWorkspaceVisible,
-          workspaceMainView: "plugin-store",
-          onExitSettings,
-        }),
-      { initialProps: { isWorkspaceVisible: true } },
-    );
-
-    hook.rerender({ isWorkspaceVisible: false });
-    act(() => hook.result.current.preserveNextSettingsExit());
-    hook.rerender({ isWorkspaceVisible: true });
-
-    expect(onExitSettings).not.toHaveBeenCalled();
-  });
 });

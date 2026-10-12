@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import { useZCodeSessionStore } from "../src/store/zcodeSessionStore.js";
 
 const WORKSPACE = "/tmp/hcode-close-conversation-test";

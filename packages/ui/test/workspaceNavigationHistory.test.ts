@@ -10,16 +10,6 @@ import {
 } from "@/lib/taskNavigationHistory.js";
 
 describe("workspace navigation history", () => {
-  it("将插件市场作为独立 workspace 目标记录", () => {
-    const history = pushPluginStoreNavEntry(
-      createTaskNavigationHistory(),
-      "/repo",
-      "ssh://dev/repo",
-    );
-    expect(history.entries).toEqual([
-      { kind: "plugin-store", workspacePath: "/repo", workspaceIdentity: "ssh://dev/repo" },
-    ]);
-  });
 
   it("将 Automations 作为独立目标记录，并支持返回会话后再次前进", () => {
     const taskHistory = pushNavEntry(

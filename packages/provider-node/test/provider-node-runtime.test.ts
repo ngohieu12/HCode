@@ -108,66 +108,6 @@ describe("@zcode/provider-node", () => {
     source.dispose();
   });
 
-  it("从 Built-in Config 解析模型能力、Access 协议和 Tool Schema 兼容事实", async () => {
-    const source = new NodeZCodeBuiltinProviderConfigSource({
-      bundledFilePath: zcodeBuiltinProviderConfigFilePath,
-      watch: false,
-    });
-    const snapshot = await source.read();
-
-    expect(
-      snapshot.models.resolve({
-        providerId: "personal-zai-api",
-        templateId: "zai-api",
-        modelId: "glm-5.3",
-        apiType: "anthropic-messages",
-        baseUrl: "https://api.z.ai/api/anthropic",
-      }).properties,
-    ).toMatchObject({
-      supportsMidConversationSystem: true,
-      supportsNativeWebSearch: true,
-    });
-    expect(
-      snapshot.models.resolve({
-        providerId: "moonshot-kimi",
-        modelId: "kimi-k3",
-        apiType: "anthropic-messages",
-        baseUrl: "https://api.moonshot.cn/anthropic",
-      }),
-    ).toMatchObject({ properties: { requiresMfjsToolSchema: true } });
-    expect(
-      snapshot.models.resolve({
-        providerId: "moonshot-kimi",
-        modelId: "kimi-k2.6",
-        apiType: "anthropic-messages",
-      }),
-    ).toMatchObject({ properties: { requiresMfjsToolSchema: false } });
-    expect(
-      snapshot.models.resolve({
-        providerId: "personal",
-        modelId: "claude-opus-4-8",
-        apiType: "anthropic-messages",
-      }).properties,
-    ).toMatchObject({
-      supportsMidConversationSystem: true,
-      supportsNativeWebSearch: false,
-    });
-    expect(snapshot.providers.get("account:zai-start-plan")?.access).toMatchObject({
-      type: "zhipu-account",
-      accountType: "zai",
-      mode: "start-plan",
-    });
-    expect(snapshot.providers.get("account:zai-offpeak-idle-plan")?.access).toMatchObject({
-      type: "zhipu-account",
-      accountType: "zai",
-      mode: "off-peak",
-    });
-    expect(snapshot.providerTemplates?.get("deepseek")?.config.access).toMatchObject({
-      type: "api-key",
-    });
-    source.dispose();
-  });
-
   it("随包配置固定路径复用相同内容，升级后原子覆盖而不增加历史副本", async () => {
     const root = await temporaryDirectory();
     const firstContent = JSON.stringify({

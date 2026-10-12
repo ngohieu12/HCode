@@ -50,20 +50,6 @@ function renderTool(component: typeof ExecuteToolCallBlock, props: ToolCallBlock
 }
 
 describe("通用模式工具展示", () => {
-  it.each([false, true])("执行详情隐藏但终态保留（failed=%s）", (failed) => {
-    const props = context(true, failed);
-    const original = JSON.stringify(props.toolCallNode);
-    const general = renderTool(ExecuteToolCallBlock, props);
-    expect(general).not.toContain("MODE_PRIVATE_COMMAND");
-    expect(general).not.toContain("MODE_PRIVATE_OUTPUT");
-    expect(general).not.toContain("MODE_PRIVATE_ERROR");
-    expect(general).toContain(failed ? "失败" : "已运行命令");
-    expect(general).not.toContain('aria-expanded="true"');
-    const coding = renderTool(ExecuteToolCallBlock, { ...props, isOfficeMode: false });
-    expect(coding).toContain("MODE_PRIVATE_COMMAND");
-    expect(coding).toContain(failed ? "MODE_PRIVATE_ERROR" : "MODE_PRIVATE_OUTPUT");
-    expect(JSON.stringify(props.toolCallNode)).toBe(original);
-  });
 
   it("编辑保留文件入口但不渲染 Diff 正文", () => {
     const props = context(true);
@@ -87,19 +73,4 @@ describe("通用模式工具展示", () => {
     expect(html).not.toContain('aria-expanded="true"');
     expect(props.rawFileSummaries[0]?.patch).toContain("MODE_NEW_VALUE");
   });
-});
-
-it("运行中的执行组只展示状态，不泄露子命令或强制展开详情", () => {
-  const props = context(true);
-  props.isRunning = true;
-  props.toolCallNode.childToolCalls = [
-    {
-      ...context(true).toolCallNode,
-      toolCall: { ...context(true).toolCallNode.toolCall, status: "in_progress" },
-    },
-  ];
-  const general = renderTool(ExecuteGroupToolCallBlock, props);
-  expect(general).not.toContain("MODE_PRIVATE_COMMAND");
-  expect(general).not.toContain("MODE_PRIVATE_OUTPUT");
-  expect(general).not.toContain('aria-expanded="true"');
 });

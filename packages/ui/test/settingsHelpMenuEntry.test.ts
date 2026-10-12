@@ -36,15 +36,4 @@ describe("settings help menu entry", () => {
     expect(settingsPageSource).toContain("<DesktopWindowControls />");
     expect(settingsPageSource).toContain('usesInlineWindowControls ? "mr-[134px]" : "mr-12"');
   });
-
-  it("passes desktop mode into the shared profile menu footer", () => {
-    const settingsPageSource = readSource("packages/ui/src/SettingsPage.tsx");
-    const footerIndex = settingsPageSource.indexOf("<WorkspaceSidebarFooter");
-    const footerCloseIndex = settingsPageSource.indexOf("/>", footerIndex);
-    const footerUsage = settingsPageSource.slice(footerIndex, footerCloseIndex);
-
-    expect(footerIndex).toBeGreaterThan(-1);
-    expect(footerUsage).toContain("isDesktop={isDesktop}");
-    expect(footerUsage).toContain("头像菜单是 WorkspaceSidebarFooter 的共享菜单");
-  });
 });

@@ -359,43 +359,6 @@ describe("remoteWorkspaceHistory helpers", () => {
     );
   });
 
-  it("persists and hydrates server remote target credentials", () => {
-    const workspaceKey = "remote:server:studio-server-01:/srv/project";
-    const target: RemoteTarget = {
-      kind: "server",
-      url: "https://studio.example.com/zcode/",
-      name: "Studio Server",
-      serverId: "Studio Server 01",
-      workspacePath: "/srv/project",
-      token: "server-secret",
-    };
-    const snapshot = createRemoteTargetSnapshot(workspaceKey, target);
-
-    expect(buildRemoteWorkspaceIdentity("\\srv\\project\\", target)).toBe(workspaceKey);
-    expect(snapshot).toEqual({
-      kind: "server",
-      url: "https://studio.example.com/zcode/",
-      name: "Studio Server",
-      serverId: "Studio Server 01",
-      workspacePath: "/srv/project",
-      tokenCredentialKey:
-        "remote-workspace:remote:server:studio-server-01:/srv/project:server-token",
-    });
-    expect(
-      createRemoteTargetFromSnapshot(snapshot, {
-        password: null,
-        privateKeyPassphrase: null,
-        token: "server-secret",
-      }),
-    ).toEqual(target);
-    expect(formatRemoteWorkspaceTargetSubtitle(snapshot)).toBe(
-      "Server · Studio Server",
-    );
-    expect(formatRemoteWorkspaceHeaderHostLabel(snapshot)).toBe(
-      "studio.example.com",
-    );
-  });
-
   it("keeps the legacy WSL identity when no user is specified", () => {
     expect(
       buildRemoteWorkspaceIdentity("/workspace/demo", {

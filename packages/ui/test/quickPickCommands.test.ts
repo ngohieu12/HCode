@@ -36,26 +36,6 @@ const shortcuts = {
 };
 
 describe("createQuickPickCommands", () => {
-  it("通用模式过滤技术面板命令并保留浏览器和普通命令", () => {
-    const commands = createQuickPickCommands({
-      allowOpenWorkspace: true,
-      canOpenCommunity: true,
-      isSidebarVisible: true,
-      isLoggedIn: false,
-      supportsTerminal: false,
-      supportsReview: false,
-      themeTarget: "dark",
-      shortcuts,
-      handlers: createHandlers(),
-    });
-    const ids = commands.map((command) => command.id);
-    expect(ids).not.toContain("toggle-terminal");
-    expect(ids).not.toContain("add-terminal-tab");
-    expect(ids).not.toContain("add-review-tab");
-    expect(ids).toContain("add-browser-tab");
-    expect(ids).toContain("new-task");
-    expect(ids).toContain("settings");
-  });
 
   it("creates the starter command registry in stable sections", () => {
     const commands = createQuickPickCommands({

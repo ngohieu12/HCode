@@ -18,6 +18,12 @@ const attachmentState = vi.hoisted(() => ({
 
 const cuaEntryProps = vi.hoisted(() => [] as Array<Record<string, unknown>>);
 
+vi.mock("@/shortcuts/useShortcutBindings.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/shortcuts/useShortcutBindings.js")>()),
+  // 测试隔离：快捷键标签不依赖 ServiceProvider。
+  useShortcutCommandLabel: () => "",
+}));
+
 vi.mock("@/ControlHintTooltip.js", async () => {
   const React = await import("react");
   return {

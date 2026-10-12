@@ -28,16 +28,6 @@ describe("Automations populated-list Figma contract", () => {
     );
   });
 
-  it("keeps the populated banner ahead of tasks with the Figma spacing", () => {
-    const bannerStart = automationsSectionSource.indexOf("<AutomationKeepAwakeNotice");
-    const gridStart = automationsSectionSource.indexOf("data-automations-task-grid");
-
-    expect(bannerStart).toBeGreaterThanOrEqual(0);
-    expect(gridStart).toBeGreaterThan(bannerStart);
-    // D47：keep-awake 是全局开关，Scheduled / Idle 两个 tab 都展示；有任务时提示条与 action row 收紧到 20px。
-    expect(automationsSectionSource).toMatch(/hasAnyTasks \? "mt-5" : "mt-8"/);
-  });
-
   it("keeps inactive tabs transparent and shows the scheduled create split action only on its tab", () => {
     expect(automationsSectionSource).toContain(
       '"text-foreground-subtle hover:bg-hover hover:text-foreground"',

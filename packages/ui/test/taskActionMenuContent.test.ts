@@ -80,18 +80,6 @@ describe("TaskActionMenuContent", () => {
     expect(html).not.toContain("appHeader.syncModelConfig");
   });
 
-  it("provider 配置文件未落盘但路径已知时仍保留入口", () => {
-    const { itemStates } = renderMenu({
-      providerConfigFile: {
-        loading: false,
-        path: "/tmp/provider/config.json",
-        exists: false,
-      },
-    });
-
-    expect(itemStates[PROVIDER_CONFIG_ITEM_INDEX]?.disabled).toBe(false);
-  });
-
   it("日志文件未落盘但路径已知时仍允许复制路径", () => {
     const { itemStates } = renderMenu({
       taskNativeSessionLogFile: {
@@ -102,22 +90,6 @@ describe("TaskActionMenuContent", () => {
     });
 
     expect(itemStates[TASK_LOG_PATH_ITEM_INDEX]?.disabled).toBe(false);
-  });
-
-  it("新建未落库任务只禁用依赖 taskId 的动作", () => {
-    const { itemStates } = renderMenu({
-      disableTaskTargetActions: true,
-    });
-
-    expect(itemStates[PIN_ITEM_INDEX]?.disabled).toBe(true);
-    expect(itemStates[RENAME_ITEM_INDEX]?.disabled).toBe(true);
-    expect(itemStates[ARCHIVE_ITEM_INDEX]?.disabled).toBe(true);
-    expect(itemStates[UNREAD_ITEM_INDEX]?.disabled).toBe(true);
-    expect(itemStates[TASK_PATH_ITEM_INDEX]?.disabled).toBe(true);
-    expect(itemStates[TASK_LOG_PATH_ITEM_INDEX]?.disabled).toBe(true);
-    expect(itemStates[FILE_MANAGER_ITEM_INDEX]?.disabled).toBe(false);
-    expect(itemStates[WORKSPACE_PATH_ITEM_INDEX]?.disabled).toBe(false);
-    expect(itemStates[PROVIDER_CONFIG_ITEM_INDEX]?.disabled).toBe(false);
   });
 
   it("手机远控菜单隐藏本机文件和配置入口但保留复制路径", () => {

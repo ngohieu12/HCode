@@ -31,8 +31,16 @@ function defaultEffective(): ComposerEffectiveBindings {
 }
 
 /** Ctrl+Enter 党：把发送改绑为 CmdOrCtrl+Enter（整组替换，裸 Enter 移除）。 */
+/** Enter 发送模式的生效表（HCode 默认是换行模式，见 DEFAULT_COMPOSER_ENTER_BEHAVIOR）。 */
+function sendEffective(): ComposerEffectiveBindings {
+  return {
+    composerSend: getDefaultShortcutBindings("composerSend", "send"),
+    composerInsertNewline: getDefaultShortcutBindings("composerInsertNewline", "send"),
+  };
+}
+
 function ctrlEnterEffective(): ComposerEffectiveBindings {
-  return { ...defaultEffective(), composerSend: ["CmdOrCtrl+Enter"] };
+  return { ...sendEffective(), composerSend: ["CmdOrCtrl+Enter"] };
 }
 
 /**
@@ -46,9 +54,19 @@ const WIN = { platform: "Win32", userAgent: "Mozilla/5.0 (Windows NT 10.0)" };
 const LINUX = { platform: "Linux x86_64", userAgent: "Mozilla/5.0 (X11; Linux x86_64)" };
 
 describe("composer 作用域键位解析（spec §12.3）", () => {
-  it("默认表：裸 Enter 发送、Shift+Enter 换行", () => {
-    expect(resolveComposerKeyAction(enterEvent(), defaultEffective())).toBe("send");
-    expect(resolveComposerKeyAction(enterEvent({ shiftKey: true }), defaultEffective())).toBe(
+  it("默认表（换行模式）：CmdOrCtrl+Enter 发送、裸 Enter 与 Shift+Enter 换行", () => {
+    expect(resolveComposerKeyAction(enterEvent({ ctrlKey: true }), defaultEffective(), WIN)).toBe(
+      "send",
+    );
+    expect(resolveComposerKeyAction(enterEvent(), defaultEffective(), WIN)).toBe("newline");
+    expect(resolveComposerKeyAction(enterEvent({ shiftKey: true }), defaultEffective(), WIN)).toBe(
+      "newline",
+    );
+  });
+
+  it("发送模式：裸 Enter 发送、Shift+Enter 换行", () => {
+    expect(resolveComposerKeyAction(enterEvent(), sendEffective())).toBe("send");
+    expect(resolveComposerKeyAction(enterEvent({ shiftKey: true }), sendEffective())).toBe(
       "newline",
     );
   });
@@ -63,8 +81,8 @@ describe("composer 作用域键位解析（spec §12.3）", () => {
     expect(shouldBareEnterFallThroughToNewline(effective)).toBe(true);
   });
 
-  it("Shift+Enter 党零改动：默认表下裸 Enter 仍发送", () => {
-    expect(shouldBareEnterFallThroughToNewline(defaultEffective())).toBe(false);
+  it("换行模式默认表下裸 Enter 不发送，交主链换行", () => {
+    expect(shouldBareEnterFallThroughToNewline(defaultEffective())).toBe(true);
   });
 
   it("非 Enter 事件默认表不命中（开放策略下改绑非 Enter 键才会命中，SG-09）", () => {
@@ -114,8 +132,8 @@ describe("composer 作用域键位解析（spec §12.3）", () => {
   it("默认状态下未命中的修饰组合返回 null（主链反转投递/换行语义不受影响）", () => {
     // Ctrl+Enter 默认不在任何 composer 绑定里：无修饰组合命中时不得吞掉
     // onModifiedSubmit（反转投递）与 Lexical 默认换行
-    expect(resolveComposerKeyAction(enterEvent({ ctrlKey: true }), defaultEffective())).toBeNull();
-    expect(resolveComposerKeyAction(enterEvent({ metaKey: true }), defaultEffective())).toBeNull();
+    expect(resolveComposerKeyAction(enterEvent({ altKey: true }), defaultEffective(), WIN)).toBeNull();
+    expect(resolveComposerKeyAction(enterEvent({ altKey: true }), sendEffective(), WIN)).toBeNull();
   });
 
   // ============================================================================
@@ -123,15 +141,15 @@ describe("composer 作用域键位解析（spec §12.3）", () => {
   // ============================================================================
 
   it("mac：默认表裸 Enter 发送、Shift+Enter 换行；Cmd+Enter 不命中（主链反转投递语义保留）", () => {
-    expect(resolveComposerKeyAction(enterEvent(), defaultEffective(), MAC)).toBe("send");
-    expect(resolveComposerKeyAction(enterEvent({ shiftKey: true }), defaultEffective(), MAC)).toBe(
+    expect(resolveComposerKeyAction(enterEvent(), sendEffective(), MAC)).toBe("send");
+    expect(resolveComposerKeyAction(enterEvent({ shiftKey: true }), sendEffective(), MAC)).toBe(
       "newline",
     );
     // mac 上 CmdOrCtrl 归一为 Cmd：Cmd+Enter 不在默认绑定（裸 Enter 不带修饰），
     // 必须落回主链给反转投递（onModifiedSubmit 接受 metaKey）
-    expect(resolveComposerKeyAction(enterEvent({ metaKey: true }), defaultEffective(), MAC)).toBeNull();
+    expect(resolveComposerKeyAction(enterEvent({ metaKey: true }), sendEffective(), MAC)).toBeNull();
     // mac 的 Win 键等价物不存在；Option（alt）+Enter 同样不命中默认绑定
-    expect(resolveComposerKeyAction(enterEvent({ altKey: true }), defaultEffective(), MAC)).toBeNull();
+    expect(resolveComposerKeyAction(enterEvent({ altKey: true }), sendEffective(), MAC)).toBeNull();
   });
 
   it("mac：改绑 CmdOrCtrl+Enter 后 Cmd+Enter 发送，显式 Ctrl+Enter 不命中（保留系统编辑区语义）", () => {

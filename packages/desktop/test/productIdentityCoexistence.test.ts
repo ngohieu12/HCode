@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, it } from "node:test";
+import { describe, it } from "vitest";
 
 import { desktopProductIdentities } from "../scripts/desktop-product-identity.mjs";
 import { installFinderOpenFolderWorkflow } from "../src/main/desktopFinderOpenFolderWorkflow.ts";

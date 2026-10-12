@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import { createBigModelProviderRuntimeConfig } from "../src/oauth/providers/bigmodelProviderConfig.js";
 import { createZaiProviderRuntimeConfig } from "../src/oauth/providers/zaiProviderConfig.js";
 

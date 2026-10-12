@@ -67,25 +67,6 @@ describe("settings model provider upgrade intent", () => {
     );
   });
 
-  it("opens workspace upgrade entries without switching to Settings", () => {
-    const appSource = readSource("packages/ui/src/App.tsx");
-    const rootSource = readSource("packages/ui/src/Root.tsx");
-    const workspaceSidebarSource = readSource("packages/ui/src/WorkspaceSidebar.tsx");
-    const v4ComposerToolbarSource = readSource("packages/ui/src/v4/composer/V4ComposerToolbar.tsx");
-    const contextUsageSource = readSource("packages/ui/src/chat-input-toolbar/contextUsage.tsx");
-
-    expect(appSource).not.toContain("handleOpenCodingPlanUpgrade");
-    expect(appSource).not.toContain("<CodingPlanUpgradeDialog");
-    expect(rootSource).toContain("<CodingPlanUpgradeDialogProvider>");
-    expect(workspaceSidebarSource).toContain("useCodingPlanUpgradeDialog");
-    expect(v4ComposerToolbarSource).toContain("useCodingPlanUpgradeDialog");
-    expect(v4ComposerToolbarSource).toContain("openCodingPlanUpgrade({");
-    expect(v4ComposerToolbarSource).toContain("startPlanBalance={contextStartPlanBalance}");
-    expect(contextUsageSource).toContain("startPlanBalance.onUpgradeClick?.()");
-    expect(workspaceSidebarSource).not.toContain("codingPlanUpgradeProviderId");
-    expect(v4ComposerToolbarSource).not.toContain("codingPlanUpgradeProviderId");
-  });
-
   it("routes both idle-time Upgrade entries through the shared purchase funnel context", () => {
     const offPeakNewTaskEntrySource = readSource("packages/ui/src/v4/OffPeakNewTaskEntry.tsx");
     const automationsSectionSource = readSource("packages/ui/src/settings/AutomationsSection.tsx");

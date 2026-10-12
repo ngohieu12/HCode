@@ -478,7 +478,11 @@ describe("快捷键冲突检测（拒绝 + 标红）", () => {
     expect(checkShortcutBindingConflict("toggleSidebar", "Enter")).toMatchObject({
       kind: "reserved",
     });
-    expect(checkShortcutBindingConflict("composerSend", "Enter")).toBeNull();
+    // 换行模式默认下 Enter 归 composerInsertNewline：composer 作用域内仍检测冲突，但不是 reserved
+    expect(checkShortcutBindingConflict("composerSend", "Enter")).toMatchObject({
+      kind: "occupied",
+      ownerCommandId: "composerInsertNewline",
+    });
     expect(checkShortcutBindingConflict("composerSend", "CmdOrCtrl+Enter")).toBeNull();
   });
 
@@ -488,10 +492,10 @@ describe("快捷键冲突检测（拒绝 + 标红）", () => {
     // 反向同样隔离：global 命令绑 composerSend 的默认键 Enter 不算 occupied，而是 reserved
     expect(checkShortcutBindingConflict("toggleSidebar", "Shift+Enter")).toBeNull();
     // composer 作用域内部仍互相检测：composerInsertNewline 绑 composerSend 的默认键 → occupied
-    expect(checkShortcutBindingConflict("composerInsertNewline", "Enter")).toEqual({
+    expect(checkShortcutBindingConflict("composerInsertNewline", "CmdOrCtrl+Enter")).toEqual({
       kind: "occupied",
       ownerCommandId: "composerSend",
-      binding: "Enter",
+      binding: "CmdOrCtrl+Enter",
     });
   });
 });

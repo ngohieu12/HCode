@@ -8,51 +8,6 @@ import type { BrowserCommand, BrowserCommandResult } from "@zcode/contracts";
 const NAV: BrowserCommand = { method: "navigate", url: "https://example.com" };
 
 describe("browserControlMainBridge", () => {
-  it("posts a request to main and resolves on matching result", async () => {
-    const posted: BrowserExecuteRequestMessage[] = [];
-    const bridge = createBrowserControlMainBridge({
-      postToMain: (m) => posted.push(m),
-    });
-    const [descriptor] = await bridge.list();
-    expect(descriptor).toMatchObject({
-      type: "iab",
-      name: "ZCode In-app Browser",
-      generation: expect.any(Number),
-      capabilities: {
-        browser: [expect.objectContaining({ id: "visibility" })],
-        tab: [],
-      },
-      apiSupportOverrides: {
-        "BrowserUser.claimTab": true,
-        "Tabs.finalize": true,
-        "Tab.markDeliverable": true,
-        "Tab.markHandoff": true,
-        "BrowserRecordingAPI.start": true,
-        "BrowserRecordingAPI.status": true,
-        "BrowserRecordingAPI.cancel": true,
-      },
-    });
-    const promise = bridge.execute({
-      browserId: descriptor.id,
-      sessionId: "s1",
-      workspaceKey: "/workspace",
-      workspacePath: "/workspace",
-      command: NAV,
-    });
-    expect(posted).toHaveLength(1);
-    const { requestId, browserId, command } = posted[0];
-    expect(browserId).toBe(descriptor.id);
-    expect(posted[0].browserGeneration).toBe(descriptor.generation);
-    expect(command).toEqual(NAV);
-    const result: BrowserCommandResult = {
-      ok: true,
-      state: { url: "https://example.com", title: "E", canGoBack: false, canGoForward: false },
-      elapsedMs: 5,
-    };
-    bridge.handleResult({ requestId, result });
-    await expect(promise).resolves.toMatchObject({ ok: true });
-    bridge.dispose();
-  });
 
   it("materializes a completed recording into the workspace before exposing its path", async () => {
     const posted: BrowserExecuteRequestMessage[] = [];

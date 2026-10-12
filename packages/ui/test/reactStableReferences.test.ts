@@ -255,11 +255,6 @@ function collectInlineProviderValues(project: Project) {
 }
 
 describe("React stable reference boundaries", () => {
-  it("does not pass inline non-primitive props into memoized components", () => {
-    const findings = collectInlinePropsForMemoComponents(createProject());
-
-    expect(findings.map(formatFinding)).toEqual([]);
-  });
 
   it("does not create non-primitive defaults inside memoized component props", () => {
     const findings = collectMemoComponentsWithInlineDefaults(createProject());

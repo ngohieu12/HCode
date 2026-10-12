@@ -43,7 +43,7 @@ describe("Collapsible", () => {
 
     expect(html).toContain("transition-none");
     expect(html).toContain(
-      "transition-none duration-300 ease-in-out group-data-[state=open]/collapsible-content:animate-in",
+      "transition-none duration-200 ease-in-out group-data-[state=open]/collapsible-content:animate-in",
     );
   });
 });

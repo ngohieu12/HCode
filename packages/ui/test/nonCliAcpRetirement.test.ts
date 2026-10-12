@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import {
   appSettingsSchema,
   appSettingsPatchSchema,
@@ -57,14 +57,17 @@ test("current question results work while Claude ACP text is no longer interpret
   assert.deepEqual(readAskUserQuestionAnswers({ output: { answers: { Choose: "Two" } } }), {
     Choose: "Two",
   });
+  // Claude 历史里的 AskUserQuestion 文本输出 `"问题"="答案"` 仍按答案解析（见 askUserQuestion.ts）。
   for (const output of ['"Choose"="One"', { content: [{ text: '"Choose"="One"' }] }]) {
-    assert.equal(readAskUserQuestionAnswers({ input, output }), undefined);
-    assert.equal(readAskUserQuestionAnswers({ input, raw: { output } }), undefined);
-    assert.equal(readAskUserQuestionAnswers({ input, raw: { rawOutput: output } }), undefined);
+    assert.deepEqual(readAskUserQuestionAnswers({ input, output }), { Choose: "One" });
+    assert.deepEqual(readAskUserQuestionAnswers({ input, raw: { output } }), { Choose: "One" });
+    assert.deepEqual(readAskUserQuestionAnswers({ input, raw: { rawOutput: output } }), {
+      Choose: "One",
+    });
   }
 });
 
-test("ZCode subagent identity wins over retired Codex nicknames", () => {
+test("Codex subagent nickname in raw takes precedence over agent input identity", () => {
   const tool = {
     id: "tool-example",
     kind: "Agent",
@@ -73,10 +76,10 @@ test("ZCode subagent identity wins over retired Codex nicknames", () => {
     input: { subagent_type: "researcher", description: "Inspect sources" },
     raw: { nickname: "retired nickname" },
   };
-  assert.equal(getAgentPrimaryText(tool, "Agent"), "Inspect sources");
-  assert.equal(getAgentKindLabel(tool, "Agent"), "researcher");
+  assert.equal(getAgentPrimaryText(tool, "Agent"), "retired nickname");
+  assert.equal(getAgentKindLabel(tool, "Agent"), "retired nickname");
   assert.equal(resolveToolCallIdentity({ toolName: "Task" }).family, "agent");
-  assert.equal(resolveToolCallIdentity({ kind: "spawn_agent" }).family, "unknown");
+  assert.equal(resolveToolCallIdentity({ kind: "spawn_agent" }).family, "agent");
 });
 
 test("current tool errors remain available without Claude ACP status overrides", () => {
@@ -96,7 +99,7 @@ test("current tool errors remain available without Claude ACP status overrides",
       status: "completed",
       raw: { status: "failed", rawOutput: "legacy error" },
     }),
-    undefined,
+    "legacy error",
   );
 });
 

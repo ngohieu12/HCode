@@ -17,7 +17,7 @@ export interface WindowsOpenFolderRegistryOperation {
   args: string[];
 }
 
-function getWindowsOpenFolderMenuName(locale: Locale, productName: string): string {
+export function getWindowsOpenFolderMenuName(locale: Locale, productName: string): string {
   return locale === "zh-CN" ? `在${productName}中打开` : `Open in ${productName}`;
 }
 

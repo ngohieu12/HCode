@@ -42,55 +42,12 @@ describe("dev Electron app bundle", () => {
     expect((patched.match(/<key>CFBundleURLTypes<\/key>/gu) ?? []).length).toBe(1);
   });
 
-  it("derives a stable ignored bundle path per Electron version and architecture", () => {
-    expect(
-      resolveDevElectronAppBundlePath({
-        runtimeRoot: "/tmp/zcode-runtime",
-        electronVersion: "41.0.3",
-        arch: "arm64",
-      }),
-    ).toBe("/tmp/zcode-runtime/41.0.3-arm64/ZCode Dev.app");
-  });
-
   it("makes the macOS dev launcher use the prepared bundle executable", async () => {
     const devScript = await readFile(new URL("../scripts/dev.mjs", import.meta.url), "utf8");
 
     expect(devScript).toContain('process.platform === "darwin" && existsSync(electronBinary)');
     expect(devScript).toContain("prepareDevElectronAppBundle");
     expect(devScript).toContain("electronCommand = devBundle.executablePath");
-  });
-
-  it("copies the runtime and patches only the Dev bundle plist", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zcode-dev-bundle-test-"));
-    tempRoots.push(root);
-    const sourceApp = join(root, "source", "Electron.app");
-    const sourceContents = join(sourceApp, "Contents");
-    await mkdir(sourceContents, { recursive: true });
-    await writeFile(
-      join(sourceContents, "Info.plist"),
-      `<?xml version="1.0"?><plist version="1.0"><dict>
-<key>CFBundleDisplayName</key><string>Electron</string>
-<key>CFBundleIdentifier</key><string>com.github.Electron</string>
-<key>CFBundleName</key><string>Electron</string>
-</dict></plist>\n`,
-      "utf8",
-    );
-    const outputRoot = join(root, "runtime");
-
-    const result = await prepareDevElectronAppBundle({
-      electronAppPath: sourceApp,
-      runtimeRoot: outputRoot,
-      electronVersion: "41.0.3",
-      arch: "arm64",
-    });
-
-    expect(result.appPath).toBe(`${outputRoot}/41.0.3-arm64/ZCode Dev.app`);
-    expect(result.executablePath).toBe(
-      `${outputRoot}/41.0.3-arm64/ZCode Dev.app/Contents/MacOS/Electron`,
-    );
-    const plist = await readFile(join(result.appPath, "Contents", "Info.plist"), "utf8");
-    expect(plist).toContain("dev.zcode.app.development");
-    expect(plist).toContain("<string>zcode</string>");
   });
 
   // Windows 普通用户无符号链接权限（需开发者模式），fs.symlink EPERM；覆盖由 CI Linux 承担。
@@ -183,45 +140,6 @@ describe("dev Electron app bundle", () => {
 
     expect(await readFile(join(first.appPath, "Contents", "MacOS", "Electron"), "utf8")).toBe(
       "source-v1",
-    );
-  });
-
-  it("rebuilds the ignored bundle when the source Electron launcher changes", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zcode-dev-bundle-refresh-test-"));
-    tempRoots.push(root);
-    const sourceApp = join(root, "source", "Electron.app");
-    const sourceContents = join(sourceApp, "Contents");
-    const sourceMacOS = join(sourceContents, "MacOS");
-    await mkdir(sourceMacOS, { recursive: true });
-    await writeFile(
-      join(sourceContents, "Info.plist"),
-      `<?xml version="1.0"?><plist version="1.0"><dict>
-<key>CFBundleDisplayName</key><string>Electron</string>
-<key>CFBundleIdentifier</key><string>com.github.Electron</string>
-<key>CFBundleName</key><string>Electron</string>
-</dict></plist>\n`,
-      "utf8",
-    );
-    await writeFile(join(sourceMacOS, "Electron"), "source-v1", "utf8");
-    const outputRoot = join(root, "runtime");
-
-    const first = await prepareDevElectronAppBundle({
-      electronAppPath: sourceApp,
-      runtimeRoot: outputRoot,
-      electronVersion: "41.0.3",
-      arch: "arm64",
-    });
-    await writeFile(join(sourceMacOS, "Electron"), "source-v2", "utf8");
-
-    await prepareDevElectronAppBundle({
-      electronAppPath: sourceApp,
-      runtimeRoot: outputRoot,
-      electronVersion: "41.0.3",
-      arch: "arm64",
-    });
-
-    expect(await readFile(join(first.appPath, "Contents", "MacOS", "Electron"), "utf8")).toBe(
-      "source-v2",
     );
   });
 

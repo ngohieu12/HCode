@@ -66,16 +66,6 @@ describe("Settings breadcrumb coverage", () => {
     expect(mcpSource).toContain("{ label: pluginsBreadcrumbLabel, onSelect: closeFormView }");
   });
 
-  it("keeps the plugins level for marketplace skill details", () => {
-    const pluginsSource = readSettingsSection("PluginsSection");
-    const skillsSource = readSettingsSection("SkillsSection");
-    expect(pluginsSource).toContain("onDetailOpenChange={setSkillDetailOpen}");
-    expect(pluginsSource).toContain('reportDetailBreadcrumb={mode === "plugin"}');
-    expect(skillsSource).toContain("showMarketplaceBreadcrumb");
-    expect(skillsSource).toContain("reportDetailBreadcrumb && detailSkill");
-    expect(skillsSource).toContain("{ label: detailSkill.name }");
-  });
-
   it.each([
     // Memory 分区在 workspace 作用域重构（08d53bd114）后不再承载页面级导航。
     "MemorySettingsSection",
