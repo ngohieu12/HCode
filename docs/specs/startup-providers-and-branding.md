@@ -349,3 +349,16 @@
   - Tham chiếu: `zcode-feature-graph.yaml` đánh dấu node `surface.new-task-suggested-prompts` là `status: "removed"`.
 - Giữ nguyên: `IClientScenesService` và các scene `scheduled-task` / `off-peak-task` vẫn dùng cho trang Automations và `OffPeakNewTaskEntry`; `ConversationDraftEmptyState` (lời chào theo giờ) không đổi.
 - Nghiệm thu: trang New task không còn hàng chip prompt mẫu; `pnpm typecheck`, `pnpm lint` và test UI không còn tham chiếu tới module đã xoá. Lưu ý: phiên soạn này không có `node_modules` trong sandbox nên chưa chạy được typecheck/lint/test — cần chạy lại trên máy có môi trường.
+
+## 31. Bỏ placeholder ở ô nhập (composer) và đổi tên sản phẩm trong README
+
+- Bối cảnh: ô nhập chat hiển thị văn bản gợi ý động (`Ask HCode anything, @ to add context, / for commands or capabilities` và các biến thể theo trạng thái). Người dùng yêu cầu bỏ placeholder. Đồng thời README còn dùng tên cũ `ZCode`.
+- Quy tắc: ô nhập không còn văn bản gợi ý ở mọi trạng thái (draft mới, đang xử lý, hỏi tiếp, và bản mobile remote); `ContentEditable` của Lexical luôn nhận `placeholder: null`.
+- Phạm vi xoá:
+  - `packages/ui/src/lib/chatPlaceholder.ts` (`resolveChatPlaceholderKey`, `shouldDeferChatPlaceholder`) và `packages/ui/test/chatPlaceholder.test.ts`.
+  - `packages/ui/src/v4/ConversationComposer.tsx`: bỏ `placeholder`, `compactMobilePlaceholder` và prop `compactPlaceholder` truyền xuống editor.
+  - `packages/ui/src/prompt-editor/ChatPromptEditor.tsx` và `packages/ui/src/LexicalChatInput.tsx`: bỏ prop `placeholder` / `compactPlaceholder` cùng nhánh render placeholder.
+  - i18n: 5 khoá `chat.placeholder.newTask` / `newTaskMobile` / `followUpAsk` / `followUpQueue` / `loading` trong `en-US.ts`, `zh-CN.ts`.
+- Giữ nguyên: `avoidIosInputFocusZoom` (chống zoom iOS trên mobile remote) và `resolveMobileInputTextSizeClassName`; các placeholder khác (tìm kiếm, model, quyền…) không đổi.
+- Tài liệu: `README.md` (tiếng Việt) và `README.en.md` dùng tên sản phẩm `HCode`; giữ nguyên định danh kỹ thuật: lệnh `zcode`, gói `@zcode/*`, biến `ZCODE_*`, thư mục `apps/zcode-cli`, `~/.zcode`, `dist/zcode/`.
+- Nghiệm thu: ô nhập không còn câu gợi ý; README không còn chuỗi `ZCode` cho tên sản phẩm. Chưa chạy được `pnpm typecheck` / `pnpm lint` / test trong phiên soạn (sandbox không có `node_modules`).

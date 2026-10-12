@@ -1,7 +1,7 @@
-# ZCode
+# HCode
 
 <div align="center">
-  <img src="public/logo/icons/1024x1024.png" alt="ZCode" width="128" height="128" />
+  <img src="public/logo/icons/1024x1024.png" alt="HCode" width="128" height="128" />
 </div>
 <p align="center">
   <a href="https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=47ag983c-8fcb-4d6d-814b-5395193a712c&amp;qr_code=true">Cộng đồng Feishu</a> ·
@@ -13,12 +13,12 @@
 
 
 
-ZCode là bàn làm việc lập trình với AI, gồm ứng dụng desktop, giao diện trình duyệt và Agent trên terminal. Kho này chứa client, dịch vụ backend, UI dùng chung, cùng mã nguồn Agent CLI và runtime.
+HCode là bàn làm việc lập trình với AI, gồm ứng dụng desktop, giao diện trình duyệt và Agent trên terminal. Kho này chứa client, dịch vụ backend, UI dùng chung, cùng mã nguồn Agent CLI và runtime.
 
 ## Cập nhật
 
-- 2026-10-10: Cập nhật lên phiên bản ZCode v3.15.1.
-- 2026-9-23: Cập nhật lên phiên bản ZCode v3.14.3.
+- 2026-10-10: Cập nhật lên phiên bản HCode v3.15.1.
+- 2026-9-23: Cập nhật lên phiên bản HCode v3.14.3.
 
 ## Khởi tạo
 
@@ -67,7 +67,7 @@ ZCODE_DATA_BASE_DIR="$HOME/.zcode-dev-home" pnpm dev:desktop:test
 
 Chạy `pnpm bootstrap:with-remote` để chuẩn bị tài nguyên từ xa (mock-cdn), rồi chạy `pnpm dev:desktop`; khi kết nối dự án từ xa, chọn tài nguyên theo kiểu "tải cục bộ rồi upload". Tài nguyên ở chế độ phát triển lấy từ `packages/desktop/mock-cdn` và sản phẩm build cục bộ, được upload qua SFTP lên máy từ xa, không truy cập CDN.
 
-### Bản dòng lệnh ZCode
+### Bản dòng lệnh HCode
 
 Gói phát hành dòng lệnh gồm TUI và Agent, dùng thống nhất lệnh `zcode`: không có tham số thì vào TUI; các tham số khác được chuyển cho Agent CLI hiện có. Không cần Electron.
 
@@ -132,13 +132,13 @@ pnpm bundle:desktop -- --help
 
 Mặc định đích là macOS arm64, thư mục đầu ra mặc định là `packages/desktop/dist/`. `--os` hỗ trợ `mac`, `win`, `linux`; `--arch` hỗ trợ `x64`, `arm64`; đóng gói và ký thực tế cần công cụ, cấu hình tương ứng của nền tảng đích.
 
-Cài đặt: nhấp đúp để mở tệp DMG, kéo ZCode vào "Applications". Bản build cục bộ chưa ký; lần mở đầu tiên nếu bị macOS chặn, chạy:
+Cài đặt: nhấp đúp để mở tệp DMG, kéo HCode vào "Applications". Bản build cục bộ chưa ký; lần mở đầu tiên nếu bị macOS chặn, chạy:
 
 ```bash
-sudo xattr -rd com.apple.quarantine /Applications/ZCode.app
+sudo xattr -rd com.apple.quarantine /Applications/HCode.app
 ```
 
-### Bản dòng lệnh ZCode
+### Bản dòng lệnh HCode
 
 Điểm vào build là `pnpm build:zcode`. Script lần lượt build CLI/TUI và Agent, thu thập thư viện native, worker cùng phụ thuộc runtime của TUI, rồi lắp gói phát hành; chạy gói phát hành vẫn cần Node.js, phiên bản lấy theo `mise.toml`.
 

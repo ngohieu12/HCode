@@ -1308,7 +1308,6 @@ function EditorApiPlugin({
 }
 
 interface LexicalChatInputProps {
-  placeholder?: string;
   disabled?: boolean;
   submitDisabled?: boolean;
   allowSubmitWhenEmpty?: boolean;
@@ -1327,7 +1326,6 @@ interface LexicalChatInputProps {
   editorApiRef?: React.MutableRefObject<LexicalChatInputHandle | null>;
   promptHistory?: readonly string[];
   avoidIosInputFocusZoom?: boolean;
-  compactPlaceholder?: boolean;
   onWhiteboardMentionSelected?: (boardId: string) => void | Promise<void>;
   onPaste?: (event: ChatComposerPasteEvent) => void;
   excludedSlashCommandNames?: readonly string[];
@@ -1342,7 +1340,6 @@ const EDITOR_THEME = {
 };
 
 export function LexicalChatInput({
-  placeholder,
   disabled = false,
   submitDisabled = false,
   allowSubmitWhenEmpty = false,
@@ -1360,7 +1357,6 @@ export function LexicalChatInput({
   editorApiRef,
   promptHistory = [],
   avoidIosInputFocusZoom = false,
-  compactPlaceholder = false,
   onWhiteboardMentionSelected,
   onPaste,
   excludedSlashCommandNames,
@@ -1434,27 +1430,10 @@ export function LexicalChatInput({
     },
     [editorApiRef, onSubmit],
   );
-  // Lexical 的 ContentEditable props 是一个互斥联合类型，
-  // aria-placeholder 一旦出现就要求 placeholder 同时存在。
-  // 之前直接写三元 JSX，TypeScript 在合并两条分支时没有正确保留这组联动约束，导致误报缺少 placeholder。
-  const contentEditableProps: React.ComponentProps<typeof ContentEditable> = placeholder
-    ? {
-        "aria-placeholder": placeholder,
-        placeholder: (
-          <div
-            className={`pointer-events-none absolute left-0 top-0 ${compactPlaceholder ? "line-clamp-2" : ""} ${resolveMobileInputTextSizeClassName(
-              {
-                avoidIosInputFocusZoom,
-              },
-            )} text-foreground-subtlest`}
-          >
-            {placeholder}
-          </div>
-        ),
-      }
-    : {
-        placeholder: null,
-      };
+  // Lexical 的 ContentEditable props 是互斥联合类型：不使用占位符时必须显式传 null。
+  const contentEditableProps: React.ComponentProps<typeof ContentEditable> = {
+    placeholder: null,
+  };
 
   const contentEditable = (
     <ContentEditable

@@ -46,7 +46,6 @@ export function ChatPromptEditor({
   skillCatalogSessionId,
   initialValue,
   syncInitialValueOnMount = true,
-  placeholder,
   disabled = false,
   disabledReason,
   submitting = false,
@@ -77,7 +76,6 @@ export function ChatPromptEditor({
   className,
   shellClassName,
   avoidIosInputFocusZoom = false,
-  compactPlaceholder = false,
   onChange,
   onSubmit,
   onModifiedSubmit,
@@ -99,7 +97,6 @@ export function ChatPromptEditor({
   skillCatalogSessionId?: string | null;
   initialValue?: string;
   syncInitialValueOnMount?: boolean;
-  placeholder?: string;
   disabled?: boolean;
   disabledReason?: string;
   submitting?: boolean;
@@ -137,7 +134,6 @@ export function ChatPromptEditor({
   className?: string;
   shellClassName?: string;
   avoidIosInputFocusZoom?: boolean;
-  compactPlaceholder?: boolean;
   onChange?: (value: string) => void;
   // 适配：返回 false 表示业务层拒绝/延迟本次提交，Lexical 不自行 reset（草稿保留）。
   onSubmit: (value: string) => boolean | void;
@@ -341,7 +337,6 @@ export function ChatPromptEditor({
 
   const editorNode = (
     <LexicalChatInput
-      placeholder={placeholder}
       disabled={disabled}
       submitDisabled={submitDisabled}
       allowSubmitWhenEmpty={allowSubmitWhenEmpty}
@@ -359,7 +354,6 @@ export function ChatPromptEditor({
       editorApiRef={resolvedInputApiRef}
       promptHistory={promptHistory}
       avoidIosInputFocusZoom={avoidIosInputFocusZoom}
-      compactPlaceholder={compactPlaceholder}
       onWhiteboardMentionSelected={onWhiteboardMentionSelected}
       onPaste={onPaste}
       excludedSlashCommandNames={excludedSlashCommandNames}

@@ -4860,12 +4860,6 @@ const enUS: Record<string, string> = {
   "chat.emptyResult.title": "No visible output",
   "chat.emptyResult.description":
     "This task finished without any chat content. It may have been stopped before the model produced a response.",
-  "chat.placeholder.newTask":
-    "Ask HCode anything, @ to add context, / for commands or capabilities",
-  "chat.placeholder.newTaskMobile": "Ask HCode anything…",
-  "chat.placeholder.followUpAsk": "Ask for follow-up changes",
-  "chat.placeholder.followUpQueue": "Keep typing to queue follow-up changes",
-  "chat.placeholder.loading": "Initializing task...",
   "chat.attachments.dragHint": "Drop to add attachments",
   "chat.composer.workspaceFileDragHint": "Drop to mention this file or folder",
   "chat.send": "Send",
