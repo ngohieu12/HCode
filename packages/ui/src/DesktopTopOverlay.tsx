@@ -35,7 +35,6 @@ interface DesktopTopOverlayProps {
   canGoBack: boolean;
   canGoForward: boolean;
   showNewTaskButton?: boolean;
-  appLogoUrl: string;
   platform: IPlatformService;
   onToggleSidebar: () => void;
   onCreateTask: () => void;
@@ -65,7 +64,6 @@ export function DesktopTopOverlay({
   canGoBack: _canGoBack,
   canGoForward: _canGoForward,
   showNewTaskButton,
-  appLogoUrl,
   platform,
   onToggleSidebar,
   onCreateTask,
@@ -131,25 +129,8 @@ export function DesktopTopOverlay({
             "pointer-events-auto flex items-center gap-1 shrink-0 [app-region:no-drag]",
           )}
         >
-          {usesCustomCaptionArea && (
-            <DesktopTopOverlayActionButton
-              title={toggleSidebarTitle}
-              shortcut={toggleSidebarShortcutLabel}
-              ariaLabel={toggleSidebarTitle}
-              buttonClassName="group relative overflow-hidden rounded-lg"
-              onClick={onToggleSidebar}
-            >
-              <img
-                src={appLogoUrl}
-                alt="HCode"
-                className="size-5 transition-opacity duration-150 group-hover:opacity-0"
-                draggable={false}
-              />
-              <SidebarToggleIcon className="absolute inset-0 m-auto size-4 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
-            </DesktopTopOverlayActionButton>
-          )}
-
-          {isMacDesktop && (
+          {/* 侧边栏开关按钮：旧品牌图标已移除，所有平台统一使用与 macOS 相同的开关图标。 */}
+          {(usesCustomCaptionArea || isMacDesktop) && (
             <DesktopTopOverlayActionButton
               title={toggleSidebarTitle}
               shortcut={toggleSidebarShortcutLabel}
@@ -159,7 +140,6 @@ export function DesktopTopOverlay({
               <SidebarToggleIcon className="size-4" />
             </DesktopTopOverlayActionButton>
           )}
-
           {/* 远程控制移动端左上角空间有限，任务前进/后退在这里会与主操作拥挤重叠。*/}
           {hideTaskNavigationButtons ? null : (
             <>

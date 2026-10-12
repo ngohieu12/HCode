@@ -88,9 +88,11 @@ describe("about", () => {
     expect(html).toContain("Copyright © 2026 HCode.");
     expect(html).toContain("class=\"ok-button\"");
     expect(html).toContain(">OK</button>");
-    expect(html).toContain("class=\"app-logo\"");
-    expect(html).toContain("viewBox=\"0 0 256 218\"");
-    expect(html).toContain("linear-gradient(180deg, #000000 0%, #151718 100%)");
+    // 品牌更名后 About 窗口不再渲染旧品牌标志，只保留名称/版本/版权信息。
+    expect(html).not.toContain("class=\"app-logo\"");
+    expect(html).not.toContain("class=\"app-icon\"");
+    expect(html).not.toContain("viewBox=\"0 0 256 218\"");
+    expect(html).not.toContain("M256 0.130127L102.401 217.732H0L153.599 0.130127H256Z");
     expect(html).toContain("class=\"about-window\"");
     expect(html).toContain("border-radius: 0");
     expect(html).toContain("background: var(--about-primary)");

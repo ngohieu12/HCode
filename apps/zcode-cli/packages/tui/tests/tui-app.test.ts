@@ -5,7 +5,6 @@ import { testRender } from "@mbears/opentui-react/test-utils";
 import { getZCodeCopy } from "@zcode/i18n";
 import { TuiApp } from "../src/app.js";
 import { LoginRequiredPanel } from "../src/app-components.js";
-import { ZCODE_LOGO_LINES } from "../src/app-empty-transcript.js";
 import { InputPane } from "../src/app-input-pane.js";
 import { InputActiveStatus } from "../src/app-input-status.js";
 import { QueuedInputPanel } from "../src/app-queued-inputs.js";
@@ -46,17 +45,13 @@ test("starts without a runtime readiness system message", async () => {
     assert.ok(view);
     const frame = view.captureCharFrame();
     const rows = frame.split("\n");
-    const firstLogoRow = rows.findIndex((row) => row.includes(ZCODE_LOGO_LINES[0]));
-    const lastLogoRow = rows.findIndex((row) => row.includes(ZCODE_LOGO_LINES.at(-1) ?? ""));
     const composerTopRow = rows.findIndex((row) => row.includes("╭─ Build"));
-    const logoCenterRow = Math.floor((firstLogoRow + lastLogoRow) / 2);
-    const transcriptCenterRow = Math.floor((composerTopRow - 1) / 2);
 
     assert.equal(frame.includes("OpenTUI Node runtime loaded."), false);
-    assert.notEqual(firstLogoRow, -1);
-    assert.notEqual(lastLogoRow, -1);
     assert.notEqual(composerTopRow, -1);
-    assert.ok(Math.abs(logoCenterRow - transcriptCenterRow) <= 1);
+    // 品牌更名后空会话不再渲染旧品牌（ZCODE）字符画标志，回归锁保留特征字符。
+    assert.equal(frame.includes("███████╗"), false);
+    assert.equal(frame.includes("╚══════╝"), false);
   } finally {
     await act(async () => {
       view?.renderer.destroy();

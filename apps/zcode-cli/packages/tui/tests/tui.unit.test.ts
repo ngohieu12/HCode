@@ -4,7 +4,6 @@ import { SessionEventType, type SessionEvent } from "@zcode/contracts";
 import { getZCodeCopy } from "@zcode/i18n";
 import { LoginRequiredPanel } from "../src/app-components.js";
 import { ContentPane, MessageRow } from "../src/app-transcript-components.js";
-import { EmptyTranscriptLogo, ZCODE_LOGO_LINES } from "../src/app-empty-transcript.js";
 import { SHIMMER_SWEEP_PERIOD_MS, shimmerTextSegments } from "../src/app-motion.js";
 import {
   ShikiDiffView,
@@ -63,26 +62,16 @@ test("describes session events without coupling the shell to business logic", ()
   assert.equal(describeSessionEvent({ type: "turn_started" } as never), "turn started");
 });
 
-test("renders a ZCODE logo placeholder for an empty transcript", () => {
-  const [child] = reactElementChildren(
+test("renders no brand mark for an empty transcript", () => {
+  const children = reactElementChildren(
     ContentPane({ copy: EN_COPY, focused: false, messages: [] }),
   );
-  const lines = collectTextLines(EmptyTranscriptLogo());
 
-  assert.equal(child?.type, EmptyTranscriptLogo);
-  assert.deepEqual(lines, [...ZCODE_LOGO_LINES]);
+  assert.deepEqual(children, []);
 });
 
-test("centers the empty transcript logo within the available viewport", () => {
-  const style = reactElementStyle(EmptyTranscriptLogo());
-
-  assert.equal(style.flexGrow, 1);
-  assert.equal(style.justifyContent, "center");
-  assert.equal(style.minHeight, ZCODE_LOGO_LINES.length);
-});
-
-test("projects logo shimmer without changing the source text", () => {
-  const sourceText = ZCODE_LOGO_LINES[0];
+test("projects shimmer without changing the source text", () => {
+  const sourceText = "shimmer-source-text";
   const segments = shimmerTextSegments(sourceText, SHIMMER_SWEEP_PERIOD_MS / 2, {
     baseColor: "#000000",
     highlightColor: "#ffffff",
@@ -101,7 +90,7 @@ test("renders the transcript as a borderless surface", () => {
   assert.equal(style.backgroundColor, "#0f1419");
 });
 
-test("hides the empty transcript logo when messages are present", () => {
+test("renders the transcript message instead of the empty state", () => {
   const message: Message = { content: "hello", role: "user" };
   const [child] = reactElementChildren(
     ContentPane({ copy: EN_COPY, focused: false, messages: [message] }),
@@ -109,8 +98,6 @@ test("hides the empty transcript logo when messages are present", () => {
   const lines = collectTextLines(MessageRow({ copy: EN_COPY, index: 0, message }));
 
   assert.equal(child?.type, MessageRow);
-  assert.notEqual(child?.type, EmptyTranscriptLogo);
-  assert.equal(lines.includes(ZCODE_LOGO_LINES[0]), false);
   assert.ok(lines.some((line) => line.includes("hello")));
   assert.equal(
     lines.some((line) => line.includes("User:")),
