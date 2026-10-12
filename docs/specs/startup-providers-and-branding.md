@@ -332,3 +332,20 @@
   - 测试期望对齐本分支默认值：Memory、消息流 Todo、工具分组 Changes 新装默认开启；Computer Use 入口默认展示；Enter 默认换行（Ctrl/Cmd+Enter 发送）。
 - 暂不包含（需单独决定）：上游 UI（web 远程控制侧栏、Shell、v4 会话、留白行 UI 等）；内置 provider 目录（本分支 BYOK，`config/provider/zcode-builtin.json` 保持空 providers）；上游 BigModel OAuth 默认启用（本分支保持关闭）。
 - 验收：`pnpm typecheck` 通过；`apps/zcode-cli` 各包 typecheck 通过；`pnpm lint` 0 错误；`packages/ui` 测试全部通过（node:test 方式运行）；`packages/shared` 测试仅余 PRT-026（依赖未包含的 `docs/monitoring` 文档）。
+
+## 30. Xoá prompt mẫu (prompt template) khỏi trang New task
+
+> Mục này được viết bằng tiếng Việt theo yêu cầu chuyển tài liệu sang tiếng Việt.
+
+- Bối cảnh: trang New task (draft) hiển thị một hàng chip prompt mẫu ngay dưới ô nhập (`Weekly Summary`, `Error Fix`, `PPT Creation`, `Idle-time task`…). Người dùng yêu cầu xoá prompt mẫu.
+- Quy tắc: trang draft chỉ còn lời chào theo giờ + ô nhập (composer). Không còn truy vấn Client Scenes cho scene `draft-suggestion`, không còn chip gợi ý và không còn luồng tự cài/bật plugin khi bấm chip.
+- Phạm vi xoá (xoá hẳn, không ẩn):
+  - UI: `packages/ui/src/v4/ConversationDraftSuggestedPrompts.tsx`, `ConversationDraftSuggestedPromptsContainer.tsx`, `ConversationDraftSuggestedPluginFlow.tsx`.
+  - Dữ liệu và hook: `draftSuggestedPromptItems.ts`, `draftSuggestedPromptPrefill.ts`, `useDraftSuggestedPromptItems.ts`, `useDraftSuggestedPluginActionPopover.ts`, `officeSuggestedPrompts.ts` (pool prompt mẫu cũ, đã không còn nơi dùng).
+  - Telemetry: `packages/ui/src/lib/promptTemplateTelemetry.ts` (sự kiện `prompt_template_ck`).
+  - Điểm render: `packages/ui/src/v4/SessionPane.tsx` — bỏ khối `<ConversationDraftSuggestedPromptsContainer />` khỏi `conversationBottomDockContent` cùng import tương ứng.
+  - i18n: 20 khoá `chat.draft.suggestedPrompt.*` trong `en-US.ts` và `zh-CN.ts` (`vi-VN.ts` chưa từng có các khoá này).
+  - Test: xoá `v4ConversationDraftSuggestedPrompts.test.ts`, `v4ConversationDraftSuggestedPromptsContainer.test.ts`, `draftSuggestedPromptItems.test.ts`, `draftSuggestedPromptPrefill.test.ts`, `promptTemplateTelemetry.test.ts`; gỡ mock/khẳng định liên quan trong `offPeakFigmaLayout.test.ts`, `highspeedVisibilityRefresh.test.ts`, `v4SessionPaneComposerContinuity.test.ts`, `v4SessionPaneLayoutParity.test.ts`, `v4SessionPaneModelSwitchRecovery.test.ts` và `packages/desktop/test/e2e/ui-shell/side-pane-tabs-responsive-interactions.test.ts` (selector `data-v4-draft-suggested-prompts-slot`).
+  - Tham chiếu: `zcode-feature-graph.yaml` đánh dấu node `surface.new-task-suggested-prompts` là `status: "removed"`.
+- Giữ nguyên: `IClientScenesService` và các scene `scheduled-task` / `off-peak-task` vẫn dùng cho trang Automations và `OffPeakNewTaskEntry`; `ConversationDraftEmptyState` (lời chào theo giờ) không đổi.
+- Nghiệm thu: trang New task không còn hàng chip prompt mẫu; `pnpm typecheck`, `pnpm lint` và test UI không còn tham chiếu tới module đã xoá. Lưu ý: phiên soạn này không có `node_modules` trong sandbox nên chưa chạy được typecheck/lint/test — cần chạy lại trên máy có môi trường.
