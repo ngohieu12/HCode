@@ -55,4 +55,4 @@
   - `scripts/zcode-distribution.test.mjs`：5 个用例中 4 个针对已移除的 `zcode --web`；发行包启动器仍由 `scripts/zcode-distribution-smoke.mjs` 在仓库外验证。
   - `scripts/test-web-app-gateway-reset.mjs`：依赖不存在的 `docker/web-app/start.mjs`。
   - `scripts/dev-web-share-env.mjs`：依赖已删除的 `@zcode/web-share` 包与 `build:web-share` 脚本。
-- 未处理：`specs/zcode-unified-distribution.md` 仍按上游描述 `zcode --web` 与 5 个进程用例，属于历史记录，需另行重写。
+- `specs/zcode-unified-distribution.md` 已按当前仓库重写（2026-10-12）：删掉 `zcode --web`、Web 资源、`build:lite` 与进程用例的描述，补上发行包结构、安装器行为、已知缺口和本次真实的验证状态；旧的验证记录保留为「Web 移除前」的历史章节。
