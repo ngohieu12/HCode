@@ -109,7 +109,6 @@ Tệp [.env.example](.env.example) ở thư mục gốc cung cấp ví dụ về
 | Cấu hình                             | Mục đích                                                              |
 | ------------------------------------ | --------------------------------------------------------------------- |
 | `ZCODE_DATA_BASE_DIR`                | Thư mục gốc lưu dữ liệu ứng dụng; dữ liệu ghi vào `.zcode/` bên trong |
-| `ZCODE_SERVER_WORKSPACE`             | Đường dẫn workspace của backend Web                                   |
 | `ZCODE_BUILTIN_PROVIDER_CONFIG_FILE` | Đường dẫn tệp cấu hình Provider cục bộ; dùng cấu hình tích hợp khi không đặt |
 | `ZCODE_DIST_BASE_URL`                | Địa chỉ gốc tải xuống mà script cài đặt dòng lệnh sử dụng             |
 
