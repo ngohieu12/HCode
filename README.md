@@ -15,11 +15,6 @@
 
 HCode là bàn làm việc lập trình với AI, gồm ứng dụng desktop, giao diện trình duyệt và Agent trên terminal. Kho này chứa client, dịch vụ backend, UI dùng chung, cùng mã nguồn Agent CLI và runtime.
 
-## Cập nhật
-
-- 2026-10-10: Cập nhật lên phiên bản HCode v3.15.1.
-- 2026-9-23: Cập nhật lên phiên bản HCode v3.14.3.
-
 ## Khởi tạo
 
 Chuẩn bị Git, Node.js **24.14.0** và pnpm **10.33.2**; phiên bản lấy theo [mise.toml](mise.toml). Mọi lệnh phát triển và đóng gói dưới đây đều chạy tại thư mục gốc của kho.
@@ -109,7 +104,6 @@ Tệp [.env.example](.env.example) ở thư mục gốc cung cấp ví dụ về
 | Cấu hình                             | Mục đích                                                              |
 | ------------------------------------ | --------------------------------------------------------------------- |
 | `ZCODE_DATA_BASE_DIR`                | Thư mục gốc lưu dữ liệu ứng dụng; dữ liệu ghi vào `.zcode/` bên trong |
-| `ZCODE_SERVER_WORKSPACE`             | Đường dẫn workspace của backend Web                                   |
 | `ZCODE_BUILTIN_PROVIDER_CONFIG_FILE` | Đường dẫn tệp cấu hình Provider cục bộ; dùng cấu hình tích hợp khi không đặt |
 | `ZCODE_DIST_BASE_URL`                | Địa chỉ gốc tải xuống mà script cài đặt dòng lệnh sử dụng             |
 

@@ -45,3 +45,14 @@
 - 独立 CLI 发行流水线（`scripts/build-zcode.mjs`、`scripts/zcode-distribution/`、`install.sh`）仍保留。它服务于命令行版本的分发，不是 Desktop 运行所必需；是否整体删除需要用户确认。
 - 删除后的发行包（Desktop 安装包与 CLI 发行包）的实际启动，需要打包后人工验证。
 - 对话分享落地页、Web 登录页迁出后的部署方式，需要仓库外负责人确认。
+
+## 6. 无消费者环境变量的清理（2026-10-12）
+
+- `ZCODE_SERVER_WORKSPACE`：唯一读取点在 `packages/server/src/http.ts` 的 `resolveServerWorkspaces`，只影响 `GET /api/server-info` 返回的工作区元数据，而 Desktop 连接远端 Server 时只使用 `serverId` 与 `capabilities`（`packages/desktop/src/host/index.ts`），Web 客户端已删除。现已删除该读取：默认工作区固定为 `process.cwd()`，程序接口 `HttpServerOptions.workspaces` 仍然生效。
+- `ZCODE_CDN_BASE_URL`：仓库内没有任何消费者，从 `.env.example` 删除该示例行；远端资源地址继续由 `ZCODE_REMOTE_ASSET_CDN_BASE_URL` 提供。
+- 文档：README 的配置表删除 `ZCODE_SERVER_WORKSPACE` 行，并删除版本「Cập nhật / Updates」段落。
+- 已删除的失效脚本（目标对象或被测模式已不在仓库中）：
+  - `scripts/zcode-distribution.test.mjs`：5 个用例中 4 个针对已移除的 `zcode --web`；发行包启动器仍由 `scripts/zcode-distribution-smoke.mjs` 在仓库外验证。
+  - `scripts/test-web-app-gateway-reset.mjs`：依赖不存在的 `docker/web-app/start.mjs`。
+  - `scripts/dev-web-share-env.mjs`：依赖已删除的 `@zcode/web-share` 包与 `build:web-share` 脚本。
+- `specs/zcode-unified-distribution.md` 已按当前仓库重写（2026-10-12）：删掉 `zcode --web`、Web 资源、`build:lite` 与进程用例的描述，补上发行包结构、安装器行为、已知缺口和本次真实的验证状态；旧的验证记录保留为「Web 移除前」的历史章节。
