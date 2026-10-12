@@ -51,4 +51,8 @@
 - `ZCODE_SERVER_WORKSPACE`：唯一读取点在 `packages/server/src/http.ts` 的 `resolveServerWorkspaces`，只影响 `GET /api/server-info` 返回的工作区元数据，而 Desktop 连接远端 Server 时只使用 `serverId` 与 `capabilities`（`packages/desktop/src/host/index.ts`），Web 客户端已删除。现已删除该读取：默认工作区固定为 `process.cwd()`，程序接口 `HttpServerOptions.workspaces` 仍然生效。
 - `ZCODE_CDN_BASE_URL`：仓库内没有任何消费者，从 `.env.example` 删除该示例行；远端资源地址继续由 `ZCODE_REMOTE_ASSET_CDN_BASE_URL` 提供。
 - 文档：README 的配置表删除 `ZCODE_SERVER_WORKSPACE` 行，并删除版本「Cập nhật / Updates」段落。
-- 未处理：`scripts/zcode-distribution.test.mjs` 中仍有针对已移除 `--web` 模式的用例，`scripts/test-web-app-gateway-reset.mjs` 引用的 `docker/web-app/start.mjs` 不存在；两者的删除需要用户确认，本次未改动。
+- 已删除的失效脚本（目标对象或被测模式已不在仓库中）：
+  - `scripts/zcode-distribution.test.mjs`：5 个用例中 4 个针对已移除的 `zcode --web`；发行包启动器仍由 `scripts/zcode-distribution-smoke.mjs` 在仓库外验证。
+  - `scripts/test-web-app-gateway-reset.mjs`：依赖不存在的 `docker/web-app/start.mjs`。
+  - `scripts/dev-web-share-env.mjs`：依赖已删除的 `@zcode/web-share` 包与 `build:web-share` 脚本。
+- 未处理：`specs/zcode-unified-distribution.md` 仍按上游描述 `zcode --web` 与 5 个进程用例，属于历史记录，需另行重写。
