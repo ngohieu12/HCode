@@ -2,7 +2,7 @@ import { PluginUiWorkspaceProvider } from "@/plugin-ui/index.js";
 /* eslint-disable max-lines -- App 当前集中编排 workspace 级状态、导航、Git 派生数据和 shell wiring；已将新增 side pane memory 桥接抽出，剩余拆分需要按 shell 边界单独重构。 */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
-import type { GitChangeSourceId, WorkspacePurpose } from "@zcode/shared";
+import { resolveWorkspaceKey, type GitChangeSourceId, type WorkspacePurpose } from "@zcode/shared";
 import { useZCodeStore } from "@/store/StoreProvider.js";
 import { getVisibleTaskMetas, useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
 import { useTaskQueryCacheStore } from "@/store/taskQueryCacheStore.js";
@@ -11,13 +11,13 @@ import { useGitAutoRefresh } from "@/hooks/useGitAutoRefresh.js";
 import { useGitRepository } from "@/hooks/useGitRepository.js";
 import { useAppKeyboard } from "@/hooks/useAppKeyboard.js";
 import { usePlatform } from "@/hooks/usePlatform.js";
+import { useWorkspaceProviderConfigFile } from "@/hooks/useWorkspaceProviderConfigFile.js";
 import { useWorkspaceActiveTaskState } from "@/hooks/useWorkspaceActiveTaskState.js";
 import { useEnsureWorkspaceMcpLoaded } from "@/hooks/useEnsureWorkspaceMcpLoaded.js";
 import { useTabStore } from "@/store/TabStoreProvider.js";
 import { isWorkspaceReadOnly, isWorkspaceTab } from "@/store/tabStore.js";
 import type { TaskChatMessage as TestChatMessage } from "@/lib/taskChatMessageTypes.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
-import { useIsOfficeMode } from "@/hooks/useInterfaceMode.js";
 import { getPathLeaf } from "@/lib/path.js";
 import {
   addPluginStoreOpenListener,
@@ -64,6 +64,7 @@ import { useTaskSidePaneMemoryBridge } from "@/app-shell/useTaskSidePaneMemoryBr
 import { resolveAppWorkspaceRpcTarget } from "@/app-shell/workspaceRpcTarget.js";
 import { useWorkspaceServicesResolution } from "@/hooks/useWorkspaceServices.js";
 import { useWorkspaceTerminalTaskNotifications } from "@/hooks/useTaskNotifications.js";
+import { useMarketingTaskCompletionRefresh } from "@/components/marketing-touch/useMarketingTaskCompletionRefresh.js";
 import { useOffPeakTaskNotifications } from "@/hooks/useOffPeakTaskNotifications.js";
 import type { AppProps, WorkspaceMainView } from "@/app-shell/types.js";
 import type {
@@ -80,6 +81,8 @@ import {
 } from "@/lib/closeActiveContext.js";
 import { usePaneLayoutStore } from "@/v4/paneLayoutStore.js";
 import { useWorkbenchGroupStore } from "@/v4/workbenchGroupStore.js";
+import type { SavedWorkflowHubTarget } from "@/v4/savedWorkflowHubContext.js";
+import type { SavedWorkflowsOpenTarget } from "@/settings/saved-workflows/SavedWorkflowsSection.js";
 import type { AssistantPreviewCardsAutoOpenRequest } from "@/lib/assistantPreviewCards.js";
 import { startMemoryDiagnosticsLogger } from "@/lib/memoryDiagnostics.js";
 
@@ -113,6 +116,10 @@ export function App({
   remoteConnectionInProgress = false,
   onReturnToWorkspace,
   allowOpenWorkspace = true,
+  webRemoteControlWorkspaceSwitcher,
+  initialWebRemoteControlMobileNavigationIntent,
+  initialWebRemoteControlWorkspaceList,
+  webRemoteControlTerminalTransportState,
   allowRemoteWorkspace = true,
   remoteWorkspaceSessions = EMPTY_REMOTE_WORKSPACE_SESSIONS,
   workspaceAbsPath,
@@ -135,7 +142,6 @@ export function App({
   const isLinuxDesktop = Boolean(isDesktop && !isMacDesktop && !isWindowsDesktop);
   const supportsEmbeddedBrowser = explicitSupportsEmbeddedBrowser ?? Boolean(isDesktop);
   const { intl, locale, setLocale } = useZCodeIntl();
-  const isOfficeMode = useIsOfficeMode();
   const platform = usePlatform();
   // 进程内存本地诊断日志：每窗口一个 60s 采样器，
   // 经门控后写桌面主日志；Web 端无日志桥时为 no-op。同一次读数还经 preload 桥把 heap 送 main 的
@@ -224,9 +230,11 @@ export function App({
     setBrowserNavigationRequest,
     handleOpenCodeViewer,
     handleOpenCodeViewers,
+    handleOpenFileTree,
     handleOpenBrowserUrl,
     handleToggleBrowser,
     handleOpenBrowserTab,
+    handleOpenBrowserPermissionSettings,
     handleToggleGit,
     handleOpenGit,
     handleOpenTreemapping,
@@ -274,6 +282,12 @@ export function App({
   });
   const workspaceKey = workspaceIdentity?.trim() || workspaceAbsPath;
   const notificationEnabled = useZCodeStore((s) => s.notificationEnabled);
+  useMarketingTaskCompletionRefresh({
+    workspacePath: workspaceAbsPath,
+    ...(workspaceIdentity ? { workspaceIdentity } : {}),
+    ...(workspaceRemoteSessionId ? { endpointKey: workspaceRemoteSessionId } : {}),
+    rpcReady: workspaceRpcReady,
+  });
   useWorkspaceTerminalTaskNotifications({
     workspacePath: workspaceAbsPath,
     ...(workspaceIdentity ? { workspaceIdentity } : {}),
@@ -381,6 +395,7 @@ export function App({
     activeTraceId,
     activeSessionId,
     activeTaskProvider,
+    workspaceHeaderProvider,
     activeTaskChangeSummary,
     activeTaskTitle,
     taskNativeSessionLogFile,
@@ -393,6 +408,12 @@ export function App({
     selectedProvider: workspaceShellZCodeState.selectedProvider,
     intl,
   });
+  const providerConfigFile = useWorkspaceProviderConfigFile(
+    workspaceAbsPath,
+    workspaceHeaderProvider,
+    workspaceRemoteSessionId,
+    workspaceIdentity,
+  );
   const workspaceTabs = useMemo(
     () =>
       tabs.filter(isWorkspaceTab).map((tab) => ({
@@ -584,12 +605,12 @@ export function App({
   );
   const handleAutoOpenAssistantPptx = useCallback(
     (request: AssistantPreviewCardsAutoOpenRequest) => {
-      if (!isDesktop || workspaceReadOnlyReason) {
+      if (!isDesktop || webRemoteControlWorkspaceSwitcher || workspaceReadOnlyReason) {
         return;
       }
       handleOpenCodeViewers(request.sources);
     },
-    [handleOpenCodeViewers, isDesktop, workspaceReadOnlyReason],
+    [handleOpenCodeViewers, isDesktop, webRemoteControlWorkspaceSwitcher, workspaceReadOnlyReason],
   );
   const handleOpenTreemappingIfWritable = useCallback(
     (...args: Parameters<typeof handleOpenTreemapping>) => {
@@ -758,11 +779,13 @@ export function App({
       ) {
         addTab(targetWorkspacePath, targetTabOptions);
       }
-      // workspace 行“新建对话”以前由叶子组件直接 activateTab + startDraft，
-      // 没有退出重启恢复的 workbench group/pane。group primary binding 因而仍可覆盖草稿。
-      // 所有显式新建入口统一先回到单 primary pane。
-      useWorkbenchGroupStore.getState().deactivateActiveGroup();
-      usePaneLayoutStore.getState().resetToPrimaryPane();
+      if (!webRemoteControlWorkspaceSwitcher) {
+        // 修复原因：workspace 行“新建对话”以前由叶子组件直接 activateTab + startDraft，
+        // 没有退出重启恢复的 workbench group/pane。group primary binding 因而仍可覆盖草稿。
+        // desktop 所有显式新建入口统一先回到单 primary pane；手机 /remote 不消费这份本地布局。
+        useWorkbenchGroupStore.getState().deactivateActiveGroup();
+        usePaneLayoutStore.getState().resetToPrimaryPane();
+      }
       store.startDraft(
         targetWorkspacePath,
         targetSelectedProvider,
@@ -789,6 +812,7 @@ export function App({
       workspaceAbsPath,
       workspaceIdentity,
       workspaceShellZCodeState.selectedProvider,
+      webRemoteControlWorkspaceSwitcher,
     ],
   );
 
@@ -805,6 +829,12 @@ export function App({
   const testActions = useMemo<TestActions>(
     () => ({
       ...taskListE2EActions,
+      sendBotMessage: (message) => services.botsService.handleInboundMessage(message),
+      submitBotGroupInput: (params) => {
+        const submit = services.zcodeTaskService.submitBotGroupInput;
+        if (!submit) throw new Error("Task material admission unavailable");
+        return submit.call(services.zcodeTaskService, params);
+      },
       getTheme: () => theme,
       setTheme,
       getLocale: () => locale,
@@ -822,7 +852,16 @@ export function App({
       getPluginReferenceCatalog: (params) =>
         services.zcodeAgentService.getPluginReferenceCatalog(params),
     }),
-    [locale, services.zcodeAgentService, setLocale, theme, setTheme, testMessages],
+    [
+      locale,
+      services.botsService,
+      services.zcodeTaskService,
+      services.zcodeAgentService,
+      setLocale,
+      theme,
+      setTheme,
+      testMessages,
+    ],
   );
   useTestActions(testActions);
   const [workspaceMainView, setWorkspaceMainView] = useState<WorkspaceMainView>("chat");
@@ -830,37 +869,37 @@ export function App({
   const [openAutomationTab, setOpenAutomationTab] = useState<NonNullable<
     AutomationsNavigationTarget["automationTab"]
   > | null>(null);
-  const [pluginStoreReturnScopeKey, setPluginStoreReturnScopeKey] = useState("user");
-  const [pluginStoreOpenVersion, setPluginStoreOpenVersion] = useState(0);
   const handleNavigateToTaskMain = useCallback(() => {
     setWorkspaceMainView("chat");
   }, []);
-  const { preserveNextSettingsExit } = useWorkspaceMainViewSettingsExit({
+  useWorkspaceMainViewSettingsExit({
     isWorkspaceVisible,
     workspaceMainView,
     onExitSettings: handleNavigateToTaskMain,
   });
-  const handleNavigateToAutomationsMain = useCallback((target: AutomationsNavigationTarget) => {
-    setOpenAutomationId(target.automationId ?? null);
-    setOpenAutomationTab(target.automationTab ?? null);
-    setWorkspaceMainView("automations");
-  }, []);
-  const handleNavigateToPluginStoreMain = useCallback(() => {
-    // 通用入口没有 scope 上下文，默认回到 User；Settings 显式带 scope 的入口会在
-    // 导航完成后覆盖这次默认值，避免沿用上一次 Workspace scope。
-    setPluginStoreReturnScopeKey("user");
-    setPluginStoreOpenVersion((version) => version + 1);
-    preserveNextSettingsExit();
-    setWorkspaceMainView("plugin-store");
-  }, [preserveNextSettingsExit]);
+  const handleNavigateToAutomationsMain = useCallback(
+    (target: AutomationsNavigationTarget) => {
+      if (target.automationTab === "workflow") {
+        // 工作流已迁入设置页：定时任务主视图不再承接这个标签，改为打开设置页的「工作流」分区。
+        handleOpenSettingsSection("workflow");
+        return;
+      }
+      setOpenAutomationId(target.automationId ?? null);
+      setOpenAutomationTab(target.automationTab ?? null);
+      setWorkspaceMainView("automations");
+    },
+    [handleOpenSettingsSection],
+  );
   const handleOpenAutomationConsumed = useCallback(() => {
     setOpenAutomationId(null);
     setOpenAutomationTab(null);
   }, []);
+  // 中枢深链（「已保存」芯片 → 那个工作流的详情页）：中枢定位后由它回调清空。
+  const [openWorkflow, setOpenWorkflow] = useState<SavedWorkflowsOpenTarget | null>(null);
+  const handleOpenWorkflowConsumed = useCallback(() => setOpenWorkflow(null), []);
   const {
     handleSelectTask,
     handleOpenAutomations,
-    handleOpenPluginStore,
     handleTaskNavBack,
     handleTaskNavForward,
     canGoBack,
@@ -874,22 +913,37 @@ export function App({
     activateTabByPath,
     onNavigateToTask: handleNavigateToTaskMain,
     onNavigateToAutomations: handleNavigateToAutomationsMain,
-    onNavigateToPluginStore: handleNavigateToPluginStoreMain,
   });
+  // 完成卡「已保存」芯片的落点（docs/dynamic-workflow/transcript-and-notifications.md「Saving the
+  // run, and running it again」）：走「自动化」入口的同一条导航（进历史、切主视图），落在「工作流」
+  // 标签，再由深链把中枢定位到那一页。项目档按 workspaceKey 找组，全局档只要名字。
+  const handleOpenSavedWorkflowInHub = useCallback(
+    (target: SavedWorkflowHubTarget) => {
+      setOpenWorkflow(
+        target.scope === "global"
+          ? { scope: "global", name: target.name }
+          : {
+              scope: "project",
+              name: target.name,
+              workspaceKey: resolveWorkspaceKey({
+                workspacePath: target.workspacePath,
+                ...(target.workspaceIdentity
+                  ? { workspaceIdentity: target.workspaceIdentity }
+                  : {}),
+              }),
+            },
+      );
+      handleOpenAutomations(undefined, "workflow");
+    },
+    [handleOpenAutomations],
+  );
   const handleOpenPluginStoreForScope = useCallback(
     (_target: PluginStoreOpenTarget = {}) => {
-      // Workspace Marketplace 已收敛为全局入口。兼容旧事件中的 Workspace key，但返回
-      // 目标统一归一为 User，避免旧 sessionStorage/同窗口事件把设置页带回失效 scope。
-      const returnScopeKey = "user";
-      if (workspaceMainView === "plugin-store") {
-        setPluginStoreReturnScopeKey(returnScopeKey);
-        setPluginStoreOpenVersion((version) => version + 1);
-        return;
-      }
-      handleOpenPluginStore();
-      setPluginStoreReturnScopeKey(returnScopeKey);
+      // 插件市场已迁入设置页，入口统一切到「插件市场」分区。Workspace scope 已收敛为全局，
+      // 旧事件中的 scope 不再使用；具体 intent 由 requestPluginStoreOpen 的 pendingTarget 在分区挂载时消费。
+      handleOpenSettingsSection("pluginStore");
     },
-    [handleOpenPluginStore, workspaceMainView],
+    [handleOpenSettingsSection],
   );
   useEffect(
     () => addPluginStoreOpenListener(handleOpenPluginStoreForScope),
@@ -939,16 +993,6 @@ export function App({
   const handleSelectNextConversation = useCallback(() => {
     handleSelectAdjacentConversation("next");
   }, [handleSelectAdjacentConversation]);
-  const handleManageInstalledPlugins = useCallback(() => {
-    setPendingSettingsPluginIntent("plugins", {
-      origin: "plugin-store",
-      scopeKey: pluginStoreReturnScopeKey,
-    });
-    openSettingsTab();
-  }, [openSettingsTab, pluginStoreReturnScopeKey]);
-  const handlePrimaryNavigationBack =
-    workspaceMainView === "plugin-store" ? handleManageInstalledPlugins : handleTaskNavBack;
-  const canPrimaryNavigationBack = workspaceMainView === "plugin-store" || canTaskNavBack;
   const shellPanelIds = useMemo(() => ["sidebar", "content"], []);
 
   useAppKeyboard({
@@ -964,9 +1008,7 @@ export function App({
     toggleSidePane: () => runVisibleWorkspaceCommand(handleToggleSidePane),
     previousConversation: handleSelectPreviousConversation,
     nextConversation: handleSelectNextConversation,
-    navigateBack: canPrimaryNavigationBack
-      ? () => runVisibleWorkspaceCommand(handlePrimaryNavigationBack)
-      : null,
+    navigateBack: canTaskNavBack ? () => runVisibleWorkspaceCommand(handleTaskNavBack) : null,
     navigateForward: canTaskNavForward
       ? () => runVisibleWorkspaceCommand(handleTaskNavForward)
       : null,
@@ -996,8 +1038,6 @@ export function App({
   const quickPickCommands = useMemo(
     () =>
       createQuickPickCommands({
-        supportsTerminal: !isOfficeMode,
-        supportsReview: !isOfficeMode,
         allowOpenWorkspace,
         canOpenCommunity: canOpenCommunityFromQuickPick,
         isSidebarVisible,
@@ -1040,7 +1080,6 @@ export function App({
       }),
     [
       allowOpenWorkspace,
-      isOfficeMode,
       canOpenCommunityFromQuickPick,
       handleOpenCommunity,
       handleOpenFeedback,
@@ -1121,7 +1160,7 @@ export function App({
         onSearchResultHighlightRequest={handleSearchResultHighlightRequest}
         onOpenCodeViewer={handleOpenCodeViewerIfWritable}
       />
-      {/* 反馈是应用级能力，必须固定走本机 base host；SSH session 连接中或断开时，
+      {/* Bugfix: 反馈是应用级能力，必须固定走本机 base host；SSH session 连接中或断开时，
           workspace-scoped services 会切成断连代理，不能让反馈提交跟随远程 session 失效。 */}
       <FeedbackHost feedbackService={baseFeedbackService} platform={platform} />
       <PluginUiWorkspaceProvider onOpenSidePane={handleOpenPluginUi}>
@@ -1129,14 +1168,14 @@ export function App({
           services={services}
           workspaceReadOnlyReason={workspaceReadOnlyReason}
           workspaceMainView={workspaceMainView}
-          pluginStoreOpenVersion={pluginStoreOpenVersion}
           openAutomationId={openAutomationId}
           openAutomationTab={openAutomationTab}
+          openWorkflow={openWorkflow}
+          onOpenWorkflowConsumed={handleOpenWorkflowConsumed}
+          onOpenSavedWorkflowInHub={handleOpenSavedWorkflowInHub}
           onWorkspaceMainViewChange={setWorkspaceMainView}
           onOpenAutomationConsumed={handleOpenAutomationConsumed}
           handleOpenAutomations={handleOpenAutomations}
-          handleOpenPluginStore={handleOpenPluginStoreForScope}
-          handleManageInstalledPlugins={handleManageInstalledPlugins}
           onConnectRemote={onConnectRemote}
           onSelectRemoteProject={onSelectRemoteProject}
           onCancelRemoteProject={onCancelRemoteProject}
@@ -1159,6 +1198,12 @@ export function App({
           onCreateScratchWorkspace={onCreateScratchWorkspace}
           remoteConnectionInProgress={remoteConnectionInProgress}
           allowOpenWorkspace={allowOpenWorkspace}
+          webRemoteControlWorkspaceSwitcher={webRemoteControlWorkspaceSwitcher}
+          initialWebRemoteControlMobileNavigationIntent={
+            initialWebRemoteControlMobileNavigationIntent
+          }
+          initialWebRemoteControlWorkspaceList={initialWebRemoteControlWorkspaceList}
+          webRemoteControlTerminalTransportState={webRemoteControlTerminalTransportState}
           allowRemoteWorkspace={allowRemoteWorkspace}
           remoteWorkspaceSessions={remoteWorkspaceSessions}
           workspaceAbsPath={workspaceAbsPath}
@@ -1213,6 +1258,7 @@ export function App({
           gitState={gitState}
           browserNavigationRequest={browserNavigationRequest}
           browserRestoreUrls={browserRestoreUrls}
+          providerConfigFile={providerConfigFile}
           taskNativeSessionLogFile={taskNativeSessionLogFile}
           taskSessionFile={taskSessionFile}
           testMessages={testMessages}
@@ -1244,6 +1290,7 @@ export function App({
           handleToggleTerminal={handleToggleTerminalIfWritable}
           handleToggleBrowser={handleToggleBrowser}
           handleOpenBrowserTab={handleOpenBrowserTab}
+          handleOpenBrowserPermissionSettings={handleOpenBrowserPermissionSettings}
           handleOpenTreemapping={handleOpenTreemappingIfWritable}
           handleOpenWhiteboard={handleOpenWhiteboard}
           handleOpenDeveloperTools={handleOpenDeveloperTools}
@@ -1252,6 +1299,7 @@ export function App({
           handleToggleSidePane={handleToggleSidePane}
           handleOpenBrowserUrl={handleOpenBrowserUrl}
           handleOpenCodeViewer={handleOpenCodeViewerIfWritable}
+          handleOpenFileTree={handleOpenFileTree}
           handleAutoOpenAssistantPptx={handleAutoOpenAssistantPptx}
           handleOpenSubagentSession={handleOpenSubagentSession}
           handleOpenBackgroundBash={handleOpenBackgroundBash}

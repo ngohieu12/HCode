@@ -18,7 +18,8 @@ export function initializeNewTaskDraft(
   return {
     ...draft,
     initializeFromNewTask: undefined,
-    mode: recent?.mode === "plan" ? "build" : (recent?.mode ?? "build"),
+    // 新会话默认 Full access（yolo）；Recent 记住的显式选择仍优先。
+    mode: recent?.mode === "plan" ? "yolo" : (recent?.mode ?? "yolo"),
     planEnabled: false,
     modelSelection:
       recent?.modelSelection ??

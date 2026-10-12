@@ -12,7 +12,6 @@ export type ShortcutChannel = "window" | "menu";
 
 /** 可配置快捷键的命令 ID，与 SHORTCUT_COMMANDS 一一对应。 */
 export type ShortcutCommandId =
-  | "toggleInterfaceMode"
   | "openOnboarding"
   | "openCommandCenter"
   | "openSettings"
@@ -88,19 +87,62 @@ export const SHORTCUT_COMMANDS: readonly ShortcutCommandEntry[] = [
   { id: "resetZoom", channel: "menu", defaultBindings: ["CmdOrCtrl+0"] },
   // composer 作用域：由输入框 Lexical 插件消费，不进 useAppKeyboard / 菜单。
   // channel 仅作类型占位（渲染进程行为），分发方按 scope 识别。
-  { id: "composerSend", channel: "window", scope: "composer", defaultBindings: ["Enter"] },
+  // 默认值取 newline 模式（Enter 换行、Ctrl/Cmd+Enter 发送）；send 模式见 COMPOSER_ENTER_PRESET_BINDINGS。
+  {
+    id: "composerSend",
+    channel: "window",
+    scope: "composer",
+    defaultBindings: ["CmdOrCtrl+Enter"],
+  },
   {
     id: "composerInsertNewline",
     channel: "window",
     scope: "composer",
-    defaultBindings: ["Shift+Enter"],
+    defaultBindings: ["Enter", "Shift+Enter"],
   },
-  { id: "toggleInterfaceMode", channel: "window", defaultBindings: ["CmdOrCtrl+Shift+u"] },
   { id: "openOnboarding", channel: "window", defaultBindings: ["CmdOrCtrl+Shift+o"] },
 ];
 
-/** 按命令 ID 取默认绑定；未知命令返回空数组（生效表 resolve 对未知命令整体忽略）。 */
-export function getDefaultShortcutBindings(id: string): readonly string[] {
+/**
+ * 输入框 Enter 行为模式（设置项 composerEnterBehavior）。
+ * - newline：Enter 换行，Ctrl/Cmd+Enter 发送（默认）；
+ * - send：Enter 发送，Shift+Enter 换行（改动前的行为）。
+ */
+export type ComposerEnterBehavior = "newline" | "send";
+
+/** 默认模式。 */
+export const DEFAULT_COMPOSER_ENTER_BEHAVIOR: ComposerEnterBehavior = "newline";
+
+/**
+ * 两种 Enter 模式下 composer 命令的默认绑定。只覆盖 composer 作用域的两条命令；
+ * 用户在快捷键设置页写入的覆盖优先于这里的模式默认。
+ */
+export const COMPOSER_ENTER_PRESET_BINDINGS: Readonly<
+  Record<ComposerEnterBehavior, Partial<Record<ShortcutCommandId, readonly string[]>>>
+> = {
+  newline: {
+    composerSend: ["CmdOrCtrl+Enter"],
+    composerInsertNewline: ["Enter", "Shift+Enter"],
+  },
+  send: {
+    composerSend: ["Enter"],
+    composerInsertNewline: ["Shift+Enter"],
+  },
+};
+
+/**
+ * 按命令 ID 取默认绑定；未知命令返回空数组（生效表 resolve 对未知命令整体忽略）。
+ * composer 命令的默认值随 Enter 模式变化，未传模式时取默认模式。
+ */
+export function getDefaultShortcutBindings(
+  id: string,
+  composerEnterBehavior: ComposerEnterBehavior = DEFAULT_COMPOSER_ENTER_BEHAVIOR,
+): readonly string[] {
+  const preset = COMPOSER_ENTER_PRESET_BINDINGS[composerEnterBehavior];
+  const presetBindings = preset[id as ShortcutCommandId];
+  if (presetBindings) {
+    return presetBindings;
+  }
   return SHORTCUT_COMMANDS.find((entry) => entry.id === id)?.defaultBindings ?? [];
 }
 

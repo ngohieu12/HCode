@@ -1,7 +1,8 @@
 import type { BrowserStorageLike } from "@/lib/browserEnvironment.js";
 import { getSafeLocalStorage } from "@/lib/browserEnvironment.js";
 
-export type SidebarTaskOrganizeBy = "grouped" | "project" | "chronological";
+// 侧栏任务只保留「按项目」视图。旧版本存下的 "grouped" / "chronological" 会回落到默认的 "project"。
+export type SidebarTaskOrganizeBy = "project";
 export type SidebarTaskSortBy = "created" | "updated";
 
 interface SidebarTaskPreferences {
@@ -9,7 +10,8 @@ interface SidebarTaskPreferences {
   sortBy: SidebarTaskSortBy;
 }
 
-const SIDEBAR_TASK_PREFERENCES_STORAGE_KEY = "zcode-sidebar-task-preferences";
+export const SIDEBAR_TASK_PREFERENCES_STORAGE_KEY =
+  "zcode-sidebar-task-preferences";
 
 const DEFAULT_SIDEBAR_TASK_PREFERENCES: SidebarTaskPreferences = {
   organizeBy: "project",
@@ -17,7 +19,7 @@ const DEFAULT_SIDEBAR_TASK_PREFERENCES: SidebarTaskPreferences = {
 };
 
 function isSidebarTaskOrganizeBy(value: unknown): value is SidebarTaskOrganizeBy {
-  return value === "grouped" || value === "project" || value === "chronological";
+  return value === "project";
 }
 
 function isSidebarTaskSortBy(value: unknown): value is SidebarTaskSortBy {

@@ -30,11 +30,7 @@ export interface AutomationsNavEntry extends WorkspaceNavEntryBase {
   automationTab?: AutomationsNavigationTab;
 }
 
-export interface PluginStoreNavEntry extends WorkspaceNavEntryBase {
-  kind: "plugin-store";
-}
-
-export type WorkspaceNavEntry = TaskNavEntry | AutomationsNavEntry | PluginStoreNavEntry;
+export type WorkspaceNavEntry = TaskNavEntry | AutomationsNavEntry;
 
 export interface TaskNavigationHistory {
   entries: WorkspaceNavEntry[];
@@ -48,16 +44,16 @@ export function createTaskNavigationHistory(): TaskNavigationHistory {
   return { entries: [], cursor: -1 };
 }
 
-function isTaskNavEntry(entry: WorkspaceNavEntry): entry is TaskNavEntry {
+export function isTaskNavEntry(
+  entry: WorkspaceNavEntry,
+): entry is TaskNavEntry {
   return entry.kind === "task";
 }
 
-export function isAutomationsNavEntry(entry: WorkspaceNavEntry): entry is AutomationsNavEntry {
+export function isAutomationsNavEntry(
+  entry: WorkspaceNavEntry,
+): entry is AutomationsNavEntry {
   return entry.kind === "automations";
-}
-
-export function isPluginStoreNavEntry(entry: WorkspaceNavEntry): entry is PluginStoreNavEntry {
-  return entry.kind === "plugin-store";
 }
 
 function isSameNavEntry(left: WorkspaceNavEntry, right: WorkspaceNavEntry): boolean {
@@ -138,18 +134,6 @@ export function pushAutomationsNavEntry(
   });
 }
 
-export function pushPluginStoreNavEntry(
-  history: TaskNavigationHistory,
-  workspacePath: string,
-  workspaceIdentity?: string,
-): TaskNavigationHistory {
-  return pushEntry(history, {
-    kind: "plugin-store",
-    workspacePath,
-    ...(workspaceIdentity ? { workspaceIdentity } : {}),
-  });
-}
-
 export function canGoBack(history: TaskNavigationHistory): boolean {
   return history.cursor > 0;
 }
@@ -206,7 +190,8 @@ export function removeTaskFromHistory(
   history: TaskNavigationHistory,
   taskId: string,
 ): TaskNavigationHistory {
-  const currentEntry = history.cursor >= 0 ? history.entries[history.cursor] : null;
+  const currentEntry =
+    history.cursor >= 0 ? history.entries[history.cursor] : null;
   const filtered = history.entries.filter(
     (entry) => !isTaskNavEntry(entry) || entry.taskId !== taskId,
   );
@@ -222,7 +207,9 @@ export function removeTaskFromHistory(
   // 当前条目未被删除时保持指向它；被删时沿用旧位置选择最近目标。
   const currentEntryIndex = currentEntry ? filtered.indexOf(currentEntry) : -1;
   const cursor =
-    currentEntryIndex >= 0 ? currentEntryIndex : Math.min(history.cursor, filtered.length - 1);
+    currentEntryIndex >= 0
+      ? currentEntryIndex
+      : Math.min(history.cursor, filtered.length - 1);
 
   return { entries: filtered, cursor };
 }

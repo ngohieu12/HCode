@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import type { PanelImperativeHandle } from "react-resizable-panels";
 
-const PANEL_FLEX_GROW_TRANSITION_CLASSES = ["transition-[flex-grow]", "duration-200", "ease-out"];
-const PANEL_FLEX_GROW_TRANSITION_FALLBACK_MS = 240;
+const PANEL_FLEX_GROW_TRANSITION_CLASSES = [
+  "transition-[flex-grow]",
+  "duration-150",
+  "ease-[cubic-bezier(0.2,0,0,1)]",
+];
+const PANEL_FLEX_GROW_TRANSITION_FALLBACK_MS = 180;
 
 function enablePanelFlexGrowTransition(panelElement: HTMLElement): () => void {
   panelElement.classList.add(...PANEL_FLEX_GROW_TRANSITION_CLASSES);

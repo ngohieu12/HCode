@@ -1,3 +1,4 @@
+import { CODE_PREVIEW_DARK_THEME, CODE_PREVIEW_LIGHT_THEME } from "@/lib/codePreviewSettings.js";
 import { memo, useMemo } from "react";
 import type { BundledTheme } from "shiki";
 import {
@@ -16,23 +17,20 @@ export {
   getHighlightedLightweightDiffLine as getInlineDiffHighlightLine,
 };
 
-function resolveInlineDiffHighlightTheme(
-  theme: Theme | undefined,
-  codePreviewSettings: CodePreviewSettings,
-): BundledTheme {
+function resolveInlineDiffHighlightTheme(theme: Theme | undefined): BundledTheme {
   if (theme === "system") {
     if (typeof window !== "undefined") {
       return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? codePreviewSettings.darkTheme
-        : codePreviewSettings.lightTheme;
+        ? CODE_PREVIEW_DARK_THEME
+        : CODE_PREVIEW_LIGHT_THEME;
     }
 
-    return codePreviewSettings.lightTheme;
+    return CODE_PREVIEW_LIGHT_THEME;
   }
 
   return theme === "dark" || theme === "zai-dark"
-    ? codePreviewSettings.darkTheme
-    : codePreviewSettings.lightTheme;
+    ? CODE_PREVIEW_DARK_THEME
+    : CODE_PREVIEW_LIGHT_THEME;
 }
 
 export const EditInlineDiffContent = memo(function EditInlineDiffContent({
@@ -54,10 +52,7 @@ export const EditInlineDiffContent = memo(function EditInlineDiffContent({
     () => inferCodeLanguage(preview.path ?? preview.title, preview.patch),
     [preview.patch, preview.path, preview.title],
   );
-  const highlightTheme = useMemo(
-    () => resolveInlineDiffHighlightTheme(theme, codePreviewSettings),
-    [codePreviewSettings, theme],
-  );
+  const highlightTheme = useMemo(() => resolveInlineDiffHighlightTheme(theme), [theme]);
 
   return (
     <div className="space-y-3">

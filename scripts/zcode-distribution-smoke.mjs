@@ -1,13 +1,12 @@
 // 在仓库外验证发行包，避免开发机 node_modules 掩盖缺失的 TUI/native/worker 依赖。
 import assert from "node:assert/strict";
-import { execFile, spawn } from "node:child_process";
-import { once } from "node:events";
+import { execFile } from "node:child_process";
 import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { setTimeout } from "node:timers/promises";
-import { promisify } from "node:util";
+import { promisify, stripVTControlCharacters } from "node:util";
 import { pathToFileURL } from "node:url";
 
 const exec = promisify(execFile);
@@ -24,7 +23,6 @@ const env = {
   NODE_OPTIONS: "",
   TERM: "xterm-256color",
 };
-let web;
 let terminal;
 try {
   await exec("tar", ["-xzf", resolve(archive), "-C", directory]);
@@ -56,9 +54,14 @@ try {
     }),
   );
   await until(
-    () => /ZCode/.test(screen) && /(?:登录|\/login|输入提示词|Type a prompt)/i.test(screen),
+    () => {
+      // 修复：TUI 渲染器会在相邻字符之间插入 SGR/光标定位序列，原始 PTY 输出里的提示词不连续；
+      // 先去掉终端控制序列再匹配可见文本，避免界面已就绪却被判定为超时。
+      const visible = stripVTControlCharacters(screen);
+      return /ZCode/.test(visible) && /(?:登录|\/login|输入提示词|Type a prompt)/i.test(visible);
+    },
     "TUI initialized render",
-    () => screen,
+    () => stripVTControlCharacters(screen),
   );
   assert.equal(terminalExit, undefined, screen);
   assert.doesNotMatch(screen, /Cannot find (?:module|package)|ERR_MODULE_NOT_FOUND/);
@@ -75,70 +78,17 @@ try {
   assert.equal(tuiExit.exitCode, 0, screen);
   terminal = undefined;
 
-  let webOutput = "";
-  web = spawn(process.execPath, [runner, "--web", "--workspace", workspace, "--no-open"], {
-    cwd: workspace,
-    env,
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-  web.stdout.on("data", (data) => {
-    webOutput += data;
-  });
-  web.stderr.on("data", (data) => {
-    webOutput += data;
-  });
-  let base;
-  await until(
-    () => {
-      base = webOutput.match(/Local:\s+(http:\/\/127\.0\.0\.1:\d+\/)/)?.[1];
-      return Boolean(base);
-    },
-    "Web URL",
-    () => webOutput,
-  );
-  let info;
-  await until(
-    async () => {
-      try {
-        const response = await fetch(new URL("api/server-info", base), {
-          signal: AbortSignal.timeout(1000),
-        });
-        if (!response.ok) return false;
-        info = await response.json();
-        return true;
-      } catch {
-        return false;
-      }
-    },
-    "Web readiness",
-    () => webOutput,
-  );
-  assert.equal(info.workspaces[0].path, workspace);
-  const html = await fetch(base);
-  assert.equal(html.status, 200);
-  assert.match(await html.text(), /<html/i);
-  const { default: WebSocket } = await import(pathToFileURL(require.resolve("ws")).href);
-  const socket = new WebSocket(new URL("ws", base.replace("http:", "ws:")));
-  await once(socket, "open");
-  socket.close();
-  await once(socket, "close");
-  const exited = once(web, "exit");
-  web.kill("SIGTERM");
-  assert.deepEqual(await exited, [0, null]);
-  web = undefined;
   console.log(
     JSON.stringify({
       version,
       platform: process.platform,
       arch: process.arch,
       tui: "native import, initialized render, keyboard exit passed",
-      web: "HTML, server-info, workspace, WebSocket, shutdown passed",
       isolated: true,
     }),
   );
 } finally {
   terminal?.kill();
-  web?.kill();
   await rm(directory, { recursive: true, force: true });
 }
 

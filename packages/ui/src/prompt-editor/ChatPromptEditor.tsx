@@ -29,6 +29,7 @@ import { appendWorkspaceFileMentionToComposer } from "@/lib/workspaceFileCompose
 import { usePromptEditorDragState } from "@/prompt-editor/usePromptEditorDragState.js";
 import { ChatPromptActionMenu } from "@/prompt-editor/ChatPromptActionMenu.js";
 import { useComposerToolbarFit } from "@/prompt-editor/useComposerToolbarFit.js";
+import { useShortcutCommandLabel } from "@/shortcuts/useShortcutBindings.js";
 
 function runAfterFrame(callback: () => void) {
   if (typeof requestAnimationFrame === "function") {
@@ -61,6 +62,7 @@ export function ChatPromptEditor({
   isDraggingOver = false,
   dragAttachmentHint,
   topContent,
+  inputLeadingContent,
   leadingActions,
   attachmentAction,
   betweenCancelAndSubmitAction,
@@ -74,6 +76,7 @@ export function ChatPromptEditor({
   promptHistory,
   className,
   shellClassName,
+  avoidIosInputFocusZoom = false,
   compactPlaceholder = false,
   onChange,
   onSubmit,
@@ -112,6 +115,8 @@ export function ChatPromptEditor({
   isDraggingOver?: boolean;
   dragAttachmentHint?: string;
   topContent?: ReactNode;
+  /** 与输入正文同一行的前置内容；Highspeed 使用紧凑 Fast 标签。 */
+  inputLeadingContent?: ReactNode;
   leadingActions?: ReactNode;
   attachmentAction?: {
     label: string;
@@ -131,6 +136,7 @@ export function ChatPromptEditor({
   promptHistory?: readonly string[];
   className?: string;
   shellClassName?: string;
+  avoidIosInputFocusZoom?: boolean;
   compactPlaceholder?: boolean;
   onChange?: (value: string) => void;
   // 适配：返回 false 表示业务层拒绝/延迟本次提交，Lexical 不自行 reset（草稿保留）。
@@ -151,6 +157,8 @@ export function ChatPromptEditor({
 }) {
   const { intl } = useZCodeIntl();
   const toolbarRef = useComposerToolbarFit();
+  // 发送键提示随 Enter 模式变化（换行模式为 Ctrl/Cmd+Enter，发送模式为 Enter）
+  const sendShortcutLabel = useShortcutCommandLabel("composerSend");
   const internalInputApiRef = useRef<LexicalChatInputHandle | null>(null);
   const resolvedInputApiRef = inputApiRef ?? internalInputApiRef;
   const [internalTriggerPanelContainer, setInternalTriggerPanelContainer] =
@@ -331,6 +339,35 @@ export function ChatPromptEditor({
       ? dragAttachmentHint
       : undefined;
 
+  const editorNode = (
+    <LexicalChatInput
+      placeholder={placeholder}
+      disabled={disabled}
+      submitDisabled={submitDisabled}
+      allowSubmitWhenEmpty={allowSubmitWhenEmpty}
+          enterSubmits={enterSubmits}
+          onSubmit={handleEditorSubmit}
+          onModifiedSubmit={onModifiedSubmit}
+      onChange={handleTextChange}
+      onFocus={onFocus}
+      triggerPanelContainer={resolvedTriggerPanelContainer}
+      workspacePath={workspacePath}
+      workspaceIdentity={workspaceIdentity}
+      taskId={taskId}
+      skillCatalogSessionId={skillCatalogSessionId}
+      inputTestId={inputTestId}
+      editorApiRef={resolvedInputApiRef}
+      promptHistory={promptHistory}
+      avoidIosInputFocusZoom={avoidIosInputFocusZoom}
+      compactPlaceholder={compactPlaceholder}
+      onWhiteboardMentionSelected={onWhiteboardMentionSelected}
+      onPaste={onPaste}
+      excludedSlashCommandNames={excludedSlashCommandNames}
+      appSlashCommands={appSlashCommands}
+      enableMentionPanel={enableMentionPanel}
+    />
+  );
+
   return (
     <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className={cn("relative", className)}>
       {triggerPanelContainer ? null : (
@@ -360,31 +397,14 @@ export function ChatPromptEditor({
         ) : null}
 
         {topContent}
-        <LexicalChatInput
-          placeholder={placeholder}
-          disabled={disabled}
-          submitDisabled={submitDisabled}
-          allowSubmitWhenEmpty={allowSubmitWhenEmpty}
-          enterSubmits={enterSubmits}
-          onSubmit={handleEditorSubmit}
-          onModifiedSubmit={onModifiedSubmit}
-          onChange={handleTextChange}
-          onFocus={onFocus}
-          triggerPanelContainer={resolvedTriggerPanelContainer}
-          workspacePath={workspacePath}
-          workspaceIdentity={workspaceIdentity}
-          taskId={taskId}
-          skillCatalogSessionId={skillCatalogSessionId}
-          inputTestId={inputTestId}
-          editorApiRef={resolvedInputApiRef}
-          promptHistory={promptHistory}
-          compactPlaceholder={compactPlaceholder}
-          onWhiteboardMentionSelected={onWhiteboardMentionSelected}
-          onPaste={onPaste}
-          excludedSlashCommandNames={excludedSlashCommandNames}
-          appSlashCommands={appSlashCommands}
-          enableMentionPanel={enableMentionPanel}
-        />
+        {inputLeadingContent ? (
+          <div className="flex min-w-0 items-start gap-2">
+            <div className="shrink-0">{inputLeadingContent}</div>
+            <div className="min-w-0 flex-1">{editorNode}</div>
+          </div>
+        ) : (
+          editorNode
+        )}
         <div ref={toolbarRef} className="group/toolbar flex items-end gap-3">
           <div className="flex min-w-0 flex-1 items-center" data-composer-leading-actions>
             <div className="flex shrink-0 items-center gap-1" data-composer-leading-content>
@@ -403,7 +423,7 @@ export function ChatPromptEditor({
                   showPlugins={enableMentionPanel !== false}
                 />
               ) : null}
-              {/* 权限/模式选择曾作为 leadingActions 先于动作菜单渲染，导致常驻顺序与产品规范相反。*/}
+              {/* Bugfix：权限/模式选择曾作为 leadingActions 先于动作菜单渲染，导致常驻顺序与产品规范相反。 */}
               {leadingActions}
               {onModeSwitchContainerChange ? (
                 <span ref={onModeSwitchContainerChange} className="flex shrink-0 items-center" />
@@ -432,7 +452,10 @@ export function ChatPromptEditor({
             ) : null}
             {betweenCancelAndSubmitAction}
             {submitControl ?? (
-              <ControlHintTooltip title={submitLabel} shortcut={enterSubmits ? "Enter" : undefined}>
+              <ControlHintTooltip
+                title={submitLabel}
+                shortcut={enterSubmits && sendShortcutLabel ? sendShortcutLabel : undefined}
+              >
                 <Button
                   type="submit"
                   size="icon-md"

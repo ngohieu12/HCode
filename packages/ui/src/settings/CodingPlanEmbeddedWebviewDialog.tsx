@@ -31,7 +31,9 @@ import {
 import {
   CodingPlanWebviewChannels,
   type CodingPlanPurchaseCompletePayload,
+  ZCODE_ENV,
   ZCODE_VERSION,
+  toZhEnLocale,
 } from "@zcode/shared";
 
 interface CodingPlanEmbeddedWebviewDialogProps {
@@ -57,6 +59,7 @@ interface CodingPlanEmbeddedWebviewDialogProps {
 }
 
 interface CodingPlanWebviewImportMetaEnv {
+  DEV?: boolean;
   VITE_CODING_PLAN_WEBVIEW_ORIGIN?: string;
   VITE_ZCODE_E2E_STORE_BRIDGE?: string;
 }
@@ -91,7 +94,7 @@ export function CodingPlanEmbeddedWebviewDialog({
   const onOpenResultRef = useRef(onOpenResult);
   onOpenResultRef.current = onOpenResult;
   // 当前 locale 作为 webview 语言 hint / 注入值；Locale 与 CodingPlanWebviewLocale 同构。
-  const webviewLocale = locale;
+  const webviewLocale = toZhEnLocale(locale);
   const webviewCleanupRef = useRef<(() => void) | null>(null);
   // webview 是否已 dom-ready：executeJavaScript 只在 ready 后调用，
   // 否则会抛 "WebView must be attached to the DOM and dom-ready emitted"。
@@ -123,9 +126,11 @@ export function CodingPlanEmbeddedWebviewDialog({
   const computedWebviewUrl = useMemo(() => {
     const env = readCodingPlanWebviewImportMetaEnv();
     const origin = resolveCodingPlanEmbeddedOrigin({
+      dev: env.DEV === true,
       endpointOrigin: RENDERER_ZCODE_ENDPOINT_URLS.origin,
       e2eStoreBridgeEnabled: env.VITE_ZCODE_E2E_STORE_BRIDGE === "1",
       overrideOrigin: env.VITE_CODING_PLAN_WEBVIEW_ORIGIN,
+      zcodeEnv: ZCODE_ENV,
     });
     // URL 带 ?lang= hint 让官网首屏就有正确语言，避免注入前的英文闪烁。
     // 同步带 ?theme= hint，避免官网 SSR 默认 dark 在 App 浅色主题下首帧闪烁。

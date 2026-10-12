@@ -39,13 +39,6 @@ import {
 import type { Theme } from "../useTheme.js";
 import { applyTheme, normalizeThemePreference, resolveTheme } from "../useTheme.js";
 
-import {
-  INTERFACE_MODE_STORAGE_KEY,
-  normalizeInterfaceMode,
-  type InterfaceMode,
-} from "@/lib/interfaceMode.js";
-import { logger } from "@/logger.js";
-
 export type LoginEntryPurpose = "app-login";
 
 // v4 重构：类型与默认值下沉到 @/lib/codePreviewSettings.ts，
@@ -67,29 +60,7 @@ export interface LoginEntryAttempt {
   status: LoginEntryAttemptStatus;
 }
 
-const CODE_PREVIEW_SETTINGS_KEY = "zcode-code-preview-settings";
 const PERFORMANCE_MODE_STORAGE_KEY = "zcode-performance-mode";
-
-function loadCodePreviewSettings(): CodePreviewSettings {
-  try {
-    const raw = readSafeLocalStorage(CODE_PREVIEW_SETTINGS_KEY);
-    if (!raw) {
-      return DEFAULT_CODE_PREVIEW_SETTINGS;
-    }
-
-    const parsed = JSON.parse(raw) as Partial<CodePreviewSettings>;
-    return {
-      ...DEFAULT_CODE_PREVIEW_SETTINGS,
-      ...parsed,
-      fontSizePx:
-        typeof parsed.fontSizePx === "number"
-          ? Math.min(20, Math.max(12, Math.round(parsed.fontSizePx)))
-          : DEFAULT_CODE_PREVIEW_SETTINGS.fontSizePx,
-    };
-  } catch {
-    return DEFAULT_CODE_PREVIEW_SETTINGS;
-  }
-}
 
 function loadPerformanceMode(): boolean {
   return readSafeLocalStorage(PERFORMANCE_MODE_STORAGE_KEY) === "true";
@@ -100,10 +71,6 @@ function loadPerformanceMode(): boolean {
 // ============================================================================
 
 export interface ZCodeState {
-  /** 展示详情偏好，不改变 Agent 权限或执行能力。 */
-  interfaceMode: InterfaceMode;
-  setInterfaceMode: (mode: InterfaceMode) => void;
-
   /** 当前主题 */
   theme: Theme;
   setTheme: (theme: Theme) => void;
@@ -112,9 +79,8 @@ export interface ZCodeState {
   locale: string;
   setLocale: (locale: string) => void;
 
-  /** 代码预览设置 */
+  /** 代码预览设置（固定为默认值，设置页不再提供修改） */
   codePreviewSettings: CodePreviewSettings;
-  setCodePreviewSettings: (patch: Partial<CodePreviewSettings>) => void;
 
   /** UI 根 rem 字号（px） */
   uiFontSizePx: number;
@@ -200,20 +166,15 @@ export interface ZCodeState {
   ) => Promise<void>;
 
   /** 手动请求打开 onboarding 弹窗 */
-  newUserOnboardingOpen: boolean;
-  setNewUserOnboardingOpen: (open: boolean) => void;
-  onboardingDialogRequested: boolean | "migration";
-  requestOnboardingDialog: (entry?: "migration") => void;
-  clearOnboardingDialogRequest: () => void;
 }
 
 // ============================================================================
 // 需要广播的字段 —— 只有这些字段的变更会发送给其他窗口
 // ============================================================================
 
-const BROADCAST_FIELDS = new Set(["theme", "locale", "uiFontSizePx", "interfaceMode"]);
+const BROADCAST_FIELDS = new Set(["theme", "locale", "uiFontSizePx"]);
 
-type BroadcastField = "theme" | "locale" | "uiFontSizePx" | "interfaceMode";
+type BroadcastField = "theme" | "locale" | "uiFontSizePx";
 
 /** 广播频道名前缀 */
 const STATE_CHANNEL_PREFIX = "state:";
@@ -240,18 +201,6 @@ export function createZCodeStore(
   let syncSystemThemeListener = (_theme: Theme) => {};
 
   const useStore = create<ZCodeState>()((set, get) => ({
-    interfaceMode: normalizeInterfaceMode(readSafeLocalStorage(INTERFACE_MODE_STORAGE_KEY)),
-    setInterfaceMode: (mode) => {
-      const interfaceMode = normalizeInterfaceMode(mode);
-      if (get().interfaceMode !== interfaceMode) {
-        logger.debug("[InterfaceMode] 切换界面模式", {
-          interfaceMode,
-          source: applyingBroadcast ? "broadcast" : "local",
-        });
-      }
-      writeSafeLocalStorage(INTERFACE_MODE_STORAGE_KEY, interfaceMode);
-      set({ interfaceMode });
-    },
     // 默认主题统一收敛到 Zai dark，避免首次启动时 store 与其他主题入口表现不一致。
     // 仍然优先尊重 localStorage 中已保存的用户选择，不覆盖已有偏好。
     theme: normalizeThemePreference((readSafeLocalStorage("zcode-theme") as Theme) || "zai-dark"),
@@ -270,20 +219,9 @@ export function createZCodeStore(
       set({ locale });
     },
 
-    codePreviewSettings: loadCodePreviewSettings(),
-    setCodePreviewSettings: (patch: Partial<CodePreviewSettings>) =>
-      set((state) => {
-        const next = {
-          ...state.codePreviewSettings,
-          ...patch,
-          fontSizePx:
-            typeof patch.fontSizePx === "number"
-              ? Math.min(20, Math.max(12, Math.round(patch.fontSizePx)))
-              : state.codePreviewSettings.fontSizePx,
-        };
-        writeSafeLocalStorage(CODE_PREVIEW_SETTINGS_KEY, JSON.stringify(next));
-        return { codePreviewSettings: next };
-      }),
+    // 代码显示固定使用默认设置（行号开、不换行、12px）。设置页已移除代码显示选项，
+    // 不再读取 localStorage 中的旧值，避免存量数据让代码显示偏离默认模式。
+    codePreviewSettings: DEFAULT_CODE_PREVIEW_SETTINGS,
 
     uiFontSizePx: loadUiFontSizePx(),
     setUiFontSizePx: (fontSizePx: number) => {
@@ -389,12 +327,6 @@ export function createZCodeStore(
       readState: get,
       writeState: (updater) => set((state) => updater(state)),
     }),
-
-    newUserOnboardingOpen: false,
-    setNewUserOnboardingOpen: (open) => set({ newUserOnboardingOpen: open }),
-    onboardingDialogRequested: false,
-    requestOnboardingDialog: (entry) => set({ onboardingDialogRequested: entry ?? true }),
-    clearOnboardingDialogRequest: () => set({ onboardingDialogRequested: false }),
   }));
 
   syncSystemThemeListener = (theme: Theme) => {
@@ -475,11 +407,6 @@ export function createZCodeStore(
         state.setTheme(msg.payload as Theme);
       } else if (field === "locale" && typeof msg.payload === "string") {
         state.setLocale(msg.payload);
-      } else if (
-        field === "interfaceMode" &&
-        (msg.payload === "office" || msg.payload === "coding")
-      ) {
-        state.setInterfaceMode(normalizeInterfaceMode(msg.payload));
       } else if (field === "uiFontSizePx" && typeof msg.payload === "number") {
         state.setUiFontSizePx(msg.payload);
       }

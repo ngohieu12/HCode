@@ -1,9 +1,10 @@
 import type { Theme } from "@/useTheme.js";
 import { useState } from "react";
-import { resolveTheme } from "@/useTheme.js";
+import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
+import { Button } from "@/components/ui/button.js";
+import { useDesktopZoomControls } from "@/hooks/useDesktopZoomControls.js";
 import { Card, CardContent } from "@/components/ui/card.js";
 import { Input } from "@/components/ui/input.js";
-import { Switch } from "@/components/ui/switch.js";
 import {
   Select,
   SelectContent,
@@ -11,15 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.js";
-import {
-  getThemeOptionLabel,
-  SettingsRow,
-  ThemePreviewCard,
-  ThemeSelect,
-} from "@/settings/SettingsPageParts.js";
-import { getCodePreviewTheme } from "@/lib/codePreviewPreferences.js";
+import { SettingsRow } from "@/settings/SettingsPageParts.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
-import type { CodePreviewSettings } from "@/store/index.js";
 import { THEME_MODES } from "@/settings/settingsPageConfig.js";
 import { MAX_UI_FONT_SIZE_PX, MIN_UI_FONT_SIZE_PX } from "@/lib/uiFontSize.js";
 
@@ -79,202 +73,122 @@ function FontSizeInput({
 }
 
 export function AppearanceSectionContent({
-  codePreviewSettings,
-  setCodePreviewSettings,
   theme,
   setTheme,
   uiFontSizePx,
   setUiFontSizePx,
+  isDesktop = false,
 }: {
-  codePreviewSettings: CodePreviewSettings;
-  setCodePreviewSettings: (settings: Partial<CodePreviewSettings>) => void;
   theme: Theme;
   setTheme: (theme: Theme) => void;
   uiFontSizePx: number;
   setUiFontSizePx: (fontSizePx: number) => void;
+  isDesktop?: boolean;
 }) {
   const { intl } = useZCodeIntl();
-  const activePreviewMode = resolveTheme(theme);
+  // 界面缩放原在账户菜单中，菜单移除后迁入这里；仅桌面端有意义。
+  const zoom = useDesktopZoomControls(isDesktop);
 
   return (
-    <>
-      <div className="min-w-0 space-y-3">
-        <div>
-          <h3 className="text-ui-lg font-semibold text-foreground">
-            {intl.formatMessage({ id: "settings.appearance.interfaceTitle" })}
-          </h3>
-          <p className="mt-1 text-ui-base leading-6 text-foreground-subtle">
-            {intl.formatMessage({
-              id: "settings.appearance.interfaceDescription",
+    <div className="min-w-0 space-y-3">
+      <div>
+        <h3 className="text-ui-lg font-semibold text-foreground">
+          {intl.formatMessage({ id: "settings.appearance.interfaceTitle" })}
+        </h3>
+        <p className="mt-1 text-ui-base leading-6 text-foreground-subtle">
+          {intl.formatMessage({
+            id: "settings.appearance.interfaceDescription",
+          })}
+        </p>
+      </div>
+      <Card className="border border-border bg-card py-0 shadow-none">
+        <CardContent className="space-y-0 px-0">
+          <SettingsRow
+            label={intl.formatMessage({ id: "settings.themeMode" })}
+            description={intl.formatMessage({
+              id: "settings.themeModeDescription",
             })}
-          </p>
-        </div>
-        <Card className="border border-border bg-card py-0 shadow-none">
-          <CardContent className="space-y-0 px-0">
+            control={
+              <Select value={theme} onValueChange={(value) => setTheme(value as Theme)}>
+                <SelectTrigger size="lg" className="w-[260px] min-w-0 justify-between">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {THEME_MODES.map(({ mode, icon: Icon }) => (
+                    <SelectItem key={mode} value={mode}>
+                      <div className="flex items-center gap-2">
+                        <Icon className="size-4" />
+                        {intl.formatMessage({
+                          id: `settings.themeMode.${mode}`,
+                        })}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            }
+          />
+          <SettingsRow
+            label={intl.formatMessage({ id: "settings.uiFontSize" })}
+            description={intl.formatMessage({
+              id: "settings.uiFontSizeDescription",
+            })}
+            control={
+              <FontSizeInput
+                key={uiFontSizePx}
+                min={MIN_UI_FONT_SIZE_PX}
+                max={MAX_UI_FONT_SIZE_PX}
+                value={uiFontSizePx}
+                onChange={setUiFontSizePx}
+                ariaLabel={intl.formatMessage({ id: "settings.uiFontSize" })}
+              />
+            }
+          />
+          {isDesktop ? (
             <SettingsRow
-              label={intl.formatMessage({ id: "settings.themeMode" })}
-              description={intl.formatMessage({
-                id: "settings.themeModeDescription",
-              })}
+              label={intl.formatMessage({ id: "sidebar.settings.interfaceZoom" })}
+              description={intl.formatMessage({ id: "settings.appearance.zoomDescription" })}
               control={
-                <Select value={theme} onValueChange={(value) => setTheme(value as Theme)}>
-                  <SelectTrigger size="lg" className="w-[260px] min-w-0 justify-between">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {THEME_MODES.map(({ mode, icon: Icon }) => (
-                      <SelectItem key={mode} value={mode}>
-                        <div className="flex items-center gap-2">
-                          <Icon className="size-4" />
-                          {intl.formatMessage({
-                            id: `settings.themeMode.${mode}`,
-                          })}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon-lg"
+                    title={intl.formatMessage({ id: "titleBar.menu.view.zoomOut" })}
+                    aria-label={intl.formatMessage({ id: "titleBar.menu.view.zoomOut" })}
+                    disabled={!zoom.canZoomOut}
+                    onClick={zoom.zoomOut}
+                  >
+                    <ZoomOut className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon-lg"
+                    title={intl.formatMessage({ id: "titleBar.menu.view.actualSize" })}
+                    aria-label={intl.formatMessage({ id: "titleBar.menu.view.actualSize" })}
+                    disabled={!zoom.canResetZoom}
+                    onClick={zoom.resetZoom}
+                  >
+                    <Maximize className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon-lg"
+                    title={intl.formatMessage({ id: "titleBar.menu.view.zoomIn" })}
+                    aria-label={intl.formatMessage({ id: "titleBar.menu.view.zoomIn" })}
+                    disabled={!zoom.canZoomIn}
+                    onClick={zoom.zoomIn}
+                  >
+                    <ZoomIn className="size-4" />
+                  </Button>
+                </div>
               }
             />
-            <SettingsRow
-              label={intl.formatMessage({ id: "settings.uiFontSize" })}
-              description={intl.formatMessage({
-                id: "settings.uiFontSizeDescription",
-              })}
-              control={
-                <FontSizeInput
-                  key={uiFontSizePx}
-                  min={MIN_UI_FONT_SIZE_PX}
-                  max={MAX_UI_FONT_SIZE_PX}
-                  value={uiFontSizePx}
-                  onChange={setUiFontSizePx}
-                  ariaLabel={intl.formatMessage({ id: "settings.uiFontSize" })}
-                />
-              }
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="space-y-6">
-        <div className="min-w-0 space-y-3">
-          <div>
-            <h3 className="text-ui-lg font-semibold text-foreground">
-              {intl.formatMessage({ id: "settings.appearance.codeTitle" })}
-            </h3>
-            <p className="mt-1 text-ui-base leading-6 text-foreground-subtle">
-              {intl.formatMessage({
-                id: "settings.appearance.codeDescription",
-              })}
-            </p>
-          </div>
-          <Card className="border border-border bg-card py-0 shadow-none [&_[data-slot=select-trigger]]:w-full">
-            <CardContent className="space-y-0 px-0">
-              <SettingsRow
-                label={intl.formatMessage({ id: "settings.lightTheme" })}
-                description={intl.formatMessage({
-                  id: "settings.lightThemeDescription",
-                })}
-                control={
-                  <ThemeSelect
-                    value={codePreviewSettings.lightTheme}
-                    onValueChange={(value) => setCodePreviewSettings({ lightTheme: value })}
-                  />
-                }
-              />
-              <SettingsRow
-                label={intl.formatMessage({ id: "settings.darkTheme" })}
-                description={intl.formatMessage({
-                  id: "settings.darkThemeDescription",
-                })}
-                control={
-                  <ThemeSelect
-                    value={codePreviewSettings.darkTheme}
-                    onValueChange={(value) => setCodePreviewSettings({ darkTheme: value })}
-                  />
-                }
-              />
-              <SettingsRow
-                label={intl.formatMessage({ id: "settings.showLineNumbers" })}
-                description={intl.formatMessage({
-                  id: "settings.showLineNumbersDescription",
-                })}
-                control={
-                  <Switch
-                    checked={codePreviewSettings.showLineNumbers}
-                    onCheckedChange={(checked) =>
-                      setCodePreviewSettings({ showLineNumbers: checked })
-                    }
-                  />
-                }
-              />
-              <SettingsRow
-                label={intl.formatMessage({ id: "settings.wrapLongLines" })}
-                description={intl.formatMessage({
-                  id: "settings.wrapLongLinesDescription",
-                })}
-                control={
-                  <Switch
-                    checked={codePreviewSettings.wrapLongLines}
-                    onCheckedChange={(checked) =>
-                      setCodePreviewSettings({ wrapLongLines: checked })
-                    }
-                  />
-                }
-              />
-              <SettingsRow
-                label={intl.formatMessage({ id: "settings.fontSize" })}
-                description={intl.formatMessage({
-                  id: "settings.fontSizeDescription",
-                })}
-                control={
-                  <FontSizeInput
-                    key={codePreviewSettings.fontSizePx}
-                    min={12}
-                    max={20}
-                    value={codePreviewSettings.fontSizePx}
-                    onChange={(fontSizePx) => setCodePreviewSettings({ fontSizePx })}
-                    ariaLabel={intl.formatMessage({ id: "settings.fontSize" })}
-                  />
-                }
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="min-w-0 space-y-4">
-          <div>
-            <h3 className="text-ui-base font-semibold text-foreground">
-              {intl.formatMessage({ id: "settings.previewSectionTitle" })}
-            </h3>
-            <p className="mt-1 text-ui-base leading-6 text-foreground-subtle">
-              {intl.formatMessage({ id: "settings.previewDescription" })}
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <ThemePreviewCard
-              mode="light"
-              title={intl.formatMessage({ id: "settings.previewLight" })}
-              themeName={getThemeOptionLabel(codePreviewSettings.lightTheme)}
-              theme={getCodePreviewTheme("light", codePreviewSettings)}
-              isActive={activePreviewMode === "light"}
-              showLineNumbers={codePreviewSettings.showLineNumbers}
-              wrapLongLines={codePreviewSettings.wrapLongLines}
-              fontSizePx={codePreviewSettings.fontSizePx}
-            />
-            <ThemePreviewCard
-              mode="dark"
-              title={intl.formatMessage({ id: "settings.previewDark" })}
-              themeName={getThemeOptionLabel(codePreviewSettings.darkTheme)}
-              theme={getCodePreviewTheme("dark", codePreviewSettings)}
-              isActive={activePreviewMode === "dark"}
-              showLineNumbers={codePreviewSettings.showLineNumbers}
-              wrapLongLines={codePreviewSettings.wrapLongLines}
-              fontSizePx={codePreviewSettings.fontSizePx}
-            />
-          </div>
-        </div>
-      </div>
-    </>
+          ) : null}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

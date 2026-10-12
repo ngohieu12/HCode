@@ -2,32 +2,30 @@ import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 import type { Locale } from "@zcode/shared";
 
-const MENU_KEY_NAME = "ZCode.OpenInZCode";
-const DIRECTORY_MENU_KEY = `HKCU\\Software\\Classes\\Directory\\shell\\${MENU_KEY_NAME}`;
-const DRIVE_MENU_KEY = `HKCU\\Software\\Classes\\Drive\\shell\\${MENU_KEY_NAME}`;
-const MENU_LABELS: Record<Locale, string> = {
-  "zh-CN": "在ZCode中打开",
-  "en-US": "Open in ZCode",
-};
+// 注册表键名按产品区分（HCode 与 ZCode 共用同名键会互相覆盖命令与图标）。
+function getMenuKeyName(productName: string): string {
+  const compact = productName.replace(/\s+/g, "");
+  return `${compact}.OpenIn${compact}`;
+}
 
 type Logger = {
   info: (...args: unknown[]) => void;
   warn: (...args: unknown[]) => void;
 };
 
-interface WindowsOpenFolderRegistryOperation {
+export interface WindowsOpenFolderRegistryOperation {
   args: string[];
 }
 
-function getWindowsOpenFolderMenuName(locale: Locale): string {
-  return MENU_LABELS[locale] ?? MENU_LABELS["en-US"];
+export function getWindowsOpenFolderMenuName(locale: Locale, productName: string): string {
+  return locale === "zh-CN" ? `在${productName}中打开` : `Open in ${productName}`;
 }
 
 function quoteWindowsCommandArg(value: string): string {
   return `"${value.replace(/"/g, '\\"')}"`;
 }
 
-function buildWindowsOpenFolderCommand(
+export function buildWindowsOpenFolderCommand(
   executablePath: string,
   appArgs: readonly string[] = [],
 ): string {
@@ -39,14 +37,19 @@ function buildWindowsOpenFolderCommand(
   ].join(" ");
 }
 
-function buildWindowsOpenFolderRegistryOperations(options: {
+export function buildWindowsOpenFolderRegistryOperations(options: {
   executablePath: string;
   appArgs?: readonly string[];
   locale: Locale;
+  productName: string;
 }): WindowsOpenFolderRegistryOperation[] {
   const command = buildWindowsOpenFolderCommand(options.executablePath, options.appArgs ?? []);
-  const menuName = getWindowsOpenFolderMenuName(options.locale);
-  const menuKeys = [DIRECTORY_MENU_KEY, DRIVE_MENU_KEY];
+  const menuName = getWindowsOpenFolderMenuName(options.locale, options.productName);
+  const menuKeyName = getMenuKeyName(options.productName);
+  const menuKeys = [
+    `HKCU\\Software\\Classes\\Directory\\shell\\${menuKeyName}`,
+    `HKCU\\Software\\Classes\\Drive\\shell\\${menuKeyName}`,
+  ];
 
   return menuKeys.flatMap((menuKey) => [
     { args: ["add", menuKey, "/ve", "/d", menuName, "/f"] },
@@ -81,6 +84,8 @@ export async function installWindowsOpenFolderContextMenu(options: {
   argv: readonly string[];
   isDefaultApp: boolean;
   locale: Locale;
+  // 产品显示名（如 HCode / HCode Preview），决定右键菜单文案与注册表键名。
+  productName: string;
   logger: Logger;
 }): Promise<void> {
   if (options.platform !== "win32") {
@@ -95,6 +100,7 @@ export async function installWindowsOpenFolderContextMenu(options: {
     executablePath: options.executablePath,
     appArgs,
     locale: options.locale,
+    productName: options.productName,
   });
 
   try {

@@ -10,10 +10,12 @@ import {
 const BIGMODEL_USERINFO_PATH = "/api/biz/customer/getCustomerInfo";
 const BIGMODEL_AUTHORIZE_PATH = "/login";
 
+// 当前产品只保留 Z.ai 登录与 Provider 集合，BigModel 默认关闭：登录列表不再展示它，
+// 已登录的 BigModel 会话在启动恢复时被清理。需要临时恢复时设置 BIGMODEL_OAUTH_ENABLED=true。
 const BIGMODEL_OAUTH_PROVIDER_CONFIG: Omit<OAuthProviderRuntimeConfig, "appSecret"> = {
   id: BIGMODEL_PROVIDER_ID,
   displayName: "BigModel",
-  enabled: true,
+  enabled: false,
   order: 0,
   authorizeUrl: "https://bigmodel.cn/login",
   tokenUrl: "https://zcode.z.ai/api/v1/oauth/token",

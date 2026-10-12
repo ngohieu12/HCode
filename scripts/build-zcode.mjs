@@ -24,7 +24,7 @@ const usage = `Usage:
   node scripts/build-zcode.mjs --base-url http://host/zcode/deps/zcode/
 
 Options:
-  --skip-build        Reuse existing web/server/agent build outputs.
+  --skip-build        Reuse existing agent build outputs.
   --version <text>    Release version. Defaults to root package.json version.
   --out-dir <path>    Output directory. Defaults to dist/zcode.
   --base-url <url>    Default install.sh download base URL.
@@ -132,13 +132,6 @@ async function assertFile(file, label) {
   }
 }
 
-async function assertDirectory(directory, label) {
-  const directoryStat = await stat(directory).catch(() => null);
-  if (!directoryStat?.isDirectory()) {
-    throw new Error(`Missing ${label}: ${directory}`);
-  }
-}
-
 async function buildOutputs(skipBuild) {
   if (skipBuild) {
     console.log("[zcode] skipping build; reusing existing outputs");
@@ -146,23 +139,12 @@ async function buildOutputs(skipBuild) {
   }
 
   run("pnpm", ["--filter", "@zcode/cli...", "build"]);
-  await rm(resolve(root, "packages", "server", "dist"), {
-    force: true,
-    recursive: true,
-  });
-  run("pnpm", ["--filter", "@zcode/server", "build"]);
-  run("pnpm", ["--filter", "@zcode/web", "build"]);
 }
 
 async function stageZCodePackage({ packageRoot, version }) {
-  const webDist = resolve(root, "packages", "web", "dist");
-  const serverDist = resolve(root, "packages", "server", "dist");
   const agentBundle = resolve(root, "apps", "zcode-cli", "packages", "cli", "dist", "zcode.cjs");
   const agentProvider = resolve(root, "apps/zcode-cli/packages/cli/dist/provider");
 
-  await assertDirectory(webDist, "web dist");
-  await assertDirectory(serverDist, "server dist");
-  await assertFile(resolve(serverDist, "entry-http.js"), "server HTTP entry");
   await assertFile(agentBundle, "agent app-server bundle");
   await assertFile(resolve(agentProvider, "zcode-builtin.json"), "Agent provider config");
 
@@ -174,12 +156,6 @@ async function stageZCodePackage({ packageRoot, version }) {
     recursive: true,
   });
 
-  await cp(webDist, resolve(packageRoot, "web"), {
-    recursive: true,
-  });
-  await cp(serverDist, resolve(packageRoot, "server"), {
-    recursive: true,
-  });
   await mkdir(resolve(packageRoot, "agent"), {
     recursive: true,
   });

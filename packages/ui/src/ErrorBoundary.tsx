@@ -1,10 +1,11 @@
 import { Component } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 import type { Locale } from "@zcode/shared";
-import { DEFAULT_LOCALE } from "@zcode/shared";
+import { DEFAULT_LOCALE, resolveLocaleFromSystemLanguage } from "@zcode/shared";
 import { DesktopWindowFrame } from "@/DesktopWindowFrame.js";
 import zhCN from "@/i18n/locales/zh-CN.js";
 import enUS from "@/i18n/locales/en-US.js";
+import viVN from "@/i18n/locales/vi-VN.js";
 import { logger } from "@/logger.js";
 import { reportReactErrorToArms } from "@/lib/reactErrorArmsTelemetry.js";
 import { cn } from "@/components/lib/utils.js";
@@ -77,7 +78,7 @@ function resolveBoundaryLocale(): Locale {
   }
 
   if (typeof navigator !== "undefined") {
-    return navigator.language.toLowerCase().startsWith("zh") ? "zh-CN" : "en-US";
+    return resolveLocaleFromSystemLanguage(navigator.language);
   }
 
   return DEFAULT_LOCALE;
@@ -85,7 +86,8 @@ function resolveBoundaryLocale(): Locale {
 
 function formatBoundaryMessage(id: string): string {
   const locale = resolveBoundaryLocale();
-  const messages = locale === "en-US" ? enUS : zhCN;
+  // 越南语缺失的键回落到英文，保证边界错误页不会出现中文。
+  const messages = locale === "zh-CN" ? zhCN : locale === "en-US" ? enUS : { ...enUS, ...viVN };
   return messages[id] ?? id;
 }
 

@@ -80,6 +80,9 @@ function escalationState(
   return pendingQids.has(qid) ? "waiting" : "answered";
 }
 
+/** 留白（hole）行的专用渲染尚未移植到本 UI，组件只接收其余三种通知。 */
+type RenderableWorkflowNotification = Exclude<WorkflowNotificationMeta, { kind: "hole" }>;
+
 interface WorkflowNotificationToolRowProps {
   notification: WorkflowNotificationMeta;
   /** run 名 = originMeta.title（CLI 权威给出，不本地化）。 */
@@ -101,7 +104,13 @@ interface WorkflowNotificationToolRowProps {
   forceOpen?: boolean;
 }
 
-export function WorkflowNotificationToolRow({
+export function WorkflowNotificationToolRow(props: WorkflowNotificationToolRowProps) {
+  // 留白行暂不渲染（其展示组件未移植）；只在这里分流，保证下方 hooks 顺序稳定。
+  if (props.notification.kind === "hole") return null;
+  return <WorkflowNotificationRowBody {...props} notification={props.notification} />;
+}
+
+function WorkflowNotificationRowBody({
   notification,
   runName,
   testIdKey,
@@ -110,7 +119,9 @@ export function WorkflowNotificationToolRow({
   onOpenArtifact,
   pendingQids,
   forceOpen = false,
-}: WorkflowNotificationToolRowProps) {
+}: Omit<WorkflowNotificationToolRowProps, "notification"> & {
+  notification: RenderableWorkflowNotification;
+}) {
   const { intl } = useZCodeIntl();
 
   // 等待时长要在没有事件流时也照走（停驻的 run 恰恰不发事件），按固定间隔喂新的"现在"。

@@ -202,7 +202,6 @@ export interface WorkflowDraftPosition {
 }
 
 export interface ToolCallBlockRenderContext {
-  isOfficeMode?: boolean;
   toolCallNode: TaskChatToolCallTreeNode;
   workspacePath: string;
   /**
@@ -223,6 +222,8 @@ export interface ToolCallBlockRenderContext {
   viewerSource: CodeViewerSource | null;
   rawFileSummaries: RawToolCallFileSummary[];
   isRunning: boolean;
+  /** 权限预览尚未执行，不展示任何输出或空输出占位。 */
+  isPermissionPreview?: boolean;
   statusLabel: string;
   sourceLabel?: string;
   errorText?: string;

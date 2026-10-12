@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import type { ShortcutCommandId } from "@zcode/shared";
+import type { ComposerEnterBehavior, ShortcutCommandId } from "@zcode/shared";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { checkShortcutBindingConflict, isSamePhysicalBinding } from "@/shortcuts/conflicts.js";
 import { formatShortcutBindingLabel } from "@/shortcuts/label.js";
@@ -13,6 +13,8 @@ interface UseShortcutRecordingOptions {
   /** 生效绑定表（Section 已按 overrides resolve）。 */
   effective: EffectiveShortcutBindings;
   overrides: Record<string, readonly string[]> | undefined;
+  /** 输入框 Enter 模式，冲突检测按该模式的 composer 默认绑定计算。 */
+  composerEnterBehavior: ComposerEnterBehavior;
   isDesktop: boolean;
   /** 录制态 Backspace：恢复默认（Section 的预检逻辑）。 */
   clearBinding: (commandId: ShortcutCommandId) => void;
@@ -31,6 +33,7 @@ export function useShortcutRecording({
   setRecording,
   effective,
   overrides,
+  composerEnterBehavior,
   isDesktop,
   clearBinding,
   appendBinding,
@@ -109,6 +112,7 @@ export function useShortcutRecording({
           overrides,
           {
             menuChannelReserved: !isDesktop,
+            composerEnterBehavior,
           },
         );
         if (conflict) {
@@ -150,6 +154,7 @@ export function useShortcutRecording({
   }, [
     appendBinding,
     clearBinding,
+    composerEnterBehavior,
     effective,
     intl,
     isDesktop,

@@ -6,8 +6,11 @@
  * - IME 组合中（isComposing / Process / Dead / keyCode 229）与长按 repeat 一律不匹配、不录制。
  */
 import {
+  type ComposerEnterBehavior,
   type ParsedShortcutBinding,
   type ShortcutCommandId,
+  DEFAULT_COMPOSER_ENTER_BEHAVIOR,
+  getDefaultShortcutBindings,
   parseShortcutBinding,
   serializeShortcutBinding,
   SHORTCUT_COMMANDS,
@@ -47,7 +50,7 @@ function isImeEvent(event: ShortcutBindingEvent): boolean {
 }
 
 /** 判断事件是否为不应触发快捷键的噪声：长按 repeat、IME 组合中、死键。 */
-function isShortcutEventNoise(event: ShortcutBindingEvent): boolean {
+export function isShortcutEventNoise(event: ShortcutBindingEvent): boolean {
   return event.repeat === true || isImeEvent(event);
 }
 
@@ -220,7 +223,7 @@ function eventMatchesKey(event: Pick<ShortcutBindingEvent, "key" | "code">, key:
 // 录制器
 // ============================================================================
 
-type ShortcutRecordResult =
+export type ShortcutRecordResult =
   | { kind: "pending" }
   | { kind: "binding"; binding: string }
   | { kind: "invalid"; reason: "no-modifier" | "unsupported-key" };
@@ -351,11 +354,13 @@ export type EffectiveShortcutBindings = Readonly<Record<ShortcutCommandId, reado
 
 /**
  * 计算生效表：命令表默认绑定 + 用户覆盖（整组替换）。
+ * 默认绑定随输入框 Enter 模式变化（composer 两条命令）；用户覆盖始终优先于模式默认。
  * 显式空数组 = 用户清除为「未设置」（生效表为空，不回退默认——抢绑会把被抢命令清到这个状态）；
  * 全部条目非法时回退默认（手改 setting.json 写入非法条目不得让快捷键整体失效）。
  */
 export function resolveEffectiveShortcutBindings(
   overrides?: Record<string, readonly string[]>,
+  composerEnterBehavior: ComposerEnterBehavior = DEFAULT_COMPOSER_ENTER_BEHAVIOR,
 ): EffectiveShortcutBindings {
   const effective: Record<ShortcutCommandId, readonly string[]> = {} as Record<
     ShortcutCommandId,
@@ -363,14 +368,15 @@ export function resolveEffectiveShortcutBindings(
   >;
   for (const entry of SHORTCUT_COMMANDS) {
     const override = overrides?.[entry.id];
+    const defaultBindings = getDefaultShortcutBindings(entry.id, composerEnterBehavior);
     if (override === undefined) {
-      effective[entry.id] = entry.defaultBindings;
+      effective[entry.id] = defaultBindings;
       continue;
     }
     const valid = override.filter((binding) => parseShortcutBinding(binding) !== null);
     if (override.length > 0 && valid.length === 0) {
       logger.warn("[shortcuts] 覆盖绑定全部非法，回退默认", { commandId: entry.id, override });
-      effective[entry.id] = entry.defaultBindings;
+      effective[entry.id] = defaultBindings;
       continue;
     }
     if (valid.length !== override.length) {

@@ -5,19 +5,11 @@ import {
   type AccountProviderConfigSnapshot,
   type AccountProviderStates,
 } from "@zcode/provider";
-import {
-  isBuiltinModelProviderId,
-  resolveRuntimeZCodeEndpointOrigin,
-  ZCODE_VERSION,
-} from "@zcode/shared";
-import { dirname, join } from "node:path";
+import { isBuiltinModelProviderId } from "@zcode/shared";
 import {
   NodeModelSelectionConfigRepository,
   NodeProviderRegistryRuntime,
   resolveNodeProviderRuntimePaths,
-  downloadZCodeBuiltinRelease,
-  resolveZCodeBuiltinClientPlatform,
-  ZCODE_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV,
   type ZCodeBuiltinRefreshEvent,
 } from "@zcode/provider-node";
 import {
@@ -56,33 +48,10 @@ export async function startProcessProviderRegistryRuntime(
     ? (options.standalone.credentialStore ?? createSharedZCodeCredentialStore({ env: { ...env } }))
     : undefined;
   let standaloneAccount: AccountProviderService | undefined;
-  const bundledFile = options.standalone
-    ? env[ZCODE_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV]?.trim()
-    : undefined;
+  // 内置 Provider 只读取随应用分发的 zcode-builtin.json（由 ZCODE_BUILTIN_PROVIDER_CONFIG_FILE 指向），
+  // 不再通过 CDN 下载覆盖；因此这里不注入 Active 缓存或远端 Synchronizer。
   const runtime = new NodeProviderRegistryRuntime({
     ...paths,
-    ...(bundledFile
-      ? {
-          zcodeBuiltinFilePath: bundledFile,
-          zcodeBuiltinActiveFilePath: paths.zcodeBuiltinFilePath,
-          zcodeBuiltinRemote: {
-            controlFilePath: join(
-              dirname(paths.zcodeBuiltinFilePath),
-              "zcode-builtin-refresh.json",
-            ),
-            resolveEndpointKey: () => resolveRuntimeZCodeEndpointOrigin(env),
-            fetchRelease: (endpointOrigin, signal) =>
-              downloadZCodeBuiltinRelease({
-                endpointOrigin,
-                signal,
-                appVersion: ZCODE_VERSION,
-                platform: resolveZCodeBuiltinClientPlatform(),
-                request: options.standalone?.request ?? globalThis.fetch,
-              }),
-            onRefreshResult: options.standalone?.onBuiltinRefreshResult,
-          },
-        }
-      : {}),
     onZCodeBuiltinRefreshError: options.standalone?.onBuiltinRefreshError,
     accountSource,
     ...(credentialStore
@@ -95,9 +64,15 @@ export async function startProcessProviderRegistryRuntime(
                 const snapshot = await readStandaloneAccountProviderConfigSnapshot(
                   credentialStore,
                   env,
-                  { revision: configRevision, providers: configuredProviders },
+                  {
+                    revision: configRevision,
+                    providers: configuredProviders,
+                  },
                 );
-                return { providers: snapshot.providers, states: snapshot.states ?? {} };
+                return {
+                  providers: snapshot.providers,
+                  states: snapshot.states ?? {},
+                };
               },
             });
             standaloneAccount.onDidRefreshError(({ error }) => {
@@ -133,7 +108,11 @@ export async function startProcessProviderRegistryRuntime(
       })
     : undefined;
   // 复用 AccountService 的串行、过期结果丢弃机制，凭据变化与 Built-in 变化不能各自发布。
+  const standaloneHeaders = credentialStore
+    ? createStandaloneProviderRuntimeHeadersPort(credentialStore, env)
+    : undefined;
   const disposeCredentialSubscription = credentialStore?.onDidChange?.(async () => {
+    await standaloneHeaders?.invalidateChangedCredentials();
     await standaloneAccount!.refresh("standalone-credentials-changed");
     await runtime.registryService.refresh("standalone-credentials-barrier");
   });
@@ -158,6 +137,7 @@ export async function startProcessProviderRegistryRuntime(
         },
         dispose() {
           disposeCredentialSubscription?.();
+          standaloneHeaders?.clearProjectTokens();
           disposeRecovery?.();
           standaloneAccount?.dispose();
           modelSelectionConfigRepository.dispose();
@@ -165,10 +145,7 @@ export async function startProcessProviderRegistryRuntime(
         },
         ...(credentialStore
           ? {
-              providerRuntimeHeadersPort: createStandaloneProviderRuntimeHeadersPort(
-                credentialStore,
-                env,
-              ),
+              providerRuntimeHeadersPort: standaloneHeaders!,
             }
           : {}),
         runtime,

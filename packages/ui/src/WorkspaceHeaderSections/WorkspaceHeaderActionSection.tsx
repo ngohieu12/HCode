@@ -1,6 +1,7 @@
 import { WorkspaceEditorButtonGroup } from "@/WorkspaceEditorButtonGroup.js";
 import { WorkspaceSidePaneToggleButton } from "@/WorkspaceSidePaneToggleButton.js";
 import { WorkspaceTerminalToggleButton } from "@/WorkspaceTerminalToggleButton.js";
+import { WorkspaceCloseConversationButton } from "@/WorkspaceCloseConversationButton.js";
 import { cn } from "@/components/lib/utils.js";
 import type { WorkspaceHeaderActionSectionProps } from "@/WorkspaceHeaderSections/shared.js";
 import { WorkspaceHelpMenuButton } from "@/WorkspaceHelpMenuButton.js";
@@ -51,6 +52,13 @@ export function WorkspaceHeaderActionSection({
       {activeTaskId && user && isDesktop !== false ? (
         <ConversationShareMenu
           taskId={activeTaskId}
+          useWindowsCaptionSpacing={useWindowsCaptionSpacing}
+        />
+      ) : null}
+      {variant === "task" && activeTaskId ? (
+        <WorkspaceCloseConversationButton
+          workspaceAbsPath={workspaceAbsPath}
+          workspaceIdentity={workspaceIdentity}
           useWindowsCaptionSpacing={useWindowsCaptionSpacing}
         />
       ) : null}

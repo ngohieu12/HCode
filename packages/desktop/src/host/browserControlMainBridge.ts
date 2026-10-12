@@ -15,7 +15,7 @@ import type {
  * 设计成可注入 postMessage + 无全局依赖，便于单测（假 parentPort）。
  */
 
-interface BrowserExecuteRequestMessage {
+export interface BrowserExecuteRequestMessage {
   type: typeof HostResponseTypes.BrowserExecuteRequest;
   requestId: string;
   browserId: string;
@@ -31,7 +31,7 @@ interface BrowserExecuteRequestMessage {
   command: BrowserCommand;
 }
 
-interface BrowserExecuteResultMessage {
+export interface BrowserExecuteResultMessage {
   requestId: string;
   result: BrowserCommandResult;
 }
@@ -92,7 +92,7 @@ function mayHaveSideEffects(command: BrowserCommand): boolean {
   ].includes(command.method);
 }
 
-interface BrowserControlMainBridge {
+export interface BrowserControlMainBridge {
   list(): Promise<BrowserBackendDescriptor[]>;
   execute(input: {
     requestId?: string;
@@ -138,7 +138,7 @@ export function createBrowserControlMainBridge(deps: {
     id: browserId,
     generation: browserGeneration,
     type: "iab",
-    name: "ZCode In-app Browser",
+    name: "HCode In-app Browser",
     capabilities: {
       // capability collection 只列 optional capability；tabs/cua/screenshot/dialog 是 core API，
       // 不能伪装成 capability。viewport 是 Playwright-like Tab 核心 API；browser capability

@@ -12,10 +12,9 @@ import { filterMentionItemsWithOptions } from "@/mentions/mentionSearch.js";
 import { buildPluginMentionMarkdown } from "@/mentions/mentionMarkdown.js";
 import { usePluginReferenceCatalog } from "@/hooks/usePluginReferenceCatalog.js";
 import { usePluginStoreOrder } from "@/hooks/usePluginStoreOrder.js";
-import { useIsOfficeMode } from "@/hooks/useInterfaceMode.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 
-interface PluginMentionLabels {
+export interface PluginMentionLabels {
   conflictReason: string;
 }
 
@@ -27,7 +26,7 @@ interface PluginMentionLabels {
 //   item.label，若本地化 label 会与按 markdown 重建的消息气泡文案分裂）。
 // - keywords 并入 listing 的全部语言显示名（无论当前 locale）：英文界面下打中文
 //   也能搜到官方插件（插件 @ 引用中文搜索）。
-function mapPluginCatalogToMentionItemsForTest(
+export function mapPluginCatalogToMentionItemsForTest(
   entries: ZCodePluginReferenceCatalogEntry[],
   labels: PluginMentionLabels,
   locale: string,
@@ -111,8 +110,7 @@ export function usePluginsMentionProvider(
 ): MentionCategoryResult {
   const { intl, locale } = useZCodeIntl();
   const { order } = usePluginStoreOrder(enabled);
-  const isOfficeMode = useIsOfficeMode();
-  const modeOrder = isOfficeMode ? order?.work : order?.code;
+  const modeOrder = order?.code;
   const catalog = usePluginReferenceCatalog(workspacePath, workspaceIdentity, sessionId, enabled);
 
   const allItems = useMemo(

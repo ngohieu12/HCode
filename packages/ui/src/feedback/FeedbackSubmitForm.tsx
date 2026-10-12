@@ -48,7 +48,7 @@ import {
   startSimplifiedFeedbackSubmission,
 } from "@/feedback/feedbackSubmitSubmission.js";
 import type { IFeedbackService } from "@zcode/services";
-import type { IPlatformService } from "@zcode/shared";
+import { toZhEnLocale, type IPlatformService } from "@zcode/shared";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { useTabStore } from "@/store/TabStoreProvider.js";
 import { selectWorkspaceZCodeState, useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
@@ -62,7 +62,7 @@ const MAX_SCREENSHOT_ATTACHMENTS = 5;
 
 type SubmitProgressState = FeedbackSubmissionProgressState;
 
-function shouldAutoCloseFeedbackOnTicketCreated({
+export function shouldAutoCloseFeedbackOnTicketCreated({
   includeLogs,
   screenshotCount,
 }: {
@@ -101,7 +101,8 @@ export function FeedbackSubmitForm({
   const [description, setDescription] = useState("");
   const [contact, setContact] = useState(() => readFeedbackContactPreference());
   const [screenshots, setScreenshots] = useState<ScreenshotAttachmentDraft[]>([]);
-  const [includeLogs, setIncludeLogs] = useState(false);
+  // 新反馈默认附带诊断日志；显式草稿值保留用户取消勾选及后台恢复时的选择。
+  const [includeLogs, setIncludeLogs] = useState(initialDraft?.includeLogs ?? true);
   const [ticketType, setTicketType] = useState<FeedbackTicketType>(DEFAULT_FEEDBACK_TYPE);
   const [ticketSeverity, setTicketSeverity] =
     useState<FeedbackTicketSeverity>(DEFAULT_FEEDBACK_SEVERITY);
@@ -121,7 +122,7 @@ export function FeedbackSubmitForm({
     setTicketType(draft.type ?? DEFAULT_FEEDBACK_TYPE);
     setTicketSeverity(draft.severity ?? DEFAULT_FEEDBACK_SEVERITY);
     setTicketModule(draft.module ?? DEFAULT_FEEDBACK_MODULE);
-    setIncludeLogs(draft.includeLogs ?? false);
+    setIncludeLogs(draft.includeLogs ?? true);
     setScreenshots(
       (draft.screenshots ?? []).map((item, index) => ({
         id: `draft-${Date.now()}-${index}`,
@@ -265,7 +266,7 @@ export function FeedbackSubmitForm({
         ticketSeverity,
         ticketModule,
         modelContext,
-        locale,
+        locale: toZhEnLocale(locale),
         copy: submissionCopy,
         formatMessage: intl.formatMessage,
         onTicketCreated: shouldCloseOnTicketCreated

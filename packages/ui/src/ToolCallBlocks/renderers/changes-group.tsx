@@ -20,7 +20,7 @@ const CHANGES_GROUP_ICON = <PencilIcon className="size-4 shrink-0 text-foregroun
 const FILE_CHIP_GAP_PX = 8;
 const FILE_CHIP_TRAILING_SPACE_PX = 24;
 
-function resolveFileChipAvailableWidth({
+export function resolveFileChipAvailableWidth({
   boundaryRight,
   listLeft,
   trailingWidth,
@@ -32,7 +32,7 @@ function resolveFileChipAvailableWidth({
   return Math.max(0, boundaryRight - listLeft - trailingWidth);
 }
 
-function resolveResponsiveFileChipCount({
+export function resolveResponsiveFileChipCount({
   availableWidth,
   chipWidths,
   overflowWidth,
@@ -298,15 +298,15 @@ export function ChangesGroupToolCallBlock(context: ToolCallBlockRenderContext) {
     <ToolLayout
       toolId={toolCall.toolId}
       icon={CHANGES_GROUP_ICON}
-      canToggle={!context.isOfficeMode && (context.canToggle ?? true)}
-      forceOpen={!context.isOfficeMode && (context.forceOpen ?? false)}
+      canToggle={context.canToggle ?? true}
+      forceOpen={context.forceOpen ?? false}
       kindLabel={intl.formatMessage({ id: "chat.toolCall.changesGroup.label" })}
       primaryText={context.isRunning ? runningPrimaryText : completedSummary}
       secondaryText={context.isRunning ? runningSecondaryText : undefined}
       summaryContentSeparator="·"
       expandedPrimaryText={countText}
       expandedSecondaryText={null}
-      diffCount={!context.isOfficeMode && context.isRunning ? runningDiffCount : undefined}
+      diffCount={context.isRunning ? runningDiffCount : undefined}
       hideDiffCountWhenOpen
       animateSummaryContent={context.isRunning}
       disableSummaryContentAnimation={context.disableSummaryContentAnimation}

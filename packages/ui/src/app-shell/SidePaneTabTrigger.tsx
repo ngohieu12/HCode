@@ -15,6 +15,7 @@ import {
   NotepadTextIcon,
   PackageIcon,
   PaletteIcon,
+  ShieldCheckIcon,
   SquareTerminalIcon,
   TerminalIcon,
   WaypointsIcon,
@@ -312,8 +313,16 @@ export function SidePaneTabIcon({ tab }: { tab: WorkspaceSidePaneTab }) {
     return <BrowserTabFavicon faviconUrl={tab.faviconUrl} />;
   }
 
+  if (tab.type === "browser-permissions") {
+    return <ShieldCheckIcon className="size-3.5" />;
+  }
+
   if (tab.type === "git") {
     return <FileDiffIcon className="size-3.5" />;
+  }
+
+  if (tab.type === "file-tree") {
+    return <ListTreeIcon className="size-3.5" />;
   }
 
   if (tab.type === "treemapping") {
@@ -455,7 +464,7 @@ function getPatchHeaderFileDisplayTarget(patch: string): string | null {
   return null;
 }
 
-function getPatchFileDisplayTarget(source: {
+export function getPatchFileDisplayTarget(source: {
   path?: string;
   title: string;
   patch: string;
@@ -520,8 +529,16 @@ export function getSidePaneTabTitle(
     return pageTitle || formatMessage({ id: "browser.title" });
   }
 
+  if (tab.type === "browser-permissions") {
+    return formatMessage({ id: "browser.permission.settings" });
+  }
+
   if (tab.type === "git") {
     return formatMessage({ id: "sidePane.review" });
+  }
+
+  if (tab.type === "file-tree") {
+    return tab.target.workspaceName || formatMessage({ id: "workspaceFileTree.title" });
   }
 
   if (tab.type === "treemapping") {

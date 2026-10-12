@@ -11,6 +11,7 @@ import {
   type ZCodeTaskRuntimeStatus,
   type ZCodeWorkspaceInitStatus,
 } from "@zcode/shared";
+import { persistLastSelectedAgentProvider } from "@/lib/zcodeProviderPreference.js";
 import { areConfigOptionsEquivalent } from "@/lib/configOptionsEquality.js";
 import type { ZCodeUiError } from "@/lib/zcodeUiError.js";
 import { pushNavEntry } from "@/lib/taskNavigationHistory.js";
@@ -233,6 +234,21 @@ function resolveActiveTaskConfigOptionsOnSwitch(
 
 export function createWorkspaceSlice(set: SetFn) {
   return {
+    closeActiveConversation: (workspacePath: string, workspaceIdentity?: string) => {
+      set((state) =>
+        updateWorkspaceState(
+          state,
+          workspacePath,
+          (current) => ({
+            ...current,
+            activeTaskId: null,
+            conversationClosed: true,
+          }),
+          workspaceIdentity,
+        ),
+      );
+    },
+
     setActiveTaskId: (workspacePath: string, id: string | null, workspaceIdentity?: string) => {
       set((state) => {
         const workspaceUpdate = updateWorkspaceState(
@@ -264,6 +280,7 @@ export function createWorkspaceSlice(set: SetFn) {
               taskUnreadByTaskId: restTaskUnreadByTaskId,
               optimisticTaskListByTaskId: nextOptimisticTaskListByTaskId,
               activeTaskId: id,
+              conversationClosed: false,
               // grouped 的 New task 草稿行只是当前草稿态锚点。
               // 一旦用户选中真实 task，就代表离开这个临时实体，必须立刻清掉，避免侧栏留下不可操作的假行。
               groupedDraftTask: id ? null : current.groupedDraftTask,
@@ -322,7 +339,7 @@ export function createWorkspaceSlice(set: SetFn) {
               // updatedAt 用最低哨兵值，保证任何 sessions-index 权威 meta 都会在
               // mergeTaskWithOptimisticMeta 中获胜，避免本地时钟压住 mode/provider/status 等字段。
               updatedAt: 0,
-              mode: "build",
+              mode: "default",
               provider: current.selectedProvider,
             };
             // task 导航和 draft session 创建是不同状态转换。只有创建成功边界
@@ -519,6 +536,9 @@ export function createWorkspaceSlice(set: SetFn) {
       const normalizedProvider = provider
         ? normalizeAgentProviderToZCodeAgent(provider)
         : undefined;
+      if (normalizedProvider) {
+        persistLastSelectedAgentProvider(normalizedProvider);
+      }
 
       set((state) =>
         updateWorkspaceState(
@@ -543,7 +563,7 @@ export function createWorkspaceSlice(set: SetFn) {
             const inheritedConfigOptions = activeTaskIdForInheritance
               ? cachedActiveTaskConfigOptions && cachedActiveTaskConfigOptions.length > 0
                 ? cachedActiveTaskConfigOptions
-                : // protocol-v4 当前任务的配置可能只完成了 workspace 投影，
+                : // Bug 原因：protocol-v4 当前任务的配置可能只完成了 workspace 投影，
                   // legacy task 缓存尚未写入或仍是首帧空数组。此时工具条已经显示
                   // current.configOptions，新草稿必须从当前投影继承，不能无种子预热。
                   current.configOptions
@@ -590,12 +610,13 @@ export function createWorkspaceSlice(set: SetFn) {
             return {
               ...current,
               activeTaskId: null,
+              conversationClosed: false,
               groupedDraftTask: nextGroupedDraftTask,
               draftCreateSource:
                 options?.createSource ?? (options?.groupedDraftPlacement ? "group" : "session"),
               draftRuntime: { status: "idle", error: null },
               // 从已有 task 点 New Task 时，草稿输入框必须继承当前 task 的完整配置。
-              // 否则后续 workspace prepare 会按 Team Plan / 默认模型重建草稿，把 deepseek 回弹成 GLM。
+              // 否则后续 workspace prepare 会按 Team Plan / 默认模型重建草稿，把已选的其他模型回弹成 GLM。
               ...(inheritedDraftConfigOptions
                 ? {
                     configOptions: inheritedDraftConfigOptions,

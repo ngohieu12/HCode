@@ -9,10 +9,10 @@
 // - lastAttemptAt 是本模块内存中的「发起时间」。UI 侧 PluginMarketplaceSummary 拿不到失败时间戳，
 //   纯靠 lastUpdated 会让离线用户每次进入都重试一次长超时请求；发起时立刻记录尝试时间，
 //   同时挡住「刚失败过」与「上一次还在飞」两种重复。进程重启清零是可接受的（重启后允许再试一次）。
-// - 商店页每次进入都是重新挂载（key 带 pluginStoreOpenVersion），组件内 ref 无法承载节流状态，
+// - 商店页每次进入都是重新挂载（PluginStorePage 在设置页内以 settingsSectionNavigationVersion 为 key），组件内 ref 无法承载节流状态，
 //   所以放在模块级。
 
-const OFFICIAL_MARKETPLACE_AUTO_REFRESH_INTERVAL_MS = 10 * 60_000;
+export const OFFICIAL_MARKETPLACE_AUTO_REFRESH_INTERVAL_MS = 10 * 60_000;
 
 const lastAttemptAtByMarketplace = new Map<string, number>();
 
@@ -22,7 +22,7 @@ function parseTimestamp(value: string | undefined): number | null {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-function shouldAutoRefreshMarketplace(params: {
+export function shouldAutoRefreshMarketplace(params: {
   lastUpdated?: string;
   lastAttemptAt?: number;
   now: number;
@@ -50,4 +50,8 @@ export function claimMarketplaceAutoRefresh(
     lastAttemptAtByMarketplace.set(marketplaceId, now);
   }
   return shouldRefresh;
+}
+
+export function resetMarketplaceAutoRefreshForTests(): void {
+  lastAttemptAtByMarketplace.clear();
 }

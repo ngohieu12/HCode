@@ -32,11 +32,12 @@ export interface UseCuaComposerEntryParams {
   workspaceIdentity?: string;
   remoteSessionId?: string | null;
   /** 手机 Web 远控壳；远控保护约束下不渲染本机 CUA 入口。 */
+  isWebRemoteControl?: boolean;
   /** 当前 composer 的 v4 snapshot.control.canStop，作为运行态的低延迟权威。 */
   currentSessionBusy?: boolean;
 }
 
-interface CuaComposerEntryController {
+export interface CuaComposerEntryController {
   view: CuaComposerEntryView;
   /** 点击按钮；仅在 view.clickAction === "open-settings" 时产生副作用。 */
   onActivate: () => void;
@@ -46,6 +47,7 @@ export function useCuaComposerEntry({
   workspacePath,
   workspaceIdentity,
   remoteSessionId,
+  isWebRemoteControl = false,
   currentSessionBusy = false,
 }: UseCuaComposerEntryParams): CuaComposerEntryController {
   const platform = usePlatform();
@@ -58,13 +60,14 @@ export function useCuaComposerEntry({
   // 与 ComputerUseSection 同口径的本地 workspace 判定：远程 workspace 的 CUA 会操作
   // 远端机器的屏幕，产品上不提供。
   const isLocalWorkspace =
+    !isWebRemoteControl &&
     !remoteSessionId &&
     !(workspaceIdentity?.trim() && isRemoteWorkspaceIdentity(workspaceIdentity.trim()));
 
   // 默认隐藏：只有显式存过 false 才展示。
   // 用 !== false 而不是 === true，是因为 settings 未加载（null）或老用户缺该字段时都应按
   // 隐藏处理——若反过来默认展示，新用户会先闪一下按钮再消失，且后台白跑一轮权限查询。
-  const hiddenBySettings = settings?.computerUseComposerEntryHidden !== false;
+  const hiddenBySettings = settings?.computerUseComposerEntryHidden === true;
 
   const plugins = usePluginManagementStore((state) => state.plugins);
   const togglingPluginId = usePluginManagementStore((state) => state.togglingPluginId);

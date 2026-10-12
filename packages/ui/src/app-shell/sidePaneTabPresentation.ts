@@ -6,9 +6,11 @@ export interface SidePaneTabPresentationLabels {
   reviewTitle: string;
   codeViewerTitle: string;
   treemappingTitle: string;
+  fileTreeTitle: string;
   whiteboardTitle: string;
   modelTrajectoryTitle: string;
   developerToolsTitle: string;
+  browserPermissionsTitle: string;
   terminalTitle: string;
   subagentTypeLabel: string;
   subagentDirectoryTitle: string;
@@ -54,11 +56,15 @@ export function getSidePaneTabSearchHint(tab: WorkspaceSidePaneTab): string {
   if (tab.type === "subagent-directory") {
     return `${tab.rootSessionId} ${tab.parentSessionId} subagent directory`;
   }
+  if (tab.type === "browser-permissions") return `${tab.origin} permissions settings`;
   if (tab.type === "browser") return tab.initialUrl ?? "";
   if (tab.type === "browser-use") {
     return `${tab.title ?? ""} ${tab.sessionId} browser use`;
   }
   if (tab.type === "git") return "git diff";
+  if (tab.type === "file-tree") {
+    return `${tab.target.workspaceName} ${tab.target.workspacePath} file tree files folder directory`;
+  }
   if (tab.type === "treemapping") return "file activity diff map treemapping";
   if (tab.type === "whiteboard") return `${tab.title} whiteboard canvas draw sketch`;
   if (tab.type === "model-trajectory") {
@@ -79,6 +85,7 @@ export function getLocalizedSidePaneTabTitle(
   return getSidePaneTabTitle(tab, (descriptor) => {
     const titleByMessageId: Record<string, string> = {
       "browser.title": labels.browserTitle,
+      "browser.permission.settings": labels.browserPermissionsTitle,
       "sidePane.review": labels.reviewTitle,
       "codeViewer.title": labels.codeViewerTitle,
       "treemapping.title": labels.treemappingTitle,
@@ -116,7 +123,9 @@ export function getSidePaneTabTypeLabel(
   }
   if (tab.type === "subagent-directory") return labels.subagentDirectoryTitle;
   if (tab.type === "browser" || tab.type === "browser-use") return labels.browserTitle;
+  if (tab.type === "browser-permissions") return labels.browserPermissionsTitle;
   if (tab.type === "git") return labels.reviewTitle;
+  if (tab.type === "file-tree") return labels.fileTreeTitle;
   if (tab.type === "treemapping") return labels.treemappingTitle;
   if (tab.type === "whiteboard") return labels.whiteboardTitle;
   if (tab.type === "model-trajectory") return labels.modelTrajectoryTitle;

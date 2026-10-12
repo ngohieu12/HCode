@@ -55,15 +55,7 @@ export const CORE_USER_ACTION_FEATURES = {
 export const SETTINGS_USER_ACTION_FEATURES = {
   "settings.navigation": ["open_section", "back_to_workspace", "open_onboarding"],
   "settings.locale": ["change_locale"],
-  "settings.appearance": [
-    "change_theme",
-    "change_ui_font_size",
-    "change_code_light_theme",
-    "change_code_dark_theme",
-    "toggle_code_line_numbers",
-    "toggle_code_line_wrap",
-    "change_code_font_size",
-  ],
+  "settings.appearance": ["change_theme", "change_ui_font_size"],
   "settings.terminal": ["toggle_system_profile", "save_font_family", "change_shell"],
   "settings.search": ["toggle_native_search"],
   "settings.network": ["save_http_proxy", "save_no_proxy", "save_ca_certificate"],
@@ -72,6 +64,7 @@ export const SETTINGS_USER_ACTION_FEATURES = {
   "settings.notification": ["toggle_notification", "toggle_notification_sound"],
   "settings.conversation": [
     "change_interaction_behavior",
+    "change_composer_enter_behavior",
     "toggle_ask_user_auto_resolution",
     "toggle_model_io_retention",
     "toggle_show_reasoning",
@@ -99,14 +92,14 @@ export type SettingsUserActionFeatureId = keyof typeof SETTINGS_USER_ACTION_FEAT
 export type UserActionFeatureId = CoreUserActionFeatureId | SettingsUserActionFeatureId;
 
 type CatalogDefinition = Readonly<Record<string, readonly string[]>>;
-type UserActionOperationKind =
+export type UserActionOperationKind =
   | "navigation"
   | "preference"
   | "command"
   | "management"
   | "destructive";
 
-interface UserActionCatalogEntry {
+export interface UserActionCatalogEntry {
   featureId: UserActionFeatureId;
   action: string;
   group: Extract<RendererActionTraceGroup, "core" | "settings">;

@@ -1,7 +1,7 @@
 /* eslint-disable max-lines -- 闲时任务整页集中维护创建/编辑/History 与 composer 项目、权限、模型工具条，拆分会割裂表单状态。 */
 /* 闲时任务创建/编辑整页。composer 范式：页标题 +
    返回行 + 内联保持电脑运行开关 + Settings/History tab + 标题输入 + 大 composer 盒
-   （textarea + 工具条：项目/权限｜模型/推理档位）。权限四档默认 build，模型走白名单。 */
+   （textarea + 工具条：项目/权限｜模型/推理档位）。权限四档默认 build，模型走白名单（D31）。 */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ModelSelectionView } from "@zcode/services";
 import { completeNewModelSelection } from "@zcode/provider";
@@ -37,11 +37,9 @@ import {
 import { SettingsBreadcrumbReporter } from "@/settings/SettingsHeaderBreadcrumb.js";
 import { OffPeakEditActionsMenu } from "@/settings/OffPeakEditActionsMenu.js";
 import { OffPeakHistoryTab } from "@/settings/OffPeakHistoryTab.js";
-import { AutomationSwitchToggle } from "@/settings/AutomationSwitchToggle.js";
 import { cn } from "@/components/lib/utils.js";
 import { SETTINGS_FRAME_CONTENT_CLASSNAME } from "@/settings/SettingsPageParts.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
-import { useSettings } from "@/hooks/useSettingService.js";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog.js";
 import {
   AUTOMATION_DEFAULT_MODE,
@@ -61,7 +59,7 @@ import { resolveModelThoughtOption } from "@/lib/modelThoughtOption.js";
 
 const MODEL_ITEM_NEVER_LOCKED = () => false;
 
-function buildOffPeakSubmissionModelSelection(
+export function buildOffPeakSubmissionModelSelection(
   providerId: string,
   modelId: string,
   displayedReasoningLevel: string | undefined,
@@ -131,7 +129,6 @@ export function OffPeakEditView({
   showToast = toast,
 }: OffPeakEditViewProps) {
   const { intl } = useZCodeIntl();
-  const { settings, update: updateSettings } = useSettings();
   const confirmDialog = useConfirmDialog();
   const localWorkspaceOptions = useAutomationProjectOptions();
   const preferredLocalWorkspace =
@@ -287,7 +284,6 @@ export function OffPeakEditView({
     if (confirmed) onBack();
   }, [confirmDialog, dirty, intl, onBack]);
 
-  const keepAwake = settings?.keepAwakeWhileRunning ?? false;
   // queued/paused 全字段可编辑；running 起锁定编辑、终态只读。
   const readOnly = Boolean(editing && editing.status !== "queued" && editing.status !== "paused");
   readOnlyRef.current = readOnly;
@@ -396,23 +392,6 @@ export function OffPeakEditView({
         </div>
       ) : null}
 
-      <div className="flex min-w-0 flex-wrap items-center gap-4 sm:flex-nowrap">
-        <div className="flex shrink-0 items-center gap-2">
-          <AutomationSwitchToggle
-            checked={keepAwake}
-            ariaLabel={intl.formatMessage({
-              id: "offPeak.form.keepAwakeLabel",
-            })}
-            onChange={(value) => void updateSettings({ keepAwakeWhileRunning: value })}
-            color="blue"
-            size="sm"
-          />
-          <span className="text-ui-base text-foreground-subtle">
-            {intl.formatMessage({ id: "offPeak.form.keepAwakeLabel" })}
-          </span>
-        </div>
-      </div>
-
       {/* Settings/History 分段 tab（左）+ 创建按钮（右上）；与定时任务编辑页同款分段样式。 */}
       <div className="flex items-center justify-between">
         <AutomationSettingsHistoryTabs
@@ -456,15 +435,6 @@ export function OffPeakEditView({
           </div>
         ) : null}
       </div>
-
-      {editing && tab === "settings" ? (
-        <div className="flex min-h-11 items-center gap-3 rounded-[10px] bg-surface px-3 py-3 text-ui-base leading-5 text-foreground-subtle sm:py-0">
-          <span className="flex size-5 shrink-0 items-center justify-center" aria-hidden="true">
-            <AutomationInfoIcon className="size-4" aria-hidden="true" />
-          </span>
-          {intl.formatMessage({ id: "offPeak.keepAwakeBanner" })}
-        </div>
-      ) : null}
 
       {tab === "history" ? (
         <OffPeakHistoryTab
@@ -525,7 +495,7 @@ export function OffPeakEditView({
             <span className="text-ui-base font-normal leading-5 text-foreground-subtle">
               {intl.formatMessage({ id: "offPeak.form.titleLabel" })}
             </span>
-            {/* 闲时任务标题曾用透明边框覆盖共享 Input 状态，导致与定时任务及 Instructions 描边不一致。 */}
+            {/* Bug 原因：闲时任务标题曾用透明边框覆盖共享 Input 状态，导致与定时任务及 Instructions 描边不一致。 */}
             <Input
               value={title}
               disabled={readOnly}
@@ -562,7 +532,7 @@ export function OffPeakEditView({
               <AutomationInstructionsToolbar>
                 <div className="flex min-w-0 flex-wrap items-center gap-0">
                   {/* 项目：创建态仅当前窗口已打开的本地项目；编辑态锁定原项目。 */}
-                  {/* UI 字号会随设置缩放，固定 18px 行高会在大字号下挤压项目文案。*/}
+                  {/* 修复原因：UI 字号会随设置缩放，固定 18px 行高会在大字号下挤压项目文案。 */}
                   {editing ? (
                     <span className="flex h-7 min-w-0 items-center gap-1 rounded-full px-2 text-ui-base font-normal leading-snug text-foreground-subtle">
                       <FolderOpen className="size-4 shrink-0" aria-hidden="true" />
@@ -614,7 +584,7 @@ export function OffPeakEditView({
                       })}
                     </Button>
                   )}
-                  {/* 闲时权限菜单曾单独渲染，缺少首页的模式图标和标准选中态。
+                  {/* Bugfix：闲时权限菜单曾单独渲染，缺少首页的模式图标和标准选中态。
                       复用 ConfigSelect，避免两处样式再次分叉。 */}
                   <ConfigSelect
                     option={modeOption}
@@ -634,7 +604,7 @@ export function OffPeakEditView({
                     restoreFocusSelector={null}
                   />
                 </div>
-                {/* 右侧组曾允许自身和子 trigger 收缩，模型与推理内容会被压成纵向多行。
+                {/* Bug 原因：右侧组曾允许自身和子 trigger 收缩，模型与推理内容会被压成纵向多行。
                     小屏时整组占据下一行，组内始终保持单行。 */}
                 <div className="flex w-full shrink-0 flex-nowrap items-center justify-end gap-0 sm:w-auto">
                   {/* 模型仍由闲时白名单驱动，只复用 New Task 的纯展示选择器。 */}
@@ -661,7 +631,7 @@ export function OffPeakEditView({
                     )}
                     triggerLabelClassName="inline-flex min-w-0 truncate text-left"
                   />
-                  {/* 推理档位：仅推理模型显示；缺省=workspace 默认 */}
+                  {/* 推理档位（D34）：仅推理模型显示；缺省=workspace 默认 */}
                   {thoughtLevelOption ? (
                     <ThoughtLevelCycleControl
                       intl={intl}
@@ -679,7 +649,7 @@ export function OffPeakEditView({
                 </div>
               </AutomationInstructionsToolbar>
             </AutomationInstructionsComposer>
-            {/* 该文案是运行机制说明而非风险告警，橙色三角会错误强化语义；
+            {/* 修复原因：该文案是运行机制说明而非风险告警，橙色三角会错误强化语义；
                 与复合输入额外拉开 4px，避免辅助说明贴近输入框边界。 */}
             <div className="mt-1 flex items-start gap-1.5 text-ui-base leading-5 text-foreground-subtle">
               <span className="flex size-5 shrink-0 items-center justify-center" aria-hidden="true">

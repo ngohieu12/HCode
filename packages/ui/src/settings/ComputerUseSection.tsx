@@ -617,9 +617,9 @@ export function ComputerUseSection({
     null,
   );
   const [composerEntrySaving, setComposerEntrySaving] = useState(false);
-  // 默认隐藏，与 useCuaComposerEntry 同口径：只有显式存过 false 才算展示。
+  // 默认展示，与 useCuaComposerEntry 同口径：只有显式存过 true 才算隐藏。
   // 两处必须一致，否则设置页开关的显示状态会和输入框按钮的实际显隐对不上。
-  const persistedComposerEntryHidden = appSettings?.computerUseComposerEntryHidden !== false;
+  const persistedComposerEntryHidden = appSettings?.computerUseComposerEntryHidden === true;
   const composerEntryVisible = !(composerEntryHiddenOverride ?? persistedComposerEntryHidden);
   useEffect(() => {
     if (composerEntryHiddenOverride === null) return;

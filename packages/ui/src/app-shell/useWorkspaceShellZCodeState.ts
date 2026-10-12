@@ -11,6 +11,7 @@ import { hasBusyTaskInWorkspaceProvider } from "@/lib/workspaceBusyTaskLock.js";
 type WorkspaceShellZCodeState = Pick<
   WorkspaceZCodeUIState,
   | "activeTaskId"
+  | "conversationClosed"
   | "draftFocusVersion"
   | "modelSwitchPending"
   | "modelSwitchStage"
@@ -32,6 +33,7 @@ export function useWorkspaceShellZCodeState(workspaceAbsPath: string, workspaceI
       const displayedTaskState = getWorkspaceDisplayedTaskState(workspaceState);
       return {
         activeTaskId: workspaceState.activeTaskId,
+        conversationClosed: workspaceState.conversationClosed,
         draftFocusVersion: workspaceState.draftFocusVersion,
         modelSwitchPending: workspaceState.modelSwitchPending,
         modelSwitchStage: workspaceState.modelSwitchStage,
