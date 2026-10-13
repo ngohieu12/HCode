@@ -57,14 +57,11 @@ describe("WorkspacePurposeSection", () => {
   it("keeps the action outside the collapse trigger and exposes accessible visibility fallbacks", () => {
     const html = renderSection(true);
     const triggerEndIndex = html.indexOf("</button>");
-    const dragHandleIndex = html.indexOf('data-purpose-section-drag-handle="projects"');
     const actionIndex = html.indexOf('data-testid="section-action"');
 
     expect(triggerEndIndex).toBeGreaterThan(-1);
-    expect(dragHandleIndex).toBeGreaterThan(triggerEndIndex);
     expect(actionIndex).toBeGreaterThan(triggerEndIndex);
-    expect(html).toContain('aria-label="Move Projects section"');
-    expect(html).toContain("touch-none");
+    expect(html).not.toContain("data-purpose-section-drag-handle");
     expect(html).toContain("group-hover/purpose-section:opacity-100");
     expect(html).toContain("group-focus-within/purpose-section:opacity-100");
     expect(html).toContain("has-[[data-state=open]]:opacity-100");

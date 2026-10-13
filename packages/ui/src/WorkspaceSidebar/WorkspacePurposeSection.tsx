@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { ChevronDown, ChevronRight, GripVertical } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
@@ -16,7 +16,6 @@ export function WorkspacePurposeSection({
   children,
   testId,
   sortableId,
-  dragHandleLabel,
 }: {
   title: string;
   open: boolean;
@@ -25,17 +24,11 @@ export function WorkspacePurposeSection({
   children: ReactNode;
   testId: string;
   sortableId: string;
-  dragHandleLabel: string;
+  dragHandleLabel?: string;
 }) {
-  const {
-    attributes,
-    listeners,
-    setActivatorNodeRef,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: sortableId });
+  const { setNodeRef, transform, transition, isDragging } = useSortable({
+    id: sortableId,
+  });
   const style: CSSProperties = {
     transform: transform
       ? CSS.Transform.toString({ ...transform, scaleX: 1, scaleY: 1 })
@@ -79,17 +72,6 @@ export function WorkspacePurposeSection({
             </button>
           </CollapsibleTrigger>
           <div className="flex shrink-0 items-center pr-1.5 opacity-0 transition-opacity group-hover/purpose-section:opacity-100 group-focus-within/purpose-section:opacity-100 has-[[data-state=open]]:opacity-100 [@media(hover:none)]:opacity-100">
-            <button
-              ref={setActivatorNodeRef}
-              type="button"
-              aria-label={dragHandleLabel}
-              data-purpose-section-drag-handle={sortableId}
-              className="flex size-6 touch-none cursor-grab items-center justify-center rounded-md text-foreground-subtlest outline-none hover:bg-hover hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/30 active:cursor-grabbing"
-              {...attributes}
-              {...listeners}
-            >
-              <GripVertical aria-hidden="true" className="size-3.5" />
-            </button>
             {action}
           </div>
         </div>
