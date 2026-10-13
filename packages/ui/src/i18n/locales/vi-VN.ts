@@ -171,6 +171,18 @@ const viVN: Record<string, string> = {
     "Chọn Enter để xuống dòng (Ctrl/Cmd+Enter để gửi) hoặc Enter để gửi prompt (Shift+Enter để xuống dòng).",
   "settings.composerEnterBehavior.option.newline": "Enter để xuống dòng",
   "settings.composerEnterBehavior.option.send": "Enter để gửi prompt",
+
+  "settings.usage.modelChartTitle": "Mức sử dụng model",
+  "settings.usage.modelChart.topByTokens": "Top {count} model theo token",
+  "settings.usage.modelChart.topByRequests": "Top {count} model theo số request",
+  "settings.usage.modelChart.tokensEmptyDescription":
+    "Không có model nào tiêu thụ token trong khoảng này.",
+  "settings.usage.modelChart.requestsEmptyDescription":
+    "Không có request nào của model trong khoảng này.",
+  "settings.usage.modelChart.hiddenModels": "Còn {count} model không được hiển thị",
+  "settings.usage.modelChart.metric.tokens": "Token",
+  "settings.usage.modelChart.metric.requests": "Số request",
+  "settings.usage.modelChart.requestUnit": "request",
 };
 
 export default viVN;

@@ -153,7 +153,7 @@ describe("AppUsageLifetimeSummaryStrip", () => {
     // resolve，占位不再依赖机器负载；若图表模块本身加载失败，预热会在此处直接报错。
     await Promise.all([
       import("@/settings/usage-stats/AppUsageDailyModelTrendChart.js"),
-      import("@/settings/usage-stats/AppUsageModelUsagePieChart.js"),
+      import("@/settings/usage-stats/AppUsageTopModelsBarChart.js"),
     ]);
     render(
       createElement(
@@ -204,32 +204,31 @@ describe("AppUsageLifetimeSummaryStrip", () => {
     expect(screen.queryByText("最常用模型")).toBeNull();
   });
 
-  it("keeps chart color indicators above the charts", async () => {
-    const dailyChartSource = await readFile(
-      "packages/ui/src/settings/usage-stats/AppUsageDailyModelTrendChart.tsx",
-      "utf8",
-    );
-    const modelChartSource = await readFile(
-      "packages/ui/src/settings/usage-stats/AppUsageModelUsagePieChart.tsx",
-      "utf8",
+  it("replaces the model usage pie chart with horizontal top-model bar charts", async () => {
+    const [dailyChartSource, modelChartSource, panelSource] = await Promise.all(
+      [
+        "packages/ui/src/settings/usage-stats/AppUsageDailyModelTrendChart.tsx",
+        "packages/ui/src/settings/usage-stats/AppUsageTopModelsBarChart.tsx",
+        "packages/ui/src/settings/usage-stats/AppUsagePanel.tsx",
+      ].map((path) => readFile(path, "utf8")),
     );
 
-    const dailyLegendIndex = dailyChartSource.indexOf('role="list"');
-    const modelLegendIndex = modelChartSource.indexOf('role="list"');
-
-    expect(dailyLegendIndex).toBeGreaterThan(-1);
-    expect(modelLegendIndex).toBeGreaterThan(-1);
-    expect(dailyLegendIndex).toBeLessThan(dailyChartSource.indexOf("<ChartContainer"));
-    expect(modelLegendIndex).toBeGreaterThan(modelChartSource.indexOf("<ChartContainer"));
-    expect(modelChartSource).toContain("md:grid-cols-2");
-    expect(modelChartSource).toContain("grid grid-cols-[auto_minmax(0,1fr)_auto]");
-    expect(modelChartSource).toContain("size-2 shrink-0 self-center rounded-full");
-    expect(modelChartSource).not.toContain("h-2.5 w-1");
-    expect(modelChartSource).not.toContain("mt-0.5");
+    // 旧饼图的色块图例（role="list"）随饼图一起移除：模型名现在画在横轴刻度上。
+    expect(dailyChartSource.indexOf('role="list"')).toBeGreaterThan(-1);
+    expect(modelChartSource).not.toContain('role="list"');
+    expect(modelChartSource).not.toContain("PieChart");
+    expect(modelChartSource).not.toContain("md:grid-cols-2");
+    expect(modelChartSource).not.toContain("grid grid-cols-[auto_minmax(0,1fr)_auto]");
+    expect(modelChartSource).toContain('layout="vertical"');
+    expect(modelChartSource).toContain('type="category"');
+    expect(modelChartSource).toContain("<LabelList");
     expect(dailyChartSource).not.toContain("rounded-md bg-surface/60");
     expect(modelChartSource).not.toContain("rounded-md bg-surface/60");
     expect(dailyChartSource).toContain('className="space-y-3 rounded-xl bg-surface p-4"');
-    expect(modelChartSource).toContain('className="space-y-3 rounded-xl bg-surface p-4"');
+    // 两个榜共用一个「模型用量」小节，不再各自带一份 section 外框。
+    expect(panelSource).toContain('className="space-y-4 rounded-xl bg-surface p-4"');
+    expect(panelSource).toContain('<AppUsageTopModelsBarChart metric="tokens"');
+    expect(panelSource).toContain('<AppUsageTopModelsBarChart metric="requests"');
   });
 
   it("uses small typography for chart content while keeping chart titles unchanged", async () => {
@@ -244,7 +243,7 @@ describe("AppUsageLifetimeSummaryStrip", () => {
       [
         "packages/ui/src/components/ui/chart.tsx",
         "packages/ui/src/settings/usage-stats/AppUsageDailyModelTrendChart.tsx",
-        "packages/ui/src/settings/usage-stats/AppUsageModelUsagePieChart.tsx",
+        "packages/ui/src/settings/usage-stats/AppUsageTopModelsBarChart.tsx",
         "packages/ui/src/settings/usage-stats/UsageHeatmap.tsx",
         "packages/ui/src/settings/usage-stats/CodingPlanUsagePanel.tsx",
         "packages/ui/src/settings/usage-stats/CodingPlanUsageLineChart.tsx",
@@ -255,9 +254,9 @@ describe("AppUsageLifetimeSummaryStrip", () => {
     expect(chartUiSource).toContain("text-ui-sm/relaxed");
     expect(dailyChartSource).toContain('className="flex min-w-0 items-center gap-2 text-ui-sm"');
     expect(dailyChartSource).toContain('<h3 className="text-ui-base font-medium text-foreground">');
-    expect(modelChartSource).toContain("font-mono text-ui-sm text-foreground");
+    expect(modelChartSource).toContain("font-mono font-medium tabular-nums");
     expect(modelChartSource).toContain("font-mono text-ui-sm text-foreground-subtle tabular-nums");
-    expect(modelChartSource).toContain('<h3 className="text-ui-base font-medium text-foreground">');
+    expect(modelChartSource).toContain('<h4 className="text-ui-base font-medium text-foreground">');
     expect(heatmapSource).toContain(
       'className="min-w-0 truncate text-ui-sm text-foreground-subtle"',
     );

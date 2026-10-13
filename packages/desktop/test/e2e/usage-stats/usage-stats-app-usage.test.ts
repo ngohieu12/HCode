@@ -24,7 +24,18 @@ describe("Usage Stats App Usage E2E", () => {
     await assertBodyIncludes(["e2e-model-alpha", "e2e-model-beta"]);
     await assertBodyIncludesAny(["Token Activity", "Token 活动"]);
     await assertBodyIncludesAny(["Daily Token Trend", "每日 Token 趋势图"]);
-    await assertBodyIncludesAny(["Model Usage", "模型用量"]);
+    // 模型用量已从饼图换成两张横向柱状图（按 token / 按请求数各取前 10）。
+    await assertBodyIncludesAny(["Model Usage", "模型用量", "Mức sử dụng model"]);
+    await assertBodyIncludesAny([
+      "Top 10 models by tokens",
+      "Token 用量前 10 的模型",
+      "Top 10 model theo token",
+    ]);
+    await assertBodyIncludesAny([
+      "Top 10 models by requests",
+      "请求数前 10 的模型",
+      "Top 10 model theo số request",
+    ]);
     // tokenNumberFormat 按 locale compact：英文为 9.5K，中文在 1 万以下保留 9510。
     await assertBodyIncludesAny(["9.5K", "9,510", "9510"]);
 
