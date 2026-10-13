@@ -3979,7 +3979,16 @@ const enUS: Record<string, string> = {
     "Switch the workspace model connection to an Individual Plan or Team Plan to view its quota and usage here.",
   "settings.usage.modelChartDescription":
     "{model} currently has the highest share at about {share}.",
-  "settings.usage.modelChart.other": "Other models",
+  "settings.usage.modelChart.topByTokens": "Top {count} models by tokens",
+  "settings.usage.modelChart.topByRequests": "Top {count} models by requests",
+  "settings.usage.modelChart.tokensEmptyDescription":
+    "No model token usage was recorded in this range.",
+  "settings.usage.modelChart.requestsEmptyDescription":
+    "No model requests were recorded in this range.",
+  "settings.usage.modelChart.hiddenModels": "{count} more models are not shown",
+  "settings.usage.modelChart.metric.tokens": "Tokens",
+  "settings.usage.modelChart.metric.requests": "Requests",
+  "settings.usage.modelChart.requestUnit": "requests",
   "settings.usage.modelChart.input": "In",
   "settings.usage.modelChart.cachedInput": "Cached",
   "settings.usage.modelChart.uncachedInput": "Uncached",

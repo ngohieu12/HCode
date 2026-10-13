@@ -25,9 +25,9 @@ const AppUsageDailyModelTrendChart = lazy(() =>
     default: module.AppUsageDailyModelTrendChart,
   })),
 );
-const AppUsageModelUsagePieChart = lazy(() =>
-  import("@/settings/usage-stats/AppUsageModelUsagePieChart.js").then((module) => ({
-    default: module.AppUsageModelUsagePieChart,
+const AppUsageTopModelsBarChart = lazy(() =>
+  import("@/settings/usage-stats/AppUsageTopModelsBarChart.js").then((module) => ({
+    default: module.AppUsageTopModelsBarChart,
   })),
 );
 
@@ -103,13 +103,13 @@ export function AppUsagePanel() {
         <AppUsageDailyModelTrendChart snapshot={snapshot} />
       </UsageChartLoadBoundary>
       <UsageChartLoadBoundary
-        scope="settings.usage.app-model-pie-chart"
-        resetKeys={[snapshot.range, snapshot.generatedAt, "model-pie"]}
+        scope="settings.usage.app-model-top-charts"
+        resetKeys={[snapshot.range, snapshot.generatedAt, "model-top"]}
         loadingDescription={intl.formatMessage({
           id: "settings.usage.appUsageLoadingDescription",
         })}
       >
-        <AppUsageModelUsagePieChart snapshot={snapshot} />
+        <AppUsageModelTopCharts snapshot={snapshot} />
       </UsageChartLoadBoundary>
 
       <div className="flex justify-end">
@@ -127,6 +127,24 @@ export function AppUsagePanel() {
         </Button>
       </div>
     </div>
+  );
+}
+
+/**
+ * 模型用量榜：同一份 snapshot 分别按 token 用量和请求数取前 10 个模型。
+ * 两个榜共用一条 lazy 加载边界，Recharts 只会在打开 Usage 时按需编译一次。
+ */
+function AppUsageModelTopCharts({ snapshot }: { snapshot: AppUsageSnapshot }) {
+  const { intl } = useZCodeIntl();
+
+  return (
+    <section className="space-y-4 rounded-xl bg-surface p-4">
+      <h3 className="text-ui-base font-medium text-foreground">
+        {intl.formatMessage({ id: "settings.usage.modelChartTitle" })}
+      </h3>
+      <AppUsageTopModelsBarChart metric="tokens" snapshot={snapshot} />
+      <AppUsageTopModelsBarChart metric="requests" snapshot={snapshot} />
+    </section>
   );
 }
 
