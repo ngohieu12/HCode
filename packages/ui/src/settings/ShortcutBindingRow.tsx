@@ -1,4 +1,4 @@
-import { Keyboard, Pencil, Trash2 } from "lucide-react";
+import { Keyboard, Pencil } from "lucide-react";
 import type { ShortcutCommandEntry, ShortcutCommandId } from "@zcode/shared";
 import { Button } from "@/components/ui/button.js";
 import { Kbd, KbdGroup } from "@/components/ui/kbd.js";
@@ -33,14 +33,13 @@ interface ShortcutBindingRowProps {
   /** 替换某条绑定（index = 生效列表下标；null = 未分配录第一条）。 */
   onRecord: (bindingIndex: number | null) => void;
   onSteal: (binding: string) => void;
-  /** 清空全部绑定 = 未分配（显式空数组，不回退默认）。 */
-  onClearAll: () => void;
 }
 
 /**
  * 快捷键设置页的命令行：左列命令名跨全部绑定垂直居中，右列是该命令的
  * 绑定列表——每条一行：逐键键帽 + 铅笔（点击即替换该条录制）；录制态内嵌在对应
- * 条目位置。暂不支持新增/删除绑定（仅替换），操作列为「清空全部」垃圾桶。
+ * 条目位置。暂不支持新增/删除绑定（仅替换），也不提供「清空」入口：键位一旦清空
+ * 就无法在本页重新录入，保留只读的清空按钮只会制造不可恢复状态。
  */
 export function ShortcutBindingRow({
   entry,
@@ -52,7 +51,6 @@ export function ShortcutBindingRow({
   menuChannelUnavailable,
   onRecord,
   onSteal,
-  onClearAll,
 }: ShortcutBindingRowProps) {
   const { intl } = useZCodeIntl();
   const conflictBinding = isRecording ? recording?.conflictBinding : null;
@@ -150,7 +148,7 @@ export function ShortcutBindingRow({
 
   return (
     <div
-      className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_80px_72px] items-center border-t border-border px-4 py-3 text-ui-base"
+      className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_80px] items-center border-t border-border px-4 py-3 text-ui-base"
       data-testid={`settings-shortcut-row-${entry.id}`}
     >
       <span className="flex min-w-0 items-center">
@@ -191,21 +189,6 @@ export function ShortcutBindingRow({
           ? intl.formatMessage({ id: "settings.shortcuts.scopeComposer" })
           : intl.formatMessage({ id: "settings.shortcuts.scopeGlobal" })}
       </span>
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={intl.formatMessage(
-          { id: "settings.shortcuts.clearAria" },
-          { command: commandLabel },
-        )}
-        // Web 端 menu 通道命令与录制入口同置灰：其默认键被根级回退监听固定消费，
-        // 清除成未分配也不会真的失效，放行会产出「显示未分配却仍触发」的分裂状态
-        disabled={menuChannelUnavailable || bindings.length === 0}
-        onClick={onClearAll}
-        data-testid={`settings-shortcut-clear-${entry.id}`}
-      >
-        <Trash2 className="size-4" />
-      </Button>
     </div>
   );
 }

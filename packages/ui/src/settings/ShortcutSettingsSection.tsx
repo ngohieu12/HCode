@@ -34,8 +34,10 @@ import { useShortcutRecording } from "./useShortcutRecording.js";
  * 快捷键设置分区：命令表只读展示 + 键盘录入 + 冲突处理。
  * 只读写 shortcutBindings 覆盖数据，键位语义（匹配/录制/冲突/抢绑）全部经 shortcuts 内核。
  * 系统保留键直接拒绝；app 内命令占用提示占用者并支持二次确认抢绑。
- * 单行多绑定：一个命令一行，多组键帽在键位列纵向排列；每条可替换/删除，
- * 命令级「+」追加；同命令物理等价重复在录制入口拒绝。
+ * 单行多绑定：一个命令一行，多组键帽在键位列纵向排列；每条可点击键帽/铅笔替换，
+ * 同命令物理等价重复在录制入口拒绝。
+ * 不提供删除/清空入口：本页只能替换已有绑定或为未分配命令录入第一条，避免把命令
+ * 清成「未分配」后用户无法自行恢复（这与录制态 Backspace 恢复默认是两个语义）。
  */
 export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boolean }) {
   const { intl } = useZCodeIntl();
@@ -137,15 +139,6 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
       void persistBindings(next);
     },
     [overrides, persistBindings, recording, composerEnterBehavior],
-  );
-
-  /** 操作列垃圾桶「清除」= 清空该命令全部绑定 = 未分配：覆盖写显式空数组，不回退默认
-   * （含 menu 通道 accelerator 摘除）。与录制态 Backspace 的「恢复默认」是两个语义。 */
-  const clearAllBindings = useCallback(
-    (commandId: ShortcutCommandId) => {
-      void persistBindings({ ...overrides, [commandId]: [] });
-    },
-    [overrides, persistBindings],
   );
 
   /**
@@ -250,11 +243,10 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
       />
 
       <div className="overflow-hidden rounded-xl border border-border">
-        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_80px_72px] bg-surface px-4 py-3 text-ui-sm text-foreground-subtle">
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_80px] bg-surface px-4 py-3 text-ui-sm text-foreground-subtle">
           <span>{intl.formatMessage({ id: "settings.shortcuts.columnHeaderCommand" })}</span>
           <span>{intl.formatMessage({ id: "settings.shortcuts.columnHeaderBinding" })}</span>
           <span>{intl.formatMessage({ id: "settings.shortcuts.columnHeaderScope" })}</span>
-          <span>{intl.formatMessage({ id: "settings.shortcuts.columnHeaderActions" })}</span>
         </div>
         {visibleCommands.map((entry) => (
           <ShortcutBindingRow
@@ -282,7 +274,6 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
               stealBinding(entry.id, binding);
               setRecording(null);
             }}
-            onClearAll={() => clearAllBindings(entry.id)}
           />
         ))}
         {visibleCommands.length === 0 ? (

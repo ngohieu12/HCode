@@ -124,44 +124,6 @@ describe("快捷键设置 E2E", () => {
     await dispatchShortcut("e", "KeyE");
     await $(sel(TID_SIDEBAR)).waitForDisplayed({ timeout: 10_000 });
   });
-
-  it("SC-10: 清除 = 未分配，原键彻底失效且持久化不回退默认", async function () {
-    this.timeout(120_000);
-
-    await openShortcutSettings();
-
-    // SC-01 后 toggleSidebar 绑在 Cmd/Ctrl+E（有覆盖条目）；点垃圾桶 = 清除为未分配
-    await clickTestIdByDom("settings-shortcut-clear-toggleSidebar", {
-      timeout: 15_000,
-      timeoutMsg: "快捷键列表没有出现 toggleSidebar 清除按钮",
-    });
-
-    // 落盘为显式空数组（未分配语义，不回退默认绑定）
-    await browser.waitUntil(
-      async () => {
-        const settings = await readSettings();
-        return settings.shortcutBindings?.toggleSidebar?.length === 0;
-      },
-      { timeout: 15_000, timeoutMsg: "清除后没有写入显式空数组" },
-    );
-
-    // kbd 显示「未分配」，清除按钮因无键可清转为禁用
-    const kbdText = await $(sel("settings-shortcut-bind-toggleSidebar-unassigned")).getText();
-    expect(["未分配", "Unassigned"]).toContain(kbdText.trim());
-    expect(await $(sel("settings-shortcut-clear-toggleSidebar")).isEnabled()).toBe(false);
-
-    // 主界面按原键不再切换侧栏（生效表为空，命令彻底失效）
-    await backToWorkspace();
-    await $(sel(TID_SIDEBAR)).waitForDisplayed({ timeout: 10_000 });
-    await dispatchShortcut("e", "KeyE");
-    await browser.pause(800);
-    expect(await $(sel(TID_SIDEBAR)).isDisplayed()).toBe(true);
-
-    // 重进设置页仍为未分配：覆盖空数组持久化生效，不回退默认键位
-    await openShortcutSettings();
-    const kbdTextAgain = await $(sel("settings-shortcut-bind-toggleSidebar-unassigned")).getText();
-    expect(["未分配", "Unassigned"]).toContain(kbdTextAgain.trim());
-  });
 });
 
 async function openShortcutSettings() {
