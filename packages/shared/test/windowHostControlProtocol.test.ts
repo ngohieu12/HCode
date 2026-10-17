@@ -194,57 +194,6 @@ describe("R1 window Host control protocol", () => {
     ).toBe(true);
   });
 
-  it("严格校验 Remote Environment Provisioning 的执行与结果消息", () => {
-    expect(
-      hostIncomingMessageSchema.safeParse({
-        type: HostMessageTypes.ProviderProvisioningExecute,
-        requestId: "provisioning-1",
-        environmentKey: "ssh:dev.internal:developer",
-        remoteSessionId: "remote-session-1",
-        trigger: "environment-online",
-      }).success,
-    ).toBe(true);
-    expect(
-      hostIncomingMessageSchema.safeParse({
-        type: HostMessageTypes.ProviderProvisioningExecute,
-        requestId: "provisioning-1",
-        environmentKey: "",
-        remoteSessionId: "remote-session-1",
-        trigger: "manual",
-      }).success,
-    ).toBe(false);
-
-    expect(
-      hostResponseMessageSchema.safeParse({
-        type: HostResponseTypes.ProviderProvisioningSourceChanged,
-        trigger: "credential",
-      }).success,
-    ).toBe(true);
-    expect(
-      hostResponseMessageSchema.safeParse({
-        type: HostResponseTypes.ProviderProvisioningSourceChanged,
-        trigger: "environment-online",
-      }).success,
-    ).toBe(false);
-
-    expect(
-      hostResponseMessageSchema.safeParse({
-        type: HostResponseTypes.ProviderProvisioningExecutionResult,
-        requestId: "provisioning-1",
-        environmentKey: "ssh:dev.internal:developer",
-        status: "applied",
-      }).success,
-    ).toBe(true);
-    expect(
-      hostResponseMessageSchema.safeParse({
-        type: HostResponseTypes.ProviderProvisioningExecutionResult,
-        requestId: "provisioning-1",
-        environmentKey: "ssh:dev.internal:developer",
-        status: "partially-applied",
-      }).success,
-    ).toBe(false);
-  });
-
   it("严格校验 host 自采资源样本（cpu / rss / heap 三项齐全且为数值）", () => {
     expect(
       hostResponseMessageSchema.safeParse({

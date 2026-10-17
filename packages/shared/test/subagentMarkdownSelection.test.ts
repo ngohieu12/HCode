@@ -2,10 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   parseSubagentMarkdownSelection,
   formatSubagentMarkdownModel,
-  migrateSubagentMarkdownProvider,
 } from "../src/subagent-markdown-selection.js";
 
-describe("Subagent 正式 Markdown 字段和单向文本迁移", () => {
+describe("Subagent 正式 Markdown 字段", () => {
   it("只读取 model/thoughtLevel，不读取未发布中间字段或结构化 model", () => {
     expect(
       parseSubagentMarkdownSelection({ modelSelection: { providerId: "p", modelId: "m" } }),
@@ -25,7 +24,7 @@ describe("Subagent 正式 Markdown 字段和单向文本迁移", () => {
     "模型 ID 无损往返 %s",
     (modelId) => {
       const selection = {
-        providerId: "account:bigmodel-individual-coding-plan",
+        providerId: "my-provider",
         modelId,
         options: { reasoningLevel: "high" },
       };
@@ -37,10 +36,15 @@ describe("Subagent 正式 Markdown 字段和单向文本迁移", () => {
       ).toEqual(selection);
     },
   );
-  it("普通读取不替换范围外的旧账号身份", () => {
-    expect(
-      parseSubagentMarkdownSelection({ model: "builtin:bigmodel-coding-plan/GLM" })?.providerId,
-    ).toBe("builtin:bigmodel-coding-plan");
+  it("普通读取不做任何身份迁移，读到什么就是什么", () => {
+    // 内置供应商已下线，不再把历史 builtin:* 改写成别的身份：改写只会把用户的明确
+    // 选择换成一个不存在的 provider，重选必须留给用户。
+    expect(parseSubagentMarkdownSelection({ model: "my-provider/GLM" })?.providerId).toBe(
+      "my-provider",
+    );
+    expect(parseSubagentMarkdownSelection({ model: "builtin:legacy/GLM" })?.providerId).toBe(
+      "builtin:legacy",
+    );
   });
   it.each(["custom:my-provider", "vendor/provider"])("Provider ID 无损往返 %s", (providerId) => {
     const selection = { providerId, modelId: "model" };
@@ -48,41 +52,9 @@ describe("Subagent 正式 Markdown 字段和单向文本迁移", () => {
       parseSubagentMarkdownSelection({ model: formatSubagentMarkdownModel(selection) }),
     ).toEqual(selection);
   });
-  it.each([
-    ["builtin:zai-start-plan/glm-5.3-flash", "account:zai-start-plan/GLM-5.3-Flash"],
-    [
-      "custom:builtin%3Abigmodel-coding-plan:glm-5.3",
-      "custom:account%3Abigmodel-individual-coding-plan:GLM-5.3",
-    ],
-    [
-      "builtin:bigmodel-coding-plan/glm-5.3$high",
-      "account:bigmodel-individual-coding-plan/GLM-5.3$high",
-    ],
-    [
-      "builtin:bigmodel-coding-plan/GLM/vendor",
-      "account:bigmodel-individual-coding-plan/GLM/vendor",
-    ],
-    [
-      "custom:builtin%3Azai-coding-plan:model%24variant",
-      "custom:account%3Azai-individual-coding-plan:model%24variant",
-    ],
-    [
-      "custom:builtin:bigmodel-coding-plan:GLM%2Fx",
-      "custom:account%3Abigmodel-individual-coding-plan:GLM%2Fx",
-    ],
-  ])("迁移仅改变身份，不改正文、档位和注释：%s", (before, after) => {
-    const content = `\uFEFF---\r\nname: helper\r\n# 备注\r\nmodel: '${before}' # 保留\r\nthoughtLevel: high\r\nextra: 123\r\n---\r\n正文 ${before}\r\n`;
-    const expected = content.replace(`model: '${before}'`, `model: '${after}'`);
-    expect(migrateSubagentMarkdownProvider(content)).toBe(expected);
-    expect(migrateSubagentMarkdownProvider(expected)).toBe(expected);
-  });
-  it("无 frontmatter、仅中间字段、继承、未知旧身份不改写", () => {
-    for (const content of [
-      "model: builtin:bigmodel-coding-plan/GLM",
-      '---\nmodelSelection: {"providerId":"builtin:bigmodel-coding-plan","modelId":"GLM"}\n---\nbody',
-      "---\nmodel: inherit\n---\nbody",
-      "---\nmodel: builtin:unknown/GLM\n---\nbody",
-    ])
-      expect(migrateSubagentMarkdownProvider(content)).toBe(content);
+  it("继承值与非法编码值都不产生选择", () => {
+    for (const value of ["inherit", "main", "sonnet", "opus", "haiku", "   ", "custom::nomodel"]) {
+      expect(parseSubagentMarkdownSelection({ model: value })).toBeUndefined();
+    }
   });
 });
