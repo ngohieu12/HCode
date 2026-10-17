@@ -2345,24 +2345,10 @@ const enUS: Record<string, string> = {
   "settings.shortcuts.columnHeaderBinding": "Keybinding",
   "settings.shortcuts.columnHeaderScope": "Scope",
   "settings.shortcuts.notSet": "Unassigned",
-  "settings.shortcuts.desktopOnly": "Desktop only",
   "settings.shortcuts.scopeComposer": "Composer",
   "settings.shortcuts.scopeGlobal": "Global",
-  "settings.shortcuts.recording": "Press new combination…",
-  "settings.shortcuts.recordingHint":
-    "Esc to cancel · Backspace to reset · press a new combo after a conflict",
-  "settings.shortcuts.conflictReserved": "This combination is reserved by the system",
-  "settings.shortcuts.conflictOccupied": 'Already used by "{command}"',
-  "settings.shortcuts.clearConflict":
-    'The default key is already used by "{command}"; restoring it would create a conflict. Adjust that command first',
-  "settings.shortcuts.stealConfirm": "Rebind anyway (current command loses it)",
-  "settings.shortcuts.invalidNoModifier":
-    "At least one modifier key is required (Ctrl / Cmd / Alt)",
-  "settings.shortcuts.invalidKey": "Unsupported key",
-  "settings.shortcuts.rebindAria": 'Rebind shortcut for "{command}"',
-  "settings.shortcuts.addAria": 'Add a binding for "{command}"',
-  "settings.shortcuts.removeBindingAria": 'Remove this binding for "{command}"',
-  "settings.shortcuts.duplicateBinding": "Already bound to this command",
+  "settings.shortcuts.readOnlyHint":
+    "These are the currently active shortcuts. Changing them is not supported yet.",
   "settings.shortcuts.command.newTask": "New Task",
   "settings.shortcuts.command.composerSend": "Send Message",
   "settings.shortcuts.command.composerInsertNewline": "Insert Newline in Composer",

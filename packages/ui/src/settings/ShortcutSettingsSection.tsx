@@ -1,53 +1,35 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  SHORTCUT_COMMANDS,
-  getDefaultShortcutBindings,
-  type ShortcutCommandId,
-} from "@zcode/shared";
-import { toast } from "@/components/ui/toast.js";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { SHORTCUT_COMMANDS, type ShortcutCommandId } from "@zcode/shared";
 import { usePlatform } from "@/hooks/usePlatform.js";
 import { useSettings } from "@/hooks/useSettingService.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
-import { logger } from "@/logger.js";
-import {
-  buildShortcutOverridesAfterAppend,
-  buildShortcutOverridesAfterSteal,
-  buildShortcutOverridesWithBindingAt,
-  checkShortcutBindingConflict,
-  isSamePhysicalBinding,
-} from "@/shortcuts/conflicts.js";
+import { isSamePhysicalBinding } from "@/shortcuts/conflicts.js";
 import { formatShortcutBindingLabel } from "@/shortcuts/label.js";
 import { useComposerEnterBehavior } from "@/shortcuts/useShortcutBindings.js";
 import {
   resolveEffectiveShortcutBindings,
   setShortcutRecordingActive,
 } from "@/shortcuts/bindings.js";
-import { ShortcutBindingRow, type RecordingState } from "./ShortcutBindingRow.js";
+import { ShortcutBindingRow } from "./ShortcutBindingRow.js";
 import { ShortcutSearchBar } from "./ShortcutSearchBar.js";
 import { useShortcutKeySearch } from "./useShortcutKeySearch.js";
-import { useShortcutRecording } from "./useShortcutRecording.js";
 
 /**
- * 快捷键设置分区：命令表只读展示 + 键盘录入 + 冲突处理。
- * 只读写 shortcutBindings 覆盖数据，键位语义（匹配/录制/冲突/抢绑）全部经 shortcuts 内核。
- * 系统保留键直接拒绝；app 内命令占用提示占用者并支持二次确认抢绑。
- * 单行多绑定：一个命令一行，多组键帽在键位列纵向排列；每条可点击键帽/铅笔替换，
- * 同命令物理等价重复在录制入口拒绝。
- * 不提供任何破坏性入口（删除单条 / 清空全部 / 全部恢复默认）：本页只能替换已有绑定
- * 或为未分配命令录入第一条，避免产生用户无法在页内恢复的状态；录制态 Backspace
- * 仅把单条命令还原为默认键位，属于录入操作而不是破坏性清空。
+ * 快捷键设置分区（只读）：展示命令表与当前生效键位，支持文本搜索与按组合键搜索。
+ *
+ * 本页不提供任何修改入口（录制 / 删除单条 / 清空 / 恢复默认都已移除），
+ * 键位只读展示；用户已有的 shortcutBindings 覆盖仍由内核按原语义解析并生效，
+ * 只是不能再从 UI 写入。按键搜索武装态仍需要键盘独占（显式捕获组合键、不触发命令）。
  */
-export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boolean }) {
+export function ShortcutSettingsSection() {
   const { intl } = useZCodeIntl();
-  const { settings, update } = useSettings();
+  const { settings } = useSettings();
   const platform = usePlatform();
   const [query, setQuery] = useState("");
-  const [recording, setRecording] = useState<RecordingState | null>(null);
   const keySearch = useShortcutKeySearch();
-  const savingRef = useRef(false);
 
   const overrides = settings?.shortcutBindings;
-  // composer 两条命令的默认键随 Enter 模式变化；冲突检测与恢复默认都要按同一模式计算
+  // composer 两条命令的默认键随 Enter 模式变化，展示要按同一模式解析
   const composerEnterBehavior = useComposerEnterBehavior();
   const effective = useMemo(
     () => resolveEffectiveShortcutBindings(overrides, composerEnterBehavior),
@@ -64,14 +46,13 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
     // 取局部变量：some 回调闭包里 TS 无法保持 keySearch.binding 的非空收窄
     const keyBinding = keySearch.binding;
     return SHORTCUT_COMMANDS.filter((entry) => {
-      // 这些快捷键保留注册和冲突检测，但不在用户可见列表中展示。
+      // 这些快捷键保留注册，但不在用户可见列表中展示。
       if (entry.id === "openOnboarding") return false;
       const matchesText =
         !keyword ||
         entry.id.toLowerCase().includes(keyword) ||
         commandLabel(entry.id).toLowerCase().includes(keyword);
-      // 按键过滤走冲突检测的物理等价口径（win 的 Ctrl+m ≡ CmdOrCtrl+m），
-      // 与「这组键占了谁」的冲突提示看到的是同一张表。
+      // 按键过滤沿用物理等价口径（win 的 Ctrl+m ≡ CmdOrCtrl+m）
       const matchesKey =
         keyBinding === null ||
         (effective[entry.id] ?? []).some((binding) => isSamePhysicalBinding(binding, keyBinding));
@@ -79,107 +60,11 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
     });
   }, [commandLabel, effective, keySearch.binding, query]);
 
-  const persistBindings = useCallback(
-    async (next: Record<string, string[]>) => {
-      if (savingRef.current) {
-        return;
-      }
-      savingRef.current = true;
-      try {
-        await update({ shortcutBindings: next });
-      } catch (error) {
-        logger.error("[shortcuts] 保存快捷键绑定失败", { error: String(error) });
-      } finally {
-        savingRef.current = false;
-      }
-    },
-    [update],
-  );
-
-  /** 追加一条（占位行录第一条也走这里：生效列表为空时等价于写入第一条）。 */
-  const appendBinding = useCallback(
-    (commandId: ShortcutCommandId, binding: string) => {
-      void persistBindings(
-        buildShortcutOverridesAfterAppend(overrides, commandId, binding, composerEnterBehavior),
-      );
-    },
-    [overrides, persistBindings, composerEnterBehavior],
-  );
-
-  /** 替换生效列表第 bindingIndex 条（覆盖整组替换语义，须写完整生效列表）。 */
-  const replaceBindingAt = useCallback(
-    (commandId: ShortcutCommandId, bindingIndex: number, binding: string) => {
-      void persistBindings(
-        buildShortcutOverridesWithBindingAt(
-          overrides,
-          commandId,
-          bindingIndex,
-          binding,
-          composerEnterBehavior,
-        ),
-      );
-    },
-    [overrides, persistBindings, composerEnterBehavior],
-  );
-
-  /**
-   * 二次确认后的抢绑：目标命令按录制时的行级语义写入新键（replace 指定条 / 未分配录
-   * 第一条 → append），并从占用命令移除冲突键。抢绑只改变冲突处理方式，不改变用户
-   * 原本选择的行级操作（多绑定命令抢绑不得静默删除其余绑定）。
-   */
-  const stealBinding = useCallback(
-    (commandId: ShortcutCommandId, binding: string) => {
-      const next = buildShortcutOverridesAfterSteal(overrides, commandId, binding, {
-        mode: recording?.mode,
-        bindingIndex: recording?.bindingIndex,
-        composerEnterBehavior,
-      });
-      void persistBindings(next);
-    },
-    [overrides, persistBindings, recording, composerEnterBehavior],
-  );
-
-  /**
-   * 录制态 Backspace「恢复默认」= 删除覆盖条目。默认键被同作用域其他命令占用
-   * （含物理等价，如 win 的 Ctrl+m ≡ CmdOrCtrl+m）时提示冲突且不落盘——恢复默认与录制
-   * 是同一不变量（一键一命令）的两个入口；按用户口径只提示不自动清占用方。
-   */
-  const clearBinding = useCallback(
-    (commandId: ShortcutCommandId) => {
-      if (overrides?.[commandId] === undefined) {
-        return;
-      }
-      const defaultBinding = getDefaultShortcutBindings(commandId, composerEnterBehavior)[0];
-      if (defaultBinding) {
-        const conflict = checkShortcutBindingConflict(commandId, defaultBinding, overrides, {
-          menuChannelReserved: !isDesktop,
-          composerEnterBehavior,
-        });
-        if (conflict?.kind === "occupied" && conflict.ownerCommandId) {
-          toast(
-            intl.formatMessage(
-              { id: "settings.shortcuts.clearConflict" },
-              { command: commandLabel(conflict.ownerCommandId) },
-            ),
-          );
-          return;
-        }
-      }
-      const next = { ...overrides };
-      delete next[commandId];
-      void persistBindings(next);
-    },
-    [overrides, persistBindings, isDesktop, intl, commandLabel, composerEnterBehavior],
-  );
-
-  // 录制态抑制：录制监听注册晚于 useAppKeyboard 的 capture 监听（同阶段先注册先执行），
-  // 不抑制的话录制按下的组合会先触发原命令，改键永远不成功。
-  // renderer 通道靠内核标记短路 useAppKeyboard；menu 通道靠 main 摘除菜单 accelerator
+  // 按键搜索武装态仍要抑制全局快捷键分发：监听注册晚于 useAppKeyboard 的 capture 监听，
+  // 不抑制的话按下的组合会先触发原命令，搜索永远捕获不到。menu 通道靠 main 摘除 accelerator
   // （macOS 系统菜单先于 renderer 吃键，preventDefault 拦不住）。
-  // 按键搜索武装态复用同一套键盘独占（同样是显式意图下捕获组合键，不触发命令）。
-  const keyboardExclusive = recording !== null || keySearch.armed;
   useEffect(() => {
-    if (!keyboardExclusive) {
+    if (!keySearch.armed) {
       return;
     }
     setShortcutRecordingActive(true);
@@ -188,31 +73,15 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
       setShortcutRecordingActive(false);
       platform.setShortcutRecordingActive?.(false);
     };
-  }, [keyboardExclusive, platform]);
-
-  useShortcutRecording({
-    recording,
-    setRecording,
-    effective,
-    overrides,
-    composerEnterBehavior,
-    isDesktop,
-    clearBinding,
-    appendBinding,
-    replaceBindingAt,
-  });
-
-  const recordingCommandId = recording?.commandId ?? null;
+  }, [keySearch.armed, platform]);
 
   return (
     <div className="space-y-4" data-testid="settings-shortcuts-section">
-      <ShortcutSearchBar
-        query={query}
-        onQueryChange={setQuery}
-        keySearch={keySearch}
-        // 与行内录制互斥：武装前取消进行中的录制，两套 window capture 监听不并存
-        onArmKeySearch={() => setRecording(null)}
-      />
+      <ShortcutSearchBar query={query} onQueryChange={setQuery} keySearch={keySearch} />
+
+      <p className="text-ui-sm text-foreground-subtle">
+        {intl.formatMessage({ id: "settings.shortcuts.readOnlyHint" })}
+      </p>
 
       <div className="overflow-hidden rounded-xl border border-border">
         <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_80px] bg-surface px-4 py-3 text-ui-sm text-foreground-subtle">
@@ -226,26 +95,6 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
             entry={entry}
             commandLabel={commandLabel(entry.id)}
             bindings={effective[entry.id] ?? []}
-            isOverridden={overrides?.[entry.id] !== undefined}
-            isRecording={recordingCommandId === entry.id}
-            recording={recording}
-            menuChannelUnavailable={entry.channel === "menu" && !isDesktop}
-            onRecord={(bindingIndex) => {
-              // 行内录制与按键搜索武装态互斥：两套 window capture 监听并存会互相吞键
-              keySearch.disarm();
-              setRecording({
-                commandId: entry.id,
-                mode: "replace",
-                bindingIndex,
-                preview: null,
-                error: null,
-                conflictBinding: null,
-              });
-            }}
-            onSteal={(binding) => {
-              stealBinding(entry.id, binding);
-              setRecording(null);
-            }}
           />
         ))}
         {visibleCommands.length === 0 ? (

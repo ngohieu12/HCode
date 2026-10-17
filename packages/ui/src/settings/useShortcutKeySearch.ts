@@ -6,7 +6,7 @@ export interface ShortcutKeySearch {
   armed: boolean;
   /** 已捕获的组合（null = 未启用按键过滤）。键盘独占抑制由设置页按 armed 聚合管理。 */
   binding: string | null;
-  /** 切换武装态。激活前调用方需先取消行内录制（互斥，见 ShortcutSettingsSection）。 */
+  /** 切换武装态。 */
   toggle: () => void;
   /** 退出武装态（保留已捕获组合的过滤）。 */
   disarm: () => void;
@@ -16,11 +16,11 @@ export interface ShortcutKeySearch {
 
 /**
  * 设置页「按组合键搜索」状态机（VSCode 键盘快捷键同款）：
- * Escape 退出武装态；Backspace 清除已捕获组合；其余事件经内核录制器捕获
+ * Escape 退出武装态；Backspace 清除已捕获组合；其余事件经内核的绑定捕获器解析
  * （含平台归一），成功即退出武装态、过滤保留直到手动清除。
- * 裸字母等命令表不可能出现的键（录制器 invalid）静默忽略，等待下一次有效组合。
+ * 裸字母等命令表不可能出现的键（解析器 invalid）静默忽略，等待下一次有效组合。
  * 过滤命中的比较口径是 conflicts.isSamePhysicalBinding（物理等价，win 的
- * Ctrl+m ≡ CmdOrCtrl+m），与冲突检测看到的是同一张表。
+ * Ctrl+m ≡ CmdOrCtrl+m）。
  */
 export function useShortcutKeySearch(): ShortcutKeySearch {
   const [armed, setArmed] = useState(false);

@@ -196,9 +196,9 @@ export function checkShortcutBindingConflict(
  * 把 newBinding 按行级语义绑到 commandId，并从当前占用该绑定的其他命令生效表里移除它——
  * 被抢命令写入 overrides = 其生效绑定减去 newBinding，可能为显式空数组（= 未设置，不回退默认）。
  * 物理等价归一（新）：平台等价条目（如 win 的 Ctrl+m 与 CmdOrCtrl+m）一并清除。
- * 行级语义：抢绑只改变「冲突处理方式」，不改变用户原本选择的行级操作——
- * options.mode/bindingIndex 与录制态一致：replace + 下标 → 替换该条（其余绑定保留）；
- * add 或 bindingIndex 为 null（未分配录第一条）→ 追加；缺省（旧调用方）→ 整组替换为单键。
+ * 行级语义：抢绑只改变「冲突处理方式」，不改变调用方原本选择的行级操作——
+ * replace + 下标 → 替换该条（其余绑定保留）；add 或 bindingIndex 为 null → 追加；
+ * 缺省（旧调用方）→ 整组替换为单键。
  */
 export function buildShortcutOverridesAfterSteal(
   overrides: Record<string, readonly string[]> | undefined,
@@ -206,7 +206,7 @@ export function buildShortcutOverridesAfterSteal(
   newBinding: string,
   options?: {
     platformInfo?: KeyboardShortcutPlatformInfo;
-    /** 录制模式（来自设置页 RecordingState）：replace = 行级替换，add = 追加；缺省 = 整组替换。 */
+    /** 行级语义：replace = 替换指定条，add = 追加；缺省 = 整组替换（history 兼容）。 */
     mode?: "replace" | "add";
     /** replace 模式的目标下标。 */
     bindingIndex?: number | null;

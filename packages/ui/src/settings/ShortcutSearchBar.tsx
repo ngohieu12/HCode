@@ -8,17 +8,10 @@ interface ShortcutSearchBarProps {
   query: string;
   onQueryChange: (value: string) => void;
   keySearch: ShortcutKeySearch;
-  /** 武装态与行内录制互斥：激活按键搜索前先取消进行中的行内录制。 */
-  onArmKeySearch: () => void;
 }
 
-/** 快捷键设置页搜索条：文本搜索框 + VSCode 式「按组合键搜索」按钮。 */
-export function ShortcutSearchBar({
-  query,
-  onQueryChange,
-  keySearch,
-  onArmKeySearch,
-}: ShortcutSearchBarProps) {
+/** 快捷键设置页搜索条：文本搜索框 + VSCode 式「按组合键搜索」按钮（只读列表的检索入口）。 */
+export function ShortcutSearchBar({ query, onQueryChange, keySearch }: ShortcutSearchBarProps) {
   const { intl } = useZCodeIntl();
   // VSCode 同款展示：捕获的组合键作为输入框文本从左侧显示（替代文本搜索词，
   // 文本过滤条件仍在内部生效，× 清除后回到纯文本搜索）。
@@ -47,7 +40,7 @@ export function ShortcutSearchBar({
           type="button"
           aria-label={intl.formatMessage({ id: "settings.shortcuts.keySearchClearAria" })}
           data-testid="settings-shortcut-key-search-clear"
-          className="absolute right-9 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-foreground-subtle hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="absolute right-9 top-1/2 -translate-y-1/2 cursor-pointer rounded-sm p-0.5 text-foreground-subtle hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2"
           onClick={keySearch.clear}
         >
           <X className="size-3.5" />
@@ -58,15 +51,10 @@ export function ShortcutSearchBar({
         aria-label={intl.formatMessage({ id: "settings.shortcuts.keySearchAria" })}
         aria-pressed={keySearch.armed}
         data-testid="settings-shortcut-key-search"
-        className={`absolute right-2.5 top-1/2 -translate-y-1/2 rounded-sm p-1 focus-visible:outline-2 focus-visible:outline-offset-2 ${
+        className={`absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-sm p-1 focus-visible:outline-2 focus-visible:outline-offset-2 ${
           keySearch.armed ? "text-brand" : "text-foreground-subtle hover:text-foreground"
         }`}
-        onClick={() => {
-          if (!keySearch.armed) {
-            onArmKeySearch();
-          }
-          keySearch.toggle();
-        }}
+        onClick={() => keySearch.toggle()}
       >
         <Keyboard className="size-4" />
       </button>

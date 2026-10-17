@@ -1532,9 +1532,9 @@ async function handleZCodeEndpointChanged() {
   }
 }
 
-/** 快捷键设置页录制态（renderer 经 SetShortcutRecordingActive 同步）；true 时菜单摘除可配置 accelerator。 */
+/** 快捷键设置页组合键捕获态（renderer 经 SetShortcutRecordingActive 同步）；true 时菜单摘除可配置 accelerator。 */
 let shortcutRecordingActive = false;
-/** 发起录制的 webContents id；窗口关闭/崩溃时 renderer 不会发复位 IPC，main 侧据此收口。 */
+/** 发起捕获的 webContents id；窗口关闭/崩溃时 renderer 不会发复位 IPC，main 侧据此收口。 */
 let shortcutRecordingOwnerWebContentsId: number | null = null;
 
 function setShortcutRecordingActive(active: boolean, ownerWebContentsId: number | null = null) {
@@ -1552,7 +1552,7 @@ function setShortcutRecordingActive(active: boolean, ownerWebContentsId: number 
 }
 
 /**
- * 录制态是跨进程的临时全局状态，收口不能依赖 renderer 合作——录制中关窗
+ * 捕获态是跨进程的临时全局状态，收口不能依赖 renderer 合作——捕获中关窗
  * 或渲染进程崩溃时 React cleanup 与复位 IPC 都不会执行，标志会永久为 true，之后所有
  * rebuildMenu（切语言/zoom/设置同步）都建出无 accelerator 的菜单且波及全部窗口。
  * 在既有窗口销毁清理里按发起 webContents 复位。
