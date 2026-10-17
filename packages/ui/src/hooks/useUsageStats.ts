@@ -189,7 +189,7 @@ export function useUsageStats(
 }
 
 export function useAppUsageStats(range: AppUsageRange) {
-  const { usageStatsService } = useServices();
+  const { appUsageService } = useServices();
   const [state, setState] = useState<AppUsageStatsState>({
     snapshot: null,
     loading: false,
@@ -207,7 +207,7 @@ export function useAppUsageStats(range: AppUsageRange) {
       error: null,
     }));
     try {
-      const snapshot = await usageStatsService.getAppUsageSnapshot({
+      const snapshot = await appUsageService.getAppUsageSnapshot({
         range,
         timeZone,
       });
@@ -231,7 +231,7 @@ export function useAppUsageStats(range: AppUsageRange) {
         error: message,
       }));
     }
-  }, [range, usageStatsService]);
+  }, [appUsageService, range]);
 
   useEffect(() => {
     void refresh();

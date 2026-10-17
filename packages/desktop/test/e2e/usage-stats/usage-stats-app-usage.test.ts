@@ -17,25 +17,18 @@ describe("Usage Stats App Usage E2E", () => {
     await clearAppData();
   });
 
-  it("US-AU-02/03/04/05: 聚合、range、Token Activity 与模型图表", async function () {
+  it("US-AU-02/03/04/05: 聚合、range 与模型用量表格", async function () {
     this.timeout(120_000);
     await openAppUsage();
 
     await assertBodyIncludes(["e2e-model-alpha", "e2e-model-beta"]);
-    await assertBodyIncludesAny(["Token Activity", "Token 活动"]);
-    await assertBodyIncludesAny(["Daily Token Trend", "每日 Token 趋势图"]);
-    // 模型用量已从饼图换成两张横向柱状图（按 token / 按请求数各取前 10）。
+    // 图表现已整体移除：不再有热力图与每日趋势图，模型用量改为表格。
+    await assertBodyExcludes(["Token Activity", "Token 活动"]);
+    await assertBodyExcludes(["Daily Token Trend", "每日 Token 趋势图"]);
     await assertBodyIncludesAny(["Model Usage", "模型用量", "Mức sử dụng model"]);
-    await assertBodyIncludesAny([
-      "Top 10 models by tokens",
-      "Token 用量前 10 的模型",
-      "Top 10 model theo token",
-    ]);
-    await assertBodyIncludesAny([
-      "Top 10 models by requests",
-      "请求数前 10 的模型",
-      "Top 10 model theo số request",
-    ]);
+    // 表格两列数值都可排序：表头是按钮。
+    await assertBodyIncludesAny(["Tokens", "Token 用量"]);
+    await assertBodyIncludesAny(["Requests", "请求数"]);
     // tokenNumberFormat 按 locale compact：英文为 9.5K，中文在 1 万以下保留 9510。
     await assertBodyIncludesAny(["9.5K", "9,510", "9510"]);
 
@@ -44,11 +37,6 @@ describe("Usage Stats App Usage E2E", () => {
     await assertBodyIncludes(["e2e-model-alpha", "e2e-model-beta"]);
     // 7d 使用精确时间戳边界，恰好第 7 天的 fixture 会落在窗口外。
     await assertBodyIncludesAny(["2.4K", "2,406", "2406"]);
-
-    await clickButtonByText(["Weekly", "每周"]);
-    await assertPressedButton(["Weekly", "每周"]);
-    await clickButtonByText(["Cumulative", "累计"]);
-    await assertPressedButton(["Cumulative", "累计"]);
 
     await clickButtonByText(["Last 30 days", "近 30 日"]);
     await assertPressedButton(["Last 30 days", "近 30 日"]);
@@ -86,7 +74,7 @@ async function openAppUsage(): Promise<void> {
     timeoutMsg: "App Usage tab 没有出现",
   });
   await browser.waitUntil(
-    async () => /Token activity|Token 活动/i.test(await $("body").getText()),
+    async () => /Model Usage|模型用量|Mức sử dụng model/i.test(await $("body").getText()),
     { timeout: 30_000, timeoutMsg: "App Usage 数据没有完成加载" },
   );
 }
