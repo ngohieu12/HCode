@@ -143,7 +143,9 @@ describe("AutomationRepo 调度状态机", () => {
     }
   });
 
-  it("旧账号与自定义选择仅凭存储即可导入，不需要账号或候选配置", async () => {
+  it("旧内置供应商选择不再被导入：0002 迁移空转，旧列原样保留", async () => {
+    // Bug 根因：内置供应商（builtin:* / account:*）已整体下线，把旧选择迁到一个
+    // 不存在的供应商比留空更危险——留空会提示用户重选，迁错会静默跑在空连接上。
     const first = await repo.create(makeParams(), { nextRunAt: NOW + MINUTE });
     const second = await repo.create(makeParams(), { nextRunAt: NOW + MINUTE });
     const db = new DatabaseSync(dbPath);
@@ -159,14 +161,12 @@ describe("AutomationRepo 调度状态机", () => {
     repo = new AutomationRepo(dbPath);
     const list = await repo.list();
     expect(
-      list.find((item) => item.automationId === first.automationId)?.modelSelection?.providerId,
-    ).toBe("account:bigmodel-individual-coding-plan");
+      list.find((item) => item.automationId === first.automationId)?.modelSelection,
+    ).toBeUndefined();
     expect(
-      list.find((item) => item.automationId === second.automationId)?.modelSelection?.providerId,
-    ).toBe("custom-provider");
-    expect((await repo.get(first.automationId))?.modelSelection?.providerId).toBe(
-      "account:bigmodel-individual-coding-plan",
-    );
+      list.find((item) => item.automationId === second.automationId)?.modelSelection,
+    ).toBeUndefined();
+    expect((await repo.get(first.automationId))?.modelSelection).toBeUndefined();
   });
 
   it("delete：返回真实删除结果并限定 workspace", async () => {
@@ -180,7 +180,7 @@ describe("AutomationRepo 调度状态机", () => {
   it.each([
     "builtin:zai-coding-plan/GLM-5.3-Flash",
     "custom:builtin%3Azai-coding-plan:GLM-5.3-Flash",
-  ])("旧定时任务解码 %s，并在新列固定迁移结果但保留回滚字段", async (legacyModel) => {
+  ])("旧定时任务编码 %s 不再被解码：旧列保留，新列留空等用户重选", async (legacyModel) => {
     const created = await repo.create(makeParams(), { nextRunAt: NOW });
     repo.close();
     const db = new DatabaseSync(dbPath);
@@ -190,12 +190,7 @@ describe("AutomationRepo 调度状态机", () => {
     db.exec("DELETE FROM tasks_schema_migration WHERE id='0002_provider_selection'");
     db.close();
     repo = new AutomationRepo(dbPath);
-    const expected = {
-      providerId: "account:zai-individual-coding-plan",
-      modelId: "GLM-5.3-Flash",
-      options: { reasoningLevel: "high" },
-    };
-    expect((await repo.get(created.automationId))?.modelSelection).toEqual(expected);
+    expect((await repo.get(created.automationId))?.modelSelection).toBeUndefined();
     await repo.update(created.automationId, { title: "Edited title" });
     repo.close();
     const persistedDb = new DatabaseSync(dbPath);
@@ -205,10 +200,10 @@ describe("AutomationRepo 调度状态机", () => {
       )
       .get(created.automationId);
     persistedDb.close();
+    // 回滚字段原样保留：迁移不再改写历史数据。
     expect(row).toMatchObject({ model: legacyModel, provider: "glm", thought_level: "high" });
-    expect(JSON.parse(String(row?.model_selection))).toEqual(expected);
     repo = new AutomationRepo(dbPath);
-    expect((await repo.get(created.automationId))?.modelSelection).toEqual(expected);
+    expect((await repo.get(created.automationId))?.modelSelection).toBeUndefined();
   });
 
   it.each(["null", "{}", "{broken"])(

@@ -183,6 +183,13 @@ const viVN: Record<string, string> = {
   "settings.usage.modelChart.metric.tokens": "Token",
   "settings.usage.modelChart.metric.requests": "Số request",
   "settings.usage.modelChart.requestUnit": "request",
+  "settings.usage.modelTableTitle": "Mức sử dụng model",
+  "settings.usage.modelTable.model": "Model",
+  "settings.usage.modelTable.tokens": "Token",
+  "settings.usage.modelTable.requests": "Số request",
+  "settings.usage.modelTable.total": "Tổng",
+  "settings.usage.modelTable.sortBy": "Sắp xếp theo {metric}",
+  "settings.usage.modelTable.modelCount": "{count} model",
 };
 
 export default viVN;

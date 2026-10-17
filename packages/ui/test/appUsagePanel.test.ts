@@ -1,10 +1,9 @@
 // @vitest-environment jsdom
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { readFile } from "node:fs/promises";
-import type { AppUsageRange, AppUsageSnapshot } from "@zcode/shared";
+import type { AppUsageModelUsage, AppUsageRange, AppUsageSnapshot } from "@zcode/shared";
 import type { IServiceAccessor } from "@zcode/services";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 import { ServiceProvider } from "@/hooks/useServices.js";
@@ -12,6 +11,11 @@ import {
   AppUsageLifetimeSummaryStrip,
   AppUsagePanel,
 } from "@/settings/usage-stats/AppUsagePanel.js";
+import {
+  buildAppUsageModelRows,
+  sortAppUsageModelRows,
+  type AppUsageModelRow,
+} from "@/settings/usage-stats/AppUsageModelTable.js";
 
 vi.mock("@/ControlHintTooltip.js", () => ({
   ControlHintTooltip: ({ children, title }: { children: ReactNode; title: string }) =>
@@ -83,13 +87,25 @@ function createOneDayHeatmap(totalTokens: number): AppUsageSnapshot["heatmap"] {
   };
 }
 
+function createModels(): AppUsageModelUsage[] {
+  return [
+    { modelId: "glm-4.6", totalTokens: 900, inputTokens: 0, outputTokens: 0, requestCount: 3, share: 0 },
+    { modelId: "glm-5.3", totalTokens: 100, inputTokens: 0, outputTokens: 0, requestCount: 9, share: 0 },
+    // 未记录 modelId 的归组行：有量就必须展示，回退成"未知模型"。
+    { modelId: null, totalTokens: 40, inputTokens: 0, outputTokens: 0, requestCount: 2, share: 0 },
+    // token 与请求数都是 0 的历史模型不应进表。
+    { modelId: "glm-4.5-air", totalTokens: 0, inputTokens: 0, outputTokens: 0, requestCount: 0, share: 0 },
+  ];
+}
+
 function createServices(): IServiceAccessor {
   return {
-    usageStatsService: {
+    appUsageService: {
       getAppUsageSnapshot: vi.fn(async ({ range }: { range: AppUsageRange }) =>
         createSnapshot({
           range,
           heatmap: range === "all" ? createOneDayHeatmap(99) : createOneDayHeatmap(10),
+          models: createModels(),
           summary: {
             ...createSnapshot().summary,
             totalTokens: range === "all" ? 20_650_000_000 : 389_000,
@@ -112,6 +128,9 @@ function createServices(): IServiceAccessor {
 }
 
 afterEach(() => {
+  // vitest 未开 globals，testing-library 不会自动卸载上一轮的 DOM；
+  // 不清理的话第二个用例会查到两份面板（findByText 命中多元素直接抛错）。
+  cleanup();
   vi.restoreAllMocks();
 });
 
@@ -145,16 +164,7 @@ describe("AppUsageLifetimeSummaryStrip", () => {
     expect(html).not.toContain("sm:border-l");
   });
 
-  it("keeps the selected range for charts but removes the old range metric cards", async () => {
-    // Bugfix: 两张图表是 lazy(() => import(...))（产品侧为了不让 Recharts/decimal.js 拖慢
-    // 启动才按需加载），全量高负载下测试 worker 现场编译图表模块图会超过 waitFor 5s，
-    // 「正在统计中」Suspense fallback 消失不了（a7cade07fb 曾放宽到 5s 仍不够）。
-    // 渲染前用与组件内 lazy 完全一致的 specifier 预热模块，动态 import 命中缓存立即
-    // resolve，占位不再依赖机器负载；若图表模块本身加载失败，预热会在此处直接报错。
-    await Promise.all([
-      import("@/settings/usage-stats/AppUsageDailyModelTrendChart.js"),
-      import("@/settings/usage-stats/AppUsageTopModelsBarChart.js"),
-    ]);
+  it("renders the lifetime strip, range tabs and a sortable model table without charts", async () => {
     render(
       createElement(
         ServiceProvider,
@@ -163,114 +173,95 @@ describe("AppUsageLifetimeSummaryStrip", () => {
       ),
     );
 
-    await screen.findByText("累计 Token 数");
-    // Bugfix: 加载过程中"正在统计中"占位会同时出现多个，queryByText 命中多元素时
-    // 直接抛错（全量负载下 waitFor 默认 1s 内未收敛就以 multiple elements 超时）。
-    // 改用 queryAllByText 断言占位全部消失，并放宽到 5s 容忍负载下慢收敛。
-    await waitFor(
-      () => {
-        expect(screen.queryAllByText("正在统计中")).toHaveLength(0);
-      },
-      { timeout: 5000 },
-    );
+    // 先等表格出现（累计摘要条在快照到达前就已渲染，不能作为数据就绪的信号）。
+    expect(await screen.findByRole("button", { name: "Token 用量" }, { timeout: 10_000 })).toBeTruthy();
+    expect(screen.getByText("累计 Token 数")).toBeTruthy();
+    // 图表已整体移除：趋势图、模型柱状图与热力图都不应再出现。
+    expect(screen.queryByText("每日 Token 趋势图")).toBeNull();
+    expect(screen.queryByText("Token 活动")).toBeNull();
+    expect(screen.queryByText("正在统计中")).toBeNull();
+    // 表格表头：模型 / Token 用量 / 请求数，两列数值都可点按排序。
+    expect(screen.getByRole("button", { name: "请求数" })).toBeTruthy();
+    expect(screen.getByText("时间范围")).toBeTruthy();
+    expect(screen.getByText("近 7 日").getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByText("近 30 日").getAttribute("aria-selected")).toBe("false");
 
-    const lifetimeTitle = screen.getByText("累计 Token 数");
-    const tokenActivityTitle = screen.getByText("Token 活动");
-    const rangeTitle = screen.getByText("时间范围");
-    expect(
-      lifetimeTitle.compareDocumentPosition(tokenActivityTitle) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(
-      tokenActivityTitle.compareDocumentPosition(rangeTitle) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(rangeTitle).toBeTruthy();
-    expect(document.body.innerHTML).toContain("99");
-    const sevenDayTab = screen.getByText("近 7 日");
-    const thirtyDayTab = screen.getByText("近 30 日");
-    expect(sevenDayTab.getAttribute("aria-selected")).toBe("true");
-    expect(thirtyDayTab.getAttribute("aria-selected")).toBe("false");
-    expect(await screen.findByText("每日 Token 趋势图")).toBeTruthy();
-    expect(screen.queryByText("趋势图")).toBeNull();
-    expect(screen.queryByText("按天 Token 趋势")).toBeNull();
-    expect(document.body.innerHTML).toContain("rounded-full bg-surface");
-    expect(document.body.innerHTML).toContain("group-data-horizontal/tabs:h-7");
-    expect(document.body.innerHTML).toContain("px-2.5 py-0 text-ui-sm");
-    expect(document.body.innerHTML).not.toContain("w-16");
-    expect(document.body.innerHTML).not.toContain("rounded-lg border border-border");
-    expect(screen.queryByText("tokens 用量")).toBeNull();
-    expect(screen.queryByText("会话数量")).toBeNull();
-    expect(screen.queryByText("消息数量")).toBeNull();
-    expect(screen.queryByText("活跃天数")).toBeNull();
-    expect(screen.queryByText("最常用模型")).toBeNull();
+    const rows = screen.getAllByTestId("app-usage-model-row");
+    expect(rows).toHaveLength(3);
+    // 默认按 Token 用量降序。
+    expect(rows[0]?.textContent).toContain("glm-4.6");
+    expect(rows[1]?.textContent).toContain("glm-5.3");
+    expect(rows[2]?.textContent).toContain("未知模型");
+    // 合计行仍然给出全量口径。
+    expect(screen.getByText("合计")).toBeTruthy();
   });
 
-  it("replaces the model usage pie chart with horizontal top-model bar charts", async () => {
-    const [dailyChartSource, modelChartSource, panelSource] = await Promise.all(
-      [
-        "packages/ui/src/settings/usage-stats/AppUsageDailyModelTrendChart.tsx",
-        "packages/ui/src/settings/usage-stats/AppUsageTopModelsBarChart.tsx",
-        "packages/ui/src/settings/usage-stats/AppUsagePanel.tsx",
-      ].map((path) => readFile(path, "utf8")),
+  it("sorts the model table by tokens or requests from the column headers", async () => {
+    render(
+      createElement(
+        ServiceProvider,
+        { services: createServices() },
+        createElement(ZCodeIntlProvider, { initialLocale: "zh-CN" }, createElement(AppUsagePanel)),
+      ),
     );
 
-    // 旧饼图的色块图例（role="list"）随饼图一起移除：模型名现在画在横轴刻度上。
-    expect(dailyChartSource.indexOf('role="list"')).toBeGreaterThan(-1);
-    expect(modelChartSource).not.toContain('role="list"');
-    expect(modelChartSource).not.toContain("PieChart");
-    expect(modelChartSource).not.toContain("md:grid-cols-2");
-    expect(modelChartSource).not.toContain("grid grid-cols-[auto_minmax(0,1fr)_auto]");
-    expect(modelChartSource).toContain('layout="vertical"');
-    expect(modelChartSource).toContain('type="category"');
-    expect(modelChartSource).toContain("<LabelList");
-    expect(dailyChartSource).not.toContain("rounded-md bg-surface/60");
-    expect(modelChartSource).not.toContain("rounded-md bg-surface/60");
-    expect(dailyChartSource).toContain('className="space-y-3 rounded-xl bg-surface p-4"');
-    // 两个榜共用一个「模型用量」小节，不再各自带一份 section 外框。
-    expect(panelSource).toContain('className="space-y-4 rounded-xl bg-surface p-4"');
-    expect(panelSource).toContain('<AppUsageTopModelsBarChart metric="tokens"');
-    expect(panelSource).toContain('<AppUsageTopModelsBarChart metric="requests"');
+    const modelNames = () =>
+      screen
+        .getAllByTestId("app-usage-model-row")
+        .map((row) => row.querySelector("th")?.textContent ?? "");
+
+    await screen.findByRole("button", { name: "请求数" }, { timeout: 10_000 });
+    expect(modelNames()).toEqual(["glm-4.6", "glm-5.3", "未知模型"]);
+
+    // 点「请求数」切到请求维度（默认降序）：glm-5.3 请求最多。
+    fireEvent.click(screen.getByRole("button", { name: "请求数" }));
+    expect(modelNames()).toEqual(["glm-5.3", "glm-4.6", "未知模型"]);
+
+    // 再点同一列切换升/降序。
+    fireEvent.click(screen.getByRole("button", { name: "请求数" }));
+    expect(modelNames()).toEqual(["未知模型", "glm-4.6", "glm-5.3"]);
+
+    // 切回「Token 用量」列重新按 token 降序。
+    fireEvent.click(screen.getByRole("button", { name: "Token 用量" }));
+    expect(modelNames()).toEqual(["glm-4.6", "glm-5.3", "未知模型"]);
   });
 
-  it("uses small typography for chart content while keeping chart titles unchanged", async () => {
-    const [
-      chartUiSource,
-      dailyChartSource,
-      modelChartSource,
-      heatmapSource,
-      codingPlanSource,
-      codingPlanLineSource,
-    ] = await Promise.all(
-      [
-        "packages/ui/src/components/ui/chart.tsx",
-        "packages/ui/src/settings/usage-stats/AppUsageDailyModelTrendChart.tsx",
-        "packages/ui/src/settings/usage-stats/AppUsageTopModelsBarChart.tsx",
-        "packages/ui/src/settings/usage-stats/UsageHeatmap.tsx",
-        "packages/ui/src/settings/usage-stats/CodingPlanUsagePanel.tsx",
-        "packages/ui/src/settings/usage-stats/CodingPlanUsageLineChart.tsx",
-      ].map((path) => readFile(path, "utf8")),
-    );
+  it("builds model rows from the snapshot and drops zero-volume models", () => {
+    const intl = { formatMessage: ({ id }: { id: string }) => id };
+    const rows = buildAppUsageModelRows({ intl, snapshot: createSnapshot({ models: createModels() }) });
 
-    expect(chartUiSource).toContain("justify-center text-ui-sm");
-    expect(chartUiSource).toContain("text-ui-sm/relaxed");
-    expect(dailyChartSource).toContain('className="flex min-w-0 items-center gap-2 text-ui-sm"');
-    expect(dailyChartSource).toContain('<h3 className="text-ui-base font-medium text-foreground">');
-    expect(modelChartSource).toContain("font-mono font-medium tabular-nums");
-    expect(modelChartSource).toContain("font-mono text-ui-sm text-foreground-subtle tabular-nums");
-    expect(modelChartSource).toContain('<h4 className="text-ui-base font-medium text-foreground">');
-    expect(heatmapSource).toContain(
-      'className="min-w-0 truncate text-ui-sm text-foreground-subtle"',
-    );
-    expect(heatmapSource).toContain(
-      '<h3 className="min-w-0 truncate text-ui-base font-medium text-foreground">',
-    );
-    expect(codingPlanSource).toContain(
-      'className="mt-3 flex flex-wrap items-center gap-3 text-ui-sm"',
-    );
-    expect(codingPlanSource).toContain(
-      'className="flex min-w-0 items-center gap-1 rounded-md px-2 py-1 text-ui-sm"',
-    );
-    expect(codingPlanLineSource).toContain(
-      'className="flex min-w-0 items-center gap-2 text-ui-sm"',
-    );
+    expect(rows.map((row) => row.label)).toEqual(["glm-4.6", "glm-5.3", "settings.usage.unknownModel"]);
+    expect(rows.map((row) => row.totalTokens)).toEqual([900, 100, 40]);
+    expect(rows.map((row) => row.requestCount)).toEqual([3, 9, 2]);
+  });
+
+  it("sorts rows by either metric in both directions with a stable tie-break", () => {
+    const rows: AppUsageModelRow[] = [
+      { key: "a", label: "a", totalTokens: 10, requestCount: 1 },
+      { key: "b", label: "b", totalTokens: 30, requestCount: 1 },
+      { key: "c", label: "c", totalTokens: 30, requestCount: 5 },
+    ];
+
+    expect(sortAppUsageModelRows(rows, "tokens", "desc").map((row) => row.key)).toEqual([
+      "b",
+      "c",
+      "a",
+    ]);
+    expect(sortAppUsageModelRows(rows, "tokens", "asc").map((row) => row.key)).toEqual([
+      "a",
+      "b",
+      "c",
+    ]);
+    // 请求数同分时沿用协议顺序（a 在 b 之前）。
+    expect(sortAppUsageModelRows(rows, "requests", "desc").map((row) => row.key)).toEqual([
+      "c",
+      "a",
+      "b",
+    ]);
+    expect(sortAppUsageModelRows(rows, "requests", "asc").map((row) => row.key)).toEqual([
+      "a",
+      "b",
+      "c",
+    ]);
   });
 });

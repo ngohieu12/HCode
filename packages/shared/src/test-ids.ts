@@ -440,8 +440,6 @@ export const TID_SUBAGENT_BUILT_IN_MODEL_TRIGGER = "subagent-built-in-model-trig
 export const TID_SETTINGS_USAGE_TAB = "settings-usage-tab";
 /** 侧边栏头像菜单剩余额度子菜单入口 */
 export const TID_SIDEBAR_USAGE_REMAINING_TRIGGER = "sidebar-usage-remaining-trigger";
-/** 侧边栏头像菜单使用统计入口 */
-export const TID_SIDEBAR_CODING_PLAN_USAGE_BUTTON = "sidebar-coding-plan-usage-button";
 
 // Model Provider Settings
 /** 模型供应商顶部添加按钮 */
@@ -456,11 +454,6 @@ export const TID_MODEL_PROVIDER_TEMPLATE_BACK_BUTTON = "model-provider-template-
 export const TID_MODEL_PROVIDER_NAV_ITEM = "model-provider-nav-item";
 /** 模型供应商连接方式下拉触发器 */
 export const TID_MODEL_PROVIDER_CONNECTION_MODE_TRIGGER = "model-provider-connection-mode-trigger";
-/** 设置页已有 Start Plan 的数量快捷入口。 */
-export const TID_MODEL_PROVIDER_START_PLAN_COUNT_SHORTCUT =
-  "model-provider-start-plan-count-shortcut";
-export const TID_MODEL_PROVIDER_START_PLAN_SWITCH_PREFIX =
-  "model-provider-start-plan-switch-prefix";
 /** 模型供应商连接方式下拉项（动态后缀为连接方式 key） */
 export const TID_MODEL_PROVIDER_CONNECTION_MODE_ITEM = "model-provider-connection-mode-item";
 /** 模型供应商详情 API Key 输入框 */
@@ -695,20 +688,6 @@ export const TID_AUTOMATIONS_STATUS_FILTER = "automations-status-filter";
 export const TID_AUTOMATION_CREATE_MENU = "automation-create-menu";
 export const TID_AUTOMATION_CREATE_MANUALLY = "automation-create-manually";
 export const TID_AUTOMATION_CARD = "automation-card";
-// 闲时任务（off-peak，独立面）
-export const TID_OFFPEAK_CREATE_BUTTON = "offpeak-create-button";
-export const TID_OFFPEAK_CARD = "offpeak-card";
-/** 闲时卡片脚注：绑定会话标题（会话内创建）。 */
-export const TID_OFFPEAK_CARD_SESSION = "offpeak-card-session";
-export const TID_OFFPEAK_CARD_MENU = "offpeak-card-menu";
-export const TID_OFFPEAK_EDIT_VIEW = "offpeak-edit-view";
-export const TID_OFFPEAK_EDIT_SUBMIT = "offpeak-edit-submit";
-export const TID_OFFPEAK_FORM_TITLE = "offpeak-form-title";
-export const TID_OFFPEAK_FORM_INSTRUCTIONS = "offpeak-form-instructions";
-export const TID_OFFPEAK_ACTION_PAUSE = "offpeak-action-pause";
-export const TID_OFFPEAK_ACTION_CONTINUE = "offpeak-action-continue";
-export const TID_OFFPEAK_ACTION_DELETE = "offpeak-action-delete";
-export const TID_OFFPEAK_TAB = "offpeak-tab";
 export const TID_AUTOMATION_CARD_MENU = "automation-card-menu";
 export const TID_AUTOMATION_ACTION_TOGGLE = "automation-action-toggle";
 export const TID_AUTOMATION_ACTION_DELETE = "automation-action-delete";
@@ -752,7 +731,6 @@ export const TID_MANUAL_CLAIM_PLAN_BANNER = "manual-claim-plan-banner";
 export const TID_PLUGIN_UI_CARD = "plugin-ui-card";
 export const TID_PLUGIN_UI_OPEN_SIDE_PANE = "plugin-ui-open-side-pane";
 export const TID_PLUGIN_UI_WEBVIEW = "plugin-ui-webview";
-export const TID_START_PLAN_RECOMMENDATION_DIALOG = "start-plan-recommendation-dialog";
 
 /** 用户反馈的诊断日志授权开关 */
 export const TID_FEEDBACK_LOGS_OPT_IN = "feedback-logs-opt-in";

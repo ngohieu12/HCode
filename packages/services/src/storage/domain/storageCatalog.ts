@@ -61,7 +61,6 @@ const FILE_RULES: FileRule[] = [
   { categoryId: "backups", pattern: /^v2\/[^/]+\.backup\.json$/ },
   { categoryId: "backups", pattern: /^v2\/setting\.json\.(?:corrupt-|[^/]*backup)[^/]*$/ },
   { categoryId: "backups", pattern: /^v2\/config\.json\.pre-[^/]+$/ },
-  { categoryId: "toolOutputs", pattern: /^v2\/coding-plan-cache\.json$/ },
   // Bot 历史缓存仅供资源管理器识别展示，不加载配置或启动渠道。
   { categoryId: "toolOutputs", pattern: /^v2\/bots-model-cache[^/]*\.json$/ },
   { categoryId: "logs", pattern: /^computer-use\/run\/[^/]+\.log$/ },

@@ -11,8 +11,6 @@ import {
   TEST_ZAI_OAUTH_CLIENT_ID,
   TEST_ZAI_OAUTH_ORIGIN,
   TEST_ZCODE_ENDPOINT_ORIGIN,
-  buildBigModelCodingPlanPersonalManageUrl,
-  buildBigModelCodingPlanTeamManageUrl,
   buildBigModelApiUrl,
   buildRuntimeZCodeApiUrl,
   buildRuntimeZaiBusinessUrl,
@@ -181,21 +179,6 @@ describe("zcodeEndpoint", () => {
     expect(resolveBigModelApiOrigin({ ZCODE_ENV: "test" })).toBe("https://bigmodel.cn");
     expect(buildBigModelApiUrl({ ZCODE_ENV: "test" }, "/api/biz/subscription/list")).toBe(
       "https://bigmodel.cn/api/biz/subscription/list",
-    );
-  });
-
-  it("derives BigModel Coding Plan manage urls from ZCODE_ENV", () => {
-    expect(buildBigModelCodingPlanPersonalManageUrl({ ZCODE_ENV: "test" })).toBe(
-      "https://bigmodel.cn/coding-plan/personal/overview",
-    );
-    expect(buildBigModelCodingPlanPersonalManageUrl({ ZCODE_ENV: "production" })).toBe(
-      "https://bigmodel.cn/coding-plan/personal/overview",
-    );
-    expect(buildBigModelCodingPlanTeamManageUrl({ ZCODE_ENV: "test" })).toBe(
-      "https://bigmodel.cn/coding-plan/team/plans",
-    );
-    expect(buildBigModelCodingPlanTeamManageUrl({ ZCODE_ENV: "production" })).toBe(
-      "https://bigmodel.cn/coding-plan/team/plans",
     );
   });
 

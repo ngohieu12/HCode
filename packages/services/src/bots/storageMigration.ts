@@ -1,7 +1,5 @@
 import {
   decodeCustomModelValue,
-  migrateLegacyModelProviderId,
-  migrateLegacyOfficialGlmModelId,
   modelSelectionSchema,
   ZCODE_AGENT_PROVIDER,
   type ModelSelection,
@@ -18,33 +16,23 @@ function migrateSelection(options: Record<string, unknown>): ModelSelection | un
     // Bug 根因：旧 thoughtLevel 曾覆盖已保存的新档位；新字段存在时禁止回读旧字段。
     const parsed = modelSelectionSchema.safeParse(options.modelSelection);
     if (!parsed.success) return undefined;
-    const selection = parsed.data;
-    if (!selection.providerId.startsWith("builtin:")) return selection;
-    const providerId = migrateLegacyModelProviderId(selection.providerId);
-    return providerId
-      ? {
-          ...selection,
-          providerId,
-          modelId: migrateLegacyOfficialGlmModelId(selection.providerId, selection.modelId),
-        }
-      : undefined;
+    // 内置 Provider 已移除：不再有旧 ID 的迁移落点，保存的选择原样搬入 v3。
+    return parsed.data;
   }
   const value = typeof options.model === "string" ? options.model.trim() : "";
   const custom = decodeCustomModelValue(value);
   const separator = value.indexOf("/");
-  const oldProviderId =
+  const providerId =
     custom?.providerId ?? (separator > 0 ? value.slice(0, separator) : undefined);
   const modelId = custom?.modelName ?? (separator > 0 ? value.slice(separator + 1) : undefined);
-  if (!oldProviderId || !modelId) return undefined;
-  const providerId = migrateLegacyModelProviderId(oldProviderId);
+  if (!providerId || !modelId) return undefined;
   // 仅接受明确身份，不再按模型名唯一匹配其他供应商，也不把裸模型名解释为 Agent Provider。
   // Bug 根因：候选为空时曾把明确旧选择永久写空到 v3；迁移只搬意图，不能检查当前可用性。
-  if (!providerId) return undefined;
   const reasoningLevel =
     typeof options.thoughtLevel === "string" ? options.thoughtLevel.trim() : "";
   return {
     providerId,
-    modelId: migrateLegacyOfficialGlmModelId(oldProviderId, modelId),
+    modelId,
     ...(reasoningLevel ? { options: { reasoningLevel } } : {}),
   };
 }

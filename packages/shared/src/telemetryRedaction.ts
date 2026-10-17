@@ -10,9 +10,6 @@
  */
 
 import { decodeCustomModelValue } from "./custom-model-value.js";
-import { migrateLegacyModelProviderId } from "./legacy-model-provider-identity.js";
-import { isBuiltinModelProviderId } from "./model-provider-types.js";
-import { OFFICIAL_GLM_MODEL_IDS } from "./official-glm-model-id.js";
 
 /** 单字段默认上限；ARMS 单字段过长会被截断或拒绝，主动截断保证关键头部一定上得去。 */
 export const TELEMETRY_TEXT_MAX_LENGTH = 2_048;
@@ -140,22 +137,7 @@ function redactTelemetryRouteSegment(segment: string): string {
   return segment.slice(0, TELEMETRY_ROUTE_SEGMENT_MAX_LENGTH);
 }
 
-/** 官方 GLM 名单之外的历史内置模型；仍是 ZCode 自己发布的稳定 ID，不是用户命名。 */
-const TELEMETRY_LEGACY_BUILTIN_MODEL_IDS: readonly string[] = ["charglm-4", "codegeex-4", "emohaa"];
-
-/**
- * telemetry 模型白名单：只有这里的内置稳定模型 ID 允许原样进入遥测。
- *
- * 白名单独立于账号返回的运行时 catalog，但以人工维护的官方 GLM 名单为来源：
- * 修复原因：此前手抄一份列表漏掉了 GLM-5.3 / GLM-5.3-Flash / GLM-5V-Turbo，导致旗舰模型在
- * plan_* / perf_ui_* 里整体写成 `custom`。派生自官方名单后，两处不会再各自漂移。
- */
-export const TELEMETRY_SAFE_BUILTIN_MODEL_IDS: ReadonlySet<string> = new Set([
-  ...OFFICIAL_GLM_MODEL_IDS.map((id) => id.toLowerCase()),
-  ...TELEMETRY_LEGACY_BUILTIN_MODEL_IDS,
-]);
-
-export type TelemetryProviderScope = "builtin" | "custom" | "unknown";
+export type TelemetryProviderScope = "custom" | "unknown";
 
 export interface TelemetryProviderIdentity {
   providerId: string;
@@ -163,19 +145,9 @@ export interface TelemetryProviderIdentity {
 }
 
 /**
- * 旧报表身份（`builtin:zai` / `builtin:zai-start-plan` 等）是 ZCode 自己的固定 ID。
- *
- * 修复原因：V4 supervisor 投影 /report detail 时会用 legacyTelemetryProviderId 把运行时
- * `account:*` 映射成这些旧身份，plan_ttft / perf_ui_* 复用同一份 detail。只认 `account:*`
- * 会让全部内置用户被当成自定义 provider 归一为 `custom`。复用 shared 的单向迁移表判定，
- * 未知的 `builtin:` 前缀仍按自定义处理，不能借前缀混入。
+ * 内置 Provider 已全部移除：所有 Provider 都由用户自行命名，原样上报会泄露私有名称并制造高基数，
+ * 因此统一归一为 `custom`。空的 Provider 身份仍保留 `unknown`，与既有留空口径一致。
  */
-function isLegacyBuiltinTelemetryProviderId(providerId: string): boolean {
-  const migrated = migrateLegacyModelProviderId(providerId);
-  return migrated !== undefined && migrated !== providerId;
-}
-
-/** 内置 provider 保留稳定 ID；自定义 provider 由用户命名，原样上报会泄露私有名称并制造高基数。 */
 export function resolveTelemetryProviderScope(
   providerId: string | undefined | null,
 ): TelemetryProviderIdentity {
@@ -183,30 +155,12 @@ export function resolveTelemetryProviderScope(
   if (!normalized) {
     return { providerId: "", providerScope: "unknown" };
   }
-  if (isBuiltinModelProviderId(normalized) || isLegacyBuiltinTelemetryProviderId(normalized)) {
-    return { providerId: normalized, providerScope: "builtin" };
-  }
   return { providerId: "custom", providerScope: "custom" };
 }
 
 /**
- * 从 `custom:<providerId>:<modelName>` 编码值或 `<providerId>/<modelId>` 复合值里剥出裸模型 ID。
- * 裸 ID 只用于查白名单，无论 provider 部分是什么都不会原样进入遥测。
- */
-function extractBareModelId(value: string): string {
-  const decoded = decodeCustomModelValue(value);
-  if (decoded) {
-    return decoded.modelName ?? "";
-  }
-  const separator = value.indexOf("/");
-  return separator > 0 ? value.slice(separator + 1) : value;
-}
-
-/**
- * 只保留白名单内的内置模型 ID。
- *
- * 自定义 provider 的模型、内置 provider 下未命中白名单的模型统一写 `custom`；
- * provider scope 未知或模型缺失时写空串，与既有留空口径一致。
+ * 内置模型白名单随内置 Provider 一并移除：任何模型 ID 都来自用户自定义 Provider，
+ * 统一写成 `custom`；provider scope 未知或模型缺失时写空串，与既有留空口径一致。
  */
 export function resolveTelemetryModelId(
   providerScope: TelemetryProviderScope,
@@ -216,21 +170,15 @@ export function resolveTelemetryModelId(
   if (!normalized || providerScope === "unknown") {
     return "";
   }
-  if (providerScope === "custom") {
-    return "custom";
-  }
-  // 修复原因：supervisor 投影出的 detail.model_name 是 `<providerId>/<modelId>` 复合值或
-  // `custom:` 编码值，直接整串查白名单必然落空；先剥出裸模型 ID 再判定。
-  const bareModelId = extractBareModelId(normalized).toLowerCase();
-  return TELEMETRY_SAFE_BUILTIN_MODEL_IDS.has(bareModelId) ? bareModelId : "custom";
+  return "custom";
 }
 
 /**
  * 归一化「只拿到一个模型值、没有独立 provider 字段」的场景。
  *
  * 支持三种形态：`custom:<providerId>[:<modelName>]` 编码值、`<providerId>/<modelId>` 复合值和
- * 裸模型 ID。裸 ID 直接按白名单判定，未命中一律降级为 `custom`——这正是「新增内置模型未进入
- * 白名单时必须默认降级」的要求，因此不需要调用方额外传 provider。
+ * 裸模型 ID。内置模型白名单已随内置 Provider 移除，因此只要值非空就一律降级为 `custom`，
+ * 不再需要调用方额外传 provider。
  */
 export function sanitizeTelemetryModelValue(value: string | undefined | null): string {
   const normalized = value?.trim();
@@ -253,5 +201,5 @@ export function sanitizeTelemetryModelValue(value: string | undefined | null): s
     return resolveTelemetryModelId(providerScope, normalized.slice(separator + 1));
   }
 
-  return resolveTelemetryModelId("builtin", normalized);
+  return resolveTelemetryModelId("custom", normalized);
 }

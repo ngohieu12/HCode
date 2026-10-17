@@ -11,10 +11,7 @@ export {
   getGenUiOutputDirectory,
 } from "./node/genUiPaths.js";
 export { scanOfficialPluginCacheRoots } from "./node/officialPluginCache.js";
-export {
-  migrateUserSubagentMarkdown,
-  migrateSubagentStateFile,
-} from "./node/subagentMarkdownMigration.js";
+export { migrateSubagentStateFile } from "./node/subagentMarkdownMigration.js";
 export {
   atomicWritePrivateTextFile,
   backupCorruptFile,

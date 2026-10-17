@@ -18,7 +18,6 @@ async function main(): Promise<void> {
   const services = createLocalServices({
     topicResourceRelayChannel: (request) => topicResourcePeers.getChannel(request),
     zcodeBuiltinProviderConfigFilePath,
-    providerProvisioningTargetEnabled: Boolean(authToken),
   });
 
   createHttpServer(services, port, {

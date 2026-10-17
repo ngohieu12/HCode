@@ -1,13 +1,12 @@
 import { RefreshCcw } from "lucide-react";
-import { Fragment, lazy, useState } from "react";
+import { Fragment, useState } from "react";
 import { APP_USAGE_RANGES } from "@zcode/shared";
 import type { AppUsageRange, AppUsageSnapshot } from "@zcode/shared";
 import { Button } from "@/components/ui/button.js";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { useAppUsageStats } from "@/hooks/useUsageStats.js";
-import { UsageChartLoadBoundary } from "@/settings/usage-stats/UsageChartLoadBoundary.js";
-import { UsageHeatmap } from "@/settings/usage-stats/UsageHeatmap.js";
+import { AppUsageModelTable } from "@/settings/usage-stats/AppUsageModelTable.js";
 import { UsageStatsErrorNotice } from "@/settings/usage-stats/UsageStatsErrorNotice.js";
 import {
   USAGE_STATS_TABS_LIST_CLASS,
@@ -17,22 +16,8 @@ import {
   formatSummaryCompactTokenUsage,
 } from "@/settings/usage-stats/usageStatsUiParts.js";
 
-// Recharts 会在模块初始化阶段触发 decimal.js-light 的 LN10 校验，
-// 在 Electron Linux 容器里会阻断整个 renderer 启动。图表按需加载后，
-// 普通启动和 e2e 首页不会被 Usage 页图表依赖影响，打开 Usage 时也由局部边界隔离。
-const AppUsageDailyModelTrendChart = lazy(() =>
-  import("@/settings/usage-stats/AppUsageDailyModelTrendChart.js").then((module) => ({
-    default: module.AppUsageDailyModelTrendChart,
-  })),
-);
-const AppUsageTopModelsBarChart = lazy(() =>
-  import("@/settings/usage-stats/AppUsageTopModelsBarChart.js").then((module) => ({
-    default: module.AppUsageTopModelsBarChart,
-  })),
-);
-
 export function AppUsagePanel() {
-  const { intl, locale } = useZCodeIntl();
+  const { intl } = useZCodeIntl();
   const [range, setRange] = useState<AppUsageRange>("7d");
   const { snapshot: lifetimeSnapshot, refresh: refreshLifetime } = useAppUsageStats("all");
   const { snapshot, loading, error, refresh } = useAppUsageStats(range);
@@ -82,9 +67,6 @@ export function AppUsagePanel() {
   return (
     <div className="space-y-5">
       <AppUsageLifetimeSummaryStrip snapshot={lifetimeSnapshot} />
-      {lifetimeSnapshot?.heatmap.weeks.length ? (
-        <UsageHeatmap locale={locale} intl={intl} weeks={lifetimeSnapshot.heatmap.weeks} />
-      ) : null}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="text-ui-base font-medium text-foreground">
           {intl.formatMessage({ id: "settings.usage.appUsageRangeTitle" })}
@@ -93,24 +75,7 @@ export function AppUsagePanel() {
       </div>
       {error ? <UsageStatsErrorNotice error={error} /> : null}
 
-      <UsageChartLoadBoundary
-        scope="settings.usage.app-daily-model-chart"
-        resetKeys={[snapshot.range, snapshot.generatedAt]}
-        loadingDescription={intl.formatMessage({
-          id: "settings.usage.appUsageLoadingDescription",
-        })}
-      >
-        <AppUsageDailyModelTrendChart snapshot={snapshot} />
-      </UsageChartLoadBoundary>
-      <UsageChartLoadBoundary
-        scope="settings.usage.app-model-top-charts"
-        resetKeys={[snapshot.range, snapshot.generatedAt, "model-top"]}
-        loadingDescription={intl.formatMessage({
-          id: "settings.usage.appUsageLoadingDescription",
-        })}
-      >
-        <AppUsageModelTopCharts snapshot={snapshot} />
-      </UsageChartLoadBoundary>
+      <AppUsageModelTable snapshot={snapshot} />
 
       <div className="flex justify-end">
         <Button
@@ -127,24 +92,6 @@ export function AppUsagePanel() {
         </Button>
       </div>
     </div>
-  );
-}
-
-/**
- * 模型用量榜：同一份 snapshot 分别按 token 用量和请求数取前 10 个模型。
- * 两个榜共用一条 lazy 加载边界，Recharts 只会在打开 Usage 时按需编译一次。
- */
-function AppUsageModelTopCharts({ snapshot }: { snapshot: AppUsageSnapshot }) {
-  const { intl } = useZCodeIntl();
-
-  return (
-    <section className="space-y-4 rounded-xl bg-surface p-4">
-      <h3 className="text-ui-base font-medium text-foreground">
-        {intl.formatMessage({ id: "settings.usage.modelChartTitle" })}
-      </h3>
-      <AppUsageTopModelsBarChart metric="tokens" snapshot={snapshot} />
-      <AppUsageTopModelsBarChart metric="requests" snapshot={snapshot} />
-    </section>
   );
 }
 

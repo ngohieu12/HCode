@@ -19,22 +19,11 @@ const productionRoots = [
   "apps/zcode-cli/packages/tui/src",
 ] as const;
 
-const legacyDtoOwners = new Set([
-  "packages/services/src/model-provider/legacyModelProviderSerialized.ts",
-  "packages/services/src/model-provider/legacyZCodeConfigProviderReader.ts",
-  "packages/services/src/model-provider/legacyPersonalProviderConfigImporter.ts",
-  "packages/services/src/model-provider/providerConfigRuntime.ts",
-]);
-const legacyDtoTestOwners = new Set([
-  "packages/services/test/legacyZCodeConfigProviderReader.test.ts",
-  "packages/services/test/legacyPersonalProviderConfigImporter.test.ts",
-  "packages/services/test/providerConfigRuntime.test.ts",
-  "packages/ui/test/providerSettingsFormBoundary.test.ts",
-]);
-const legacyApiFormatOwners = new Set([
-  "packages/services/src/model-provider/legacyModelProviderSerialized.ts",
-  "packages/services/src/model-provider/legacyZCodeConfigProviderReader.ts",
-]);
+// 内置供应商体系下线时一次性删除了旧 DTO 的全部持有者：生产面已无遗留，
+// 只有 UI 的表单边界测试还保留一条断言（它验证的是“不再出现”，不是使用）。
+const legacyDtoOwners = new Set<string>();
+const legacyDtoTestOwners = new Set(["packages/ui/test/providerSettingsFormBoundary.test.ts"]);
+const legacyApiFormatOwners = new Set<string>();
 const testRoots = [
   "packages/desktop/test",
   "packages/services/test",

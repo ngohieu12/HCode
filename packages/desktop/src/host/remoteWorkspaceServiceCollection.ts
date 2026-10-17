@@ -21,7 +21,7 @@ import {
   IOAuthService,
   IModelSelectionService,
   IProviderSettingsService,
-  IUsageStatsService,
+  IAppUsageService,
   ICodingPlanSubscriptionService,
   IClientConfigService,
   IClientScenesService,
@@ -61,7 +61,7 @@ import {
   resolveAccountTeamPlanRuntimeMaterial,
   createSettingsSyncService,
   createBotsService,
-  createUsageStatsService,
+  createAppUsageService,
   createMediaPreviewService,
   createCodingPlanSubscriptionService,
   createClientScenesService,
@@ -83,10 +83,6 @@ import {
   ZAI_PROVIDER_ID,
 } from "@zcode/shared";
 import { assertLegacyRemoteWorkspaceRpcContract } from "./legacyRemoteWorkspaceRpcContract.js";
-import {
-  createRemoteProviderProvisioningExecutorFromWorkspace,
-  registerRemoteProviderProvisioningExecutor,
-} from "./remoteProviderProvisioningService.js";
 
 const runtimePreferencesLogger = createServiceLogger("remote-runtime-preferences");
 const ZCODE_JWT_TOKEN_KEY = "zcodejwttoken";
@@ -263,8 +259,6 @@ export function createRemoteWorkspaceServiceCollection(params: {
   const remoteZCodeSessionService = params.createRemotePromptAttachmentSessionService(
     params.connectionServices.zcodeSessionService,
   );
-  const remoteProviderProvisioningService =
-    createRemoteProviderProvisioningExecutorFromWorkspace(params);
 
   // desktop-attached remote 的 Agent 运行在远端，但 app-global 设置权威仍在
   // desktop shared Host。通过窄化的 runtime-preferences 请求原路返回，避免远端读取自己的 setting。
@@ -411,11 +405,8 @@ export function createRemoteWorkspaceServiceCollection(params: {
     .register(IModelSelectionService, params.connectionServices.modelSelectionService)
     .register(IProviderSettingsService, params.connectionServices.providerSettingsService)
     .register(
-      IUsageStatsService,
-      createUsageStatsService({
-        apiClient: localApiClient,
-        accountRequestAuthService: localAccountRequestAuthService,
-        credentialService: localCredentialService,
+      IAppUsageService,
+      createAppUsageService({
         zcodeAgentService: params.connectionServices.zcodeAgentService,
       }),
     )
@@ -442,7 +433,6 @@ export function createRemoteWorkspaceServiceCollection(params: {
     )
     .register(IPromptAttachmentTransferService, params.promptAttachmentTransferService);
   registerHostApiNetworkTransportForDispose(services, hostApiNetworkTransport);
-  registerRemoteProviderProvisioningExecutor(services, remoteProviderProvisioningService);
   return services;
 }
 
@@ -454,8 +444,6 @@ export function createServerRemoteWorkspaceServiceCollection(params: {
   assertLegacyRemoteWorkspaceRpcContract(params.connectionServices);
   // Server remote 连接的是一个已经运行的完整 ZCode server。
   // Host 只做 RPC 转接，不替 server 决定 workspace/runtime/model-provider 归属。
-  const remoteProviderProvisioningService =
-    createRemoteProviderProvisioningExecutorFromWorkspace(params);
   const services = new ServiceCollection()
     .register(IFileService, params.connectionServices.fileService)
     .register(
@@ -479,7 +467,7 @@ export function createServerRemoteWorkspaceServiceCollection(params: {
     .register(IOAuthService, params.connectionServices.oauthService)
     .register(IModelSelectionService, params.connectionServices.modelSelectionService)
     .register(IProviderSettingsService, params.connectionServices.providerSettingsService)
-    .register(IUsageStatsService, params.connectionServices.usageStatsService)
+    .register(IAppUsageService, params.connectionServices.appUsageService)
     .register(
       ICodingPlanSubscriptionService,
       params.connectionServices.codingPlanSubscriptionService,
@@ -506,6 +494,5 @@ export function createServerRemoteWorkspaceServiceCollection(params: {
   if (params.connectionServices.onboardingRecordService) {
     services.register(IOnboardingRecordService, params.connectionServices.onboardingRecordService);
   }
-  registerRemoteProviderProvisioningExecutor(services, remoteProviderProvisioningService);
   return services;
 }

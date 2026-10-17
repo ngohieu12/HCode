@@ -54,31 +54,10 @@ vi.mock("electron", () => ({
 class MockUtilityProcess extends EventEmitter {
   pid: number;
   postMessage: ReturnType<typeof vi.fn>;
-  provisioningResult: {
-    status: "applied" | "already-applied" | "unsupported" | "failed" | "rollback_failed";
-    error?: string;
-    errorCode?: string;
-  } = { status: "applied" };
-
   constructor(pid: number) {
     super();
     this.pid = pid;
-    this.postMessage = vi.fn((message: unknown) => {
-      const candidate = message as {
-        type?: string;
-        requestId?: string;
-        environmentKey?: string;
-      };
-      if (candidate.type !== HostMessageTypes.ProviderProvisioningExecute) return;
-      queueMicrotask(() => {
-        this.emit("message", {
-          type: HostResponseTypes.ProviderProvisioningExecutionResult,
-          requestId: candidate.requestId,
-          environmentKey: candidate.environmentKey,
-          ...this.provisioningResult,
-        });
-      });
-    });
+    this.postMessage = vi.fn();
   }
 }
 
@@ -278,111 +257,6 @@ describe("desktopRemoteSessions R1 window Host forwarding", () => {
       expect.any(Array),
     );
   });
-
-  it.each(["failed", "rollback_failed", "unsupported"] as const)(
-    "首次 Provisioning 返回 %s 时拒绝连接且不发布 Renderer port",
-    async (status) => {
-      const child = new MockUtilityProcess(1001);
-      child.provisioningResult = { status, error: "sync unavailable" };
-      const win = createWindow(1, 101);
-      const manager = createManager(new Map([[101, child]]));
-
-      const connecting = manager.createRemoteWorkspaceSession(win as never, sshTarget, "connect-1");
-      await emitConnected({ child, requestId: "connect-1", remoteSessionId: "remote-session-1" });
-
-      await expect(connecting).rejects.toThrow(/Provider Provisioning/u);
-      expect(win.webContents.postMessage).not.toHaveBeenCalledWith(
-        InternalChannels.ScopedServicePort,
-        expect.anything(),
-        expect.anything(),
-      );
-    },
-  );
-
-  it("已连接后的 Provisioning 失败只记录结构化 warning，不拆除 Workspace", async () => {
-    const child = new MockUtilityProcess(1001);
-    const win = createWindow(1, 101);
-    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
-    const manager = createManager(new Map([[101, child]]), { logger });
-    const connecting = manager.createRemoteWorkspaceSession(
-      win as never,
-      sshTarget,
-      "connect-1",
-      undefined,
-      { remoteUsageTelemetryEligible: true },
-    );
-    await emitConnected({ child, requestId: "connect-1", remoteSessionId: "remote-session-1" });
-    confirmLatestScopedAttachment(manager, win);
-    await connecting;
-
-    child.provisioningResult = { status: "failed", error: "token=secret-value" };
-    child.emit("message", {
-      type: HostResponseTypes.ProviderProvisioningSourceChanged,
-      trigger: "personal-config",
-    });
-    for (let index = 0; index < 6; index += 1) await Promise.resolve();
-
-    expect(logger.warn).toHaveBeenCalledWith(
-      "[provider-provisioning] Environment sync did not apply",
-      expect.objectContaining({
-        environmentKey: expect.any(String),
-        trigger: "personal-config",
-        status: "failed",
-      }),
-    );
-    expect(logger.warn.mock.calls.at(-1)?.[1]).not.toHaveProperty("errorSummary");
-    expect(manager.getRemoteConnectionStats()).toEqual({
-      activeSessionCount: 1,
-      activeTargetCount: 1,
-    });
-  });
-
-  it.each([undefined, "source-read-failed"])(
-    "首次同步失败把安全错误码 %s 写入日志和连接面板，不泄漏自由文本",
-    async (errorCode) => {
-      const child = new MockUtilityProcess(1001);
-      child.provisioningResult = { status: "failed", error: "token=fixture-secret", errorCode };
-      const win = createWindow(1, 101);
-      const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
-      const manager = createManager(new Map([[101, child]]), { logger });
-      const connecting = manager.createRemoteWorkspaceSession(
-        win as never,
-        sshTarget,
-        "connect-diagnostic",
-      );
-      const outcome = connecting.catch((error: Error) => error.message);
-      await emitConnected({
-        child,
-        requestId: "connect-diagnostic",
-        remoteSessionId: "remote-diagnostic",
-      });
-      const code = errorCode ?? "target-apply-failed";
-      expect(logger.warn).toHaveBeenCalledWith(
-        "[provider-provisioning] Environment sync did not apply",
-        expect.objectContaining({
-          trigger: "environment-online",
-          status: "failed",
-          errorCode: code,
-        }),
-      );
-      expect(await outcome).toContain(code);
-      expect(win.webContents.send).toHaveBeenCalledWith(
-        PlatformChannels.RemoteConnectionLog,
-        expect.objectContaining({
-          requestId: "connect-diagnostic",
-          level: "error",
-          message: expect.stringContaining(code),
-        }),
-      );
-      expect(
-        JSON.stringify([logger.warn.mock.calls, win.webContents.send.mock.calls, await outcome]),
-      ).not.toContain("fixture-secret");
-      expect(win.webContents.postMessage).not.toHaveBeenCalled();
-      expect(child.postMessage).toHaveBeenCalledWith(
-        expect.objectContaining({ type: HostMessageTypes.DisposeRemoteWorkspaceSession }),
-      );
-    },
-  );
 
   it("只在 eligible 连接完成 renderer ACK 后计入并发并上报 connected gauge", async () => {
     const child = new MockUtilityProcess(1001);
@@ -687,14 +561,6 @@ describe("desktopRemoteSessions R1 window Host forwarding", () => {
       }),
       expect.anything(),
     );
-    const provisioningExecutions = [
-      ...firstChild.postMessage.mock.calls,
-      ...secondChild.postMessage.mock.calls,
-    ].filter(
-      ([message]) =>
-        (message as { type?: string }).type === HostMessageTypes.ProviderProvisioningExecute,
-    );
-    expect(provisioningExecutions).toHaveLength(1);
   });
 
   it("取消 pending connection 只发控制消息，不退出窗口 Host", () => {
