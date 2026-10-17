@@ -10,18 +10,12 @@ export {
   type ProviderSettingsView,
 } from "./model-provider/providerFacadeServices.js";
 export {
-  createAccountRequestAuthService,
-  type IAccountRequestAuthService,
-  type AccountRequestAuthInput,
-  type AccountRequestAuthMaterial,
-  type AccountRequestAuthResolver,
-} from "./model-provider/accountRequestAuthService.js";
-export { IProviderProvisioningTargetService } from "./model-provider/providerProvisioning.js";
-export {
   collectServiceMemoryDiagnostics,
   memoryDiagnosticsRegistry,
   registerMemoryDiagnosticsProvider,
 } from "./memoryDiagnostics.js";
+
+export { createAppUsageService, IAppUsageService } from "./usage/appUsageService.js";
 
 // Accessor
 export type { IServiceAccessor } from "./accessor.js";
@@ -227,20 +221,9 @@ export type { SessionRealtimePort } from "./session/sessionRealtimePort.js";
 // FileWatcher service — IFileWatcherService is both a type (interface) and value (descriptor)
 export { IFileWatcherService } from "./fileWatcher/fileWatcher.js";
 
-// OAuth service — IOAuthService is both a type (interface) and value (descriptor)
-export { IOAuthService } from "./oauth/oauth.js";
-
-// UsageStats service — IUsageStatsService is both a type (interface) and value (descriptor)
-export { IUsageStatsService } from "./usage-stats/usageStats.js";
-
 // Storage（资源管理器「存储」tab）：数据类型在 @zcode/shared；这里只导出服务接口与卷分组纯函数
 export type { IStorageService } from "./storage/contract.js";
 
-// CodingPlanSubscription service — ICodingPlanSubscriptionService is both a type (interface) and value (descriptor)
-export {
-  ICodingPlanSubscriptionService,
-  type OffPeakClientConfig,
-} from "./coding-plan-subscription/codingPlanSubscription.js";
 export {
   IClientScenesService,
   type ClientSceneConfig,
@@ -250,10 +233,6 @@ export {
   type ClientScenesResponse,
 } from "./client-scenes/clientScenes.js";
 export { isValidCronExpr } from "./session/automationCronValidation.js";
-// 闲时任务管理服务（与 automation 服务面独立）；接口/描述符 browser-safe。
-export { IOffPeakTaskService } from "./session/offPeakTask.js";
-export type { OffPeakUpdateTaskParams } from "./session/offPeakTask.js";
-
 // Skills service — ISkillsService is both a type (interface) and value (descriptor)
 export { ISkillsService } from "./skills/skills.js";
 export { ISkillSyncService } from "./skill-sync/skillSync.js";
@@ -347,14 +326,6 @@ export {
   type PluginUiWorkspaceTarget,
 } from "./plugin-ui-bridge/contract.js";
 export { IClientConfigService } from "./client-config/clientConfig.js";
-
-export { IHighspeedCardService } from "./highspeed/highspeedCard.js";
-export {
-  HighspeedCardService,
-  createHighspeedHttpTransport,
-  buildHighspeedTurnExecution,
-} from "./highspeed/highspeedCardService.js";
-export { createHighspeedMockTransport } from "./highspeed/highspeedMockTransport.js";
 
 export { IGenUiService } from "./gen-ui/contract.js";
 export type { GenUiPrepareParams } from "./gen-ui/contract.js";

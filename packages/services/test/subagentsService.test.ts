@@ -573,18 +573,15 @@ describe("createSubagentsService", () => {
     await writeFile(projectFile, content.replace("name: helper", "name: project-helper"));
     const service = createSubagentsService({ homeDir: home, isDesktopRuntime: true });
     const result = await service.list({ workspacePath });
+    // 内置供应商已下线：Markdown 里的 builtin:* 不再被原地改写成 account:* ，
+    // 用户文件保持原样，改选留给用户（改写会把明确选择换成一个不存在的供应商）。
     expect(result.agents.find((agent) => agent.name === "helper")?.modelSelection?.providerId).toBe(
-      "account:zai-individual-coding-plan",
+      "builtin:zai-coding-plan",
     );
     expect(
       result.agents.find((agent) => agent.name === "project-helper")?.modelSelection?.providerId,
     ).toBe("builtin:zai-coding-plan");
-    expect(await readFile(userFile, "utf8")).toBe(
-      content.replace(
-        "model: builtin:zai-coding-plan",
-        "model: account:zai-individual-coding-plan",
-      ),
-    );
+    expect(await readFile(userFile, "utf8")).toBe(content);
     expect(await readFile(projectFile, "utf8")).toBe(
       content.replace("name: helper", "name: project-helper"),
     );
@@ -625,7 +622,7 @@ describe("createSubagentsService", () => {
     const saved = JSON.parse(await readFile(statePath, "utf8"));
     expect(saved).toMatchObject(legacy);
     expect(saved.builtInModelSelectionOverrides.Explore).toEqual({
-      providerId: "account:zai-individual-coding-plan",
+      providerId: "builtin:zai-coding-plan",
       modelId: "GLM-5.3-Flash",
       options: { reasoningLevel: "high" },
     });
@@ -673,7 +670,7 @@ describe("createSubagentsService", () => {
     const listed = await service.list(params);
     const explore = listed.agents.find((agent) => agent.name === "Explore")!;
     expect(explore.modelSelection).toEqual({
-      providerId: "account:zai-individual-coding-plan",
+      providerId: "builtin:zai-coding-plan",
       modelId: "GLM-5.3-Flash",
       options: { reasoningLevel: "high" },
     });

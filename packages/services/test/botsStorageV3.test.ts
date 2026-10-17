@@ -60,8 +60,9 @@ describe("Bot v3 单向导入与回滚文件隔离", () => {
     });
     try {
       const states = await service.getBotStates();
+      // 内置供应商已下线：旧 ID 原样保留，等用户手动重选，不再映射到不存在的 account:* 。
       expect(states[0]?.draftOptions?.modelSelection).toEqual({
-        providerId: "account:bigmodel-individual-coding-plan",
+        providerId: "builtin:bigmodel-coding-plan",
         modelId: "GLM",
       });
       expect(states[0]?.workspaceIdentity).toBe("ssh://remote/workspace");
@@ -138,7 +139,7 @@ describe("Bot v3 单向导入与回滚文件隔离", () => {
     expect(oldReader.parse(JSON.parse(retained))).toEqual(original);
   });
 
-  it("并发首次读取只导入一次，并在读成功时固定旧 Coding Plan 身份", async () => {
+  it("并发首次读取只导入一次，并在读成功时保留旧内置身份", async () => {
     await writeFile(
       join(dir, "bot-state.v2.json"),
       JSON.stringify(legacyState({ provider: "glm", model: "builtin:bigmodel-coding-plan/GLM" })),
@@ -147,7 +148,7 @@ describe("Bot v3 单向导入与回滚文件隔离", () => {
     const results = await Promise.all([repo.readState(), repo.readState()]);
     expect(results[0]).toEqual(results[1]);
     expect((await makeRepo().readState()).bots.bot?.draftOptions?.modelSelection?.providerId).toBe(
-      "account:bigmodel-individual-coding-plan",
+      "builtin:bigmodel-coding-plan",
     );
   });
 
