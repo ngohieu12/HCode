@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { RotateCcw } from "lucide-react";
 import {
   SHORTCUT_COMMANDS,
   getDefaultShortcutBindings,
   type ShortcutCommandId,
 } from "@zcode/shared";
-import { Button } from "@/components/ui/button.js";
 import { toast } from "@/components/ui/toast.js";
-import { useConfirmDialogStore } from "@/store/confirmDialogStore.js";
 import { usePlatform } from "@/hooks/usePlatform.js";
 import { useSettings } from "@/hooks/useSettingService.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
@@ -36,8 +33,9 @@ import { useShortcutRecording } from "./useShortcutRecording.js";
  * 系统保留键直接拒绝；app 内命令占用提示占用者并支持二次确认抢绑。
  * 单行多绑定：一个命令一行，多组键帽在键位列纵向排列；每条可点击键帽/铅笔替换，
  * 同命令物理等价重复在录制入口拒绝。
- * 不提供删除/清空入口：本页只能替换已有绑定或为未分配命令录入第一条，避免把命令
- * 清成「未分配」后用户无法自行恢复（这与录制态 Backspace 恢复默认是两个语义）。
+ * 不提供任何破坏性入口（删除单条 / 清空全部 / 全部恢复默认）：本页只能替换已有绑定
+ * 或为未分配命令录入第一条，避免产生用户无法在页内恢复的状态；录制态 Backspace
+ * 仅把单条命令还原为默认键位，属于录入操作而不是破坏性清空。
  */
 export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boolean }) {
   const { intl } = useZCodeIntl();
@@ -174,21 +172,6 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
     [overrides, persistBindings, isDesktop, intl, commandLabel, composerEnterBehavior],
   );
 
-  // 「全部恢复默认」是破坏性操作（清空全部自定义键位覆盖），复用全局确认弹窗（Promise 式）防一键误触
-  const requestConfirmation = useConfirmDialogStore((state) => state.requestConfirmation);
-  const resetAll = useCallback(async () => {
-    if (!overrides || Object.keys(overrides).length === 0) {
-      return;
-    }
-    const confirmed = await requestConfirmation({
-      title: intl.formatMessage({ id: "settings.shortcuts.resetAllConfirmTitle" }),
-      description: intl.formatMessage({ id: "settings.shortcuts.resetAllConfirmDescription" }),
-    });
-    if (confirmed) {
-      void persistBindings({});
-    }
-  }, [overrides, persistBindings, requestConfirmation, intl]);
-
   // 录制态抑制：录制监听注册晚于 useAppKeyboard 的 capture 监听（同阶段先注册先执行），
   // 不抑制的话录制按下的组合会先触发原命令，改键永远不成功。
   // renderer 通道靠内核标记短路 useAppKeyboard；menu 通道靠 main 摘除菜单 accelerator
@@ -229,17 +212,6 @@ export function ShortcutSettingsSection({ isDesktop = false }: { isDesktop?: boo
         keySearch={keySearch}
         // 与行内录制互斥：武装前取消进行中的录制，两套 window capture 监听不并存
         onArmKeySearch={() => setRecording(null)}
-        actions={
-          <Button
-            variant="outline"
-            onClick={resetAll}
-            disabled={!overrides || Object.keys(overrides).length === 0}
-            data-testid="settings-shortcut-reset-all"
-          >
-            <RotateCcw className="mr-2 size-4" />
-            {intl.formatMessage({ id: "settings.shortcuts.resetAll" })}
-          </Button>
-        }
       />
 
       <div className="overflow-hidden rounded-xl border border-border">

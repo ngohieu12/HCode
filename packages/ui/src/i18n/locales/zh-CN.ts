@@ -2199,10 +2199,6 @@ const zhCN: Record<string, string> = {
   "settings.shortcuts.keySearchClearAria": "清除按键搜索",
   "settings.shortcuts.keySearchEmpty": "没有命令绑定 {keys}",
   "settings.shortcuts.searchEmpty": "没有匹配的命令",
-  "settings.shortcuts.resetAll": "全部恢复默认",
-  "settings.shortcuts.resetAllConfirmTitle": "恢复全部默认快捷键？",
-  "settings.shortcuts.resetAllConfirmDescription":
-    "将清除所有自定义键位覆盖，全部命令回到默认绑定。",
   "settings.shortcuts.columnHeaderCommand": "命令",
   "settings.shortcuts.columnHeaderBinding": "按键绑定",
   "settings.shortcuts.columnHeaderScope": "作用域",

@@ -266,41 +266,6 @@ describe("快捷键设置真实按键 E2E", () => {
     );
   });
 
-  it("SC-10: 全部恢复默认有二次确认——取消保留覆盖，确认清空（spec §12.4）", async function () {
-    this.timeout(120_000);
-
-    await openShortcutSettings();
-    // 前序用例留下的覆盖仍在，按钮可用；点击后弹全局确认弹窗（ConfirmDialogHost）
-    await clickTestIdByDom("settings-shortcut-reset-all", {
-      timeout: 15_000,
-      timeoutMsg: "没有找到「全部恢复默认」按钮",
-    });
-    await $(sel("confirm-dialog-confirm")).waitForDisplayed({ timeout: 10_000 });
-
-    // 取消（Esc）：覆盖保留
-    await browser.keys(["Escape"]);
-    await $(sel("confirm-dialog-confirm")).waitForDisplayed({ reverse: true, timeout: 10_000 });
-    const settingsAfterCancel = await readSettings();
-    expect(Object.keys(settingsAfterCancel.shortcutBindings ?? {}).length).toBeGreaterThan(0);
-
-    // 再点并确认：shortcutBindings 清空，全部命令回到默认绑定
-    await clickTestIdByDom("settings-shortcut-reset-all", {
-      timeout: 15_000,
-      timeoutMsg: "确认弹窗关闭后没找到「全部恢复默认」按钮",
-    });
-    await clickTestIdByDom("confirm-dialog-confirm", {
-      timeout: 10_000,
-      timeoutMsg: "没有出现恢复默认确认弹窗",
-    });
-    await browser.waitUntil(
-      async () => {
-        const settings = await readSettings();
-        return Object.keys(settings.shortcutBindings ?? {}).length === 0;
-      },
-      { timeout: 15_000, timeoutMsg: "确认后 shortcutBindings 没有被清空" },
-    );
-  });
-
   it("SC-11: 工具条三键转正为可配置命令——列表可见、改绑落盘（spec §12.6）", async function () {
     this.timeout(120_000);
 

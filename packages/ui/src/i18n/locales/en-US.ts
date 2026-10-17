@@ -2341,10 +2341,6 @@ const enUS: Record<string, string> = {
   "settings.shortcuts.keySearchClearAria": "Clear key search",
   "settings.shortcuts.keySearchEmpty": "No command is bound to {keys}",
   "settings.shortcuts.searchEmpty": "No matching commands",
-  "settings.shortcuts.resetAll": "Reset all to defaults",
-  "settings.shortcuts.resetAllConfirmTitle": "Reset all shortcuts to defaults?",
-  "settings.shortcuts.resetAllConfirmDescription":
-    "This clears all custom keybinding overrides and restores every command to its default binding.",
   "settings.shortcuts.columnHeaderCommand": "Command",
   "settings.shortcuts.columnHeaderBinding": "Keybinding",
   "settings.shortcuts.columnHeaderScope": "Scope",
