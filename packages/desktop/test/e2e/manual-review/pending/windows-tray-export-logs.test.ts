@@ -9,7 +9,7 @@ type TrayCapture = {
 };
 type TrayTestGlobal = typeof globalThis & { __trayExportCapture?: TrayCapture };
 type DesktopBridge = {
-  zcode: { setApplicationLocale: (locale: "en-US" | "zh-CN" | "vi-VN") => Promise<void> };
+  zcode: { setApplicationLocale: (locale: "en-US" | "vi-VN") => Promise<void> };
 };
 
 describe("Windows 托盘导出日志", () => {
@@ -40,7 +40,7 @@ describe("Windows 托盘导出日志", () => {
     try {
       for (const [locale, label, removedLabel] of [
         ["en-US", "Export logs", "Clear all data"],
-        ["zh-CN", "导出日志", "清除所有数据"],
+        ["en-US", "导出日志", "清除所有数据"],
       ] as const) {
         await browser.execute(async (value) => {
           await (window as unknown as DesktopBridge).zcode.setApplicationLocale(value);

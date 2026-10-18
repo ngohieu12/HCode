@@ -223,7 +223,7 @@ function renderCoverageHeatmapHtml(data: CoverageHeatmapData) {
     .replaceAll("\u2028", "\\u2028")
     .replaceAll("\u2029", "\\u2029");
   return `<!doctype html>
-<html lang="zh-CN">
+<html lang="en-US">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -380,7 +380,7 @@ function renderCoverageHeatmapHtml(data: CoverageHeatmapData) {
       const metricSelect = document.getElementById("metric-select");
       const heatGrid = document.getElementById("heat-grid");
       const summary = document.getElementById("summary");
-      const number = new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 1 });
+      const number = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
       let domain = report.domains[0];
       let selected = null;
 

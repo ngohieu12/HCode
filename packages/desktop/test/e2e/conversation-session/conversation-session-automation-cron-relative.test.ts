@@ -44,7 +44,7 @@ describe("会话内相对时间一次性定时任务 E2E", () => {
 
     // 该 case 的证据包含本地化后的调度摘要；显式固定中文 locale，避免 WDIO
     // 继承运行机系统语言后把同一语义渲染成 Custom，导致证明在不同开发机上漂移。
-    await seedSettings({ locale: "zh-CN", localePreference: "zh-CN" });
+    await seedSettings({ locale: "en-US", localePreference: "en-US" });
     await prepareV4ConversationE2E({ resetDraftBeforeProvider: true });
 
     // 1) 触发回放的相对时间 CronCreate 并批准副作用权限，等待工具真实执行落库。

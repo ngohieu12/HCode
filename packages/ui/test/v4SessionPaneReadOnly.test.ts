@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -274,7 +275,7 @@ function renderReadOnlyPane({
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(SessionPane, {
         allowWorkspaceFileRewind,
         paneId: "pane-1",
@@ -432,7 +433,7 @@ describe("SessionPane 分享模式接线", () => {
     return renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(SessionPane, {
           paneId: "pane-1",
           readOnly: false,

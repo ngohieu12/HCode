@@ -10,6 +10,7 @@
 // 「这一区是面板的最后一节」那条位置断言在 workflowRunSidePane.test.ts 里（那里才有
 // 完整的面板）；本文件只钉这一区自己的形态与交互。
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TID_WORKFLOW_ARTIFACTS_TOGGLE, TID_WORKFLOW_ARTIFACT_CARD } from "@zcode/shared";
@@ -64,12 +65,15 @@ function artifact(overrides: Partial<WorkflowRunArtifactView> = {}): WorkflowRun
 
 function renderSection(
   artifacts: readonly WorkflowRunArtifactView[],
-  options: { locale?: "en-US" | "zh-CN"; openable?: boolean } = {},
+  options: { locale?: "en-US" | "vi-VN"; openable?: boolean } = {},
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: options.locale ?? "zh-CN" },
+      {
+        initialLocale: options.locale === "vi-VN" ? "vi-VN" : (options.locale ?? "vi-VN"),
+        messages: options.locale === "vi-VN" ? zhCNLegacy : undefined,
+      },
       createElement(WorkflowRunArtifactsSection, {
         artifacts,
         runId: "dwfrun-1",
@@ -350,7 +354,7 @@ describe("WorkflowRunArtifactsSection", () => {
     view.rerender(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(WorkflowRunArtifactsSection, {
           artifacts: [board(3)],
           runId: "dwfrun-1",

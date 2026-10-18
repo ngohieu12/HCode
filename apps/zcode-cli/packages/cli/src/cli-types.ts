@@ -1,4 +1,3 @@
-import type { TuiReadClipboardImage, TuiWriteClipboardText } from "@zcode/tui";
 import type { UiLocale } from "@zcode/i18n";
 import type { Logger } from "@zcode/contracts";
 import type {
@@ -44,7 +43,6 @@ import type {
 import type { CliEnv, DotenvLoadResult, LoadCliDotenvOptions } from "./env.js";
 import type { PluginsCommandOverrides } from "./plugins-command.js";
 import type { CliShutdownProcess } from "./shutdown.js";
-import type { resolveWorkspaceGitBranch } from "./tui-workspace-git.js";
 
 export type BootstrapModule = typeof import("@zcode/bootstrap");
 
@@ -101,15 +99,11 @@ export interface RunDependencies extends PluginsCommandOverrides {
   isReservedSlashCommandName?: BootstrapModule["isReservedZCodeSlashCommandName"];
   listSkills?: (options: ListZCodeSkillsOptions) => ReturnType<typeof listZCodeSkills>;
   logger?: Logger;
-  readClipboardImage?: TuiReadClipboardImage;
-  writeClipboardText?: TuiWriteClipboardText;
   resolveLatestSession?: (
     options: ResolveLatestSessionOptions,
   ) => ReturnType<typeof resolveLatestSession>;
-  resolveWorkspaceGitBranch?: typeof resolveWorkspaceGitBranch;
   logoutZCodeCli?: (options?: LogoutZCodeCliOptions) => ReturnType<typeof logoutZCodeCli>;
   runZCodeProtocolAgent?: (options?: RunZCodeProtocolAgentOptions) => Promise<void>;
-  runTui?: typeof import("@zcode/tui").runTui;
   skipUserConfig?: boolean;
   userConfigPath?: string;
   exitProcess?: (code: number) => void;
@@ -134,7 +128,7 @@ export interface CliTargetRequest {
 
 export type ModeCapableApp = Awaited<ReturnType<typeof createZCodeApp>> & {
   getMode?: () => CliRuntimeMode;
-  setLocale?: (locale: UiLocale) => Promise<{ locale: "en-US" | "zh-CN" }>;
+  setLocale?: (locale: UiLocale) => Promise<{ locale: "en-US" | "vi-VN" }>;
   setMode?: (mode: CliRuntimeMode) => Promise<{ mode: CliRuntimeMode }>;
 };
 

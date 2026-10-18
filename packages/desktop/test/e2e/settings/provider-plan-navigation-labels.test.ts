@@ -49,7 +49,7 @@ describe("套餐导航名称与身份回归", () => {
   });
 
   for (const family of ["bigmodel", "zai"] as const) {
-    for (const locale of ["zh-CN", "en-US"] as const) {
+    for (const locale of ["en-US", "en-US"] as const) {
       it(`PN-01/02: ${family} ${locale} 导航、详情及窄屏名称一致`, async function () {
         this.timeout(180000);
         await skipOccupationOnboardingIfPresent();
@@ -80,7 +80,7 @@ describe("套餐导航名称与身份回归", () => {
             if (!actions?.setTheme) throw new Error("missing setTheme action");
             actions.setTheme(theme);
           },
-          locale === "zh-CN" ? "dark" : "light",
+          locale === "en-US" ? "dark" : "light",
         );
         await clickTestIdByDom(TID_TASK_SETTINGS_BUTTON);
         await clickTestIdByDom(testId(TID_SETTINGS_SECTION_NAV, "modelProvider"));

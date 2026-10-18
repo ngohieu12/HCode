@@ -29,8 +29,8 @@ export function useAppKeyboard(handlers: AppKeyboardHandlers) {
       if (event.repeat || event.isComposing) {
         return;
       }
-      // 录制态短路：录制监听注册晚于本监听（同阶段先注册先执行），不短路的话
-      // 录制按下的组合会先触发原命令，改键永远不成功（见 setShortcutRecordingActive 注释）。
+      // 捕获态短路：捕获监听注册晚于本监听（同阶段先注册先执行），不短路的话
+      // 按下的组合会先触发原命令，按键搜索永远捕获不到（见 setShortcutRecordingActive 注释）。
       if (isShortcutRecordingActive()) {
         return;
       }

@@ -10,7 +10,7 @@ describe("buildZCodeSourceHeadersFromContext", () => {
       buildZCodeSourceHeadersFromContext({
         appVersion: " 2.14.0 ",
         arch: "arm64",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         clientTimezone: "Asia/Shanghai",
         deviceMid: "mid-1",
         endpointOrigin: "https://zcode.z.ai",
@@ -27,7 +27,7 @@ describe("buildZCodeSourceHeadersFromContext", () => {
       "X-Title": "Z Code@cli",
       "X-Platform": "darwin-arm64",
       "X-Release-Channel": "test",
-      "X-Client-Language": "zh-CN",
+      "X-Client-Language": "en-US",
       "X-Client-Timezone": "Asia/Shanghai",
       "X-Os-Category": "macos",
       "X-Os-Version": "Darwin 25.0.0",

@@ -138,7 +138,7 @@ const unavailableWorkspacePath = readStringFlag("unavailableWorkspacePath");
 const windowKind = readStringFlag("windowKind");
 const initialLocaleFlag = readStringFlag("locale");
 const initialLocale: Locale =
-  initialLocaleFlag === "zh-CN" || initialLocaleFlag === "en-US"
+  initialLocaleFlag === "vi-VN" || initialLocaleFlag === "en-US"
     ? initialLocaleFlag
     : DEFAULT_LOCALE;
 let baseServicesForRemoteSessions: IServiceAccessor | null = null;

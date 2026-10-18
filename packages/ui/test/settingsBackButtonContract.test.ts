@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 const secondarySurfaces = [
   "CommandsSection.tsx",

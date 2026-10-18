@@ -326,7 +326,7 @@ export async function createMarketingTouchFixture() {
           code: 0,
           data: {
             server_time: Math.floor(Date.now() / 1000),
-            language: req.headers["x-client-language"] === "zh-CN" ? "zh-CN" : "en-US",
+            language: req.headers["x-client-language"] === "en-US" ? "en-US" : "en-US",
             deliveries:
               overrideDeliveries ??
               (actionDelivery

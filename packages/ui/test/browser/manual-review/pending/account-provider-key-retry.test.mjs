@@ -59,10 +59,7 @@ after(async () => {
 
 const artifacts = join(tmpdir(), "zcode-todo105-browser");
 for (const family of ["zai", "bigmodel"]) {
-  for (const [width, locale, theme] of [
-    [390, "zh-CN", "light"],
-    [1200, "en-US", "dark"],
-  ]) {
+  for (const [width, locale, theme] of [[1200, "en-US", "dark"]]) {
     test(`T105-UI01 ${family}/${width}/${locale}/${theme}`, async () => {
       await mkdir(artifacts, { recursive: true });
       const page = await browser.newPage({ viewport: { width, height: 700 } });
@@ -84,15 +81,12 @@ for (const family of ["zai", "bigmodel"]) {
       try {
         await page.goto(`${origin}fixture?${new URLSearchParams({ family, locale, theme })}`);
         const retry = page.getByRole("button", {
-          name: locale === "zh-CN" ? "重新登录" : "Sign in again",
+          name: "Sign in again",
           exact: true,
         });
         await retry.waitFor();
         await page.screenshot({ path: join(artifacts, `${family}-${width}-failed.png`) });
-        assert.match(
-          await page.locator("main").innerText(),
-          locale === "zh-CN" ? /获取失败/ : /Fetch failed/,
-        );
+        assert.match(await page.locator("main").innerText(), /Fetch failed/);
         for (const [count, status] of [
           [1, 503],
           [2, 200],
@@ -110,9 +104,7 @@ for (const family of ["zai", "bigmodel"]) {
             await page.waitForFunction(() => !document.querySelector("button").disabled);
         }
         await retry.waitFor({ state: "hidden" });
-        await page
-          .getByRole("button", { name: locale === "zh-CN" ? "订阅" : "Subscribe", exact: true })
-          .waitFor();
+        await page.getByRole("button", { name: "Subscribe", exact: true }).waitFor();
         assert.equal(await page.getByTestId("logins").textContent(), "2");
         assert.deepEqual(errors, []);
         await page.screenshot({ path: join(artifacts, `${family}-${width}.png`) });

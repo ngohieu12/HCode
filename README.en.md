@@ -7,7 +7,7 @@
   <a href="README.md">Tiếng Việt</a> | English
 </p>
 
-HCode is an AI coding workspace with desktop, browser, and terminal interfaces. This repository contains the clients, backend services, shared UI, and Agent CLI and runtime source code.
+HCode is an AI coding workspace for the desktop. This repository contains the desktop application, backend services, shared UI, and the Agent CLI and runtime that the desktop application bundles and launches. It does not ship a browser UI, a TUI, or a standalone CLI distribution.
 
 ## Setup
 
@@ -52,34 +52,18 @@ Set `ZCODE_DATA_BASE_DIR` to use a separate development data directory. For exam
 ZCODE_DATA_BASE_DIR="$HOME/.zcode-dev-home" pnpm dev:desktop:test
 ```
 
-### HCode CLI distribution
+### Agent CLI Source Development
 
-The command-line distribution includes the TUI and Agent behind one `zcode` command. With no arguments it starts the TUI; all other arguments go to the existing Agent CLI. It runs locally and does not require Electron.
-
-```bash
-# Start the terminal UI by default
-zcode
-
-# Show CLI options
-zcode --help
-```
-
-See Packaging below for build instructions. `pnpm build:zcode` only creates the distribution; it does not replace an existing `zcode` on `PATH`. If the command still points to an older installation or another checkout, check it with `command -v zcode` on macOS / Linux or `where.exe zcode` on Windows.
-
-### CLI Source Development
-
-Use the source entry when developing the TUI or Agent:
+The Agent CLI is a headless runtime that the desktop application invokes through `dist/zcode.cjs`:
 
 ```bash
 pnpm --filter @zcode/cli dev --help
-pnpm --filter @zcode/cli dev
+pnpm --filter @zcode/cli dev -p "summarize this repository"
 
 # Build the CLI and its workspace dependencies
 pnpm --filter @zcode/cli... build
 node apps/zcode-cli/packages/cli/dist/zcode.cjs --help
 ```
-
-This entry runs the Agent CLI directly. Use the extracted `bin/zcode.mjs` shown below to test the unified command.
 
 ### UI Plugin development
 
@@ -95,7 +79,6 @@ The root [.env.example](.env.example) provides sample service URLs and build con
 | ------------------------------------ | --------------------------------------------------------------------------------------- |
 | `ZCODE_DATA_BASE_DIR`                | Base directory for application data, stored under its `.zcode/` subdirectory            |
 | `ZCODE_BUILTIN_PROVIDER_CONFIG_FILE` | Path to a local provider configuration file; uses the built-in configuration when unset |
-| `ZCODE_DIST_BASE_URL`                | Download base URL used by the CLI distribution installer                                |
 
 Runtime variables can be set explicitly in the environment of the startup command. See [config/README.md](config/README.md) for the default configuration shipped with the client.
 
@@ -116,46 +99,6 @@ pnpm bundle:desktop -- --help
 
 The default target is macOS arm64, and the default output directory is `packages/desktop/dist/`. `--os` accepts `mac`, `win`, or `linux`; `--arch` accepts `x64` or `arm64`. Packaging and signing require the tools and configuration for the target platform.
 
-### HCode CLI distribution
-
-Run `pnpm build:zcode` to build the CLI/TUI and Agent, collect the TUI native libraries, workers, and runtime dependencies, then assemble the distribution. Running the distribution still requires Node.js; use the version specified in `mise.toml`.
-
-Before packaging, set the download base URL with `ZCODE_DIST_BASE_URL` in `.env`, `.env.local`, or the process environment, or pass it through `--base-url`. The URL below is a placeholder; replace it with your hosting URL when publishing:
-
-```bash
-pnpm build:zcode --base-url https://downloads.example.com/zcode/
-
-# When ZCODE_DIST_BASE_URL is already configured
-pnpm build:zcode
-
-# Repackage existing Agent build outputs
-pnpm build:zcode --skip-build
-
-# Show options for the version, output directory, and more
-pnpm build:zcode --help
-```
-
-The version defaults to the root `package.json` version. Output is written to `dist/zcode/`:
-
-- `releases/<version>/zcode-<version>.tar.gz`: runtime package.
-- `releases/<version>/sha256.txt`: checksum file.
-- `latest.json` and `install.sh`: version index and installer.
-
-Upload the entire directory to the configured download base URL. The installer downloads the runtime package from that URL, installs it to `~/.zcode/runtime` by default, and creates the `zcode` command in `~/.local/bin`. Override these directories with `ZCODE_DIST_HOME` and `ZCODE_DIST_BIN_DIR`, respectively.
-
-Existing Lite users should switch to the new build command, environment variables, and installer. Installation does not remove old Lite directories or migrate/delete session data.
-
-To test a packaged build locally, extract and run it directly without uploading or installing it:
-
-```bash
-zcode_version=$(node -p "require('./dist/zcode/latest.json').version")
-mkdir -p dist/zcode/debug
-tar -xzf "dist/zcode/releases/$zcode_version/zcode-$zcode_version.tar.gz" \
-  -C dist/zcode/debug
-# Start the TUI by default
-node dist/zcode/debug/zcode/bin/zcode.mjs
-```
-
 ## Repository Structure
 
 | Directory                                            | Responsibility                                                                          |
@@ -166,7 +109,7 @@ node dist/zcode/debug/zcode/bin/zcode.mjs
 | `packages/services`                                  | Business services and persistence                                                       |
 | `packages/shared`, `packages/rpc`, `packages/client` | Shared protocols and types, RPC framework, and Agent client SDK                         |
 | `packages/provider`, `packages/provider-node`        | Common provider capabilities and Node implementations                                   |
-| `apps/zcode-cli`                                     | Agent CLI, TUI, runtime, and tools                                                      |
+| `apps/zcode-cli`                                     | Agent CLI, runtime, and tools                                                           |
 | `scripts`, `config`, `third-party`                   | Build and maintenance scripts, built-in configuration, and third-party notice materials |
 
 ## Project Notice

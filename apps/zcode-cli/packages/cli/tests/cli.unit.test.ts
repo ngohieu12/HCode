@@ -26,9 +26,7 @@ import {
   type ZCodeModelOption,
 } from "@zcode/shared";
 import type { RunContext } from "@zcode/shared-types";
-import type { TuiOptions } from "@zcode/tui";
 import { run } from "../src/run.js";
-import { createTuiSubmitPrompt } from "../src/tui-prompt-handler.js";
 import {
   buildManualSkillPrompt,
   createCommandCenter,
@@ -39,12 +37,9 @@ import { findDotenv, loadCliDotenv, prepareCliRuntimeEnv } from "../src/env.js";
 import { runPluginsCommand } from "../src/plugins-command.js";
 import { runPluginHostCommand } from "../src/plugin-host-command.js";
 import { CLI_PROCESS_NAME, setCliProcessTitle } from "../src/process-name.js";
-import { loadCliPlaywrightChromium } from "../src/sea-playwright-runtime.js";
+import { loadCliPlaywrightChromium } from "../src/playwright-runtime.js";
 import { interceptKnownRuntimeWarnings } from "../src/runtime-warnings.js";
 import { installStderrConsoleBoundary } from "../src/protocol-console.js";
-import { interceptTuiStderr, isTuiInvocation } from "../src/tui-stderr.js";
-import { resolveWorkspaceGitBranch } from "../src/tui-workspace-git.js";
-import { createWorkspacePathSuggestionProvider } from "../src/tui-workspace-paths.js";
 import type { RunDependencies } from "../src/run.js";
 import { scheduleCliExitWatchdog, type CliShutdownProcess } from "../src/shutdown.js";
 
@@ -109,7 +104,7 @@ const fakeProjection = {
   turnCount: 1,
 };
 
-/** 协议 Model Option 测试夹具；TUI 登录态由 App 模型目录中是否存在可选模型推导。 */
+/** 协议 Model Option 测试夹具；登录态由 App 模型目录中是否存在可选模型推导。 */
 const createTestModelOption = (
   providerId: string,
   modelId: string,
@@ -142,15 +137,6 @@ const createTestModelOption = (
 const selectableTestModels = (): ZCodeModelOption[] => [
   createTestModelOption("openai", "gpt-test"),
 ];
-
-/**
- * 真实 runTui 先绘制启动屏，再调用 loadStartupOptions 并把结果合并进 TUI 选项；
- * 测试替身按同一顺序模拟启动，断言 TUI 最终拿到的初始模型、主题、命令等数据。
- */
-const loadTuiStartup = async (options: TuiOptions): Promise<TuiOptions> => ({
-  ...options,
-  ...(await options.loadStartupOptions?.()),
-});
 
 const createPromptDeps = (): RunDependencies => ({
   createModelAdapter: () => ({}) as never,
@@ -236,264 +222,15 @@ test("preserves explicit storage root when beta mode is enabled", () => {
   assert.equal(env.ZCODE_STORAGE_DIR, "/tmp/custom-zcode-home");
 });
 
-test("opens the TUI by default", async () => {
-  const ctx = createContext([]);
-  let opened = false;
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    runTui: async (options) => {
-      opened = true;
-      assert.equal(options.stdin, ctx.stdin);
-      // 启动屏先于运行时绘制：模型、主题、命令等启动数据改由 loadStartupOptions 在首帧后提供。
-      assert.equal(typeof options.loadStartupOptions, "function");
-      const startup = await loadTuiStartup(options);
-      assert.equal(startup.initialModel, "openai/gpt-test");
-      assert.equal(startup.initialThoughtLevel, "medium");
-      assert.equal(startup.theme, "auto");
-      assert.equal(typeof options.listMcpServers, "function");
-      assert.equal(typeof options.listWorkspacePathSuggestions, "function");
-      assert.equal(typeof options.submitPrompt, "function");
-      assert.equal(typeof options.writeClipboardText, "function");
-      assert.ok(startup.slashCommands?.some((command) => command.name === "model"));
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-  assert.equal(opened, true);
-  assert.equal(ctx.stdout.output(), "");
-  assert.equal(ctx.stderr.output(), "");
-});
 
-test("ignores ambient NODE_ENV when deciding TUI developer mode", async () => {
-  const ctx = createContext([]);
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    env: {
-      NODE_ENV: "development",
-    },
-    runTui: async (options) => {
-      assert.equal(options.developerMode, false);
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-});
 
-test("passes developer mode, version, and workspace git branch into the TUI", async () => {
-  const ctx = createContext([]);
-  const workspaceDirectory = "/workspace/dev";
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    cwd: () => workspaceDirectory,
-    env: {
-      ZCODE_RUNTIME_ENV: "development",
-    },
-    resolveWorkspaceGitBranch: async (options) => {
-      assert.equal(options.workspaceDirectory, workspaceDirectory);
-      return "feature/sidebar";
-    },
-    runTui: async (options) => {
-      assert.equal(options.developerMode, true);
-      assert.equal(options.version, "0.0.0");
-      assert.equal(options.workspaceDirectory, workspaceDirectory);
-      // Git 分支解析不阻塞首帧，随 loadStartupOptions 一起返回。
-      const startup = await loadTuiStartup(options);
-      assert.equal(startup.workspaceGitBranch, "feature/sidebar");
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-});
 
-test("resolves workspace git branch from a non-shell git command", async () => {
-  const branch = await resolveWorkspaceGitBranch({
-    workspaceDirectory: "/workspace/project",
-    runCommand: async (file, args) => {
-      assert.equal(file, "git");
-      assert.deepEqual(args, [
-        "-C",
-        "/workspace/project",
-        "symbolic-ref",
-        "--quiet",
-        "--short",
-        "HEAD",
-      ]);
-      return { exitCode: 0, stdout: "main\n" };
-    },
-  });
 
-  assert.equal(branch, "main");
-});
 
-test("ignores missing workspace git branch", async () => {
-  assert.equal(
-    await resolveWorkspaceGitBranch({
-      workspaceDirectory: "/workspace/project",
-      runCommand: async () => ({ exitCode: 1, stdout: "" }),
-    }),
-    undefined,
-  );
-  assert.equal(
-    await resolveWorkspaceGitBranch({
-      workspaceDirectory: "/workspace/project",
-      runCommand: async () => ({ exitCode: 0, stdout: "HEAD\n" }),
-    }),
-    undefined,
-  );
-});
 
-test("passes configured TUI theme into the TUI", async () => {
-  const ctx = createContext([]);
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: () =>
-      ({
-        getLocale: () => "en-US",
-        getModel: () => "openai/gpt-test",
-        getTheme: () => "light",
-        getThoughtLevel: () => "medium",
-        runtime: {} as never,
-        sessionId: "session-test",
-        submitPrompt: async () => {
-          throw new Error("submitPrompt should not be called");
-        },
-        traceId: "trace-test",
-      }) as never,
-    runTui: async (options) => {
-      const startup = await loadTuiStartup(options);
-      assert.equal(startup.theme, "light");
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-});
-
-test("suggests workspace paths for TUI file mentions", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "zcode-tui-paths-"));
-
-  try {
-    await mkdir(join(dir, "public"));
-    await mkdir(join(dir, "node_modules"));
-    await writeFile(join(dir, "public", "app.ts"), "export {}", "utf8");
-    await writeFile(join(dir, "puzzle.md"), "# puzzle", "utf8");
-    await writeFile(join(dir, ".hidden.md"), "# hidden", "utf8");
-
-    const suggest = createWorkspacePathSuggestionProvider({ workspaceDirectory: dir });
-
-    assert.deepEqual(await suggest({ token: "pu" }), {
-      items: [
-        { kind: "directory", path: "public/" },
-        { kind: "file", path: "puzzle.md" },
-      ],
-      truncated: false,
-    });
-    assert.deepEqual(await suggest({ token: "public/" }), {
-      items: [{ kind: "file", path: "public/app.ts" }],
-      truncated: false,
-    });
-    assert.deepEqual(await suggest({ token: "../" }), {
-      items: [],
-      truncated: false,
-    });
-    assert.equal(
-      (await suggest({ token: "" })).items.some((item) => item.path === ".hidden.md"),
-      false,
-    );
-  } finally {
-    await rm(dir, { force: true, recursive: true });
-  }
-});
-
-test("enables session title generation for TUI sessions", async () => {
-  const ctx = createContext(["tui"]);
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      assert.deepEqual(options?.runtimeConfig?.titleGeneration, {});
-      assert.equal(options?.runtimeConfig?.memory?.extractionEnabled, undefined);
-      return {
-        getLocale: () => "en-US",
-        getModel: () => "openai/gpt-test",
-        getThoughtLevel: () => "medium",
-        sessionId: "session-test",
-        traceId: "trace-test",
-        runtime: {} as never,
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-      } as never;
-    },
-    runTui: async () => 0,
-  });
-
-  assert.equal(exitCode, 0);
-});
-
-test("passes --disallowedTools into TUI runtime config", async () => {
-  const ctx = createContext(["tui", "--disallowedTools", "Bash", "Edit,web_search"]);
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      assert.deepEqual(options?.runtimeConfig?.toolDisallowlist, ["Bash", "Edit", "WebSearch"]);
-      return {
-        getLocale: () => "en-US",
-        getModel: () => "openai/gpt-test",
-        getThoughtLevel: () => "medium",
-        sessionId: "session-test",
-        traceId: "trace-test",
-        runtime: {} as never,
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-      } as never;
-    },
-    runTui: async () => 0,
-  });
-
-  assert.equal(exitCode, 0);
-});
-
-test("passes force MCS into TUI runtime config", async () => {
-  const ctx = createContext(["tui", "--force-mcs"]);
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      assert.deepEqual((options?.runtimeConfig as any)?.midConversationSystem, {
-        mode: "force",
-      });
-      return {
-        getLocale: () => "en-US",
-        getModel: () => "openai/gpt-test",
-        getThoughtLevel: () => "medium",
-        sessionId: "session-test",
-        traceId: "trace-test",
-        runtime: {} as never,
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-      } as never;
-    },
-    runTui: async () => 0,
-  });
-
-  assert.equal(exitCode, 0);
-});
 
 test("does not enable session title generation for headless prompts", async () => {
   const ctx = createContext(["--prompt", "hello"]);
@@ -601,11 +338,9 @@ test("borrows one process provider registry for a headless prompt and disposes i
     userConfigPath: "/tmp/zcode-legacy-cli.json",
     startProcessProviderRegistryRuntime: async (_env, options) => {
       runtimeStarts += 1;
-      assert.deepEqual(options, {
-        standalone: {
-          legacyCliUserConfigFilePath: "/tmp/zcode-legacy-cli.json",
-        },
-      });
+      assert.deepEqual(options?.standalone?.legacyCliUserConfigFilePath, "/tmp/zcode-legacy-cli.json");
+      assert.equal(typeof options?.standalone?.onBuiltinRefreshError, "function");
+      assert.equal(typeof options?.standalone?.onBuiltinRefreshResult, "function");
       return {
         accountSource: {} as never,
         dispose: () => {
@@ -659,192 +394,16 @@ test("borrows one process provider registry for a headless prompt and disposes i
   assert.equal(selectionRepositoryDisposals, 1);
 });
 
-test("shows a non-blocking login notice when no coding plan key is configured", async () => {
-  const ctx = createContext([]);
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    // 登录态改由 Registry 的可选模型推导：未配置 Coding Plan 时模型目录只有被禁用的选项。
-    createZCodeApp: () =>
-      ({
-        getLocale: () => "en-US",
-        getModel: () => undefined,
-        listModels: () => [
-          {
-            ...createTestModelOption("zai", "glm-5.1"),
-            disabledReason: "Sign in to Z.AI Coding Plan first.",
-          },
-        ],
-        runtime: {} as never,
-        sessionId: "session-test",
-        submitPrompt: async () => {
-          throw new Error("submitPrompt should not be called");
-        },
-        traceId: "trace-test",
-      }) as never,
-    runTui: async (options) => {
-      const startup = await loadTuiStartup(options);
-      assert.equal(startup.loginRequired, true);
-      assert.equal(startup.initialResult, undefined);
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-});
 
-test("honors configured locale before app creation when login is required", async () => {
-  const tempRoot = await mkdtemp(join(tmpdir(), "zcode-cli-prelogin-locale-"));
-  const configPath = join(tempRoot, "config.json");
-  await writeFile(configPath, JSON.stringify({ ui: { locale: "zh-CN" } }));
 
-  try {
-    const ctx = createContext([]);
-    let appCreated = false;
-    const exitCode = await run(ctx, {
-      cwd: () => tempRoot,
-      env: {},
-      // 登录态改由 App 的可选模型推导；App 在启动屏首帧之后才创建，这里模拟没有可选模型。
-      createZCodeApp: () => {
-        appCreated = true;
-        return {
-          listModels: () => [],
-          runtime: {} as never,
-          sessionId: "session-prelogin",
-          submitPrompt: async () => {
-            throw new Error("submitPrompt should not be called");
-          },
-          traceId: "trace-prelogin",
-        } as never;
-      },
-      listCustomCommands: async () =>
-        ({
-          commands: [],
-          diagnostics: [],
-          totalDiscovered: 0,
-        }) as never,
-      loadDotenv: () => ({
-        keys: [],
-        loaded: false,
-      }),
-      startProcessProviderRegistryRuntime: async () =>
-        ({
-          dispose: () => {},
-          runtime: { registryService: {} },
-        }) as never,
-      runTui: async (options) => {
-        // 启动屏在 App 创建前就按用户配置的语言渲染。
-        assert.equal(options.locale, "zh-CN");
-        assert.equal(appCreated, false);
-
-        const startup = await loadTuiStartup(options);
-        assert.equal(startup.loginRequired, true);
-        assert.equal(startup.locale, "zh-CN");
-
-        const pickerResult = await options.submitPrompt("/login", {
-          abortSignal: new AbortController().signal,
-        });
-
-        assert.equal(pickerResult.response, "选择 Coding Plan 提供商的配置方式。");
-        assert.equal(pickerResult.selection?.title, "配置 Coding Plan");
-        assert.equal(pickerResult.selection?.prompt, "选择登录或 API key 配置方式。");
-        return 0;
-      },
-      userConfigPath: configPath,
-    });
-
-    assert.equal(exitCode, 0);
-  } finally {
-    await rm(tempRoot, { force: true, recursive: true });
-  }
-});
-
-test("passes detected auto locale into the app and TUI", async () => {
-  const ctx = createContext(["--locale", "auto"]);
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      assert.equal(options?.uiLocale, "auto");
-      assert.equal(options?.uiDetectedLocale, "zh-CN");
-      return {
-        getLocale: () => "zh-CN",
-        getModel: () => "openai/gpt-test",
-        getThoughtLevel: () => "medium",
-        runtime: {} as never,
-        sessionId: "session-test",
-        submitPrompt: async () => {
-          throw new Error("submitPrompt should not be called");
-        },
-        traceId: "trace-test",
-      } as never;
-    },
-    env: {
-      LANG: "zh_CN.UTF-8",
-    },
-    runTui: async (options) => {
-      assert.equal(options.locale, "zh-CN");
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-});
-
-test("TUI locale command updates later app creation locale", async () => {
-  const ctx = createContext(["--locale", "en-US"]);
-  const createdLocales: Array<unknown> = [];
-  let activeLocale: "en-US" | "zh-CN" = "en-US";
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      createdLocales.push(options?.uiLocale);
-      return {
-        getLocale: () => activeLocale,
-        getModel: () => "openai/gpt-test",
-        getThoughtLevel: () => "medium",
-        runtime: {} as never,
-        sessionId: `session-${createdLocales.length}`,
-        setLocale: async (locale: "auto" | "en-US" | "zh-CN") => {
-          activeLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
-          return {
-            configPath: "/tmp/zcode/config.json",
-            locale: activeLocale,
-            previousLocale: "en-US",
-            requestedLocale: locale,
-            traceId: "trace-test" as never,
-          };
-        },
-        submitPrompt: async () => {
-          throw new Error("submitPrompt should not be called");
-        },
-        traceId: `trace-${createdLocales.length}`,
-      } as never;
-    },
-    runTui: async (options) => {
-      // 真实 TUI 首帧后即创建初始 App；/locale 由该 App 持久化，不会落到默认用户配置文件。
-      await loadTuiStartup(options);
-      const switched = await options.submitPrompt("/locale zh-CN", {
-        abortSignal: new AbortController().signal,
-      });
-      const created = await options.submitPrompt("/new", {
-        abortSignal: new AbortController().signal,
-      });
-
-      assert.equal(switched.locale, "zh-CN");
-      assert.equal(created.locale, "zh-CN");
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-  assert.deepEqual(createdLocales, ["en-US", "zh-CN"]);
-});
 
 test("prints localized CLI help with explicit locale", async () => {
-  const ctx = createContext(["--help", "--locale", "zh-CN"]);
+  const ctx = createContext(["--help", "--locale", "en-US"]);
   const exitCode = await run(ctx, createPromptDeps());
 
   assert.equal(exitCode, 0);
-  assert.match(ctx.stdout.output(), /用法:/);
+  assert.match(ctx.stdout.output(), /Usage:/);
   assert.match(ctx.stdout.output(), /--locale <locale>/);
 });
 
@@ -858,43 +417,9 @@ test("prints localized CLI help with auto locale detection", async () => {
   });
 
   assert.equal(exitCode, 0);
-  assert.match(ctx.stdout.output(), /用法:/);
+  assert.match(ctx.stdout.output(), /Usage:/);
 });
 
-test("passes custom command suggestions into the TUI", async () => {
-  const ctx = createContext([]);
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    listCustomCommands: async () =>
-      ({
-        commands: [
-          {
-            allowedTools: [],
-            argumentHint: "[scope]",
-            description: "Review custom changes",
-            disableNonInteractive: false,
-            frontmatterKeys: [],
-            name: "review",
-            path: "/workspace/.zcode/commands/review.md",
-            rootPath: "/workspace/.zcode/commands",
-            scope: "project",
-            source: "zcode",
-          },
-        ],
-        diagnostics: [],
-        totalDiscovered: 1,
-      }) as never,
-    runTui: async (options) => {
-      // 自定义命令扫描与首帧并行，随 loadStartupOptions 返回。
-      const startup = await loadTuiStartup(options);
-      assert.ok(startup.slashCommands?.some((command) => command.name === "review"));
-      assert.ok(startup.slashCommands?.some((command) => command.usage === "/review [scope]"));
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-});
 
 test("command center expands custom commands before submitting to runtime", async () => {
   let submittedPrompt = "";
@@ -1065,7 +590,7 @@ test("command center handles login and logout locally", async () => {
     type?: string;
   }> = [];
   const commandCenter = createCommandCenter({
-    // 授权链接消息归属当前活动会话（TUI 首帧后已创建 App），但登录流程本身不向模型提交 prompt。
+    // 授权链接消息归属当前活动会话（App 已创建），但登录流程本身不向模型提交 prompt。
     getApp: async () =>
       ({
         sessionId: "session-login",
@@ -1158,7 +683,7 @@ test("command center localizes the Coding Plan setup picker", async () => {
     getApp: async () => {
       throw new Error("app should not be created");
     },
-    getLocale: () => "zh-CN",
+    getLocale: () => "en-US",
     resumeApp: async () => {
       throw new Error("resume should not be called");
     },
@@ -1166,13 +691,13 @@ test("command center localizes the Coding Plan setup picker", async () => {
 
   const result = await commandCenter("/login", {});
 
-  assert.equal(result.response, "选择 Coding Plan 提供商的配置方式。");
-  assert.equal(result.selection?.title, "配置 Coding Plan");
-  assert.equal(result.selection?.prompt, "选择登录或 API key 配置方式。");
+  assert.equal(result.response, "Choose how to set up a Coding Plan provider.");
+  assert.equal(result.selection?.title, "Set Up Coding Plan");
+  assert.equal(result.selection?.prompt, "Choose a login or API key setup method.");
   assert.equal(result.selection?.filterable, false);
-  assert.match(result.selection?.items[0]?.secondary ?? "", /打开浏览器登录/);
-  assert.equal(result.selection?.items[2]?.input?.primary, "输入 Z.AI Coding Plan API Key");
-  assert.equal(result.selection?.items[2]?.input?.placeholder, "粘贴 API key");
+  assert.match(result.selection?.items[0]?.secondary ?? "", /Open browser login/);
+  assert.equal(result.selection?.items[2]?.input?.primary, "Enter Z.AI Coding Plan API Key");
+  assert.equal(result.selection?.items[2]?.input?.placeholder, "Paste API key");
 });
 
 test("command center keeps local commands usable before login", async () => {
@@ -1189,31 +714,31 @@ test("command center keeps local commands usable before login", async () => {
       throw new Error("resume should not be called");
     },
     setLocale: async (locale) => ({
-      locale: locale === "zh-CN" ? "zh-CN" : "en-US",
+      locale: locale === "en-US" ? "en-US" : "en-US",
       requestedLocale: locale,
     }),
   });
 
   const promptResult = await commandCenter("hello model", {});
-  const localeResult = await commandCenter("/locale zh-CN", {});
+  const localeResult = await commandCenter("/locale vi-VN", {});
 
   assert.equal(promptResult.loginRequired, true);
   assert.match(promptResult.response, /No available models/);
-  assert.equal(localeResult.locale, "zh-CN");
-  assert.match(localeResult.response, /Locale switched to zh-CN/);
+  assert.equal(localeResult.locale, "en-US");
+  assert.match(localeResult.response, /Locale set to vi-VN; effective locale is en-US/);
   assert.equal(appCreated, false);
 
   const zhCommandCenter = createCommandCenter({
     getApp: async () => {
       throw new Error("app should not be created before login");
     },
-    getLocale: () => "zh-CN",
+    getLocale: () => "en-US",
     hasSelectableModels: async () => false,
   });
   const zhPromptResult = await zhCommandCenter("hello model", {});
 
   assert.equal(zhPromptResult.loginRequired, true);
-  assert.match(zhPromptResult.response, /没有可用模型/);
+  assert.match(zhPromptResult.response, /No available models/);
 });
 
 const reviewCustomCommand = {
@@ -1345,131 +870,8 @@ test("headless prompt propagates a custom command load failure that is not a mis
   assert.equal(ctx.stdout.output().includes("Unknown command"), false);
 });
 
-test("wires TUI input recall skip into the active app", async () => {
-  const ctx = createContext(["tui"]);
-  const recalledSkips: Array<number | undefined> = [];
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: () =>
-      ({
-        sessionId: "session-test",
-        traceId: "trace-test",
-        runtime: {} as never,
-        recallPreviousInputHistory: async (skip?: number) => {
-          recalledSkips.push(skip);
-          return { text: skip === 1 ? "older project prompt" : "previous project prompt" };
-        },
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-      }) as never,
-    runTui: async (options) => {
-      assert.equal(typeof options.recallPreviousInput, "function");
-      const previous = await options.recallPreviousInput?.();
-      const older = await options.recallPreviousInput?.(1);
-      assert.equal(previous?.text, "previous project prompt");
-      assert.equal(older?.text, "older project prompt");
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-  assert.deepEqual(recalledSkips, [undefined, 1]);
-});
 
-test("wires TUI slash command history recording into the active app", async () => {
-  const ctx = createContext(["tui"]);
-  const recorded: Array<{ input: unknown; kind: unknown }> = [];
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: () =>
-      ({
-        getModel: () => "openai/gpt-main",
-        listModels: () => [],
-        recordInputHistory: async (input: unknown, kind?: unknown) => {
-          recorded.push({ input, kind });
-          return null;
-        },
-        sessionId: "session-test",
-        traceId: "trace-test",
-        runtime: {} as never,
-        recallPreviousInputHistory: async () => null,
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-      }) as never,
-    runTui: async (options) => {
-      // 活动 App 在启动屏首帧后创建；此后的 slash 命令写入该 App 的输入历史。
-      await loadTuiStartup(options);
-      await options.submitPrompt("/help", {
-        abortSignal: new AbortController().signal,
-      });
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-  assert.deepEqual(recorded, [{ input: "/help", kind: "slash_command" }]);
-});
-
-test("TUI bare skill command lists skills when startup metadata is unavailable", async () => {
-  const ctx = createContext([]);
-  let appCreationAttempts = 0;
-  let listed = false;
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: () => {
-      appCreationAttempts += 1;
-      throw new Error("app is unavailable");
-    },
-    cwd: () => "/workspace/project",
-    listSkills: async (options) => {
-      listed = true;
-      assert.equal(options.workingDirectory, "/workspace/project");
-      return {
-        diagnostics: [],
-        skills: [
-          {
-            description: "Use for demo tasks.",
-            directory: "/workspace/project/.zcode/skills/demo",
-            frontmatterKeys: ["name", "description"],
-            name: "demo-skill",
-            path: "/workspace/project/.zcode/skills/demo/SKILL.md",
-            rootPath: "/workspace/project/.zcode/skills",
-            safeToAutoLoad: true,
-            scope: "project",
-            source: "zcode",
-          },
-        ],
-        totalDiscovered: 1,
-      } as never;
-    },
-    runTui: async (options) => {
-      // 启动元数据在首帧后加载；App 创建失败时降级为空元数据，TUI 仍可进入。
-      const startup = await loadTuiStartup(options);
-      assert.equal(startup.initialModel, undefined);
-      const result = await options.submitPrompt("/skill", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.match(result.response, /Available skills \(1\)/);
-      assert.match(result.response, /demo-skill \(project\/zcode\)/);
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-  assert.equal(appCreationAttempts, 1);
-  assert.equal(listed, true);
-  assert.equal(ctx.stderr.output(), "");
-});
 
 test("command center handles goal commands locally", async () => {
   let submittedPrompt: string | undefined;
@@ -1633,7 +1035,7 @@ test("command center explains skipped goal continuation in plan mode", async () 
   assert.equal(continued, true);
   assert.match(result.response, /Goal active/);
   assert.match(result.response, /Optimize performance/);
-  assert.match(result.response, /Plan mode 下已记录 goal，但不会自动继续。/);
+  assert.match(result.response, /The goal was recorded in Plan mode, but it will not continue automatically\./);
 });
 
 test("command center asks before replacing an existing goal", async () => {
@@ -1683,94 +1085,10 @@ test("command center asks before replacing an existing goal", async () => {
   assert.equal(result.selection?.items[0]?.command, "/goal replace New target");
 });
 
-test("TUI startup migration failures return before entering fullscreen UI", async () => {
-  const ctx = createContext(["tui"]);
-  let mainUiMounted = false;
-  const migrationError = new Error(
-    "SQLite migration checksum mismatch for 0001_base_session_store",
-  );
-  migrationError.name = "SqliteSessionMigrationError";
 
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: () => {
-      throw migrationError;
-    },
-    // 新启动流程先绘制启动屏，再在 loadStartupOptions 中创建运行时；真实 runTui 在启动数据
-    // 加载失败时销毁 renderer 并把错误抛回 CLI，因此主界面不会挂载，错误在终端恢复后输出。
-    runTui: async (options) => {
-      await options.loadStartupOptions?.();
-      mainUiMounted = true;
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 1);
-  assert.equal(mainUiMounted, false);
-  assert.match(ctx.stderr.output(), /SQLite migration checksum mismatch/);
-  assert.equal(ctx.stdout.output(), "");
-});
 
-test("detects TUI invocations before loading the runtime", () => {
-  assert.equal(isTuiInvocation([]), true);
-  assert.equal(isTuiInvocation(["tui"]), true);
-  assert.equal(isTuiInvocation(["--mode", "build"]), true);
-  assert.equal(isTuiInvocation(["--resume", "session-test", "tui"]), true);
 
-  assert.equal(isTuiInvocation(["acp"]), false);
-  assert.equal(isTuiInvocation(["--help"]), false);
-  assert.equal(isTuiInvocation(["tui", "--help"]), false);
-  assert.equal(isTuiInvocation(["--prompt", "hello"]), false);
-  assert.equal(isTuiInvocation(["missing"]), false);
-  assert.equal(isTuiInvocation(["--wat"]), false);
-});
-
-test("buffers TUI stderr and drops it on clean restore", () => {
-  const stderr = createWriteStream();
-  const interceptor = interceptTuiStderr(stderr);
-
-  stderr.write("runtime warning\n");
-
-  assert.equal(stderr.output(), "");
-  assert.equal(interceptor.bufferedOutput, "runtime warning\n");
-
-  interceptor.restore();
-
-  assert.equal(stderr.output(), "");
-});
-
-test("flushes buffered TUI stderr when startup fails", async () => {
-  const stderr = createWriteStream();
-  const interceptor = interceptTuiStderr(stderr);
-  let callbackCalled = false;
-
-  await new Promise<void>((resolve) => {
-    stderr.write(Buffer.from("startup failed\n"), () => {
-      callbackCalled = true;
-      resolve();
-    });
-  });
-
-  assert.equal(callbackCalled, true);
-  assert.equal(stderr.output(), "");
-
-  interceptor.restore({ flush: true });
-
-  assert.equal(stderr.output(), "startup failed\n");
-});
-
-test("lets controlled TUI errors bypass raw stderr interception", () => {
-  const stderr = createWriteStream();
-  const interceptor = interceptTuiStderr(stderr);
-
-  interceptor.passthrough.write("TUI requires an interactive terminal.\n");
-  stderr.write("runtime warning\n");
-
-  assert.equal(stderr.output(), "TUI requires an interactive terminal.\n");
-  assert.equal(interceptor.bufferedOutput, "runtime warning\n");
-
-  interceptor.restore();
-});
 
 test("filters the known SQLite experimental warning from stderr", () => {
   const stderr = createWriteStream();
@@ -1862,650 +1180,18 @@ test("keeps unrelated stderr while filtering runtime warnings", () => {
   interceptor.restore();
 });
 
-test("wires TUI approval requests into the runtime permission broker", async () => {
-  const ctx = createContext(["tui"]);
-  let approvalSeen = false;
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      assert.ok(options?.permissionBroker);
-      return {
-        listModels: selectableTestModels,
-        sessionId: "session-test",
-        traceId: "trace-test",
-        runtime: {} as never,
-        submitPrompt: async () => {
-          const permission = await options.permissionBroker?.requestPermission(
-            createPermissionRequest(),
-            {
-              signal: new AbortController().signal,
-            },
-          );
-          return {
-            events: [],
-            projection: fakeProjection as never,
-            response: `permission ${permission?.decision}`,
-            traceId: "trace-test" as never,
-            turnId: "turn-test" as never,
-          };
-        },
-      } as never;
-    },
-    runTui: async (options) => {
-      const result = await options.submitPrompt("needs approval", {
-        abortSignal: new AbortController().signal,
-        requestPermission: async (request) => {
-          approvalSeen = true;
-          assert.equal(request.toolName, "Bash");
-          return {
-            decision: "allow",
-            reason: "approved by tui test",
-          };
-        },
-      });
-      assert.equal(result.response, "permission allow");
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-  assert.equal(approvalSeen, true);
-});
 
-test("wires TUI sendInput approval requests into the runtime permission broker", async () => {
-  const ctx = createContext(["tui"]);
-  let approvalSeen = false;
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      assert.ok(options?.permissionBroker);
-      return {
-        sessionId: "session-test",
-        traceId: "trace-test",
-        runtime: {} as never,
-        sendInput: async () => {
-          const permission = await options.permissionBroker?.requestPermission(
-            createPermissionRequest(),
-            {
-              signal: new AbortController().signal,
-            },
-          );
-          return {
-            kind: "started_turn",
-            result: {
-              events: [],
-              projection: fakeProjection as never,
-              response: `permission ${permission?.decision}`,
-              traceId: "trace-test" as never,
-              turnId: "turn-test" as never,
-            },
-          };
-        },
-        submitPrompt: async () => {
-          throw new Error("sendInput should handle this prompt");
-        },
-      } as never;
-    },
-    runTui: async (options) => {
-      assert.ok(options.sendInput);
-      const result = await options.sendInput("needs approval while busy", {
-        abortSignal: new AbortController().signal,
-        requestPermission: async (request) => {
-          approvalSeen = true;
-          assert.equal(request.toolName, "Bash");
-          return {
-            decision: "allow",
-            reason: "approved by tui sendInput test",
-          };
-        },
-      });
-      assert.equal(result.kind, "started_turn");
-      assert.equal(result.result.response, "permission allow");
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-  assert.equal(approvalSeen, true);
-});
 
-test("wires TUI mode display and switching into runtime config", async () => {
-  const ctx = createContext(["--mode", "plan", "tui"]);
-  let appMode: "plan" | "build" | "edit" | "yolo" | "auto" = "build";
-  const runtimeModeUpdates: string[] = [];
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      // 启动屏首帧后按 CLI --mode 创建 App；此后的模式切换都作用于活动 App。
-      assert.equal(options?.runtimeConfig?.mode, "plan");
-      appMode = options?.runtimeConfig?.mode ?? "build";
-      return {
-        getMode: () => appMode,
-        listModels: selectableTestModels,
-        sessionId: "session-test",
-        setMode: async (mode: typeof appMode) => {
-          runtimeModeUpdates.push(mode);
-          const previousMode = appMode;
-          appMode = mode;
-          return {
-            mode: appMode,
-            previousMode,
-            traceId: "trace-test",
-          };
-        },
-        traceId: "trace-test",
-        runtime: {
-          updateConfig: (patch: { mode?: typeof appMode }) => {
-            if (patch.mode) {
-              runtimeModeUpdates.push(patch.mode);
-              appMode = patch.mode;
-            }
-          },
-        } as never,
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-      } as never;
-    },
-    runTui: async (options) => {
-      const startup = await loadTuiStartup(options);
-      assert.equal(startup.initialMode, "plan");
-      const firstSwitch = await options.submitPrompt("/mode yolo", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(firstSwitch.mode, "yolo");
 
-      const promptResult = await options.submitPrompt("hello mode", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(promptResult.mode, "yolo");
 
-      const liveSwitch = await options.submitPrompt("/mode build", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(liveSwitch.mode, "build");
 
-      assert.ok(options.setMode);
-      const shortcutSwitch = await options.setMode("plan");
-      assert.equal(shortcutSwitch.mode, "plan");
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-  assert.deepEqual(runtimeModeUpdates, ["yolo", "build", "plan"]);
-});
 
-test("wires TUI edit mode switching into runtime config", async () => {
-  const ctx = createContext(["--mode", "build", "tui"]);
-  let appMode: "plan" | "build" | "edit" | "yolo" | "auto" = "build";
-  const runtimeModeUpdates: string[] = [];
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      // 启动屏首帧后按 CLI --mode 创建 App；edit 切换经活动 App 的 runtime config 生效。
-      assert.equal(options?.runtimeConfig?.mode, "build");
-      appMode = options?.runtimeConfig?.mode ?? "build";
-      return {
-        getMode: () => appMode,
-        listModels: selectableTestModels,
-        sessionId: "session-edit-test",
-        traceId: "trace-edit-test",
-        runtime: {
-          updateConfig: (patch: { mode?: typeof appMode }) => {
-            if (patch.mode) {
-              runtimeModeUpdates.push(patch.mode);
-              appMode = patch.mode;
-            }
-          },
-        } as never,
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-edit-test" as never,
-          turnId: "turn-edit-test" as never,
-        }),
-      } as never;
-    },
-    runTui: async (options) => {
-      const startup = await loadTuiStartup(options);
-      assert.equal(startup.initialMode, "build");
-      const liveSwitch = await options.submitPrompt("/mode edit", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(liveSwitch.mode, "edit");
 
-      const promptResult = await options.submitPrompt("hello edit mode", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(promptResult.mode, "edit");
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-  assert.deepEqual(runtimeModeUpdates, ["edit"]);
-});
-
-test("wires TUI model command into app server state", async () => {
-  const ctx = createContext(["tui"]);
-  // 模型目录改为协议 Model Option（ref + 推理档位），/model 切换提交完整的结构化选择。
-  const modelOptions = [
-    createTestModelOption("openai", "gpt-main", {
-      defaultLevel: "high",
-      label: "Main",
-      levels: ["low", "high"],
-    }),
-    createTestModelOption("openai", "gpt-lite", {
-      defaultLevel: "low",
-      label: "Lite",
-      levels: ["low", "high"],
-    }),
-  ];
-  let current: ModelSelection = {
-    providerId: "openai",
-    modelId: "gpt-main",
-    options: { reasoningLevel: "high" },
-  };
-  const currentModelId = () => `${current.providerId}/${current.modelId}`;
-  const requestedSelections: unknown[] = [];
-  const savedDefaults: ModelSelection[] = [];
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    startProcessProviderRegistryRuntime: async () =>
-      ({
-        dispose: () => {},
-        modelSelectionConfigRepository: {
-          dispose: () => {},
-          read: async () => undefined,
-          saveConfiguredDefault: async (selection: ModelSelection) => {
-            savedDefaults.push(selection);
-          },
-        },
-        runtime: { registryService: {} },
-      }) as never,
-    createZCodeApp: () => {
-      return {
-        getCurrentModelOption: () =>
-          modelOptions.find(
-            ({ ref }) => ref.providerId === current.providerId && ref.modelId === current.modelId,
-          ),
-        getModel: currentModelId,
-        getThoughtLevel: () => current.options?.reasoningLevel,
-        listModels: () => modelOptions,
-        sessionId: "session-test",
-        setModel: async (selection: ModelSelection) => {
-          requestedSelections.push(selection);
-          const previousModel = currentModelId();
-          current = selection;
-          return {
-            model: currentModelId(),
-            previousModel,
-            thoughtLevel: selection.options?.reasoningLevel,
-            traceId: "trace-test",
-          };
-        },
-        traceId: "trace-test",
-        runtime: {} as never,
-        submitPrompt: async () => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: `using ${currentModelId()}`,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-      } as never;
-    },
-    runTui: async (options) => {
-      const startup = await loadTuiStartup(options);
-      assert.equal(startup.initialModel, "openai/gpt-main");
-      assert.equal(startup.initialThoughtLevel, "high");
-      assert.deepEqual(startup.modelOptions, modelOptions);
-
-      const listed = await options.submitPrompt("/model", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.match(listed.response, /Current model: openai\/gpt-main/);
-      assert.equal(listed.model, "openai/gpt-main");
-      assert.equal(listed.thoughtLevel, "high");
-
-      const switched = await options.submitPrompt("/model openai/gpt-lite", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(switched.response, "Model switched to openai/gpt-lite (low).");
-      assert.equal(switched.model, "openai/gpt-lite");
-      assert.equal(switched.thoughtLevel, "low");
-
-      const promptResult = await options.submitPrompt("hello model", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(promptResult.response, "using openai/gpt-lite");
-      assert.equal(promptResult.model, "openai/gpt-lite");
-      assert.equal(promptResult.thoughtLevel, "low");
-      return 0;
-    },
-  });
-
-  const expectedSelection = {
-    providerId: "openai",
-    modelId: "gpt-lite",
-    options: { reasoningLevel: "low" },
-  };
-  assert.equal(exitCode, 0);
-  assert.deepEqual(requestedSelections, [expectedSelection]);
-  // 用户主动切换成功后，完整选择同步保存为新会话默认值。
-  assert.deepEqual(savedDefaults, [expectedSelection]);
-});
-
-test("wires TUI effort command into app server state", async () => {
-  const ctx = createContext(["tui"]);
-  let thoughtLevel = "medium";
-  const requestedLevels: string[] = [];
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: () => {
-      return {
-        getModel: () => "openai/gpt-main",
-        getThoughtLevel: () => thoughtLevel,
-        listModels: () => [createTestModelOption("openai", "gpt-main", { label: "Main" })],
-        listThoughtLevels: () => ["low", "medium", "high"],
-        sessionId: "session-test",
-        setThoughtLevel: async (level: string) => {
-          requestedLevels.push(level);
-          const previousThoughtLevel = thoughtLevel;
-          thoughtLevel = level;
-          return {
-            previousThoughtLevel,
-            thoughtLevel,
-            traceId: "trace-test",
-          };
-        },
-        traceId: "trace-test",
-        runtime: {} as never,
-        submitPrompt: async () => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: `effort ${thoughtLevel}`,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-      } as never;
-    },
-    runTui: async (options) => {
-      const startup = await loadTuiStartup(options);
-      assert.equal(startup.initialThoughtLevel, "medium");
-      assert.deepEqual(startup.effortOptions, [
-        { id: "low", label: "low" },
-        { id: "medium", label: "medium" },
-        { id: "high", label: "high" },
-      ]);
-
-      const listed = await options.submitPrompt("/effort", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(listed.selection, undefined);
-      assert.match(listed.response, /Current reasoning effort: medium/);
-      assert.match(listed.response, /- high/);
-      assert.equal(listed.thoughtLevel, "medium");
-
-      const switched = await options.submitPrompt("/variant high", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.match(switched.response, /Reasoning effort switched to high/);
-      assert.deepEqual(switched.effortOptions, startup.effortOptions);
-      assert.equal(switched.thoughtLevel, "high");
-
-      const promptResult = await options.submitPrompt("hello effort", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(promptResult.response, "effort high");
-      assert.equal(promptResult.thoughtLevel, "high");
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-  assert.deepEqual(requestedLevels, ["high"]);
-});
-
-test("wires TUI fork command into a new active app", async () => {
-  const ctx = createContext(["tui"]);
-  const createdSessionIds: Array<string | undefined> = [];
-  let forkTarget: string | undefined;
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      const appSessionId = options?.sessionId ?? "sess_parent";
-      createdSessionIds.push(options?.sessionId);
-      return {
-        forkFromCheckpoint: async (forkOptions?: { targetCheckpointId?: string }) => {
-          forkTarget = forkOptions?.targetCheckpointId;
-          return {
-            checkpoint: {} as never,
-            copiedMessageCount: 1,
-            forkedSessionId: "sess_child",
-            restoredFiles: [],
-            response: "Forked session sess_child",
-          };
-        },
-        listModels: selectableTestModels,
-        sessionId: appSessionId,
-        traceId: "trace-test",
-        runtime: {} as never,
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: `${appSessionId}:${prompt}`,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-      } as never;
-    },
-    runTui: async (options) => {
-      const forked = await options.submitPrompt("/fork checkpoint_1", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.match(forked.response, /Switched to forked session sess_child/);
-
-      const promptResult = await options.submitPrompt("hello fork", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(promptResult.response, "sess_child:hello fork");
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-  assert.equal(forkTarget, "checkpoint_1");
-  assert.deepEqual(createdSessionIds, [undefined, "sess_child"]);
-});
-
-test("wires TUI new command into a fresh active app", async () => {
-  const ctx = createContext(["tui"]);
-  const createdSessionIds: Array<string | undefined> = [];
-  const closedSessionIds: string[] = [];
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createZCodeApp: (options) => {
-      const appSessionId = options?.sessionId ?? `sess_new_${createdSessionIds.length}`;
-      createdSessionIds.push(options?.sessionId);
-      return {
-        listModels: selectableTestModels,
-        sessionId: appSessionId,
-        traceId: `trace_${appSessionId}`,
-        runtime: {} as never,
-        close: async () => {
-          closedSessionIds.push(appSessionId);
-        },
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: `${appSessionId}:${prompt}`,
-          traceId: `trace_${appSessionId}` as never,
-          turnId: "turn-test" as never,
-        }),
-      } as never;
-    },
-    runTui: async (options) => {
-      const initial = await options.submitPrompt("hello first", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(initial.response, "sess_new_0:hello first");
-
-      const created = await options.submitPrompt("/new", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.match(created.response, /Started new session sess_new_1/);
-      assert.equal(created.sessionId, "sess_new_1");
-      assert.equal(created.resetSessionProjection, true);
-
-      const promptResult = await options.submitPrompt("hello new", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(promptResult.response, "sess_new_1:hello new");
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-  assert.deepEqual(createdSessionIds, [undefined, undefined]);
-  assert.deepEqual(closedSessionIds, ["sess_new_0", "sess_new_1"]);
-});
-
-test("keeps shared telemetry alive across TUI session replacement and shuts it down once", async () => {
-  const ctx = createContext(["tui"]);
-  let telemetryPrepareCount = 0;
-  let telemetryShutdownCount = 0;
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    prepareZCodeTelemetryEnv: async (env) => {
-      telemetryPrepareCount += 1;
-      return env;
-    },
-    shutdownZCodeTelemetry: async () => {
-      telemetryShutdownCount += 1;
-    },
-    runTui: async (options) => {
-      await options.submitPrompt("hello first", {
-        abortSignal: new AbortController().signal,
-      });
-      await options.submitPrompt("/new", {
-        abortSignal: new AbortController().signal,
-      });
-      assert.equal(telemetryShutdownCount, 0);
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-  assert.equal(telemetryPrepareCount, 2);
-  assert.equal(telemetryShutdownCount, 1);
-});
-
-test("reuses provider endpoint routing when TUI replaces its active session", async () => {
-  const ctx = createContext(["tui"]);
-  const providerEndpointRoutingPort = {
-    async resolve(url: string) {
-      return { routed: false, url };
-    },
-  };
-  let routingFactoryCalls = 0;
-  let createdApps = 0;
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createProviderEndpointRoutingPort: () => {
-      routingFactoryCalls += 1;
-      return providerEndpointRoutingPort;
-    },
-    createZCodeApp: (options) => {
-      assert.equal(options?.providerEndpointRoutingPort, providerEndpointRoutingPort);
-      createdApps += 1;
-      return {
-        close: async () => {},
-        runtime: {} as never,
-        sessionId: `session-routing-tui-${createdApps}`,
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: `trace-routing-tui-${createdApps}` as never,
-          turnId: "turn-routing-tui" as never,
-        }),
-        traceId: `trace-routing-tui-${createdApps}`,
-      } as never;
-    },
-    runTui: async (options) => {
-      await options.submitPrompt("first", {
-        abortSignal: new AbortController().signal,
-      });
-      await options.submitPrompt("/new", {
-        abortSignal: new AbortController().signal,
-      });
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-  assert.equal(createdApps, 2);
-  assert.equal(routingFactoryCalls, 1);
-});
-
-test("closes the active TUI app on process shutdown signals", async () => {
-  const ctx = createContext(["tui"]);
-  const shutdownProcess = createTestShutdownProcess("darwin");
-  const exitDeferred = createDeferred<number>();
-  let closeCount = 0;
-  let telemetryShutdownCount = 0;
-
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    prepareZCodeTelemetryEnv: async (env) => env,
-    shutdownZCodeTelemetry: async () => {
-      telemetryShutdownCount += 1;
-    },
-    createZCodeApp: () =>
-      ({
-        close: async () => {
-          closeCount += 1;
-        },
-        getModel: () => "openai/gpt-test",
-        getThoughtLevel: () => "medium",
-        runtime: {} as never,
-        sessionId: "session-test",
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-test" as never,
-          turnId: "turn-test" as never,
-        }),
-        traceId: "trace-test",
-      }) as never,
-    exitProcess: (code) => {
-      exitDeferred.resolve(code);
-    },
-    runTui: async (options) => {
-      await options.submitPrompt("hello", {
-        abortSignal: new AbortController().signal,
-      });
-      shutdownProcess.emitSignal("SIGHUP");
-      assert.equal(await exitDeferred.promise, 129);
-      return 0;
-    },
-    shutdownProcess,
-  });
-
-  assert.equal(exitCode, 0);
-  assert.equal(closeCount, 1);
-  assert.equal(telemetryShutdownCount, 1);
-});
-
-test("parses built-in slash commands outside the TUI", () => {
+test("parses built-in slash commands", () => {
   assert.deepEqual(parseSlashCommand("hello"), null);
   assert.deepEqual(parseSlashCommand("/compact keep files"), {
     args: "keep files",
@@ -2561,8 +1247,8 @@ test("parses built-in slash commands outside the TUI", () => {
     rawName: "mode",
     type: "known",
   });
-  assert.deepEqual(parseSlashCommand("/locale zh-CN"), {
-    args: "zh-CN",
+  assert.deepEqual(parseSlashCommand("/locale vi-VN"), {
+    args: "vi-VN",
     name: "locale",
     rawName: "locale",
     type: "known",
@@ -2689,7 +1375,7 @@ test("command center returns slash help without creating an app", async () => {
   assert.match(allCommands.response, /\/expert \[status\|resume\|stop\|<task>\]/);
   assert.match(clearCommand.response, /^\/new$/m);
   assert.match(clearCommand.response, /Aliases: \/clear/);
-  assert.match(clearCommand.response, /Start a fresh session in the TUI\./);
+  assert.match(clearCommand.response, /Start a fresh session\./);
   assert.match(effortCommand.response, /^\/effort \[list\|<level>\]/);
   assert.match(effortCommand.response, /Aliases: \/variant/);
   assert.match(effortCommand.response, /reasoning effort/);
@@ -3003,11 +1689,11 @@ test("command center resolves plugin labels from listings by stable plugin id", 
           pluginListingsById: {
             "computer-use@zcode-plugins-official": {
               displayName: "Computer Use",
-              displayNameI18n: { "zh-CN": "电脑控制" },
+              displayNameI18n: { "en-US": "电脑控制" },
             },
             "zcode-cua@custom-marketplace": {
               displayName: "Custom Computer Use",
-              displayNameI18n: { "zh-CN": "自定义电脑控制" },
+              displayNameI18n: { "en-US": "自定义电脑控制" },
             },
           },
           plugins: [
@@ -3060,7 +1746,7 @@ test("command center resolves plugin labels from listings by stable plugin id", 
         traceId: "trace-active",
         submitPrompt: async () => ({ response: "prompt" }),
       }) as never,
-    getLocale: () => "zh-CN",
+    getLocale: () => "en-US",
     getMode: () => "build",
     resumeApp: async () => {
       throw new Error("resume should not run");
@@ -3290,7 +1976,7 @@ test("command center dispatches init through the active app", async () => {
 });
 
 test("command center dispatches workflow through the active app as a prompt", async () => {
-  // 与 /init 同款：TUI 只识别名字，原文交给 app.submitPrompt，由 bootstrap 的 builtin resolver
+  // 与 /init 同款：命令层只识别名字，原文交给 app.submitPrompt，由 bootstrap 的 builtin resolver
   // 展开；没有显式分支会落到 resume 兜底，/workflow 就再也到不了模型。
   let submitted = "";
   const submitPrompt = createCommandCenter({
@@ -3773,16 +2459,16 @@ test("command center reports and switches effort without sending a model prompt"
 });
 
 test("command center reports and switches locale without sending a model prompt", async () => {
-  let locale = "en-US" as const | "zh-CN";
+  let locale = "en-US" as const | "en-US";
   let promptSubmitted = false;
   const submitPrompt = createCommandCenter({
     getApp: async () =>
       ({
         getLocale: () => locale,
         sessionId: "sess_active",
-        setLocale: async (requestedLocale: "auto" | "en-US" | "zh-CN") => {
+        setLocale: async (requestedLocale: "auto" | "en-US" | "vi-VN") => {
           const previousLocale = locale;
-          locale = requestedLocale === "zh-CN" ? "zh-CN" : "en-US";
+          locale = requestedLocale === "en-US" ? "en-US" : "en-US";
           return {
             configPath: "/tmp/zcode/config.json",
             locale,
@@ -3810,7 +2496,7 @@ test("command center reports and switches locale without sending a model prompt"
   const current = await submitPrompt("/locale", {
     abortSignal: new AbortController().signal,
   });
-  const switched = await submitPrompt("/locale zh-CN", {
+  const switched = await submitPrompt("/locale vi-VN", {
     abortSignal: new AbortController().signal,
   });
   const rejected = await submitPrompt("/locale fr-FR", {
@@ -3820,10 +2506,10 @@ test("command center reports and switches locale without sending a model prompt"
   assert.equal(promptSubmitted, false);
   assert.equal(current.locale, "en-US");
   assert.match(current.response, /Current locale: en-US/);
-  assert.equal(switched.locale, "zh-CN");
-  assert.match(switched.response, /Locale switched to zh-CN/);
+  assert.equal(switched.locale, "en-US");
+  assert.match(switched.response, /Locale set to vi-VN; effective locale is en-US/);
   assert.match(switched.response, /Config: \/tmp\/zcode\/config\.json/);
-  assert.equal(rejected.locale, "zh-CN");
+  assert.equal(rejected.locale, "en-US");
   assert.match(rejected.response, /Unsupported locale: fr-FR/);
 });
 
@@ -3985,12 +2671,22 @@ test("prints help with help flag", async () => {
   const exitCode = await run(ctx);
 
   assert.equal(exitCode, 0);
-  assert.match(ctx.stdout.output(), /With no command, zcode opens the full-screen TUI\./);
+  assert.match(ctx.stdout.output(), /With no command, zcode prints this help\./);
   assert.match(ctx.stdout.output(), /Commands:/);
   assert.match(ctx.stdout.output(), /--force-mcs/);
   assert.match(ctx.stdout.output(), /--surface <surface>/);
   assert.match(ctx.stdout.output(), /--resume <sessionId>/);
   assert.match(ctx.stdout.output(), /sessionId \(sess_\.\.\.\)/);
+  assert.equal(ctx.stderr.output(), "");
+});
+
+test("prints help when no command is given", async () => {
+  const ctx = createContext([]);
+  const exitCode = await run(ctx);
+
+  assert.equal(exitCode, 0);
+  assert.match(ctx.stdout.output(), /Usage:/);
+  assert.match(ctx.stdout.output(), /Commands:/);
   assert.equal(ctx.stderr.output(), "");
 });
 
@@ -4772,7 +3468,7 @@ test("loads dotenv before creating the prompt app", async () => {
   assert.equal(ctx.stderr.output(), "");
 });
 
-test("runs a single prompt without opening the TUI", async () => {
+test("runs a single prompt without an interactive UI", async () => {
   const ctx = createContext(["--prompt", "hello runtime"]);
   const exitCode = await run(ctx, createPromptDeps());
 
@@ -5156,36 +3852,6 @@ test("closes a late async app without submitting after shutdown during initializ
   assert.equal(closed, 1);
 });
 
-test("TUI closes an app that finishes initialization after handler shutdown", async () => {
-  const started = createDeferred<void>();
-  const release = createDeferred<void>();
-  let closed = 0;
-  const handler = createTuiSubmitPrompt(
-    {
-      ...createPromptDeps(),
-      createZCodeApp: async () => {
-        started.resolve();
-        await release.promise;
-        return {
-          close: async () => {
-            closed += 1;
-          },
-          getModel: () => "model",
-        } as never;
-      },
-    },
-    {},
-    "test",
-  );
-  const pending = handler.getSessionMetadata!();
-  // 立即注册 rejection observer，避免关闭与迟到返回之间产生未处理拒绝。
-  const rejected = assert.rejects(pending, /closed/);
-  await started.promise;
-  await handler.close?.();
-  release.resolve();
-  await rejected;
-  assert.equal(closed, 1);
-});
 
 test("rejects headless goal replacement without explicit target-replace", async () => {
   const ctx = createContext(["--target", "New target"]);
@@ -5780,7 +4446,7 @@ test("prints JSON for doctor command", async () => {
     const exitCode = await run(ctx);
     const payload = JSON.parse(ctx.stdout.output()) as {
       cli: { name: string; processName: string };
-      packaging: { default: string; sea: string };
+      packaging: { default: string };
       runtime: { node: string; processTitle: string };
     };
 
@@ -5790,7 +4456,6 @@ test("prints JSON for doctor command", async () => {
     assert.equal(payload.runtime.node, process.version);
     assert.equal(payload.runtime.processTitle, CLI_PROCESS_NAME);
     assert.equal(payload.packaging.default, "node-bundle");
-    assert.equal(payload.packaging.sea, "optional");
   } finally {
     process.title = originalTitle;
   }
@@ -5816,12 +4481,12 @@ test("prints human doctor details with verbose diagnostics", async () => {
   }
 });
 
-test("rejects force MCS outside prompt, target, or TUI commands", async () => {
+test("rejects force MCS outside prompt or target commands", async () => {
   const ctx = createContext(["doctor", "--force-mcs"]);
   const exitCode = await run(ctx);
 
   assert.equal(exitCode, 1);
-  assert.match(ctx.stderr.output(), /--force-mcs can only be used with --prompt, --target, or tui/);
+  assert.match(ctx.stderr.output(), /--force-mcs can only be used with --prompt or --target/);
   assert.equal(ctx.stdout.output(), "");
 });
 
@@ -5911,7 +4576,7 @@ test("rejects force MCS before starting the protocol app server", async () => {
 
   assert.equal(exitCode, 1);
   assert.equal(called, false);
-  assert.match(ctx.stderr.output(), /--force-mcs can only be used with --prompt, --target, or tui/);
+  assert.match(ctx.stderr.output(), /--force-mcs can only be used with --prompt or --target/);
   assert.equal(ctx.stdout.output(), "");
 });
 
@@ -6068,7 +4733,7 @@ test("rejects unsupported Browser Use modes and invalid CLI surfaces", async () 
 
   const appServer = createContext(["--browser-use=headless", "app-server", "--stdio"]);
   assert.equal(await run(appServer, createPromptDeps()), 1);
-  assert.match(appServer.stderr.output(), /can only be used with --prompt, --target, or tui/u);
+  assert.match(appServer.stderr.output(), /can only be used with --prompt or --target/u);
 });
 
 test("loads the pinned Playwright runtime from a standard Node CLI install", async () => {
@@ -6212,137 +4877,7 @@ test("forces the existing exit code when the CLI watchdog deadline is reached", 
   assert.equal(await exitDeferred.promise, 7);
 });
 
-test("injects one managed CDP runtime into TUI app lifecycle and closes it", async () => {
-  const ctx = createContext(["--browser-use=headless", "tui"]);
-  const browserControlPort = {} as never;
-  let runtimeClosed = 0;
-  let appClosed = 0;
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    createManagedCdpBrowserRuntime: () => ({
-      browserControlPort,
-      close: async () => {
-        runtimeClosed += 1;
-      },
-    }),
-    createZCodeApp: (options) => {
-      assert.equal(options?.browserControlPort, browserControlPort);
-      return {
-        close: async () => {
-          appClosed += 1;
-        },
-        getLocale: () => "en-US",
-        getModel: () => "openai/gpt-test",
-        getThoughtLevel: () => "medium",
-        runtime: {} as never,
-        sessionId: "session-browser-tui",
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-browser-tui" as never,
-          turnId: "turn-browser-tui" as never,
-        }),
-        traceId: "trace-browser-tui",
-      } as never;
-    },
-    // 真实 TUI 在首帧后通过 loadStartupOptions 创建 App；浏览器运行时随该 App 注入和关闭。
-    runTui: async (options) => {
-      await loadTuiStartup(options);
-      return 0;
-    },
-  });
 
-  assert.equal(exitCode, 0);
-  assert.equal(appClosed, 1);
-  assert.equal(runtimeClosed, 1);
-});
-
-test("reuses one process provider registry across TUI app replacements", async () => {
-  const ctx = createContext(["tui"]);
-  const providerRegistry = {} as never;
-  const providerRuntimeHeadersPort = {} as never;
-  let runtimeStarts = 0;
-  let runtimeDisposals = 0;
-  let selectionRepositoryDisposals = 0;
-  let appCreations = 0;
-  const exitCode = await run(ctx, {
-    ...createPromptDeps(),
-    skipUserConfig: false,
-    userConfigPath: "/tmp/zcode-legacy-tui.json",
-    startProcessProviderRegistryRuntime: async (_env, options) => {
-      runtimeStarts += 1;
-      assert.deepEqual(options, {
-        standalone: {
-          legacyCliUserConfigFilePath: "/tmp/zcode-legacy-tui.json",
-        },
-      });
-      return {
-        accountSource: {} as never,
-        dispose: () => {
-          selectionRepositoryDisposals += 1;
-          runtimeDisposals += 1;
-        },
-        configuredDefaultModelSelection: { providerId: "provider-a", modelId: "model-a" },
-        modelSelectionConfigRepository: {
-          dispose: () => {
-            selectionRepositoryDisposals += 1;
-          },
-          read: async () => ({ providerId: "provider-a", modelId: "model-a" }),
-        },
-        providerRuntimeHeadersPort,
-        snapshot: {} as never,
-        runtime: {
-          dispose: () => {
-            runtimeDisposals += 1;
-          },
-          registryService: providerRegistry,
-        },
-      } as never;
-    },
-    createZCodeApp: (options) => {
-      appCreations += 1;
-      assert.equal(options?.providerRegistry, providerRegistry);
-      assert.equal(options?.providerRuntimeHeadersPort, providerRuntimeHeadersPort);
-      assert.equal(Object.hasOwn(options ?? {}, "workspaceProviderCompatibilityMode"), false);
-      assert.deepEqual(options?.configuredDefaultModelSelection, {
-        providerId: "provider-a",
-        modelId: "model-a",
-      });
-      return {
-        close: async () => {},
-        getLocale: () => "en-US",
-        getModel: () => "openai/gpt-test",
-        getThoughtLevel: () => "medium",
-        runtime: {} as never,
-        sessionId: `session-registry-tui-${appCreations}`,
-        submitPrompt: async (prompt: string) => ({
-          events: [],
-          projection: fakeProjection as never,
-          response: prompt,
-          traceId: "trace-registry-tui" as never,
-          turnId: "turn-registry-tui" as never,
-        }),
-        traceId: "trace-registry-tui",
-      } as never;
-    },
-    runTui: async (options) => {
-      await options.submitPrompt("/new", {
-        requestPermission: async () => ({
-          decision: "deny",
-          resolvedAt: new Date(),
-        }),
-      });
-      return 0;
-    },
-  });
-
-  assert.equal(exitCode, 0);
-  assert.equal(appCreations, 2);
-  assert.equal(runtimeStarts, 1);
-  assert.equal(runtimeDisposals, 1);
-  assert.equal(selectionRepositoryDisposals, 1);
-});
 
 test("rejects an invalid explicit browser executable before creating the app", async () => {
   const ctx = createContext([
@@ -6366,14 +4901,6 @@ test("rejects an invalid explicit browser executable before creating the app", a
   assert.match(ctx.stderr.output(), /missing or not executable/u);
 });
 
-test("rejects tui when stdio is not interactive", async () => {
-  const ctx = createContext(["tui"]);
-  const exitCode = await run(ctx);
-
-  assert.equal(exitCode, 1);
-  // Locale can come from user config; the invariant is that non-interactive TUI exits.
-  assert.match(ctx.stderr.output(), /TUI requires an interactive terminal|TUI 需要交互式终端/);
-});
 
 const createRuntimeEvent = (type: string, payload: Record<string, unknown>): never =>
   ({

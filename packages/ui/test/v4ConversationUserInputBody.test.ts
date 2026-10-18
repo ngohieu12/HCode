@@ -1,4 +1,5 @@
 import { act, createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -140,7 +141,7 @@ async function renderBody(root: Root, rowId: number, contentText: string) {
     root.render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ConversationUserInputBody,
           { contentText, rowId },

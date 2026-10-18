@@ -569,7 +569,7 @@ describe("session persistence", () => {
         uiLocale: "auto",
       });
 
-      expect(app.getLocale()).toBe("zh-CN");
+      expect(app.getLocale()).toBe("en-US");
     } finally {
       store.close();
     }
@@ -608,7 +608,7 @@ describe("session persistence", () => {
       await app.submitPrompt("hello");
 
       const firstRequest = requests[0]?.join("\n") ?? "";
-      expect(app.getLocale()).toBe("zh-CN");
+      expect(app.getLocale()).toBe("en-US");
       expect(firstRequest).toContain("hello");
       // 修复原因：现行 prompt 合同已移除 legacy # Language，UI locale 只影响界面展示。
       expect(firstRequest).not.toContain("# Language");
@@ -653,14 +653,14 @@ describe("session persistence", () => {
         userConfigPath: configPath,
       });
 
-      const result = await app.setLocale("zh-CN");
+      const result = await app.setLocale("en-US");
       const written = JSON.parse(await readFile(configPath, "utf-8"));
 
-      expect(result.locale).toBe("zh-CN");
+      expect(result.locale).toBe("en-US");
       expect(result.previousLocale).toBe("en-US");
-      expect(result.requestedLocale).toBe("zh-CN");
-      expect(app.getLocale()).toBe("zh-CN");
-      expect(written.ui.locale).toBe("zh-CN");
+      expect(result.requestedLocale).toBe("en-US");
+      expect(app.getLocale()).toBe("en-US");
+      expect(written.ui.locale).toBe("en-US");
 
       await app.submitPrompt("hello");
 

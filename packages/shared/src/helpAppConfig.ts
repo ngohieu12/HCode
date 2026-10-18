@@ -5,7 +5,6 @@ import { getCommunityUrlFromConfigs, getFeedbackUrlFromConfig } from "./remoteAp
 const helpConfigSchema = z.object({
   community_urls: z
     .object({
-      "zh-CN": z.string().optional().catch(undefined),
       "en-US": z.string().optional().catch(undefined),
     })
     .optional()
@@ -35,7 +34,6 @@ export function resolveHelpAppConfig(remote: unknown, local: unknown): HelpAppCo
   const localConfig = helpConfigSchema.safeParse(local).data;
   return {
     community_urls: {
-      "zh-CN": getCommunityUrlFromConfigs(remoteConfig, localConfig, "zh-CN"),
       "en-US": getCommunityUrlFromConfigs(remoteConfig, localConfig, "en-US"),
     },
     feedback_url: getFeedbackUrlFromConfig(remoteConfig) ?? getFeedbackUrlFromConfig(localConfig),

@@ -2,14 +2,13 @@ import { createServer } from "node:http";
 import { once } from "node:events";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { build } from "esbuild";
 
 export const HELP_FIXTURE_PATH = resolve(
   import.meta.dirname,
   "../fixtures/fs/settings/help-client-config/config.json",
 );
 export interface HelpFixtureConfig {
-  community_urls?: Partial<Record<"zh-CN" | "en-US", string>>;
+  community_urls?: Partial<Record<"en-US" | "vi-VN", string>>;
   feedback_url?: string;
   feedback_use_external_form?: boolean;
 }
@@ -20,7 +19,7 @@ export async function readHelpFixture(): Promise<{
   return JSON.parse(await readFile(HELP_FIXTURE_PATH, "utf8"));
 }
 
-export async function startHelpConfigFixture(config: HelpFixtureConfig, browserBundle?: string) {
+export async function startHelpConfigFixture(config: HelpFixtureConfig) {
   let payload: unknown = { code: 0, data: { configs: { feedbackUrl: config } } };
   let status = 200;
   let raw: string | undefined;
@@ -28,18 +27,6 @@ export async function startHelpConfigFixture(config: HelpFixtureConfig, browserB
   const requests: Array<{ url: string; headers: Record<string, string | string[] | undefined> }> =
     [];
   const server = createServer((req, res) => {
-    if (req.url === "/web-helper.js") {
-      res.writeHead(200, { "Content-Type": "application/javascript", "Cache-Control": "no-store" });
-      res.end(browserBundle ?? "");
-      return;
-    }
-    if (req.url === "/") {
-      res.writeHead(200, { "Content-Type": "text/html", "Cache-Control": "no-store" });
-      res.end(
-        '<!doctype html><meta name="viewport" content="width=device-width"><title>E2E_HELP_WEB</title><script src="/web-helper.js"></script>',
-      );
-      return;
-    }
     if (!req.url?.startsWith("/api/v1/client/configs?")) {
       res.writeHead(404);
       res.end();
@@ -95,20 +82,4 @@ export async function startHelpConfigFixture(config: HelpFixtureConfig, browserB
       );
     },
   };
-}
-
-export async function buildHelpBrowserFixture(): Promise<string> {
-  const result = await build({
-    stdin: {
-      contents:
-        'import * as help from "./packages/web/src/communityUrl.ts"; window.helpFixture = help;',
-      resolveDir: resolve(import.meta.dirname, "../../../../.."),
-    },
-    bundle: true,
-    write: false,
-    platform: "browser",
-    format: "iife",
-    define: { "import.meta.env": "{}" },
-  });
-  return result.outputFiles[0]!.text;
 }

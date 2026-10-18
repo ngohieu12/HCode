@@ -68,7 +68,7 @@ export function V4UserInputDialog({ model, onSubmit }: V4UserInputDialogProps) {
               data-testid={TID_V4_USER_INPUT_TEXT}
             />
             <Button type="button" onClick={handleFreeTextSubmit}>
-              提交
+              Submit
             </Button>
           </div>
         ) : null}

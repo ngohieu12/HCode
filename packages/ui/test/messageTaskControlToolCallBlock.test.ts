@@ -1,4 +1,5 @@
 import { createElement, type ComponentType } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -25,7 +26,7 @@ function renderToolCall(toolCall: TaskChatToolCallTreeNode["toolCall"]) {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(ToolCallBlock, {
         toolCallNode: {
           toolCall,
@@ -45,7 +46,7 @@ function renderDedicatedToolCall(
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(Renderer, {
         toolCallNode: {
           toolCall,

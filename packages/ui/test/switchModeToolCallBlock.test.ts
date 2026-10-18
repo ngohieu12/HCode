@@ -1,4 +1,5 @@
 import type { IBroadcastService, IServiceAccessor } from "@zcode/services";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { ServiceProvider } from "@/hooks/useServices.js";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 import { StoreProvider } from "@/store/StoreProvider.js";
@@ -59,7 +60,7 @@ function renderSwitchModeBlock(
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(
         ServiceProvider,
         { services: mockServices },

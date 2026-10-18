@@ -49,12 +49,12 @@ export function detectArchitectureMismatch(
 }
 
 export function resolveArchitectureDownloadUrl(
-  locale: Locale,
+  _locale: Locale,
   endpointOrigin = DEFAULT_ZCODE_ENDPOINT_ORIGIN,
 ): string {
-  // 与 changelog 等外链保持一致，按应用语言分流到官网下载页。
+  // 与 changelog 等外链保持一致，统一指向官网英文下载页。
   const origin = buildZCodeEndpointUrls(endpointOrigin).origin;
-  return locale === "zh-CN" ? `${origin}/cn` : `${origin}/en`;
+  return `${origin}/en`;
 }
 
 interface ArchitectureMismatchDialogText {
@@ -67,22 +67,8 @@ interface ArchitectureMismatchDialogText {
 
 export function formatArchitectureMismatchDialogText(
   mismatch: ArchitectureMismatch,
-  locale: Locale,
+  _locale: Locale,
 ): ArchitectureMismatchDialogText {
-  const isZh = locale === "zh-CN";
-  if (isZh) {
-    return {
-      title: "架构不匹配",
-      message: "当前安装的不是适配本机的版本",
-      detail:
-        `你正在运行 ${mismatch.binaryArch} 版本，但本机是 ${mismatch.nativeArch}（Apple 芯片）架构，` +
-        `当前通过系统转译运行，会更慢、更耗电。\n\n` +
-        `建议前往官网下载并安装 ${mismatch.nativeArch} 原生版本以获得最佳性能。`,
-      downloadButton: "前往下载",
-      dismissButton: "暂不处理",
-    };
-  }
-
   return {
     title: "Architecture Mismatch",
     message: "The installed build does not match your machine",

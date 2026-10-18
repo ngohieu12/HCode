@@ -46,8 +46,8 @@ function withStartAuthorization(manager: {
 
 vi.mock("electron", () => ({
   app: {
-    getLocale: vi.fn(() => "zh-CN"),
-    getPreferredSystemLanguages: vi.fn(() => ["zh-CN"]),
+    getLocale: vi.fn(() => "en-US"),
+    getPreferredSystemLanguages: vi.fn(() => ["en-US"]),
   },
   BrowserWindow: {
     fromWebContents: h.fromWebContents,

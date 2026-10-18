@@ -10,7 +10,7 @@ import {
   resolveBotProviderEntry,
 } from "../src/botsUi.js";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 describe("BotsDialog config", () => {
   it("keeps reply granularity labels localized", () => {

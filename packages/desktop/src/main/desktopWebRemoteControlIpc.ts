@@ -107,7 +107,7 @@ export function registerWebRemoteControlIpcHandlers(
       runStartOperation({
         context,
         sender: event.sender,
-        missingWindowMessage: "未找到当前窗口，无法开启 Web 远程控制",
+        missingWindowMessage: "No active window found; cannot start web remote control",
         operation: (windowId) => {
           const manager = dependencies.webRemoteControlManager;
           const authorization = manager.authorizeStart(windowId, context);

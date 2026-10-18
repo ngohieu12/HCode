@@ -53,10 +53,8 @@ export function getCommunityUrlsFromConfig(config: unknown): LocaleUrlMap {
     return {};
   }
 
-  return {
-    "zh-CN": sanitizeUrl(rawCommunityUrls["zh-CN"]),
-    "en-US": sanitizeUrl(rawCommunityUrls["en-US"]),
-  };
+  const enUS = sanitizeUrl(rawCommunityUrls["en-US"]);
+  return enUS ? { "en-US": enUS } : {};
 }
 
 export function getCommunityUrlFromConfig(config: unknown, locale: Locale): string | undefined {
@@ -72,9 +70,9 @@ export function getCommunityUrlFromConfigs(
   const remoteUrls = getCommunityUrlsFromConfig(remoteConfig);
   const localUrls = getCommunityUrlsFromConfig(localConfig);
 
-  // 社群渠道具有语言边界。只允许远端覆盖同语言的内置入口，
-  // 对应语言缺失时保持隐藏，避免中文和英文用户被导向错误渠道。
-  return remoteUrls[locale] ?? localUrls[locale];
+  // 社群渠道具有语言边界。越南语没有独立社群入口，回落到英文站；
+  // 两种语言都缺失时保持隐藏。
+  return remoteUrls[locale] ?? remoteUrls["en-US"] ?? localUrls[locale] ?? localUrls["en-US"];
 }
 
 export function getForceUpdateMinimalVersionFromConfig(config: unknown): string | undefined {

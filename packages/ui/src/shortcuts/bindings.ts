@@ -332,9 +332,9 @@ function normalizeEventKey(rawKey: string): string | null {
 let shortcutRecordingActive = false;
 
 /**
- * 设置页进入快捷键录制态时置 true。
- * 录制监听与 useAppKeyboard 同为 window capture 监听，但注册更晚（点击录制按钮才挂），
- * 同阶段先注册先执行——录制按下的组合会先触发原命令再进入录制处理，改键永远不成功。
+ * 设置页进入组合键捕获态（「按组合键搜索」武装）时置 true。
+ * 捕获监听与 useAppKeyboard 同为 window capture 监听，但注册更晚（武装后才挂），
+ * 同阶段先注册先执行——按下的组合会先触发原命令再进入捕获处理，搜索永远捕获不到。
  * useAppKeyboard 分发前检查此标记短路；menu 通道由 platform.setShortcutRecordingActive
  * 通知 main 暂时摘除菜单 accelerator（macOS 系统菜单会先于 renderer 吃掉按键）。
  */

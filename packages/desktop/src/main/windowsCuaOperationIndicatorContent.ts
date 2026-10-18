@@ -11,10 +11,8 @@ const INDICATOR_CARD_HEIGHT = 38;
 export const INDICATOR_CARD_TOP_OFFSET = 12;
 export const INDICATOR_SHADOW_INSET = { top: 6, right: 8, bottom: 12, left: 8 } as const;
 
-export function indicatorCopy(locale: Locale): { text: string; width: number } {
-  return locale === "zh-CN"
-    ? { text: "HCode 正在操作电脑", width: 234 }
-    : { text: "HCode is controlling your computer", width: 308 };
+export function indicatorCopy(_locale: Locale): { text: string; width: number } {
+  return { text: "HCode is controlling your computer", width: 308 };
 }
 
 export function indicatorWindowSize(locale: Locale): { width: number; height: number } {

@@ -16,7 +16,6 @@ const productionRoots = [
   "apps/zcode-cli/packages/cli/src",
   "apps/zcode-cli/packages/contracts/src",
   "apps/zcode-cli/packages/core/src",
-  "apps/zcode-cli/packages/tui/src",
 ] as const;
 
 // 内置供应商体系下线时一次性删除了旧 DTO 的全部持有者：生产面已无遗留，

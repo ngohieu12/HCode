@@ -12,7 +12,7 @@ export function formatDateTime(value: string | Date) {
   if (Number.isNaN(date.getTime())) {
     return "n/a";
   }
-  return date.toLocaleString("zh-CN", {
+  return date.toLocaleString("en-US", {
     hour12: false,
     timeZoneName: "short",
   });

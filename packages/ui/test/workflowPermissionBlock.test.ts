@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import type { ZCodePermissionRequest } from "@zcode/shared";
 import { createElement, type ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -89,13 +90,13 @@ function buildWorkflowRequest(
 
 function renderDialog(
   request: ZCodePermissionRequest = buildWorkflowRequest(),
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
   onRespond: (requestId: string, option: unknown, feedback?: string) => void = () => {},
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(PermissionDialog, {
         request,
         onRespond,
@@ -131,7 +132,7 @@ describe("WorkflowPermissionBlock", () => {
   });
 
   it("renders the localized question in both locales", () => {
-    renderDialog(buildWorkflowRequest(), "zh-CN");
+    renderDialog(buildWorkflowRequest(), "vi-VN");
     expect(screen.getByText("运行此工作流？")).toBeTruthy();
     expect(screen.getByText("显示完整脚本")).toBeTruthy();
     cleanup();
@@ -283,7 +284,7 @@ describe("WorkflowPermissionBlock", () => {
         run_id: "dwfrun-prev",
         predecessor: { status: "running", owned_by_this_session: false },
       }),
-      "zh-CN",
+      "vi-VN",
     );
 
     expect(screen.getByTestId("workflow-card-kind").textContent).toBe("调整此工作流？");
@@ -339,7 +340,7 @@ describe("WorkflowPermissionBlock", () => {
         run_id: "dwfrun-prev",
         predecessor: { status: "completed", owned_by_this_session: false, script_inherited: true },
       }),
-      "zh-CN",
+      "vi-VN",
     );
 
     const lineage = document.querySelector('[data-workflow-amends="true"]');
@@ -396,7 +397,7 @@ describe("WorkflowPermissionBlock", () => {
   });
 
   it("localizes the row", () => {
-    renderDialog(buildWorkflowRequest({ raw: { script: SCRIPT, max_concurrency: 4 } }), "zh-CN");
+    renderDialog(buildWorkflowRequest({ raw: { script: SCRIPT, max_concurrency: 4 } }), "vi-VN");
 
     expect(queryMaxConcurrency()?.textContent).toBe("最多 4 个子代理同时运行");
   });
@@ -481,7 +482,7 @@ describe("WorkflowPermissionBlock", () => {
   it("localizes the subagent-model row, leaving the model name untranslated", () => {
     renderDialog(
       buildWorkflowRequest({ raw: { script: SCRIPT, subagent_model: "anthropic/opus-5$high" } }),
-      "zh-CN",
+      "vi-VN",
     );
 
     expect(querySubagentModel()?.textContent).toBe("子代理运行在 opus-5 · 思考 高");
@@ -544,7 +545,7 @@ describe("PermissionDialog workflow dispatch", () => {
   // 会话免确认（docs/dynamic-workflow/launch.md「Always allow in this session」）：name 命中本地化，描述不沿用项目级文案。
   it.each([
     ["en-US", "Always allow in this session", "Do not ask again for workflows in this session"],
-    ["zh-CN", "本会话内始终允许", "本会话内运行工作流不再询问"],
+    ["vi-VN", "本会话内始终允许", "本会话内运行工作流不再询问"],
   ] as const)("localizes the session option in %s", (locale, label, description) => {
     renderDialog(buildWorkflowRequest(), locale);
 
@@ -730,7 +731,7 @@ describe("PermissionDialog workflow refine", () => {
   });
 
   it("双语渲染 Refine 行文案", () => {
-    renderDialog(buildRefineRequest(), "zh-CN");
+    renderDialog(buildRefineRequest(), "vi-VN");
     expect(queryRefineInput()!.placeholder).toBe("描述这个工作流应该怎么改…");
     expect(queryRefineInput()!.getAttribute("aria-label")).toBe("提出修改");
     cleanup();

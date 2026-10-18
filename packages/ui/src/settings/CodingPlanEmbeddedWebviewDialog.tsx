@@ -33,7 +33,6 @@ import {
   type CodingPlanPurchaseCompletePayload,
   ZCODE_ENV,
   ZCODE_VERSION,
-  toZhEnLocale,
 } from "@zcode/shared";
 
 interface CodingPlanEmbeddedWebviewDialogProps {
@@ -86,15 +85,15 @@ export function CodingPlanEmbeddedWebviewDialog({
   onPurchaseComplete,
   onOpenResult,
 }: CodingPlanEmbeddedWebviewDialogProps) {
-  const { intl, locale } = useZCodeIntl();
+  const { intl } = useZCodeIntl();
   const platform = usePlatform();
   const theme = useZCodeStoreWithDefault((state) => state.theme, "zai-dark");
   const userId = useZCodeStoreWithDefault((state) => state.user?.id ?? null, null);
   const webviewRef = useRef<ElectronWebviewTag | null>(null);
   const onOpenResultRef = useRef(onOpenResult);
   onOpenResultRef.current = onOpenResult;
-  // 当前 locale 作为 webview 语言 hint / 注入值；Locale 与 CodingPlanWebviewLocale 同构。
-  const webviewLocale = toZhEnLocale(locale);
+  // 应用只提供越南语/英语，官网 webview 固定使用英文（其语言子集不含越南语）。
+  const webviewLocale = "en-US" as const;
   const webviewCleanupRef = useRef<(() => void) | null>(null);
   // webview 是否已 dom-ready：executeJavaScript 只在 ready 后调用，
   // 否则会抛 "WebView must be attached to the DOM and dom-ready emitted"。
@@ -200,7 +199,6 @@ export function CodingPlanEmbeddedWebviewDialog({
           provider,
           credentials,
           theme: embeddedTheme,
-          locale: webviewLocale,
           reportContext,
         });
         // webview 使用持久 partition，provider/account 切换时不能让旧 token
@@ -231,7 +229,7 @@ export function CodingPlanEmbeddedWebviewDialog({
     if (!webviewReadyRef.current) return;
     const webview = webviewRef.current;
     if (!webview) return;
-    const script = createCodingPlanLangInjectionScript(webviewLocale);
+    const script = createCodingPlanLangInjectionScript();
     void webview.executeJavaScript(script, true).catch(() => {
       // webview 已销毁时 executeJavaScript 会拒绝，静默即可。
     });

@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -18,7 +19,7 @@ describe("topic preparation presentation", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN", children: null },
+        { initialLocale: "vi-VN", messages: zhCNLegacy, children: null },
         createElement(BotTopicPreparationList, {
           items: [
             { messageId: "a", senderName: "Alice", text: "first", status: "preparing" },
@@ -48,7 +49,7 @@ describe("topic preparation presentation", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN", children: null },
+        { initialLocale: "vi-VN", messages: zhCNLegacy, children: null },
         createElement(BotTopicPreparationList, {
           items: [
             { messageId: "a", senderName: "Alice", text: "first\nsecond", status: "preparing" },
@@ -100,7 +101,7 @@ describe("topic preparation presentation", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN", children: null },
+        { initialLocale: "vi-VN", messages: zhCNLegacy, children: null },
         createElement(BotTopicPreparationList, {
           provider: "lark",
           items: [{ messageId: "a", senderName: "Alice", text: "hello", status: "preparing" }],

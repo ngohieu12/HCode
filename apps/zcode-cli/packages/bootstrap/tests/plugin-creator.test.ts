@@ -17,7 +17,7 @@ describe("bundled Plugin Creator", () => {
     expect(definition).toMatchObject({
       defaultEnabled: true,
       version: "0.1.1",
-      listing: { displayName_i18n: { "zh-CN": "插件创建器" } },
+      listing: { displayName_i18n: { "en-US": "插件创建器" } },
     });
     const root = fileURLToPath(new URL("../../plugin-creator-plugin/", import.meta.url));
     const manifest = JSON.parse(await readFile(join(root, ".zcode-plugin/plugin.json"), "utf8"));
@@ -35,7 +35,7 @@ describe("bundled Plugin Creator", () => {
         expect(definition.listing, definition.name).toBeUndefined();
         continue;
       }
-      expect(definition.listing?.description_i18n?.["zh-CN"], definition.name).toBeTruthy();
+      expect(definition.listing?.description_i18n?.["en-US"], definition.name).toBeTruthy();
     }
   });
 });

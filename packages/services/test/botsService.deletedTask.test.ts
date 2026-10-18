@@ -13,7 +13,7 @@ afterEach(() => {
   for (const service of services.splice(0)) service.disposeAll();
 });
 
-function setup(locale: "zh-CN" | "en-US" = "zh-CN", remote = true) {
+function setup(locale: "en-US" | "vi-VN" = "en-US", remote = true) {
   const workspace = {
     workspacePath: "/tmp/workspace",
     ...(remote ? { workspaceIdentity: "ssh://host/tmp/workspace" } : {}),
@@ -138,7 +138,7 @@ describe("Bot deleted active task recovery", () => {
   it.each([true, false])(
     "replaces a deleted task once, preserving workspace scope (remote=%s)",
     async (remote) => {
-      const h = setup("zh-CN", remote);
+      const h = setup("en-US", remote);
       await h.service.handleInboundMessage(inbound);
       expect(h.taskService.listDeletedTaskIds).toHaveBeenCalledWith(h.workspace);
       expect(h.taskService.resumeTask).not.toHaveBeenCalled();
@@ -159,8 +159,8 @@ describe("Bot deleted active task recovery", () => {
       expect((await h.repo.readState()).bots[actor.botId]?.pendingElicitation).toBeUndefined();
       expect(h.taskService.respondElicitation).not.toHaveBeenCalled();
       expect(h.requests).toHaveLength(1);
-      expect(h.requests[0]).toContain("原任务已删除");
-      expect(h.requests[0]).toContain("不会继承原任务的对话上下文");
+      expect(h.requests[0]).toContain("The previous task was deleted");
+      expect(h.requests[0]).toContain("without the previous conversation history");
       expect(h.broadcastService.send).toHaveBeenCalledWith(
         expect.objectContaining({
           channel: "bots:task",

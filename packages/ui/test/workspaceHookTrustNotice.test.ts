@@ -1,4 +1,5 @@
 import type { Hook, WorkspaceHookReviewTrustState } from "@zcode/shared";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -40,11 +41,11 @@ function workspaceHook(trustState: WorkspaceHookReviewTrustState): Hook {
   };
 }
 
-function renderNotice(locale: "en-US" | "zh-CN", hooks: Hook[]): string {
+function renderNotice(locale: "en-US" | "vi-VN", hooks: Hook[]): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkspaceHookTrustNotice, { hooks }),
     ),
   );
@@ -65,7 +66,7 @@ describe("Workspace Hook Trust settings notice", () => {
   });
 
   it("uses the requested Chinese copy", () => {
-    expect(renderNotice("zh-CN", [workspaceHook("stale_digest")])).toContain(
+    expect(renderNotice("vi-VN", [workspaceHook("stale_digest")])).toContain(
       "钩子可在沙盒外运行，因此，请审查最近安装或修改的所有钩子",
     );
   });

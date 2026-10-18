@@ -1,6 +1,7 @@
 /** @vitest-environment jsdom */
 
 import type { IBroadcastService } from "@zcode/services";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import {
   createElement,
   type ComponentProps,
@@ -91,7 +92,7 @@ function renderImageToolCall(source?: "browser_turn_end", imageCount = 1) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(
         StoreProvider,
         { broadcastService: mockBroadcastService },
@@ -141,7 +142,7 @@ describe("node repl tool interaction", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           StoreProvider,
           { broadcastService: mockBroadcastService },
@@ -206,7 +207,7 @@ describe("node repl tool interaction", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           StoreProvider,
           { broadcastService: mockBroadcastService },
@@ -372,7 +373,7 @@ describe("node repl tool interaction", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ImagePreviewDialog, {
           initialIndex: 0,
           items: [
@@ -405,7 +406,7 @@ describe("node repl tool interaction", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ImagePreviewDialog, {
           initialIndex: 0,
           items: [
@@ -464,7 +465,7 @@ describe("node repl tool interaction", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ImagePreviewDialog, {
           initialIndex: 0,
           items: [

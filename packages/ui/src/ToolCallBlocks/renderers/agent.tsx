@@ -161,19 +161,25 @@ function BackgroundAgentProcessSection({
   const msg = (id: string, fallback: string) => formatAgentMessage(intl, id, fallback);
   const launchStatus =
     status === "failed"
-      ? msg("chat.toolCall.agent.backgroundLaunchFailed", "启动失败")
+      ? msg("chat.toolCall.agent.backgroundLaunchFailed", "Launch failed")
       : status === "pending"
-        ? msg("chat.toolCall.agent.backgroundLaunching", "启动中")
-        : msg("chat.toolCall.agent.backgroundLaunched", "已启动");
+        ? msg("chat.toolCall.agent.backgroundLaunching", "Launching")
+        : msg("chat.toolCall.agent.backgroundLaunched", "Launched");
   const launchStatusKind =
     status === "failed" ? "failed" : status === "pending" ? "pending" : "launched";
   const activityStatus = isRunning
     ? hasActivity
-      ? msg("chat.toolCall.agent.backgroundActivityStreaming", "后台运行中，正在同步输出")
-      : msg("chat.toolCall.agent.backgroundActivityRunningWaiting", "后台运行中，等待输出")
+      ? msg(
+          "chat.toolCall.agent.backgroundActivityStreaming",
+          "Running in background, syncing output",
+        )
+      : msg(
+          "chat.toolCall.agent.backgroundActivityRunningWaiting",
+          "Running in background, waiting for output",
+        )
     : hasActivity
-      ? msg("chat.toolCall.agent.backgroundActivityReceived", "已收到子智能体回传")
-      : msg("chat.toolCall.agent.backgroundActivityWaiting", "等待子智能体回传");
+      ? msg("chat.toolCall.agent.backgroundActivityReceived", "SubAgent output received")
+      : msg("chat.toolCall.agent.backgroundActivityWaiting", "Waiting for SubAgent output");
   const activityStatusKind = isRunning
     ? hasActivity
       ? "streaming"
@@ -189,17 +195,19 @@ function BackgroundAgentProcessSection({
       className="rounded-lg border border-border bg-background-alt/40 p-3 text-ui-base"
     >
       <div className="font-medium text-foreground-subtle">
-        {msg("chat.toolCall.agent.backgroundProcess", "后台 Agent 过程")}
+        {msg("chat.toolCall.agent.backgroundProcess", "Background Agent process")}
       </div>
       <div className="mt-2 space-y-2">
-        <BackgroundAgentProcessRow label={msg("chat.toolCall.agent.backgroundLaunch", "启动")}>
+        <BackgroundAgentProcessRow label={msg("chat.toolCall.agent.backgroundLaunch", "Launch")}>
           {launchStatus}
         </BackgroundAgentProcessRow>
-        <BackgroundAgentProcessRow label={msg("chat.toolCall.agent.backgroundActivity", "活动")}>
+        <BackgroundAgentProcessRow
+          label={msg("chat.toolCall.agent.backgroundActivity", "Activity")}
+        >
           {activityStatus}
         </BackgroundAgentProcessRow>
         {outputFile ? (
-          <BackgroundAgentProcessRow label={msg("chat.toolCall.agent.outputFile", "输出文件")}>
+          <BackgroundAgentProcessRow label={msg("chat.toolCall.agent.outputFile", "Output file")}>
             <span className="block break-all rounded-md bg-background px-2 py-1 font-mono text-foreground-subtle">
               {outputFile}
             </span>

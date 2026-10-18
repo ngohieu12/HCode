@@ -297,16 +297,10 @@ function buildStaticProductsSnapshot(
 function buildZaiStartStaticProducts(
   preview: StartPlanPreviewConfig,
 ): CodingPlanStaticProduct[] {
-  const isChineseLocale =
-    typeof navigator !== "undefined" &&
-    navigator.language.toLowerCase().startsWith("zh");
   const previewName = preview.name.trim() || "Z.ai Start";
   const equityList = preview.entitlements.map((entitlement) => ({
     productEquityTitle: entitlement.showName,
-    productEquityDetails: formatStartPlanPreviewEntitlement(
-      entitlement,
-      isChineseLocale,
-    ),
+    productEquityDetails: formatStartPlanPreviewEntitlement(entitlement),
   }));
 
   return [
@@ -354,11 +348,8 @@ function buildZaiStartStaticProducts(
 
 function formatStartPlanPreviewEntitlement(
   entitlement: StartPlanPreviewConfig["entitlements"][number],
-  isChineseLocale: boolean,
 ): string {
-  const amount = new Intl.NumberFormat(
-    isChineseLocale ? "zh-CN" : "en-US",
-  ).format(entitlement.grantUnits);
+  const amount = new Intl.NumberFormat("en-US").format(entitlement.grantUnits);
   const unit = entitlement.unitType.trim();
   const period = entitlement.period.trim();
   return [amount, unit, period].filter(Boolean).join(" ");

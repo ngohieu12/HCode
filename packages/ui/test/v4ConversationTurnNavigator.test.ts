@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type {
@@ -362,7 +363,7 @@ describe("conversation turn navigator helpers", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationTurnNavigator, {
           onJumpToQuery: () => {},
           renderUnits: units([
@@ -400,7 +401,7 @@ describe("conversation turn navigator helpers", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationTurnNavigator, {
           onJumpToQuery: () => {},
           renderUnits: units([

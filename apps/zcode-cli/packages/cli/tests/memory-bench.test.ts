@@ -151,7 +151,6 @@ test("memory bench rejects disabled Memory before submitting the main prompt", a
 
 for (const argv of [
   [],
-  ["tui"],
   ["app-server"],
   ["agent-server"],
   ["--target", "remember this convention"],

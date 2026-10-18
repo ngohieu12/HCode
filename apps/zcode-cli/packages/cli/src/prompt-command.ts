@@ -94,7 +94,7 @@ export const runPrompt = async (
     return 0;
   }
   // disabled 下 `/workflow` 不展开（builtin resolver 同判）；若照常建 app 提交，原文会作为普通文本
-  // 发给模型并「成功」退出，脚本察觉不到。建 app 之前就报错退出，与 TUI 的本地提示同一句。
+  // 发给模型并「成功」退出，脚本察觉不到。建 app 之前就报错退出，与交互式客户端的本地提示同一句。
   if (
     slashCommand?.type === "known" &&
     slashCommand.name === "workflow" &&

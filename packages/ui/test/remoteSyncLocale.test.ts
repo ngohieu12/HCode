@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 describe("remote sync locale labels", () => {
   it("uses consistent technical-term capitalization for every sync action", () => {

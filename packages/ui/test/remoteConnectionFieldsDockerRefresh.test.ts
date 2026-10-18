@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
@@ -211,7 +212,7 @@ function renderDockerFields({
       { platform },
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Component, props),
       ),
     ),

@@ -33,8 +33,8 @@ export const appSettingsOccupationEnum = appSettingsOccupationSchema;
 
 const nonEmptyStringSchema = z.string().trim().min(1);
 
-export const localeSchema = z.enum(["zh-CN", "en-US", "vi-VN"]);
-export const localePreferenceSchema = z.enum(["system", "zh-CN", "en-US", "vi-VN"]);
+export const localeSchema = z.enum(["en-US", "vi-VN"]);
+export const localePreferenceSchema = z.enum(["system", "en-US", "vi-VN"]);
 const zcodeInteractionBehaviorSchema = z.enum(["queue", "guide"]);
 const composerEnterBehaviorSchema = z.enum(["newline", "send"]);
 // launch.md「The user's choice」：读文件时未知取值（降级后读到新版本写的值）按「跟随」处理，
@@ -253,19 +253,28 @@ function migrateLegacyLocalePreference(value: unknown): unknown {
     return value;
   }
 
-  const raw = value as Record<string, unknown>;
+  const source = value as Record<string, unknown>;
+  // 中文界面已下线：旧配置里落盘的 zh-CN 一律迁移到越南语。
+  const raw: Record<string, unknown> = { ...source };
+  if (raw.locale === "zh-CN") {
+    raw.locale = "vi-VN";
+  }
+  if (raw.localePreference === "zh-CN") {
+    raw.localePreference = "vi-VN";
+  }
+
   if ("localePreference" in raw || !("locale" in raw)) {
-    return value;
+    return raw;
   }
 
   const parsedLocale = localeSchema.safeParse(raw.locale);
   if (!parsedLocale.success) {
-    return value;
+    return raw;
   }
 
   return {
     ...raw,
-    // 旧 setting.json 只有 locale，无法区分“用户显式选择 zh-CN”和“默认值 zh-CN”。
+    // 旧 setting.json 只有 locale，无法区分“用户显式选择语言”和“默认值”。
     // 对已经落盘的旧配置保留原 locale 作为显式偏好，避免升级后误切到 system。
     localePreference: parsedLocale.data,
   };
@@ -461,7 +470,7 @@ function migrateLegacyWorkspaceSession(value: unknown): unknown {
 
 const appSettingsObjectSchema = z.object({
   recentProjects: z.array(z.string()).default([]),
-  locale: localeSchema.default("zh-CN"),
+  locale: localeSchema.default("vi-VN"),
   // 快捷键用户覆盖（语义校验在 ui/src/shortcuts 生效表阶段容错，schema 只管形状）
   shortcutBindings: z.record(z.string(), z.array(z.string())).optional(),
   localePreference: localePreferenceSchema.default("system"),

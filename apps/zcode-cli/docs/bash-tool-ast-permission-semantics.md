@@ -10,7 +10,7 @@ Bash tool 的权限、只读和并发安全判断必须避免把动态 shell 结
 
 - `bash-parser` 提供 Bash AST，但最新 npm 版本仍是 `0.5.0`，发布时间较早，维护活跃度和现代 Bash 覆盖面不足。
 - `tree-sitter` + `tree-sitter-bash` 的 AST 节点覆盖完整，但 Node 绑定是 native package；在当前仓库的 CLI 构建和跨平台安装链路中会引入额外 build/prebuild 风险。
-- `web-tree-sitter` 已在 TUI 间接依赖中出现，但它是 WASM/web 绑定，不自带 Bash grammar；把异步 WASM 初始化放进核心权限判断会增加运行时复杂度。
+- `web-tree-sitter` 已作为间接依赖出现，但它是 WASM/web 绑定，不自带 Bash grammar；把异步 WASM 初始化放进核心权限判断会增加运行时复杂度。
 - `unbash` 是维护中的纯 TypeScript Bash AST parser，0 依赖、同步 API，AST 能结构化区分 command/process substitution、redirect、assignment、pipeline、and/or 和 compound shell 节点，因此作为 Bash 权限语义的 parser 基础。
 
 ## 语义边界

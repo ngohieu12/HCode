@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
@@ -32,7 +33,7 @@ describe("artifact-backed Markdown images", () => {
     const rendered = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(MarkdownImage, {
           alt: "shot",
           src,

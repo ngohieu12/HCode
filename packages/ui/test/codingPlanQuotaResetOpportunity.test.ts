@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CodingPlanResetType } from "@zcode/shared";
@@ -26,7 +27,7 @@ function renderOpportunity(props: {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(CodingPlanQuotaResetOpportunity, {
         ...props,
         placement: "inline",
@@ -108,7 +109,7 @@ function renderStatefulOpportunity(
     );
     return createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(CodingPlanQuotaResetOpportunity, {
         count: badge.count,
         dialog: createDialogConfig({ resetItems }),
@@ -338,7 +339,7 @@ describe("CodingPlanQuotaResetOpportunity", () => {
     view.rerender(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(CodingPlanQuotaResetOpportunity, {
           count: 1,
           dialog,

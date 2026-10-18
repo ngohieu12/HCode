@@ -55,7 +55,7 @@ describe("automation run keeps the first-input session title", () => {
 
     // 卡片运行次数/下次运行是本 case 的可见证据；显式固定中文 locale，避免 WDIO
     // 继承英文系统语言后把“已运行 0 次”渲染为 “Ran 0 times”。
-    await seedSettings({ locale: "zh-CN", localePreference: "zh-CN" });
+    await seedSettings({ locale: "en-US", localePreference: "en-US" });
     await prepareV4ConversationE2E({ resetDraftBeforeProvider: true });
     const telemetryFetch = await browser.electron.mock("net", "fetch");
     await telemetryFetch.mockResolvedValue({ ok: true, status: 204 });

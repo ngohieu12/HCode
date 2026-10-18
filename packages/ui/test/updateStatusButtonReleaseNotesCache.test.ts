@@ -1,4 +1,5 @@
 import { act, createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { IServiceAccessor } from "@zcode/services";
@@ -164,7 +165,7 @@ describe("UpdateStatusButton release notes cache", () => {
             { platform: noopPlatform },
             createElement(
               ZCodeIntlProvider,
-              { initialLocale: "zh-CN" },
+              { initialLocale: "vi-VN", messages: zhCNLegacy },
               createElement(UpdateStatusButton, {
                 platform: noopPlatform,
                 version: null,
@@ -220,7 +221,7 @@ describe("UpdateStatusButton release notes cache", () => {
             { platform },
             createElement(
               ZCodeIntlProvider,
-              { initialLocale: "zh-CN" },
+              { initialLocale: "vi-VN", messages: zhCNLegacy },
               createElement(UpdateStatusButton, {
                 platform,
                 version: null,
@@ -355,7 +356,7 @@ describe("UpdateStatusButton release notes cache", () => {
           { platform },
           createElement(
             ZCodeIntlProvider,
-            { initialLocale: "zh-CN" },
+            { initialLocale: "vi-VN", messages: zhCNLegacy },
             createElement(UpdateStatusButton, {
               platform,
               version: null,
@@ -441,7 +442,7 @@ describe("UpdateStatusButton release notes cache", () => {
             { platform },
             createElement(
               ZCodeIntlProvider,
-              { initialLocale: "zh-CN" },
+              { initialLocale: "vi-VN", messages: zhCNLegacy },
               createElement(UpdateStatusButton, {
                 platform,
                 version: null,
@@ -499,7 +500,7 @@ describe("UpdateStatusButton release notes cache", () => {
             { platform },
             createElement(
               ZCodeIntlProvider,
-              { initialLocale: "zh-CN" },
+              { initialLocale: "vi-VN", messages: zhCNLegacy },
               createElement(UpdateStatusButton, {
                 platform,
                 version: null,
@@ -551,7 +552,7 @@ describe("UpdateStatusButton release notes cache", () => {
             { platform },
             createElement(
               ZCodeIntlProvider,
-              { initialLocale: "zh-CN" },
+              { initialLocale: "vi-VN", messages: zhCNLegacy },
               createElement(UpdateStatusButton, {
                 platform,
                 version: null,
@@ -598,7 +599,7 @@ describe("UpdateStatusButton release notes cache", () => {
             { platform },
             createElement(
               ZCodeIntlProvider,
-              { initialLocale: "zh-CN" },
+              { initialLocale: "vi-VN", messages: zhCNLegacy },
               createElement(UpdateStatusButton, {
                 platform,
                 version: null,

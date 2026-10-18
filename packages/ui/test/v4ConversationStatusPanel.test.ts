@@ -12,7 +12,7 @@ import type {
   WorkflowRunState,
 } from "@zcode/shared/zcode-protocol-v4";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import { getStatusPanelTodoFocusWindow } from "@/v4/ConversationStatusPanel.js";
 
 const statusPanelCapture = vi.hoisted(() => ({
@@ -158,7 +158,7 @@ vi.mock("@/i18n/IntlProvider.js", () => ({
           (values ? `${descriptor.id} ${Object.values(values).join("/")}` : descriptor.id);
       },
     },
-    locale: "zh-CN",
+    locale: "vi-VN",
   }),
 }));
 

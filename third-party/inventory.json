@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "inputHashEncoding": "UTF-8 with CRLF normalized to LF; notice and source snapshot hashes remain byte-exact",
   "scope": "Production dependency union across current workspace projects, copied source/assets and native tools; not a per-installer SBOM or a certification of all licensing obligations.",
-  "noticesSha256": "93d9c2ba4ca24bd7052e6393307686c64d216771d3d44058db6df4f367384e53",
+  "noticesSha256": "df137c787550c25486412f4ce91b3c94be3c1aac493ff173f4b875e06881b344",
   "inputs": {
     ".agents/skills/agent-browser/references/authentication.md": "e2c3b0f4a1dc1368dee821f03c000d818a48421d09f3872525dddffe73f2112b",
     ".agents/skills/agent-browser/references/commands.md": "17522fc56d742663f47231ff06c4811abc87e12c7f78e11f94d253ddd540a909",
@@ -224,12 +224,12 @@
     ".agents/skills/react-best-practices/rules/server-parallel-nested-fetching.md": "ad5d9656984d4a959997a2367bf59cc6632297b4634a1dd13a087939d83f30b3",
     ".agents/skills/react-best-practices/rules/server-serialization.md": "f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f",
     ".agents/skills/react-best-practices/SKILL.md": "71ed7794962fa6e803ee83030517b5b93a9f70fbfeb431ec4535c5480a8d8355",
-    "apps/zcode-cli/package.json": "8c11b1ddbbcc5c98bc17dac8d61c7840be1d67d237e4b952d707e31884129317",
+    "apps/zcode-cli/package.json": "a1de77e75e3c620074f0b1e6162ce0a16808cd67d2d36a3d8a6836bfcbb8c3e8",
     "apps/zcode-cli/packages/adapters/package.json": "12316ccf002e19a4fbc6536007b2e89ded5704a8f757baeec4dc83d47c0ea345",
     "apps/zcode-cli/packages/android-emulator-plugin/package.json": "96ecaa9ce091e13f7e508b0aed8ab116360b40ba21dc1be78c906b2eebbf5571",
     "apps/zcode-cli/packages/bootstrap/package.json": "554ddd3fc3a017e1bde9af23477d7cff16d4e86b63f3faeda19ce3af7f1edee8",
     "apps/zcode-cli/packages/browser-use-plugin/package.json": "53a2c64811fbb85a8a88bf22ac2b42dbca7a283e3c83f0ebd24601889223741d",
-    "apps/zcode-cli/packages/cli/package.json": "11f1caaad677756c511a3c8a159441f41ea09c90960cedcae92e767987b624a4",
+    "apps/zcode-cli/packages/cli/package.json": "f000f039561678a8cfe101847892751844370b03a471133ad388e51f040fc201",
     "apps/zcode-cli/packages/contracts/package.json": "d71e04825072c7407dcc3e1fcca3d8b9221cfac411ea58a024998a57cb579029",
     "apps/zcode-cli/packages/core/package.json": "e70205607c75f7fb51cd1815ff3d411d7ea63bef6a0148f3a698229c30189d32",
     "apps/zcode-cli/packages/core/src/tool/handlers/generated/bash-command-registry.ts": "60fa5acd9f5c357f4e51b1d1e944ee39da92680e4bc5e98dd708f1457fcf612b",
@@ -252,13 +252,12 @@
     "apps/zcode-cli/packages/superpowers-plugin/package.json": "003495dd8441f4a9b017931e081770a157fa48b895752d0cfe7487d437507685",
     "apps/zcode-cli/packages/swift-bridge/package.json": "958674fcd44c789564ee672b0e6c687f1f900f4286174280700ddfb442d23906",
     "apps/zcode-cli/packages/telemetry/package.json": "2c7efa1d5b42700400b971fff61314c7277f5e05b5f96f48b7d50c9ccf11772e",
-    "apps/zcode-cli/packages/tui/package.json": "303b8c2f0eb3f8ea0476935f452dd0d2c620ac52587ebb08b24a193f3e3658e0",
     "apps/zcode-cli/packages/visualize-plugin/package.json": "f38e0334cd743a4ca15cf8884ca563aaf0b37bccbdfca63505f56f84f5576971",
     "apps/zcode-cli/packages/zcode-cua-plugin/package.json": "ecc5640181e2273ef04ad741e7ff25fd36326410386a58c60b61fb704277732a",
     "apps/zcode-cli/packages/zcode-guide-plugin/package.json": "b6b6c4a0097496f5bf8848ad4fecea1c2e9f8a94d4a3b962217a74a6253deacf",
     "apps/zcode-cli/tools/prompt-trajectory/package.json": "a8374fef7b1f1814d91dfe5ef5f3d369de8d12f73601dbed6e026f2b12bcca0d",
     "apps/zcode-cli/tools/typescript/package.json": "23d7e50d2089d205ce3022c5bafbb6b3e31d000e41ac678a5934e0b72627cf3a",
-    "package.json": "b8df3bd7e57a585ddfb52a76de89267f277b8255ede1f0110b37fdd07f13fc0c",
+    "package.json": "96ab0681d822d9aa497ebaa3a7191c8d75eac8808ea57af3fb14b410aca779c5",
     "packages/client/package.json": "e76f441549130dc3e5e68072a36b6cb9044e19a6625f1e813f19a4def2b1b689",
     "packages/desktop/package.json": "e8e441e61cb788b932062c870244e4bd09de8a79761ea7bd93597b19a88baa7b",
     "packages/desktop/src/renderer/public/material-icons/3d.svg": "9527b849f0fba57ca7640e2717b3a19cb5f5e046712cbbd8b75d73af338c68fb",
@@ -1438,7 +1437,7 @@
     "packages/shared/package.json": "c11d49fc3d0f22483b3e9859c54c53a5c080a7f4a1a2fc1e6e535ec41ca95023",
     "packages/shared/src/zcode-protocol-v4/wire-codec.ts": "ac2494a3acc795c809c94ee9393f50271a9c2a0fd33813459e5ab93842ceef75",
     "packages/stream-animate/package.json": "31cb25ed87e64dbcd695bbc932729ac30499107d45f747b96a5c3de832afdc28",
-    "packages/ui/package.json": "00190b9af794b3c3b3b410a82a9cf5d24b980f8b74bdd30648eee2d36481febb",
+    "packages/ui/package.json": "981f0047fa0bc00d20368fc4f7af9500d8906f3d825ff9cf00dfe95e17d61c5e",
     "packages/ui/src/components/ai-elements/agent.tsx": "830e7ea9e927de1524851337f1d35bda0e5690e3e4fa307fff854b60006b16c7",
     "packages/ui/src/components/ai-elements/artifact.tsx": "7d73f08864d6280ac86c77d32e56d0e702f8aa6208e5910820139d0fb08ce64c",
     "packages/ui/src/components/ai-elements/attachments.tsx": "7a847ce6c8ac9dc630481a82dd20a5e9e00949bf710a41fea1d32a18123011d8",
@@ -1516,11 +1515,11 @@
     "packages/ui/src/components/ui/pptx-preview-viewer.tsx": "64d7ed9e83cad0e98ba56ff2c49be2db335aedca4230b207cba5a383a15cb93d",
     "packages/ui/src/components/ui/pptx-selection-action-bar.tsx": "6e7187b7f527e4a97df117cc0df85d2dd8f4408d7415aec2e4907db39a331efd",
     "packages/ui/src/components/ui/progress.tsx": "ba88ffa75ad78eaa23519c7af84e11679ca2b8e4508c57759d769462811c0ec5",
-    "packages/ui/src/components/ui/README.md": "75b3a7d95cb683c0e97d4212af3a984359031f9b1f0c5d373b2c9ed38e4bda40",
+    "packages/ui/src/components/ui/README.md": "5b5d554e2ad0c8e095258d70e5c3f35f58b9340a850c767f7b76bbe19c3b42d0",
     "packages/ui/src/components/ui/resizable.tsx": "83425c34fb76c35276e6dbf8d7ad0ee860b4536ba9d4cfd8e8a60aec3b7cabc4",
     "packages/ui/src/components/ui/scroll-area.tsx": "83999d597a4a417aea402e833884826539b9aa1bd1ec966aa2f6dab9a97afb3c",
     "packages/ui/src/components/ui/scroll-fade-viewport.tsx": "50e5984232b6a7d59e872aab4ebb36ae837e2865e3a770adbc234b61c2531da1",
-    "packages/ui/src/components/ui/select.tsx": "e6d73ae0bf6916256fd86005d8a94e3dfb004c8107f51882cfd2d52e7751ca09",
+    "packages/ui/src/components/ui/select.tsx": "718c222c5acdfa149f4a61da3d6756a4ca5ef1ba14b2ebafb7a5306c3a616beb",
     "packages/ui/src/components/ui/separator.tsx": "31ade0b9a0eca6689226c94d479352416ef076859980a976422a8af17879dee2",
     "packages/ui/src/components/ui/spinner.tsx": "96bef1c5ef7e582de503aac8402b55f3539cea37bd2c186a12a4f2cb7605468e",
     "packages/ui/src/components/ui/switch.tsx": "1a6490eb3c47b3a86b76c8469e5702608ea57da7853df5de00fffa9a4a472adf",
@@ -1529,15 +1528,15 @@
     "packages/ui/src/components/ui/toast.tsx": "0f8894c6fc30e4cec44caa4cffe70e111f9c41ff9bf3699ec8e91696ea631671",
     "packages/ui/src/components/ui/tooltip.tsx": "301dbf3a6f8b1bc496f9bdc6fbc5fe6202ed373182897f39cd1ecd19b00fdfbe",
     "packages/ui/src/components/ui/usePdfZoomOverlay.ts": "c8c91b003ce2fded32c7a2369dc6eac43aa4b9dc9c830a0f5ceccb21d366b610",
-    "packages/ui/src/lib/builtinSkillI18n.ts": "e8848b55c52baf421b6e5a2f8889708e808b33f448957387e8b9f815b9f579bf",
-    "packages/ui/src/styles.css": "632d6ad850ba85a8d62bf380fed74421a8d31ad07803c4a9f6f37974ebfb7ba7",
+    "packages/ui/src/lib/builtinSkillI18n.ts": "4a870a7d84aa545a8d14c0765fa606ab0da45506d95674dd6d7647192c85a7fc",
+    "packages/ui/src/styles.css": "99743bf68e348eb6b40c6a169f27a7bec28f54a1fe0815a29ac61914ff7c63f0",
     "packages/zcode-cua/package.json": "e71948820aafebeac7ec92879adf344011d0f310ed954eb7204be7320f08ebef",
     "patches/@ai-sdk__anthropic@3.0.81.patch": "d3a7c381eba7f5157f765a0528003af17cf84544911dfb7412c7800168e01c18",
     "patches/@ai-sdk__openai-compatible@2.0.60.patch": "9632fe9d821b3dc20939ae509cc35b968d90d018bbd1d812390718898182a38b",
     "patches/@arms__rum-electron@0.0.3.patch": "36855354851ea495bc47a03340b0484ff62836b739cad56904b8a69f18e2ae97",
     "patches/vitest@4.1.7.patch": "11fdb66aa985e1d77e68752deeb7c1130ae33c9a4e2968f23aae8adaf8bc9ba0",
     "patches/wdio-electron-service@9.2.1.patch": "52481dae5e76772fcb8c2a9ff42feb3d0e1478e28815a4b975c81b9287e3385f",
-    "pnpm-lock.yaml": "75da5f3df4194fb34cb75df0dbefe375a1539f68f04a4e9d4da3016b34102e85",
+    "pnpm-lock.yaml": "3a19d80bf3cf971b927d56a84623a4e373af46d77b9815f4757576f8cca6c41e",
     "pnpm-workspace.yaml": "f18a18233e82cda1dc40be61bf2ad1bc99de25de63ad0be64bc652761a638372",
     "scripts/license-texts/Apache-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "scripts/native-search-tools-config.mjs": "06e9d2b066a22f4bb731fb7356d786b52cf08e20dd6faf91e1a82b167d7462e8",
@@ -3538,102 +3537,6 @@
         {
           "member": "LICENSE",
           "sha256": "a3d60eaf32d2fb09c9d82ef39f14bd6e2c0f3ca7de30daa827486c0d6f8b6e9f"
-        }
-      ]
-    },
-    {
-      "name": "@mbears/opentui-core-darwin-arm64",
-      "version": "0.2.15",
-      "license": "MIT",
-      "repository": "https://github.com/anomalyco/opentui",
-      "notices": [
-        {
-          "member": "LICENSE",
-          "sha256": "d9c397a5dc5ac77a2a08fc967ea06a65317a4b5b8de48f6f732ffcb21737e3d2"
-        }
-      ]
-    },
-    {
-      "name": "@mbears/opentui-core-darwin-x64",
-      "version": "0.2.15",
-      "license": "MIT",
-      "repository": "https://github.com/anomalyco/opentui",
-      "notices": [
-        {
-          "member": "LICENSE",
-          "sha256": "d9c397a5dc5ac77a2a08fc967ea06a65317a4b5b8de48f6f732ffcb21737e3d2"
-        }
-      ]
-    },
-    {
-      "name": "@mbears/opentui-core-linux-arm64",
-      "version": "0.2.15",
-      "license": "MIT",
-      "repository": "https://github.com/anomalyco/opentui",
-      "notices": [
-        {
-          "member": "LICENSE",
-          "sha256": "d9c397a5dc5ac77a2a08fc967ea06a65317a4b5b8de48f6f732ffcb21737e3d2"
-        }
-      ]
-    },
-    {
-      "name": "@mbears/opentui-core-linux-x64",
-      "version": "0.2.15",
-      "license": "MIT",
-      "repository": "https://github.com/anomalyco/opentui",
-      "notices": [
-        {
-          "member": "LICENSE",
-          "sha256": "d9c397a5dc5ac77a2a08fc967ea06a65317a4b5b8de48f6f732ffcb21737e3d2"
-        }
-      ]
-    },
-    {
-      "name": "@mbears/opentui-core-win32-arm64",
-      "version": "0.2.15",
-      "license": "MIT",
-      "repository": "https://github.com/anomalyco/opentui",
-      "notices": [
-        {
-          "member": "LICENSE",
-          "sha256": "d9c397a5dc5ac77a2a08fc967ea06a65317a4b5b8de48f6f732ffcb21737e3d2"
-        }
-      ]
-    },
-    {
-      "name": "@mbears/opentui-core-win32-x64",
-      "version": "0.2.15",
-      "license": "MIT",
-      "repository": "https://github.com/anomalyco/opentui",
-      "notices": [
-        {
-          "member": "LICENSE",
-          "sha256": "d9c397a5dc5ac77a2a08fc967ea06a65317a4b5b8de48f6f732ffcb21737e3d2"
-        }
-      ]
-    },
-    {
-      "name": "@mbears/opentui-core",
-      "version": "0.2.15",
-      "license": "MIT",
-      "repository": "https://github.com/anomalyco/opentui",
-      "notices": [
-        {
-          "member": "LICENSE",
-          "sha256": "d9c397a5dc5ac77a2a08fc967ea06a65317a4b5b8de48f6f732ffcb21737e3d2"
-        }
-      ]
-    },
-    {
-      "name": "@mbears/opentui-react",
-      "version": "0.2.15",
-      "license": "MIT",
-      "repository": "https://github.com/anomalyco/opentui",
-      "notices": [
-        {
-          "member": "LICENSE",
-          "sha256": "d9c397a5dc5ac77a2a08fc967ea06a65317a4b5b8de48f6f732ffcb21737e3d2"
         }
       ]
     },

@@ -895,7 +895,7 @@ export interface IPlatformService {
    */
   getCloseToTrayCapability?(): Promise<DesktopCloseToTrayCapability>;
 
-  /** 快捷键设置页录制态开关；桌面端 main 据此暂时摘除可配置菜单 accelerator，Web 可忽略 */
+  /** 快捷键设置页「按组合键搜索」的捕获态开关；桌面端 main 据此暂时摘除可配置菜单 accelerator，Web 可忽略 */
   setShortcutRecordingActive?(active: boolean): void;
 
   /** 注册 main 进程要求聚焦某个 workspace tab 的回调，返回 disposer */

@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -9,7 +10,7 @@ function render(entry: PendingCommandEntry): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(PendingCommandRecoveryBanner, {
         entry,
         onResend: entry.replay.kind === "input" ? vi.fn() : undefined,

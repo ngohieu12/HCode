@@ -5,7 +5,7 @@ import {
   shouldSilenceStaleRejection,
 } from "../src/settings/workspaceHookTrustState.js";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 describe("workspace Hook trust state 展示语义（D19）", () => {
   it("行内 Trust 文案在 zh/en 两侧都存在", () => {

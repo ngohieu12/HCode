@@ -1288,7 +1288,7 @@ export function SettingsPage({
         });
         return;
       }
-      if (value === "zh-CN" || value === "en-US") {
+      if (value === "en-US" || value === "vi-VN") {
         runUserAction({
           input: { featureId: "settings.locale", action: "change_locale", trigger: "select" },
           operation: () => setLocalePreference(value as Locale),
@@ -1762,7 +1762,7 @@ export function SettingsPage({
                             }
                           />
                         ) : activeSection === "shortcuts" ? (
-                          <ShortcutSettingsSection isDesktop={Boolean(isDesktop)} />
+                          <ShortcutSettingsSection />
                         ) : activeSection === "modelProvider" ? (
                           <ServiceProvider services={localHostServices}>
                             {/* 模型配置属于本机全局事实源；激活远端 workspace 时也不能注入远端 Host。 */}

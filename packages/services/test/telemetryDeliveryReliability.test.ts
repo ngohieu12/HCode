@@ -52,7 +52,7 @@ describe("telemetry delivery reliability", () => {
     await service.reportEvent({
       context: {
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "1920x1080",
       },
       elementName: "off_peak_task_create_result",
@@ -92,7 +92,7 @@ describe("telemetry delivery reliability", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "1920x1080",
     });
 
@@ -117,7 +117,7 @@ describe("telemetry delivery reliability", () => {
     await expect(
       service.reportAppLaunch({
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "1920x1080",
       }),
     ).rejects.toThrow(String(status));
@@ -152,7 +152,7 @@ describe("telemetry delivery reliability", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "1920x1080",
     });
 
@@ -180,7 +180,7 @@ describe("telemetry delivery reliability", () => {
       service.reportEvent({
         context: {
           clientTimezone: "Asia/Shanghai",
-          clientLanguage: "zh-CN",
+          clientLanguage: "en-US",
           screenResolution: "1920x1080",
         },
         elementName: "off_peak_task_create_result",
@@ -217,7 +217,7 @@ describe("telemetry delivery reliability", () => {
     });
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "1920x1080",
     };
 
@@ -261,7 +261,7 @@ describe("telemetry delivery reliability", () => {
 
     const report = service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "1920x1080",
     });
     await waitForCalls(fetchMock, 1);

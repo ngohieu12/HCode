@@ -30,7 +30,7 @@ const platform: IPlatformService = {
   selectFile: vi.fn(),
 };
 
-function renderRemoteConnectionFields(locale: "zh-CN" | "en-US") {
+function renderRemoteConnectionFields(locale: "vi-VN" | "en-US") {
   return renderToStaticMarkup(
     createElement(
       PlatformProvider,
@@ -88,7 +88,7 @@ function renderRemoteConnectionFields(locale: "zh-CN" | "en-US") {
 
 describe("RemoteConnectionFields authentication method layout", () => {
   it("keeps SSH auth method options wide enough and non-wrapping for Chinese and English labels", () => {
-    const zhHtml = renderRemoteConnectionFields("zh-CN");
+    const zhHtml = renderRemoteConnectionFields("vi-VN");
     const enHtml = renderRemoteConnectionFields("en-US");
 
     for (const html of [zhHtml, enHtml]) {

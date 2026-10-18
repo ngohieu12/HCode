@@ -56,7 +56,7 @@ after(async () => {
 });
 
 for (const width of [390, 1200])
-  for (const locale of ["zh-CN", "en-US"])
+  for (const locale of ["en-US"])
     for (const theme of ["light", "dark"]) {
       test(`SPB01/02/03 ${width}/${locale}/${theme}`, async () => {
         const page = await browser.newPage({ viewport: { width, height: 700 } });
@@ -72,7 +72,7 @@ for (const width of [390, 1200])
           await page.goto(`${origin}fixture?locale=${locale}&theme=${theme}`);
           await page.getByTestId("pane").waitFor();
           const banner = page.getByTestId("v4-session-quota-banner");
-          const closeName = locale === "zh-CN" ? "关闭" : "Close";
+          const closeName = "Close";
           async function update(bucket, value) {
             const prior = await page.getByTestId("revision").textContent();
             await page.getByTestId(bucket).selectOption(String(value));
@@ -88,10 +88,7 @@ for (const width of [390, 1200])
           }
           await update("event", 10);
           await banner.waitFor();
-          assert.match(
-            await banner.innerText(),
-            locale === "zh-CN" ? /活动额度剩余 10%/ : /promotional quota remaining/,
-          );
+          assert.match(await banner.innerText(), /promotional quota remaining/);
           await page.screenshot({ path: join(artifacts, `${width}-${locale}-${theme}.png`) });
           await update("event", 9);
           assert.equal(await banner.count(), 1);
@@ -111,17 +108,12 @@ for (const width of [390, 1200])
           assert.equal(await banner.count(), 0);
           await update("daily", 10);
           await banner.waitFor();
-          assert.match(
-            await banner.innerText(),
-            locale === "zh-CN" ? /今日额度剩余 10%/ : /daily quota remaining/,
-          );
+          assert.match(await banner.innerText(), /daily quota remaining/);
           await page.getByRole("button", { name: "Switch task", exact: true }).click();
           await banner.waitFor({ state: "hidden" });
           await page.getByRole("button", { name: "New cycle", exact: true }).click();
           await banner.waitFor();
-          await banner
-            .getByRole("button", { name: locale === "zh-CN" ? "升级" : "Upgrade", exact: true })
-            .click();
+          await banner.getByRole("button", { name: "Upgrade", exact: true }).click();
           assert.equal(await page.locator("body").getAttribute("data-upgraded"), "true");
           await update("daily", 100);
           await banner.waitFor({ state: "hidden" });

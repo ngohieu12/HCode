@@ -39,7 +39,7 @@ describe("startup workspace", () => {
   it("启动预热只选 active workspace，recentProjects 不再补位", () => {
     const settings = {
       recentProjects: ["/repo/a", "/repo/b", "/repo/c", "/repo/d", "/repo/e"],
-      locale: "zh-CN" as const,
+      locale: "en-US" as const,
     };
 
     expect(resolveStartupAgentWarmupTargets(settings, { workspacePath: "/repo/c" })).toEqual([
@@ -59,7 +59,7 @@ describe("startup workspace", () => {
       settingsFile,
       JSON.stringify({
         recentProjects: [workspaceDir],
-        locale: "zh-CN",
+        locale: "en-US",
         lastWorkspaceSession: [
           {
             kind: "local",
@@ -93,7 +93,7 @@ describe("startup workspace", () => {
       settingsFile,
       JSON.stringify({
         recentProjects: [workspaceA, workspaceB],
-        locale: "zh-CN",
+        locale: "en-US",
         lastWorkspaceSession: [
           {
             kind: "local",
@@ -129,7 +129,7 @@ describe("startup workspace", () => {
       settingsFile,
       JSON.stringify({
         recentProjects: ["/tmp/workspace-a"],
-        locale: "zh-CN",
+        locale: "en-US",
         lastWorkspaceSession: [
           {
             kind: "local",
@@ -172,7 +172,7 @@ describe("startup workspace", () => {
       settingsFile,
       JSON.stringify({
         recentProjects: ["/tmp/workspace-a"],
-        locale: "zh-CN",
+        locale: "en-US",
         lastWorkspaceSession: [
           {
             kind: "remote",
@@ -349,7 +349,7 @@ describe("startup workspace", () => {
       settingsFile,
       JSON.stringify({
         recentProjects: ["/tmp/workspace-a"],
-        locale: "zh-CN",
+        locale: "en-US",
         lastWorkspaceSession: [],
         lastActiveTabIndex: 0,
       }),
@@ -374,7 +374,7 @@ describe("startup workspace", () => {
       settingsFile,
       JSON.stringify({
         recentProjects: [],
-        locale: "zh-CN",
+        locale: "en-US",
         lastWorkspaceSession: [],
         lastActiveTabIndex: 0,
       }),

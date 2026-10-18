@@ -162,8 +162,6 @@ nodes:
         file: "packages/shared/src/zcode-agent-model-state.ts"
       - symbol: "buildAutomationModeOption"
         file: "packages/ui/src/settings/automationAgentConfigOptions.ts"
-      - symbol: "filterModeOptions"
-        file: "apps/zcode-cli/packages/tui/src/app-mode-command.ts"
     invariants:
       - "Only guarded mode explicit catalog matches add mandatory one-time approval; unsupported analysis retains YOLO policy. Existing modes and defaults are unchanged."
       - "Guarded replaces Edit only in selectable menus and shortcut cycles; persisted edit values and explicit legacy commands retain their original policy. YOLO and full-auto aliases remain unchanged."
@@ -233,8 +231,6 @@ nodes:
         symbol: "createHelpAppConfigReader"
       - file: "packages/desktop/src/main/desktopHelpConfig.ts"
         symbol: "createDesktopHelpConfigReader"
-      - file: "packages/web/src/communityUrl.ts"
-        symbol: "resolveWebHelpConfig"
   - id: "capability.subagent-computer-use-boundary"
     kind: "capability"
     label: "Subagent official Computer Use boundary"
@@ -4363,13 +4359,12 @@ nodes:
 
   - id: "surface.multi-server-controller-ui"
     kind: "ui-surface"
-    label: "Desktop, Browser, and attached Mobile multi-server view"
+    label: "Desktop and attached Mobile multi-server view"
     docs:
       - "docs/architecture/unified-zcode-lite-server-multi-server-plan.md"
     codeSeeds:
       - symbol: "Root"
         file: "packages/ui/src/Root.tsx"
-      - file: "packages/web/src/main.tsx"
       - file: "packages/desktop/src/renderer/src/main.tsx"
 
   - id: "state.controller-server-directory"
@@ -4932,8 +4927,6 @@ nodes:
         file: "packages/ui/src/v4/composer/newTaskDraft.ts"
       - symbol: "useDraftConfigControl"
         file: "packages/ui/src/v4/composer/useDraftConfigControl.ts"
-      - symbol: "ConversationShareLandingPage"
-        file: "packages/web/src/share/ConversationShareLandingPage.tsx"
       - symbol: "useRootPlatformEffects"
         file: "packages/ui/src/root/useRootPlatformEffects.ts"
       - symbol: "ConversationShareImportNotice"
@@ -6302,7 +6295,7 @@ edges:
     to: "service.project-memory-extraction-lifecycle"
     type: "suppresses-automatic-scheduling-in"
     rank: "must-inspect"
-    condition: "By default both non-interactive entry points materialize `memory.extractionEnabled=false`; the scheduler returns before enabled-root resolution, snapshot acquisition, provider work, cursor updates or file mutation. TUI and app-server keep the default enabled lifecycle."
+    condition: "By default both non-interactive entry points materialize `memory.extractionEnabled=false`; the scheduler returns before enabled-root resolution, snapshot acquisition, provider work, cursor updates or file mutation. app-server keeps the default enabled lifecycle."
   - from: "service.headless-cli-prompt-runtime"
     to: "service.project-memory-extraction-lifecycle"
     type: "waits-before-close-for"

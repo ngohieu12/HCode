@@ -1063,7 +1063,7 @@ describe("desktopWindowChrome", () => {
   });
 
   it("uses the current application locale for the editable text context menu", async () => {
-    let locale: "zh-CN" | "en-US" = "zh-CN";
+    let locale: "en-US" | "vi-VN" = "en-US";
     const { createBrowserWindow } = await import("../src/main/desktopWindowChrome.js");
 
     createBrowserWindow({

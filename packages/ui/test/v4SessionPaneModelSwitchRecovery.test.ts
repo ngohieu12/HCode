@@ -1,4 +1,5 @@
 import { act, createElement, type ComponentProps, useRef } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ModelSelectionView } from "@zcode/services";
@@ -611,7 +612,7 @@ function makeWorkspaceStateSnapshot(): ZCodeWorkspaceStateSnapshot {
 function createPaneElement(props: Partial<ComponentProps<typeof SessionPane>> = {}) {
   return createElement(
     ZCodeIntlProvider,
-    { initialLocale: "zh-CN" },
+    { initialLocale: "vi-VN", messages: zhCNLegacy },
     createElement(SessionPane, {
       paneId: "workspace-main",
       sessionId: "session-1",

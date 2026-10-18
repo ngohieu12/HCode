@@ -5,7 +5,6 @@ import { join } from "node:path";
 import test from "node:test";
 import type { RunContext } from "@zcode/shared-types";
 import { run } from "../src/run.js";
-import { isTuiInvocation } from "../src/tui-stderr.js";
 import type { RunDependencies } from "../src/run.js";
 
 type CapturedWriteStream = NodeJS.WriteStream & {
@@ -79,10 +78,6 @@ function createPromptApp(overrides: Record<string, unknown> = {}) {
     ...overrides,
   } as never;
 }
-
-test("recognizes --cwd as a default TUI invocation", () => {
-  assert.equal(isTuiInvocation(["--cwd", "/workspace/project"]), true);
-});
 
 test("prints --cwd in help", async () => {
   const ctx = createContext(["--help"]);
@@ -166,48 +161,6 @@ test("uses --cwd when resolving latest sessions for --continue", async () => {
     assert.equal(exitCode, 0);
     assert.equal(resolved, true);
     assert.equal(ctx.stdout.output(), "hello continue cwd\n");
-  } finally {
-    await rm(cwd, { force: true, recursive: true });
-  }
-});
-
-test("passes --cwd into TUI app, skills, and session listing", async () => {
-  const cwd = await mkdtemp(join(tmpdir(), "zcode-cli-tui-cwd-"));
-  const ctx = createContext(["--cwd", cwd, "tui"]);
-
-  try {
-    const exitCode = await run(ctx, {
-      ...createPromptDeps(),
-      cwd: () => "/workspace/ignored",
-      createZCodeApp: (options) => {
-        assert.equal(options?.runtimeConfig?.workingDirectory, cwd);
-        return createPromptApp();
-      },
-      listSessions: async (options) => {
-        assert.equal(options.directory, cwd);
-        return [] as never;
-      },
-      listSkills: async (options) => {
-        assert.equal(options.workingDirectory, cwd);
-        return { diagnostics: [], skills: [], totalDiscovered: 0 } as never;
-      },
-      loadDotenv: (options) => {
-        assert.equal(options.cwd, cwd);
-        return { keys: [], loaded: false };
-      },
-      runTui: async (options) => {
-        // 初始模型随 loadStartupOptions 在启动屏首帧后返回，App 也在此时按 --cwd 创建。
-        const startup = { ...options, ...(await options.loadStartupOptions?.()) };
-        assert.equal(startup.initialModel, "openai/gpt-test");
-        assert.equal(options.workspaceDirectory, cwd);
-        await options.submitPrompt("/skill", { abortSignal: new AbortController().signal });
-        await options.submitPrompt("/resume", { abortSignal: new AbortController().signal });
-        return 0;
-      },
-    });
-
-    assert.equal(exitCode, 0);
-    assert.equal(ctx.stderr.output(), "");
   } finally {
     await rm(cwd, { force: true, recursive: true });
   }

@@ -69,7 +69,7 @@ interface TreeViewState {
 
 const reviewKey = "zcode.conversation-state-space.review.v1";
 const statusOptions: ReviewStatus[] = ["accepted", "undefined", "invalid", "ignored", "bug"];
-const numberFormat = new Intl.NumberFormat("zh-CN");
+const numberFormat = new Intl.NumberFormat("en-US");
 const app = mustQuery<HTMLDivElement>("#app");
 
 let zoomBehavior: d3.ZoomBehavior<SVGSVGElement, unknown> | null = null;
@@ -429,7 +429,7 @@ function buildStateSpaceGraph(root: TraceNode): StateSpaceGraph {
   for (const column of columns) {
     const columnNodes = nodes
       .filter((node) => node.column === column)
-      .sort((a, b) => graphSortKey(a).localeCompare(graphSortKey(b), "zh-CN"));
+      .sort((a, b) => graphSortKey(a).localeCompare(graphSortKey(b), "en-US"));
 
     columnNodes.forEach((node, index) => {
       node.x = left + column * columnWidth;

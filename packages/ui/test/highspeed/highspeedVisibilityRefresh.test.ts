@@ -1,4 +1,5 @@
 import { act, createElement, type ComponentProps } from "react";
+import zhCNLegacy from "../fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ConversationSnapshot } from "@zcode/shared/zcode-protocol-v4";
@@ -408,7 +409,7 @@ async function renderExpiredCardPane(cardId: string, sourceCommandId: string): P
     root.render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(SessionPane, {
           paneId: "workspace-main",
           sessionId: "session-vis",

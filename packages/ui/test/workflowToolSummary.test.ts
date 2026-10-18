@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -15,12 +16,12 @@ const summary = {
 };
 afterEach(cleanup);
 describe("WorkflowToolSummary", () => {
-  it.each(["en-US", "zh-CN"] as const)("本地化子代理数并通过普通摘要打开详情：%s", (locale) => {
+  it.each(["en-US", "vi-VN"] as const)("本地化子代理数并通过普通摘要打开详情：%s", (locale) => {
     const onOpen = vi.fn();
     const view = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: locale },
+        { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
         createElement(WorkflowToolSummary, { toolCallId: "tool-1", summary, onOpen }),
       ),
     );
@@ -37,12 +38,12 @@ describe("WorkflowToolSummary", () => {
   });
   it.each([
     ["en-US", "Workflow amended"],
-    ["zh-CN", "工作流已调整"],
+    ["vi-VN", "工作流已调整"],
   ] as const)("修订行的种类词是「工作流已调整」：%s", (locale, word) => {
     const view = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: locale },
+        { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
         createElement(WorkflowToolSummary, { toolCallId: "tool-1", summary, amend: true }),
       ),
     );

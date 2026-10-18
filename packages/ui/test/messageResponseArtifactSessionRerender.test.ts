@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MessageResponse } from "@/components/ai-elements/message.js";
@@ -27,7 +28,7 @@ describe("MessageResponse artifact session changes", () => {
     const renderMessage = (sessionId: string, readAttachment: typeof readSessionA) =>
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {

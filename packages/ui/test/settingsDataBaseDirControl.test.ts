@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 const capturedButtons: Array<Record<string, unknown>> = [];
 const capturedInputs: Array<Record<string, unknown>> = [];
@@ -104,7 +104,6 @@ vi.mock("@/i18n/IntlProvider.js", () => ({
           "settings.themeMode.zai-light": "浅色",
           "settings.locale": "界面语言",
           "settings.locale.system": "系统默认",
-          "settings.locale.zh-CN": "简体中文",
           "settings.locale.en-US": "English",
           "settings.terminalProfile": "继承系统终端 Profile",
           "settings.terminalProfileDescription": "desc",

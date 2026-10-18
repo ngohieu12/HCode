@@ -64,8 +64,8 @@ function heroData(args: Record<string, unknown> | undefined, locale: string) {
     benefits,
     endsAtLabel:
       typeof plan.ends_at === "number" ? new Date(plan.ends_at * 1000).toLocaleString(locale) : "",
-    endsAtPrefix: locale === "zh-CN" ? "有效期至" : "Valid until",
-    replayLabel: locale === "zh-CN" ? "重播" : "Replay",
+    endsAtPrefix: "Valid until",
+    replayLabel: "Replay",
   };
 }
 

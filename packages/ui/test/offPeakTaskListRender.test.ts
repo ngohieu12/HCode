@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TID_OFFPEAK_CARD, TID_OFFPEAK_CARD_SESSION, type ZCodeOffPeakTask } from "@zcode/shared";
@@ -23,7 +24,7 @@ function renderList(tasks: ZCodeOffPeakTask[]) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(OffPeakTaskList, {
         tasks,
         busyOperationId: null,
@@ -69,7 +70,7 @@ describe("OffPeakTaskList render", () => {
     view.rerender(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(OffPeakTaskList, {
           tasks: [...eight, task({ offPeakTaskId: "t-8" })],
           busyOperationId: null,

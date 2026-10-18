@@ -79,7 +79,7 @@ describe("settingService", () => {
 
     await expect(service.get()).resolves.toMatchObject({
       recentProjects: [],
-      locale: "zh-CN",
+      locale: "vi-VN",
       localePreference: "system",
       taskAutoArchiveEnabled: true,
       taskAutoArchiveOlderThanDays: 7,
@@ -98,7 +98,7 @@ describe("settingService", () => {
     const home = makeTempHome();
     const settingsDir = join(home, ".zcode", "v2");
     mkdirSync(settingsDir, { recursive: true });
-    writeFileSync(join(settingsDir, "setting.json"), JSON.stringify({ locale: "zh-CN" }), "utf-8");
+    writeFileSync(join(settingsDir, "setting.json"), JSON.stringify({ locale: "vi-VN" }), "utf-8");
 
     const service = await createSettingServiceInHome(home);
     await expect(service.get()).resolves.toMatchObject({
@@ -119,7 +119,7 @@ describe("settingService", () => {
     writeFileSync(
       settingsFile,
       JSON.stringify({
-        locale: "zh-CN",
+        locale: "vi-VN",
         closeToTrayOnWindows: false,
       }),
       "utf-8",
@@ -151,7 +151,7 @@ describe("settingService", () => {
     writeFileSync(
       settingsFile,
       JSON.stringify({
-        locale: "zh-CN",
+        locale: "vi-VN",
         messageStreamShowReasoning: false,
         closeToTrayOnWindowsMigrationInitialized: true,
       }),
@@ -188,7 +188,7 @@ describe("settingService", () => {
     writeFileSync(
       settingsFile,
       JSON.stringify({
-        locale: "zh-CN",
+        locale: "vi-VN",
         messageStreamShowReasoning: false,
       }),
       "utf-8",
@@ -311,7 +311,7 @@ describe("settingService", () => {
     // 高负载下会在等待临界区收口时先超时导致偶发失败，这里放宽回默认量级。
     process.env.ZCODE_SETTING_WRITE_QUEUE_TIMEOUT_MS = "30000";
     const latestUpdate = service.update({
-      locale: "zh-CN",
+      locale: "vi-VN",
       localePreference: "system",
     });
     let latestUpdateSettled = false;
@@ -331,7 +331,7 @@ describe("settingService", () => {
     await expect(latestUpdate).resolves.toBeUndefined();
 
     expect(JSON.parse(readFileSync(settingsFile, "utf-8"))).toMatchObject({
-      locale: "zh-CN",
+      locale: "vi-VN",
       localePreference: "system",
     });
     await vi.waitFor(() => {
@@ -342,7 +342,7 @@ describe("settingService", () => {
       ).toHaveLength(0);
     });
     expect(JSON.parse(readFileSync(settingsFile, "utf-8"))).toMatchObject({
-      locale: "zh-CN",
+      locale: "vi-VN",
       localePreference: "system",
     });
   });
@@ -409,7 +409,7 @@ describe("settingService", () => {
     // 造成偶发失败；本用例只需第一笔写超时，第二笔写放宽到默认量级避免计时抖动。
     process.env.ZCODE_SETTING_WRITE_QUEUE_TIMEOUT_MS = "30000";
     const latestUpdate = service.update({
-      locale: "zh-CN",
+      locale: "vi-VN",
       localePreference: "system",
     });
 
@@ -417,7 +417,7 @@ describe("settingService", () => {
     await expect(latestUpdate).resolves.toBeUndefined();
 
     expect(JSON.parse(readFileSync(settingsFile, "utf-8"))).toMatchObject({
-      locale: "zh-CN",
+      locale: "vi-VN",
       localePreference: "system",
     });
     await vi.waitFor(() => {
@@ -498,7 +498,7 @@ describe("settingService", () => {
 
     await expect(service.get()).resolves.toMatchObject({
       recentProjects: [],
-      locale: "zh-CN",
+      locale: "vi-VN",
     });
 
     expect(existsSync(settingsFile)).toBe(false);
@@ -915,7 +915,7 @@ describe("settingService", () => {
       settingsFile,
       JSON.stringify({
         recentProjects: ["/tmp/existing"],
-        locale: "zh-CN",
+        locale: "vi-VN",
         lastOpenTabs: ["/tmp/local-demo"],
         lastWorkspaceSession: [{ kind: "remote", historyId: "legacy-remote" }],
         remoteWorkspaceHistory: [

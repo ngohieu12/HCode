@@ -5,7 +5,6 @@ import { run } from "../src/run.js";
 import type { RunDependencies } from "../src/run.js";
 import { createCommandCenter, listSlashCommandSuggestions } from "../src/command-center.js";
 import type { CommandCenterApp, CommandCenterDeps } from "../src/command-center.js";
-import { createTuiSubmitPrompt } from "../src/tui-prompt-handler.js";
 import { WORKFLOW_DISABLED_NOTICE, WORKFLOW_MODE_SCOPE_ERROR } from "../src/workflow-mode.js";
 
 /**
@@ -50,7 +49,7 @@ type RuntimeConfigSeen = {
   dynamicWorkflowToolsOnDemand?: boolean;
 };
 
-/** 记录每次建 app 时的两个工作流字段；app 本身只够跑通一次 prompt / TUI 启动。 */
+/** 记录每次建 app 时的两个工作流字段；app 本身只够跑通一次 prompt。 */
 function createRecordingDeps(): { deps: RunDependencies; seen: RuntimeConfigSeen[] } {
   const seen: RuntimeConfigSeen[] = [];
   const deps: RunDependencies = {
@@ -112,74 +111,8 @@ for (const [mode, pair] of [
   });
 }
 
-test("TUI without --workflow-mode writes the disabled pair and suggests no /workflow", async () => {
-  const { deps, seen } = createRecordingDeps();
-  let suggestions: string[] = [];
-  const ctx = createContext(["tui"]);
-  const exitCode = await run(ctx, {
-    ...deps,
-    runTui: async (options) => {
-      // TUI 的斜杠命令与首个 App 由启动选项异步提供（TUI 启动画面先渲染，再加载会话元数据）。
-      const startup = await options.loadStartupOptions?.();
-      suggestions = (startup?.slashCommands ?? options.slashCommands ?? []).map(
-        (entry) => entry.name,
-      );
-      return 0;
-    },
-  });
-  assert.equal(exitCode, 0);
-  assert.ok(seen.length > 0, "the TUI creates its first app at startup");
-  for (const config of seen) assert.deepEqual(config, DISABLED_PAIR);
-  assert.ok(!suggestions.includes("workflow"));
-  assert.ok(suggestions.includes("dwf"), "/dwf stays for viewing existing runs");
-});
 
-test("TUI with --workflow-mode onDemand writes the onDemand pair and suggests /workflow", async () => {
-  const { deps, seen } = createRecordingDeps();
-  let suggestions: string[] = [];
-  const ctx = createContext(["--workflow-mode", "onDemand"]);
-  const exitCode = await run(ctx, {
-    ...deps,
-    runTui: async (options) => {
-      // TUI 的斜杠命令与首个 App 由启动选项异步提供（TUI 启动画面先渲染，再加载会话元数据）。
-      const startup = await options.loadStartupOptions?.();
-      suggestions = (startup?.slashCommands ?? options.slashCommands ?? []).map(
-        (entry) => entry.name,
-      );
-      return 0;
-    },
-  });
-  assert.equal(exitCode, 0);
-  assert.ok(seen.length > 0);
-  for (const config of seen) assert.deepEqual(config, ON_DEMAND_PAIR);
-  assert.ok(suggestions.includes("workflow"));
-});
 
-test("every app the TUI creates, including /new, carries the same pair", async () => {
-  const { deps, seen } = createRecordingDeps();
-  const handler = createTuiSubmitPrompt(
-    deps,
-    {},
-    "test",
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    false,
-    undefined,
-    undefined,
-    "alwaysOn",
-  );
-  try {
-    await handler.getSessionMetadata!();
-    await handler("/new", { abortSignal: new AbortController().signal });
-  } finally {
-    await handler.close?.();
-  }
-  assert.equal(seen.length, 2);
-  for (const config of seen) assert.deepEqual(config, ALWAYS_ON_PAIR);
-});
 
 test("an unknown --workflow-mode value fails before any app is created", async () => {
   const { deps, seen } = createRecordingDeps();

@@ -61,7 +61,7 @@ describe("skills mention provider", () => {
     const skill = {
       id: "builtin-pdf",
       name: "pdf",
-      description: "专业 PDF 工具集",
+      description: "Professional PDF toolkit (frontmatter fallback)",
       path: "/cache/zcode-plugins-official/document-skills/0.1.0/skills/pdf/SKILL.md",
       scope: "plugin" as const,
       pluginName: "document-skills",
@@ -70,8 +70,8 @@ describe("skills mention provider", () => {
     expect(mapSkillsToMentionItemsForTest([skill], "en-US")[0]?.description).toContain(
       "Plugin · Professional PDF toolkit",
     );
-    expect(mapSkillsToMentionItemsForTest([skill], "zh-CN")[0]?.description).toContain(
-      "插件 · 专业 PDF 工具集",
+    expect(mapSkillsToMentionItemsForTest([skill], "vi-VN")[0]?.description).toContain(
+      "Plugin · Professional PDF toolkit",
     );
   });
 
@@ -88,8 +88,8 @@ describe("skills mention provider", () => {
     expect(mapSkillsToMentionItemsForTest([skill], "en-US")[0]?.description).toContain(
       "Plugin · Run pure GUI black-box tests",
     );
-    expect(mapSkillsToMentionItemsForTest([skill], "zh-CN")[0]?.description).toContain(
-      "插件 · 使用 HCode Browser Use 对网页和本地 Web 前端执行纯 GUI 黑盒测试",
+    expect(mapSkillsToMentionItemsForTest([skill], "vi-VN")[0]?.description).toContain(
+      "Plugin · Run pure GUI black-box tests",
     );
   });
 });

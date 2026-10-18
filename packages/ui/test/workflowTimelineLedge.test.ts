@@ -23,7 +23,7 @@ import { timelineWidth } from "@/components/workflow-timeline/timeline-geometry.
 import { WorkflowTimeline } from "@/components/workflow-timeline/WorkflowTimeline.js";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 describe("timeline-ledge geometry", () => {
   it("ledge width: none for none, lamps 16 apart with 8px pads, +n past three", () => {

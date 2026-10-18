@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { IServiceAccessor } from "@zcode/services";
@@ -31,7 +32,7 @@ describe("Project Memory local image service boundary", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: createServices(remoteReadMediaPreview) },

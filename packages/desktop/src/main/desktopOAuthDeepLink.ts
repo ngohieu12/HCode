@@ -138,19 +138,8 @@ export function isNetworkWorkspacePath(path: string): boolean {
 }
 
 export function resolveExternalWorkspaceOpenDialogCopy(
-  locale: Locale,
+  _locale: Locale,
 ): ExternalWorkspaceOpenDialogCopy {
-  // TODO(i18n): 新增 Locale 时把这里收敛成完整 Record<Locale, ...>，
-  // 避免未覆盖语言静默回退英文。
-  if (locale === "zh-CN") {
-    return {
-      buttons: ["打开文件夹", "取消"],
-      title: "打开外部 HCode 链接？",
-      message: "是否在 HCode 中打开此文件夹？",
-      detail: (path) => `${path}\n\n只打开你信任来源的文件夹。项目设置可能影响 agent runtime。`,
-    };
-  }
-
   return {
     buttons: ["Open folder", "Cancel"],
     title: "Open external HCode link?",

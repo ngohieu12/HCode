@@ -695,7 +695,7 @@ export async function getPluginControlText(
 }
 
 export async function setPluginPresentation(input: {
-  locale: "zh-CN" | "en-US";
+  locale: "en-US" | "vi-VN";
   theme: "zai-light" | "zai-dark";
   width: number;
   height: number;
@@ -1100,9 +1100,9 @@ async function writeMarketplaceManifest(marketplaceRoot: string, version: string
         name: PLUGIN_LIFECYCLE_NAME,
         version,
         displayName: "Lifecycle Fixture",
-        displayName_i18n: { "zh-CN": "生命周期测试插件" },
+        displayName_i18n: { "en-US": "生命周期测试插件" },
         description: `Deterministic plugin lifecycle fixture ${version}`,
-        description_i18n: { "zh-CN": `确定性插件生命周期测试 ${version}` },
+        description_i18n: { "en-US": `确定性插件生命周期测试 ${version}` },
         category: "productivity",
         author: { name: "ZCode E2E", url: "https://example.com" },
         homepage: "https://example.com/e2e-plugin-lifecycle",

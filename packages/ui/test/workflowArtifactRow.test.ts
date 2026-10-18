@@ -5,6 +5,7 @@
 // 行在完成卡与 run 侧板上的**落位**分别在 workflowCompletionCard.test.ts 与 workflowRunArtifactsSection.test.ts；
 // 这里只钉行自己的形态，与两条纯函数。
 import { cleanup, fireEvent, render } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -34,13 +35,16 @@ const REPORT: WorkflowCompletionArtifact = {
 
 function renderRow(
   artifact: WorkflowCompletionArtifact,
-  options: { locale?: "en-US" | "zh-CN"; onOpen?: (id: string) => void; title?: string } = {},
+  options: { locale?: "en-US" | "vi-VN"; onOpen?: (id: string) => void; title?: string } = {},
 ) {
   const labels = buildPresetLabels((descriptor) => descriptor.id.split(".").at(-1)!);
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: options.locale ?? "en-US" },
+      {
+        initialLocale: options.locale ?? "en-US",
+        messages: options.locale === "vi-VN" ? zhCNLegacy : undefined,
+      },
       createElement(WorkflowArtifactRow, {
         artifact,
         labels,
@@ -97,7 +101,7 @@ describe("WorkflowArtifactRow", () => {
   it("看板的细节是条数；说明缺席时那一行不画；v1 不写版本；zh-CN 的 kind 词", () => {
     const view = renderRow(
       { id: "perf", kind: "chart", title: "每轮耗时", version: 1, itemCount: 12 },
-      { locale: "zh-CN" },
+      { locale: "vi-VN" },
     );
     expect(view.queryByTestId("workflow-artifact-row-description")).toBeNull();
     expect(view.queryByTestId("workflow-artifact-tile-version")).toBeNull();

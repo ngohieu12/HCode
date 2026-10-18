@@ -1,6 +1,7 @@
 /** @vitest-environment jsdom */
 
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import {
   cleanup,
   fireEvent,
@@ -29,7 +30,7 @@ function renderMarkdownImage(src: string, workspacePath?: string) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(MarkdownImage, { alt: "示例图", src, workspacePath }),
     ),
   );
@@ -82,7 +83,7 @@ describe("MarkdownImage loading state", () => {
     view.rerender(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(MarkdownImage, {
           alt: "示例图",
           src: "https://example.com/new.png",

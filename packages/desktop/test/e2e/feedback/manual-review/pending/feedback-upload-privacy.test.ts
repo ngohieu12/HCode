@@ -68,7 +68,7 @@ describe("反馈上传授权（manual review）", () => {
 
   for (const [locale, width, height, helpLabel, reportLabel, hint] of [
     ["en-US", 1280, 900, "Help", "Report", "On by default"],
-    ["zh-CN", 430, 900, "帮助", "问题上报", "默认开启"],
+    ["en-US", 430, 900, "帮助", "问题上报", "默认开启"],
   ] as const) {
     it(`FB-PRIV-01/08: ${locale} ${width}px 新反馈默认开启日志且允许取消`, async () => {
       await seedSettings({ locale, localePreference: locale, zcodeEndpointOrigin: server.origin });

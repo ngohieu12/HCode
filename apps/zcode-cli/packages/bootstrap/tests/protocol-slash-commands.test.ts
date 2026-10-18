@@ -133,7 +133,7 @@ describe("protocol slash command surface", () => {
       expect(expanded).toContain("Required skills: `dynamic-workflows`.");
       expect(expanded).toContain("ship it");
       expect(expanded).not.toContain("Should not expand.");
-      // 缺席（TUI / headless）等于开启；显式 false 才挡下。
+      // 缺席（headless）等于开启；显式 false 才挡下。
       expect(
         resolveZCodeBuiltinPromptCommand("/workflow ship it", { workingDirectory: workspace }),
       ).toContain("ship it");

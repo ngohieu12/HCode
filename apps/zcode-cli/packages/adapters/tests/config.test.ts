@@ -322,7 +322,7 @@ describe("config adapters", () => {
       ZCODE_NO_PROXY: "localhost,127.0.0.1",
       ZCODE_AGENT_CA_CERT: "/tmp/zcode-ca.pem",
       ZCODE_HTTP_TIMEOUT: "1234",
-      ZCODE_LOCALE: "zh-CN",
+      ZCODE_LOCALE: "en-US",
       ZCODE_LOG_FORMAT: "json",
     });
 
@@ -585,14 +585,14 @@ describe("config adapters", () => {
     const path = join(dir, "config.json");
 
     try {
-      await writeFile(path, JSON.stringify({ ui: { locale: "zh-CN" } }));
+      await writeFile(path, JSON.stringify({ ui: { locale: "en-US" } }));
 
       const result = loadFileConfig(path);
       const merged = createConfig({ env: {}, userConfigPath: path });
 
       expect(result.loaded).toBe(true);
-      expect(result.config.ui?.locale).toBe("zh-CN");
-      expect(merged.config.ui.locale).toBe("zh-CN");
+      expect(result.config.ui?.locale).toBe("en-US");
+      expect(merged.config.ui.locale).toBe("en-US");
     } finally {
       await rm(dir, { force: true, recursive: true });
     }
@@ -671,11 +671,11 @@ describe("config adapters", () => {
         }),
       );
 
-      const result = await updateUiLocaleInFileConfig(path, "zh-CN");
+      const result = await updateUiLocaleInFileConfig(path, "en-US");
       const written = JSON.parse(await readFile(path, "utf-8"));
 
       expect(result).toEqual({
-        locale: "zh-CN",
+        locale: "en-US",
         path,
       });
       expect(written).toMatchObject({
@@ -687,7 +687,7 @@ describe("config adapters", () => {
         },
         ui: {
           density: "compact",
-          locale: "zh-CN",
+          locale: "en-US",
         },
       });
     } finally {

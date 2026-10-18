@@ -3,6 +3,7 @@
 // useServices().zcodeAgentService，RPC 带 { scope: "global" }。卡片 / 实参窗 / 移动窗 / 详情页换桩，
 // 只看组的状态流与全局语义（运行带 scope、修订 / 创建落到本地项目、移到项目、-32602 提示、运行行项目列）。
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -270,7 +271,7 @@ function mount(props: Partial<Parameters<typeof SavedWorkflowGlobalGroup>[0]> = 
   const utils = render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(SavedWorkflowGlobalGroup, {
         refreshSeq: 0,
         mode: { kind: "list" },
@@ -363,7 +364,7 @@ describe("SavedWorkflowGlobalGroup", () => {
     expect(onCreateViaChat.mock.calls[0]?.[0]).toContain('scope: "global"');
 
     fireEvent.click(screen.getByTestId("revise-research"));
-    expect(onCreateViaChat.mock.calls[1]?.[0]).toContain("请修订已保存的工作流");
+    expect(onCreateViaChat.mock.calls[1]?.[0]).toContain("Please revise the saved workflow");
     expect(onCreateViaChat.mock.calls[1]?.[1]).toEqual({ workspacePath: "/a" });
   });
 

@@ -58,9 +58,7 @@ after(async () => {
 
 const artifacts = join(tmpdir(), "zcode-start156-browser");
 for (const [width, locale, theme] of [
-  [390, "zh-CN", "light"],
   [390, "en-US", "dark"],
-  [1200, "zh-CN", "dark"],
   [1200, "en-US", "light"],
 ]) {
   for (const family of ["bigmodel", "zai"]) {
@@ -87,37 +85,17 @@ for (const [width, locale, theme] of [
           assert.equal(await trigger.getAttribute("data-placeholder"), null);
           assert.match(await trigger.innerText(), /InternationalResearch/);
           assert.ok(
-            (await page.getByTestId("model-label").innerText()).includes(
-              locale === "zh-CN" ? "GLM-5.3(团队套餐)" : "GLM-5.3(Team Plan)",
-            ),
+            (await page.getByTestId("model-label").innerText()).includes("GLM-5.3(Team Plan)"),
           );
           if (["disconnected", "unavailable", "expired"].includes(state)) {
             const name =
-              state === "unavailable"
-                ? locale === "zh-CN"
-                  ? "重试"
-                  : "Retry"
-                : state === "expired"
-                  ? locale === "zh-CN"
-                    ? "重新登录"
-                    : "Sign in again"
-                  : locale === "zh-CN"
-                    ? "登录"
-                    : "Log in";
+              state === "unavailable" ? "Retry" : state === "expired" ? "Sign in again" : "Log in";
             await page.getByRole("button", { name, exact: true }).click();
             assert.equal(await page.getByTestId("actions").innerText(), "1");
           }
           if (state === "notPurchased")
-            assert.ok(
-              (await page.locator("main").innerText()).includes(
-                locale === "zh-CN" ? "暂无可用体验套餐" : "No available Start Plan",
-              ),
-            );
-          if (state === "pending")
-            assert.match(
-              await page.locator("main").innerText(),
-              locale === "zh-CN" ? /待生效/ : /Pending/,
-            );
+            assert.ok((await page.locator("main").innerText()).includes("No available Start Plan"));
+          if (state === "pending") assert.match(await page.locator("main").innerText(), /Pending/);
           if (state === "empty") assert.match(await page.locator("main").innerText(), /0%/);
           const bounds = await page.evaluate(() => ({
             width: innerWidth,

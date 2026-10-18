@@ -107,11 +107,11 @@ function Fixture() {
             kindLabel="Agent"
             primaryText="general-purpose"
             showFailureStatus
-            statusLabel={params.get("locale") === "zh-CN" ? "执行失败" : "Failed"}
+            statusLabel={params.get("locale") === "en-US" ? "执行失败" : "Failed"}
             statusTooltip={getToolCallErrorText({
               status: "failed",
               error:
-                "Cannot start subagent: No reasoning level selected / 未选择思考档位 [reason=reasoning-level-missing; selection=account:bigmodel-team-coding-plan/GLM-5.3]",
+                "Cannot start subagent: No reasoning level selected [reason=reasoning-level-missing; selection=account:bigmodel-team-coding-plan/GLM-5.3]",
             })}
           />
         </section>
@@ -262,7 +262,7 @@ createRoot(document.getElementById("root")!).render(
     }
   >
     <TooltipProvider>
-      <ZCodeIntlProvider initialLocale={params.get("locale") === "zh-CN" ? "zh-CN" : "en-US"}>
+      <ZCodeIntlProvider initialLocale="en-US">
         {params.has("teamEntry") ? (
           <OffPeakTeamEntryFixture />
         ) : params.has("offpeak") ? (

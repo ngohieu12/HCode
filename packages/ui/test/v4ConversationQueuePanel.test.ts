@@ -1,4 +1,5 @@
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { QueueState } from "@zcode/shared/zcode-protocol-v4";
@@ -54,7 +55,7 @@ function renderPanel(): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(ConversationQueuePanel, {
         queue: queueState(),
         onDeleteItem: vi.fn(),
@@ -75,7 +76,7 @@ describe("ConversationQueuePanel", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationQueuePanel, { queue }),
       ),
     );
@@ -100,7 +101,7 @@ describe("ConversationQueuePanel", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationQueuePanel, {
           queue,
           onResume: vi.fn(),
@@ -123,7 +124,7 @@ describe("ConversationQueuePanel", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationQueuePanel, {
           queue,
           onDeleteItem: vi.fn(),
@@ -143,7 +144,7 @@ describe("ConversationQueuePanel", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationQueuePanel, {
           queue: queueState(),
           onDeleteItem: vi.fn(),
@@ -174,7 +175,7 @@ describe("ConversationQueuePanel", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationQueuePanel, {
           queue,
           onDeleteItem: vi.fn(),

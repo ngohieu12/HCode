@@ -114,7 +114,7 @@ describe("BOT-E2E-SC-01 Feishu streaming card lifecycle", () => {
       zcodeTaskService,
       settingService: {
         get: async () => ({
-          locale: "zh-CN",
+          locale: "en-US",
           recentProjects: [E2E_BOT_WORKSPACE],
           lastWorkspaceSession: [{ kind: "local", workspacePath: E2E_BOT_WORKSPACE }],
           enabledBuiltinAgentCliProviders: ["glm"],

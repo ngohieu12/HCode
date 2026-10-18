@@ -29,7 +29,7 @@ import {
 // eslint-disable-next-line import/first -- 词条只用于双语言存在性断言。
 import enUS from "../src/i18n/locales/en-US.js";
 // eslint-disable-next-line import/first
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 afterEach(() => {
   resetWorkflowRunSavedStoreForTests();
@@ -85,16 +85,16 @@ describe("弹层起点", () => {
 describe("交给 ZCode 的那条消息", () => {
   const base = { runId: "dwfrun-7", runName: "PR 分层评审", scope: "project" as const };
 
-  it("zh：要提炼而不是照抄、带上填好的名字与说明、要求回传 run_id；不带脚本", () => {
+  it("要提炼而不是照抄、带上填好的名字与说明、要求回传 run_id；不带脚本", () => {
     const text = buildWorkflowSaveRequestPrompt({
       ...base,
-      locale: "zh-CN",
+      locale: "vi-VN",
       name: "pr-review",
       description: "三层评审",
     });
-    expect(text).toContain("「PR 分层评审」");
-    expect(text).toContain("提炼");
-    expect(text).toContain("保存到本项目");
+    expect(text).toContain('("PR 分层评审")');
+    expect(text).toContain("distill");
+    expect(text).toContain("save it to this project");
     expect(text).toContain("`pr-review`");
     expect(text).toContain("三层评审");
     expect(text).toContain('run_id: "dwfrun-7"');

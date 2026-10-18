@@ -162,7 +162,7 @@ describe("Team Plan 设置与使用统计 E2E", () => {
     );
   });
 
-  for (const locale of ["zh-CN", "en-US"] as const) {
+  for (const locale of ["en-US", "en-US"] as const) {
     it(`CTP-02B: 侧栏头像旁应显示当前已确认的 Team Plan 标签（${locale}）`, async function () {
       this.timeout(120000);
 
@@ -175,7 +175,7 @@ describe("Team Plan 设置与使用统计 E2E", () => {
         timeoutMsg: "侧栏头像入口没有出现",
       });
       // 英文 UI 的套餐标签为 Team；只断言徽标本身，避免用户名包含团队文字时误通过。
-      const teamLabel = locale === "zh-CN" ? "团队" : "Team";
+      const teamLabel = locale === "en-US" ? "团队" : "Team";
       const badge = profileTrigger.$(`span[title="${teamLabel}"]`);
       await badge.waitForDisplayed({ timeout: 30000 });
       await expect(badge).toHaveText(teamLabel);
@@ -260,7 +260,7 @@ describe("Team Plan 设置与使用统计 E2E", () => {
     );
   });
 
-  for (const locale of ["zh-CN", "en-US"] as const) {
+  for (const locale of ["en-US", "en-US"] as const) {
     it(`CTP-05: 个人/团队套餐组合应跟随当前连接方式展示（${locale}）`, async function () {
       this.timeout(180000);
 
@@ -279,7 +279,7 @@ describe("Team Plan 设置与使用统计 E2E", () => {
       await assertBodyTextIncludes(["70%", "glm-credit-e2e"]);
       // 使用统计的个人页签是 Individual Plan，不是设置页左侧的 Coding Plan。
       const personalTab = $(sel(testId(TID_SETTINGS_USAGE_TAB, `codingPlan:${PERSONAL_PLAN_KEY}`)));
-      await expect(personalTab).toHaveText(locale === "zh-CN" ? "个人套餐" : "Individual Plan");
+      await expect(personalTab).toHaveText(locale === "en-US" ? "个人套餐" : "Individual Plan");
       await expect(personalTab).toHaveAttribute("aria-pressed", "true");
       await assertBodyTextExcludes(["Team Org"]);
 
@@ -708,7 +708,7 @@ async function prepareScenario(
   bigmodelSelectedKey: string,
   faultMode: CodingPlanFaultMode = "none",
   resetScenario: CodingPlanResetScenario = "none",
-  locale?: "zh-CN" | "en-US",
+  locale?: "en-US" | "vi-VN",
 ) {
   // 修复原因：同一 spec 会连续切换个人/团队套餐场景。必须在旧 Electron 退出前清理
   // file:// origin 的 entitlement 缓存；退出后再执行 browser.execute 会被异常吞掉，

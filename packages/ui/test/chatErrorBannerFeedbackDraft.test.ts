@@ -1,4 +1,5 @@
 import type { IPlatformService } from "@zcode/shared";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -46,7 +47,7 @@ function renderErrorBanner() {
   renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(
         PlatformProvider,
         { platform: mockPlatform },

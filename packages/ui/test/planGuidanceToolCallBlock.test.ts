@@ -1,4 +1,5 @@
 import type { IBroadcastService, IServiceAccessor } from "@zcode/services";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -59,7 +60,7 @@ function renderPlanGuidanceBlock(
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(
         ServiceProvider,
         { services: mockServices },

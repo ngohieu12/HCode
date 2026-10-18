@@ -38,7 +38,7 @@ export function mapSkillsToMentionItemsForTest(
   const uniqueSkills = [...uniqueSkillsByName.values()];
 
   return uniqueSkills.map((skill) => {
-    const sourceLabel = resolveSkillSourceLabel(skill.scope, locale);
+    const sourceLabel = resolveSkillSourceLabel(skill.scope);
     const description = resolveSkillDisplayDescription(skill, locale);
     return {
       id: `skill:${skill.id}`,

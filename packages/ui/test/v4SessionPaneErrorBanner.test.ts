@@ -1,4 +1,5 @@
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { ConversationSnapshot } from "@zcode/shared/zcode-protocol-v4";
@@ -222,7 +223,7 @@ function renderPane(): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(SessionPane, {
         paneId: "workspace-main",
         sessionId: "session-1",

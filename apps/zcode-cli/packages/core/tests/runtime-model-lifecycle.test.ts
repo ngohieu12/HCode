@@ -332,7 +332,7 @@ describe("Agent Runtime Model lifecycle", () => {
             createTestModelSelection(createTestModelSelection("test/model-b")),
           );
           runtime.updateConfig({
-            language: "zh-CN",
+            language: "en-US",
             outputStyle: {
               name: "Learning",
               prompt: "Explain tradeoffs while solving the task.",

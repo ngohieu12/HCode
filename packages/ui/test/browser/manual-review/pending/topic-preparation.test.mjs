@@ -58,7 +58,7 @@ after(async () => {
 
 const artifacts = join(tmpdir(), "zcode-topic-preparation");
 for (const width of [390, 1200]) {
-  for (const locale of ["en-US", "zh-CN"]) {
+  for (const locale of ["en-US"]) {
     for (const theme of ["light", "dark"]) {
       test(`BOT-UI-TP-PREPARATION ${width}/${locale}/${theme}`, async () => {
         const page = await browser.newPage({ viewport: { width, height: 1000 } });
@@ -93,16 +93,13 @@ for (const width of [390, 1200]) {
             true,
           );
           assert.equal(await bubble.locator("[data-topic-preparation-loading]").count(), 0);
-          assert.equal(
-            await bubble.textContent(),
-            locale === "zh-CN" ? "北京今天天气如何？" : "What is the weather in Beijing today?",
-          );
+          assert.equal(await bubble.textContent(), "What is the weather in Beijing today?");
           assert.ok(
             (await first.locator("[data-topic-preparation-source]").textContent()).includes(
-              locale === "zh-CN" ? "飞书 · 莫汝舰" : "Feishu · 莫汝舰",
+              "Feishu · 莫汝舰",
             ),
           );
-          const label = locale === "zh-CN" ? "正在准备材料" : "Preparing materials";
+          const label = "Preparing materials";
           await loading.hover();
           await page.getByRole("tooltip", { name: label, exact: true }).waitFor();
           await page.mouse.move(0, 0);
@@ -129,7 +126,7 @@ for (const width of [390, 1200]) {
           }
           const waiting = page.locator('[data-topic-preparation="waiting"]');
           const expand = waiting.getByRole("button", {
-            name: locale === "zh-CN" ? "展开" : "Expand",
+            name: "Expand",
             exact: true,
           });
           await expand.waitFor();

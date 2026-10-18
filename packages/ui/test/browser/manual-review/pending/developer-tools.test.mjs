@@ -103,7 +103,7 @@ for (const width of [390, 1200])
       page.on("pageerror", (e) => errors.push(e.message));
       try {
         await page.goto(
-          `${origin}fixture?theme=${theme}&locale=${width === 390 ? "zh-CN" : "en-US"}`,
+          `${origin}fixture?theme=${theme}&locale=${width === 390 ? "en-US" : "en-US"}`,
         );
         const tps = page.getByTestId("token-debug-tps");
         await tps.waitFor();

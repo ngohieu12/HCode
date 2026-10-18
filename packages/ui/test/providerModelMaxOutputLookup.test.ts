@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProviderModelsSection } from "@/settings/model-provider-section/ProviderCardSections.js";
 import { ProviderModelMetadataDialog } from "@/settings/model-provider-section/ProviderModelMetadataDialog.js";
 import { MODEL_PROVIDER_TEXT_IDLE_TRIGGER_MS } from "@/settings/model-provider-section/useIdleTrigger.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import enUS from "@/i18n/locales/en-US.js";
 
 const providerSettingsServiceMock = vi.hoisted(() => ({
@@ -56,7 +56,7 @@ vi.mock("@/components/ui/dialog.js", () => ({
 
 vi.mock("@/i18n/IntlProvider.js", () => ({
   useZCodeIntl: () => ({
-    locale: "zh-CN",
+    locale: "vi-VN",
     intl: {
       formatMessage: ({ id }: { id: string }) => {
         const messages: Record<string, string> = {

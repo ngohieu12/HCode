@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 describe("onboarding welcome i18n", () => {
   // 缺失 key 会被 IntlProvider 原样显示，既破坏引导文案，也会污染复用按钮文案的埋点。

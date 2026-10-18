@@ -100,27 +100,17 @@ export interface PluginSandboxPermissionDialogText {
   denyButton: string;
 }
 
-const PERMISSION_LABELS: Record<"zh" | "en", Record<PluginSandboxPromptedPermission, string>> = {
-  zh: { camera: "摄像头", microphone: "麦克风", geolocation: "位置" },
-  en: { camera: "camera", microphone: "microphone", geolocation: "location" },
+const PERMISSION_LABELS: Record<PluginSandboxPromptedPermission, string> = {
+  camera: "camera",
+  microphone: "microphone",
+  geolocation: "location",
 };
 
 export function formatPluginSandboxPermissionDialogText(
   input: { serverName: string; permissions: readonly PluginSandboxPromptedPermission[] },
-  locale: Locale,
+  _locale: Locale,
 ): PluginSandboxPermissionDialogText {
-  if (locale === "zh-CN") {
-    const list = input.permissions.map((permission) => PERMISSION_LABELS.zh[permission]).join("、");
-    return {
-      title: "应用权限请求",
-      message: `「${input.serverName}」的应用请求使用${list}`,
-      detail:
-        "该页面运行在 ZCode 的沙箱中。允许后，本次运行期间这个 MCP server 的应用可继续使用这些权限；重启桌面端后会再次询问。",
-      allowButton: "允许",
-      denyButton: "拒绝",
-    };
-  }
-  const list = input.permissions.map((permission) => PERMISSION_LABELS.en[permission]).join(", ");
+  const list = input.permissions.map((permission) => PERMISSION_LABELS[permission]).join(", ");
   return {
     title: "App permission request",
     message: `The "${input.serverName}" app wants to use your ${list}`,

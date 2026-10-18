@@ -124,7 +124,7 @@ function Fixture() {
     setRevision((v) => v + 1);
   }
   return (
-    <ZCodeIntlProvider initialLocale={query.get("locale") === "zh-CN" ? "zh-CN" : "en-US"}>
+    <ZCodeIntlProvider initialLocale="en-US">
       <main className="min-h-screen bg-background p-4 text-ui-base text-foreground">
         {(["event", "daily", "other"] as const).map((key) => (
           <label key={key}>

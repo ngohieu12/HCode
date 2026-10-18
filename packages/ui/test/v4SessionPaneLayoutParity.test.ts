@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { resolve } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -346,7 +347,7 @@ function renderPane({
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(SessionPane, {
         paneId: "workspace-main",
         sessionId,

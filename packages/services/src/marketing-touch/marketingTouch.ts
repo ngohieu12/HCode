@@ -2,9 +2,9 @@ import { ServiceChannels, type MarketingTouchSnapshot } from "@zcode/shared";
 import { createServiceDescriptor } from "#src/descriptors.js";
 
 export interface IMarketingTouchService {
-  query(input: { locale: "zh-CN" | "en-US" }): Promise<MarketingTouchSnapshot & { scope: string }>;
+  query(input: { locale: "en-US" }): Promise<MarketingTouchSnapshot & { scope: string }>;
   report(input: {
-    locale: "zh-CN" | "en-US";
+    locale: "en-US";
     scope: string;
     campaignId: string;
     actionType: "confirm" | "cancel";

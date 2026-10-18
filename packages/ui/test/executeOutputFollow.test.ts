@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ExecuteOutput } from "@/ToolCallBlocks/renderers/ExecuteOutput.js";
@@ -13,7 +14,7 @@ afterEach(() => {
 function view(text: string, running = true) {
   return createElement(
     ZCodeIntlProvider,
-    { initialLocale: "zh-CN" },
+    { initialLocale: "vi-VN", messages: zhCNLegacy },
     createElement(ExecuteOutput, { text, running }),
   );
 }

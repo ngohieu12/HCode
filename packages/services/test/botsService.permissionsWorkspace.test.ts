@@ -54,8 +54,8 @@ describe("botsService permissions and workspace", () => {
 
     const replies = await service.handleInboundMessage({ botId: "webhook-1", text: "/workspace 1", actor });
 
-    expect(replies[0]?.text).toContain("工作区: workspace");
-    expect(replies[0]?.text).toContain("任务: 草稿");
+    expect(replies[0]?.text).toContain("Workspace: workspace");
+    expect(replies[0]?.text).toContain("Task: draft");
     expect((await repo.readState()).bots["webhook-1"]).toMatchObject({
       workspacePath: "/tmp/workspace",
       workspaceIdentity: "ssh://host/tmp/workspace",
@@ -85,7 +85,7 @@ describe("botsService permissions and workspace", () => {
 
     const replies = await service.handleInboundMessage({ botId: "webhook-1", text: "/model gpt-5.4", actor });
 
-    expect(replies[0]?.text).toContain("未启用");
+    expect(replies[0]?.text).toContain("not enabled");
     expect((await repo.readConfig()).bots[0]?.currentOptions.model).toBeUndefined();
     service.disposeAll();
   });

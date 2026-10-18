@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createRoot } from "react-dom/client";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { act, createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
@@ -10,7 +11,7 @@ it("explains FULL, provides manual recovery, and never claims all changes rolled
   const html = renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(GlobalDatabaseStartupLoading, {
         state: {
           schemaVersion: 1,
@@ -39,12 +40,12 @@ it("explains FULL, provides manual recovery, and never claims all changes rolled
 
 function renderStartup(
   state: import("@zcode/shared").DatabaseStartupState | null,
-  locale: "zh-CN" | "en-US" = "zh-CN",
+  locale: "vi-VN" | "en-US" = "vi-VN",
 ) {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(GlobalDatabaseStartupLoading, {
         state,
         onRetry() {},
@@ -65,7 +66,7 @@ const baseState: import("@zcode/shared").DatabaseStartupState = {
   disk: [],
 };
 it("SILENTDB-01/08: every normal preparation phase has no visible text or buttons", () => {
-  for (const locale of ["zh-CN", "en-US"] as const) {
+  for (const locale of ["vi-VN", "en-US"] as const) {
     for (const databasePhase of [
       "checking",
       "waiting_for_lock",
@@ -145,7 +146,7 @@ it("SILENTDB-01: silent UI mounts no timer and migration-to-failure clears the p
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(GlobalDatabaseStartupLoading, {
             state,
             onRetry() {},

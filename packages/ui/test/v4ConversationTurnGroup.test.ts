@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, type ContextType } from "react";
 import { DeliveryContext } from "@/v4/botGroupDeliveryContext.js";
 import { withTopicPreparationMessages } from "@/v4/topicPreparationRenderUnits.js";
@@ -304,7 +305,7 @@ function baseUnit(overrides: Partial<ConversationTurnRenderUnit>): ConversationT
 function renderUnit(
   unit: ConversationTurnRenderUnit,
   options: {
-    locale?: "zh-CN" | "en-US";
+    locale?: "vi-VN" | "en-US";
     botContext?: ContextType<typeof DeliveryContext>;
     chatLoadingBlockedByActiveWork?: boolean;
     chatLoadingBlockedByInteraction?: boolean;
@@ -331,7 +332,10 @@ function renderUnit(
       { value: options.botContext ?? null },
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: options.locale ?? "zh-CN" },
+        {
+          initialLocale: options.locale === "vi-VN" ? "vi-VN" : (options.locale ?? "vi-VN"),
+          messages: options.locale === "vi-VN" ? zhCNLegacy : undefined,
+        },
         createElement(
           PlatformProvider,
           { platform: noopPlatform },
@@ -1267,7 +1271,7 @@ describe("ConversationTurnGroup assistant history status", () => {
         assistantHistoryRows: [row],
         renderRows: [row],
       });
-      expect(renderUnit(unit, { locale: "zh-CN" })).toContain("已被新消息中断");
+      expect(renderUnit(unit, { locale: "vi-VN" })).toContain("已被新消息中断");
       expect(renderUnit(unit, { locale: "en-US" })).toContain("Interrupted by a new message");
     } finally {
       topicInterrupted.mockReturnValue(false);
@@ -1288,8 +1292,8 @@ describe("ConversationTurnGroup assistant history status", () => {
 
     expect(renderUnit(interruptedUnit, { locale: "en-US" })).toContain("Stopped");
     expect(renderUnit(interruptedUnit, { locale: "en-US" })).not.toContain("Worked for 5s");
-    expect(renderUnit(interruptedUnit, { locale: "zh-CN" })).toContain("已停止");
-    expect(renderUnit(interruptedUnit, { locale: "zh-CN" })).not.toContain("已工作 5 秒");
+    expect(renderUnit(interruptedUnit, { locale: "vi-VN" })).toContain("已停止");
+    expect(renderUnit(interruptedUnit, { locale: "vi-VN" })).not.toContain("已工作 5 秒");
   });
 
   it("按语言格式化工作时长的单位间距", () => {
@@ -1305,7 +1309,7 @@ describe("ConversationTurnGroup assistant history status", () => {
     });
 
     expect(renderUnit(completedUnit, { locale: "en-US" })).toContain("Worked for 7m 30s");
-    expect(renderUnit(completedUnit, { locale: "zh-CN" })).toContain("已工作 7 分 30 秒");
+    expect(renderUnit(completedUnit, { locale: "vi-VN" })).toContain("已工作 7 分 30 秒");
   });
 
   it.each([
@@ -1444,7 +1448,7 @@ describe("ConversationTurnGroup assistant history status", () => {
         { id: "book", kind: "file", title: "审计报告", version: 2 },
         { id: "perf", kind: "chart", title: "每轮耗时", version: 1 },
       ]),
-      { context: artifactContext, locale: "zh-CN" },
+      { context: artifactContext, locale: "vi-VN" },
     );
 
     expect(html).toContain('data-testid="workflow-notification-artifacts"');
@@ -1471,7 +1475,7 @@ describe("ConversationTurnGroup assistant history status", () => {
           version: 1,
         })),
       ),
-      { context: artifactContext, locale: "zh-CN" },
+      { context: artifactContext, locale: "vi-VN" },
     );
 
     expect(
@@ -1487,7 +1491,7 @@ describe("ConversationTurnGroup assistant history status", () => {
       workflowNotificationUnit([{ id: "a", kind: "file", title: "只剩一件", version: 1 }], {
         artifactsTruncated: true,
       }),
-      { context: artifactContext, locale: "zh-CN" },
+      { context: artifactContext, locale: "vi-VN" },
     );
 
     expect(html).toContain('data-testid="workflow-notification-artifacts-more"');
@@ -1497,7 +1501,7 @@ describe("ConversationTurnGroup assistant history status", () => {
   it("载荷缺席（批量轮 / 旧 CLI / 旧 transcript）⇒ 无 chips，通知行其余部分逐字不变", () => {
     const withoutArtifacts = renderUnit(workflowNotificationUnit(undefined), {
       context: artifactContext,
-      locale: "zh-CN",
+      locale: "vi-VN",
     });
     expect(withoutArtifacts).not.toContain('data-testid="workflow-notification-artifacts"');
     expect(withoutArtifacts).toContain("flaky-test-triage");
@@ -1506,7 +1510,7 @@ describe("ConversationTurnGroup assistant history status", () => {
     // 与「一件产物都没有」的空数组同构：两者都不该长出 chips。
     const emptyArtifacts = renderUnit(workflowNotificationUnit([]), {
       context: artifactContext,
-      locale: "zh-CN",
+      locale: "vi-VN",
     });
     expect(emptyArtifacts).not.toContain('data-testid="workflow-notification-artifacts"');
   });
@@ -1514,7 +1518,7 @@ describe("ConversationTurnGroup assistant history status", () => {
   it("宿主没注入打开能力时 chips 仍在场，只是不可点——交付了什么是事实，能不能打开是能力", () => {
     const html = renderUnit(
       workflowNotificationUnit([{ id: "book", kind: "file", title: "审计报告", version: 1 }]),
-      { locale: "zh-CN" },
+      { locale: "vi-VN" },
     );
 
     expect(html).toContain(`data-testid="${TID_CHAT_WORKFLOW_ARTIFACT_CHIP}"`);
@@ -1544,7 +1548,7 @@ describe("ConversationTurnGroup assistant history status", () => {
       }),
       assistantTextRow(6, { text: "后台总结最终段" }),
     ]);
-    const html = renderUnit(unit!, { context: artifactContext, locale: "zh-CN" });
+    const html = renderUnit(unit!, { context: artifactContext, locale: "vi-VN" });
     expect(html).not.toContain('data-testid="workflow-notification-artifacts"');
   });
 
@@ -1751,7 +1755,7 @@ describe("ConversationTurnGroup assistant history status", () => {
   it("renders the completed assistant action toolbar after the file change summary", () => {
     const createdAt = new Date();
     createdAt.setHours(7, 15, 0, 0);
-    const timeLabel = new Intl.DateTimeFormat("zh-CN", {
+    const timeLabel = new Intl.DateTimeFormat("vi-VN", {
       hour: "2-digit",
       minute: "2-digit",
     }).format(createdAt);
@@ -2212,7 +2216,7 @@ describe("ConversationTurnGroup assistant history status", () => {
   it("按复制、赞、踩、分叉顺序渲染反馈工具栏，手机远控常显", () => {
     const createdAt = new Date();
     createdAt.setHours(7, 15, 0, 0);
-    const timeLabel = new Intl.DateTimeFormat("zh-CN", {
+    const timeLabel = new Intl.DateTimeFormat("vi-VN", {
       hour: "2-digit",
       minute: "2-digit",
     }).format(createdAt);

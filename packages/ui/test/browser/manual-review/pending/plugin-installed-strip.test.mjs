@@ -58,7 +58,7 @@ after(async () => {
 
 const artifacts = join(tmpdir(), "zcode-plugin-strip-clipping");
 for (const width of [390, 1200]) {
-  for (const locale of ["en-US", "zh-CN"]) {
+  for (const locale of ["en-US"]) {
     for (const theme of ["light", "dark"]) {
       test(`PLM-STRIP-CLIP ${width}/${locale}/${theme}`, async () => {
         const page = await browser.newPage({ viewport: { width, height: 700 } });

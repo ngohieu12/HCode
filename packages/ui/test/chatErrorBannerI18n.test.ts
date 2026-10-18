@@ -7,7 +7,7 @@ import {
 import { resolveChatErrorBannerDisplayMessage } from "@/ChatErrorBanner.js";
 import type { IntlInstance } from "@/i18n/IntlProvider.js";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 function createIntl(messages: Record<string, string>): IntlInstance {
   return {

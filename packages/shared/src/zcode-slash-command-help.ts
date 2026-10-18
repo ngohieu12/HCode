@@ -44,7 +44,7 @@ export const BUILTIN_ZCODE_SLASH_COMMAND_HELP_ENTRIES: readonly BuiltinZCodeSlas
   {
     aliases: ["variant"],
     details: [
-      "In the TUI, type /effort or /variant to open composer suggestions.",
+      "Type /effort or /variant to open composer suggestions.",
       "Submitting the empty command or list shows the current and selectable efforts as text.",
       "Use a listed level to switch the current session reasoning effort.",
     ],
@@ -64,7 +64,7 @@ export const BUILTIN_ZCODE_SLASH_COMMAND_HELP_ENTRIES: readonly BuiltinZCodeSlas
   },
   {
     details: [
-      "In the TUI, opens a checkpoint picker when called without arguments.",
+      "Opens a checkpoint picker when called without arguments.",
       "Use latest or a specific checkpoint id to bypass the picker.",
     ],
     name: "fork",
@@ -75,11 +75,11 @@ export const BUILTIN_ZCODE_SLASH_COMMAND_HELP_ENTRIES: readonly BuiltinZCodeSlas
     aliases: ["language"],
     details: [
       "Shows the current UI locale when called without arguments.",
-      "Use auto, en-US, or zh-CN to switch and persist the UI locale.",
+      "Use auto, en-US, or vi-VN to switch and persist the UI locale.",
     ],
     name: "locale",
     summary: "Show or switch the UI locale.",
-    usage: "/locale [auto|en-US|zh-CN]",
+    usage: "/locale [auto|en-US|vi-VN]",
   },
   {
     details: [
@@ -93,7 +93,7 @@ export const BUILTIN_ZCODE_SLASH_COMMAND_HELP_ENTRIES: readonly BuiltinZCodeSlas
   {
     aliases: ["plugin"],
     details: [
-      "Opens a TUI plugin panel when called without arguments.",
+      "Opens a plugin panel when called without arguments.",
       "Rows show ✓ for enabled plugins and ○ for disabled plugins.",
       "Use enable or disable with a plugin id to persist the switch in user config.",
       "Plugin capability changes apply to new sessions.",
@@ -105,7 +105,7 @@ export const BUILTIN_ZCODE_SLASH_COMMAND_HELP_ENTRIES: readonly BuiltinZCodeSlas
   {
     details: [
       "Shows the current permission mode when submitted without arguments.",
-      "Interactive TUI composer input opens a local picker before submit.",
+      "Interactive composer input opens a local picker before submit.",
       "Switchable modes are plan, build, edit, yolo, and guarded.",
       "Picker rows and explicit input submit /mode <mode> commands.",
     ],
@@ -124,15 +124,15 @@ export const BUILTIN_ZCODE_SLASH_COMMAND_HELP_ENTRIES: readonly BuiltinZCodeSlas
   },
   {
     aliases: ["clear"],
-    details: ["Starts a fresh root session and resets the TUI session projection."],
+    details: ["Starts a fresh root session and resets the session projection."],
     name: "new",
-    summary: "Start a fresh session in the TUI.",
+    summary: "Start a fresh session.",
     usage: "/new",
   },
   {
     aliases: ["continue"],
     details: [
-      "In the TUI, opens a session picker when called without arguments.",
+      "Opens a session picker when called without arguments.",
       "Resumes a specific session id when provided.",
       "/continue resumes the latest root session for the current directory.",
     ],
@@ -142,7 +142,7 @@ export const BUILTIN_ZCODE_SLASH_COMMAND_HELP_ENTRIES: readonly BuiltinZCodeSlas
   },
   {
     details: [
-      "In the TUI, opens a checkpoint picker when called without arguments.",
+      "Opens a checkpoint picker when called without arguments.",
       "Use status to show the latest checkpoint, or latest/a checkpoint id to restore directly.",
     ],
     name: "rewind",
