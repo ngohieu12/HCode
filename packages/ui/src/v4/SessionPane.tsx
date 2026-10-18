@@ -3798,9 +3798,13 @@ export function SessionPane({
         logger.warn("[v4-pane] edit 跳过：行内编辑内容为空且无附件");
         return false;
       }
+      // 编辑重发按新的一次发送处理：Selection 与本次 Composer 提交同源（用户刚切换的模型必须
+      // 驱动本次重发），不能让 CLI 沿用被 rewind 那轮 pin 的旧模型；加速卡抽取同源（规则 15）。
+      const submission = createSubmissionFromComposer();
       const highspeed = await prepareHighspeedSendContext(
         sessionId,
         prepareHighspeedTurnFrom(captureHighspeedPaneOrigin()),
+        submission?.modelSelection,
       );
       const latest = snapshotRef.current;
       if (!latest || latest.sessionId !== sessionId) {
@@ -3817,6 +3821,9 @@ export function SessionPane({
           // editUserQuery 的 attachments 缺省表示保留 canonical 原附件；
           // 只有显式透传 []，CLI 才能区分“用户删除全部”与“调用方未修改附件”。
           ...(attachments ? { attachments: [...attachments] } : {}),
+          // 显式提交本次 Composer 选择的模型（与 sendText 同源）；Submission 校验未通过时
+          // 缺省该键，CLI 收口为当前会话常驻 Selection，两种情况都不沿用旧模型。
+          ...(submission ? { modelSelection: submission.modelSelection } : {}),
           ...highspeed.override,
         },
         sessionId,
@@ -3832,7 +3839,13 @@ export function SessionPane({
       // fork ACK 只做旧协议解码兼容；新 edit 永不导航 child。blocked 由行内冲突弹窗处理。
       return ack;
     },
-    [captureHighspeedPaneOrigin, dispatchCommand, prepareHighspeedTurnFrom, sessionId],
+    [
+      captureHighspeedPaneOrigin,
+      createSubmissionFromComposer,
+      dispatchCommand,
+      prepareHighspeedTurnFrom,
+      sessionId,
+    ],
   );
 
   const dispatchRetryTurn = useCallback(
