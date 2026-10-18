@@ -1,5 +1,5 @@
-import type { TuiSubmitPromptResult } from "@zcode/tui";
-import type { CommandCenterDeps, TuiSubmitOptions } from "../types.js";
+import type { CliSubmitPromptResult } from "../contracts.js";
+import type { CommandCenterDeps, CliSubmitOptions } from "../types.js";
 
 type ParsedExpertCommand =
   | {
@@ -14,8 +14,8 @@ type ParsedExpertCommand =
 export async function handleExpertCommand(
   args: string,
   deps: CommandCenterDeps,
-  options: TuiSubmitOptions,
-): Promise<TuiSubmitPromptResult> {
+  options: CliSubmitOptions,
+): Promise<CliSubmitPromptResult> {
   const app = await deps.getApp();
   const parsed = parseExpertCommandArgs(args);
 

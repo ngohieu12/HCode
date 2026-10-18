@@ -16,7 +16,6 @@ const productionRoots = [
   "apps/zcode-cli/packages/cli/src",
   "apps/zcode-cli/packages/contracts/src",
   "apps/zcode-cli/packages/core/src",
-  "apps/zcode-cli/packages/tui/src",
 ] as const;
 
 const legacyDtoOwners = new Set([

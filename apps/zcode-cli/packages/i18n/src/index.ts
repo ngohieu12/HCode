@@ -19,12 +19,14 @@ export {
   resolveLocale,
 };
 export type { LocaleDetectionInput } from "./locale.js";
-export type { CliCopy, TuiCopy, UiLocale, SupportedLocale, ZCodeCopy } from "./types.js";
+export type { CliCopy, CommandCenterCopy, UiLocale, SupportedLocale, ZCodeCopy } from "./types.js";
+
+// CLI 尚未提供越南语文案，先以英文兜底，避免出现未翻译的空界面；locale 仍标记为请求的界面语言。
+const viVN: ZCodeCopy = { ...enUS, locale: "vi-VN" };
 
 const CATALOGS: Record<SupportedLocale, ZCodeCopy> = {
   "en-US": enUS,
-  // CLI 尚未提供越南语文案，先以英文兜底，避免出现未翻译的空界面。
-  "vi-VN": enUS,
+  "vi-VN": viVN,
 };
 
 export function getZCodeCopy(locale?: UiLocale | string, detected?: string | null): ZCodeCopy {

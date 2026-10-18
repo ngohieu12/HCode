@@ -43,7 +43,7 @@ ZCode CLI 按四层组织：
 
 `adapters/` 是外部 I/O 实现层。它负责文件系统、子进程、网络、SQLite、artifact、provider、MCP、ZCode app-server、config loader、logger、metrics、sandbox 等具体副作用。所有 adapter 都必须通过 contracts 暴露能力。
 
-`bootstrap/` 是组合层和入口层。它负责 CLI、TUI、server、SDK 等入口的启动、依赖装配、渲染、退出码和进程边界。它是唯一允许把 core 和 adapter 组装到一起的地方。
+`bootstrap/` 是组合层和入口层。它负责 CLI、server、SDK 等入口的启动、依赖装配、渲染、退出码和进程边界。它是唯一允许把 core 和 adapter 组装到一起的地方。
 
 ### 1.2 分层职责详细说明
 
@@ -123,7 +123,7 @@ adapters/
 
 允许的编译依赖方向：
 
-- `bootstrap` 可以依赖 `contracts`、`core`、`adapters`、`cli`、`tui`。
+- `bootstrap` 可以依赖 `contracts`、`core`、`adapters`、`cli`。
 - `core` 只依赖 `contracts`。
 - `adapters` 只依赖 `contracts`。
 - `contracts` 不依赖任何上层。
@@ -151,15 +151,13 @@ adapters/
 7. UI、CLI、SDK 或 server 订阅状态变化。
 8. 每一轮用户输入都通过 session event 推进，而不是靠隐式内存状态推进。
 
-### 1.5 CLI/TUI 默认入口契约
+### 1.5 CLI 默认入口契约
 
-面向人工交互时，`zcode` 不带命令和参数应默认进入本地 TUI，而不是打印 help。`zcode tui` 是同一入口的显式别名；`zcode --prompt <text>` 继续作为脚本友好的单轮非交互入口。
+`zcode` 是无界面 Agent 运行时：Desktop 通过 ZCode Protocol 调用 `app-server`/`agent-server`，脚本使用 `zcode --prompt <text>` 触发单轮非交互任务。不带命令和参数时打印 help，不再启动本地 TUI。
 
-TUI 默认占用整个终端屏幕，底部保留输入框，回车提交当前问题；上方按时间顺序展示用户消息和 agent 回复。TUI 只负责输入采集、布局渲染、状态提示和退出清理，不直接持有 provider、tool、permission 或 event store 的内部实现。
+CLI 入口继续保持 Unix 风格 I/O 契约：结果写 `stdout`，诊断和错误写 `stderr`；入口层只能过滤已经明确归因、不会改变用户操作结果的 Node runtime warning，例如 Node 24+ 加载 `node:sqlite` 时打印的实验性 SQLite 提示，不能把全量 `stderr` 静默。stdio 协议模式下 `stdout` 只承载 ZCode Protocol 帧，入口层在加载 bootstrap/provider/storage 之前把 `console` 输出重定向到 `stderr`。
 
-TUI 模式下入口层必须在加载 bootstrap、provider、storage 等可能产生进程级诊断输出的模块之前接管 raw `process.stderr`。正常 TUI 会话期间 raw `stderr` 不得直接写入终端，避免 Node runtime warning、adapter warning 或后台诊断破坏全屏界面；这些输出应先进入 TUI 诊断缓冲或受控日志。入口层、参数解析和 TUI 启动失败等受控错误可以通过显式 passthrough 写回终端，避免真实错误静默，但不得把启动期 raw warning 直接刷回用户界面。非 TUI 的 CLI 模式继续保持 Unix 风格 I/O 契约：结果写 `stdout`，诊断和错误写 `stderr`；入口层只能过滤已经明确归因、不会改变用户操作结果的 Node runtime warning，例如 Node 24+ 加载 `node:sqlite` 时打印的实验性 SQLite 提示，不能把全量 `stderr` 静默。
-
-TUI 提交问题时通过入口层注入的受限回调进入 bootstrap/core。该回调负责创建或复用 session、传递同一个 trace 链、执行 turn，并把最终回复返回给 TUI 渲染；同一个 runtime 内的后续提交必须复用 session 级 message history，而不是每轮重新构造上下文。这样可以保证连续多轮的本地 agent CLI 交互体验，同时仍保持 UI 与业务状态机的边界清晰。
+单轮 prompt 通过入口层注入的受限回调进入 bootstrap/core。该回调负责创建或复用 session、传递同一个 trace 链、执行 turn，并把最终回复写回 `stdout`；同一个 runtime 内的后续提交必须复用 session 级 message history，而不是每轮重新构造上下文。
 
 ---
 
@@ -197,8 +195,7 @@ packages/
 │   ├── src/
 │   └── package.json
 │
-├── cli/               # CLI 入口
-├── tui/               # TUI 入口
+├── cli/               # CLI 入口（无界面 Agent 运行时）
 ├── shared-types/      # 共享类型
 └── swift-bridge/     # Swift 桥接（不动）
 ```
@@ -263,7 +260,7 @@ v2 引入接口成熟度，而不是一次性定义所有接口。
 
 ### 4.1 本地模式
 
-CLI 和 TUI 在本地模式下可以和 core 运行在同一进程。交互层不直接读写 core 的内部对象，而是通过统一传输边界提交命令、订阅事件和读取 projection。
+CLI 在本地模式下可以和 core 运行在同一进程。交互层不直接读写 core 的内部对象，而是通过统一传输边界提交命令、订阅事件和读取 projection。
 
 候选命名：
 
@@ -276,7 +273,7 @@ CLI 和 TUI 在本地模式下可以和 core 运行在同一进程。交互层�
 
 ### 4.2 远程模式
 
-远程模式服务于 SDK 集成、远程 TUI、后台 server 或多进程场景。远程协议需要支持请求响应、服务端推送、取消、错误归一化、trace 传播和权限交互。
+远程模式服务于 SDK 集成、Desktop 客户端、后台 server 或多进程场景。远程协议需要支持请求响应、服务端推送、取消、错误归一化、trace 传播和权限交互。
 
 候选命名：
 
@@ -285,7 +282,7 @@ CLI 和 TUI 在本地模式下可以和 core 运行在同一进程。交互层�
 - `RpcRequest`
 - `RpcResponse`
 
-v2 不定义具体 RPC 方法表。RPC 方法必须从真实 CLI/TUI/SDK 操作流中沉淀，而不是从架构文档里一次性枚举。
+v2 不定义具体 RPC 方法表。RPC 方法必须从真实 CLI/Desktop/SDK 操作流中沉淀，而不是从架构文档里一次性枚举。
 
 ### 4.3 通信原则
 

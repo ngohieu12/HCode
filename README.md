@@ -9,7 +9,7 @@
 
 
 
-HCode là bàn làm việc lập trình với AI, gồm ứng dụng desktop, giao diện trình duyệt và Agent trên terminal. Kho này chứa client, dịch vụ backend, UI dùng chung, cùng mã nguồn Agent CLI và runtime.
+HCode là bàn làm việc lập trình với AI dành cho desktop. Kho này chứa ứng dụng desktop, dịch vụ backend, UI dùng chung, cùng mã nguồn Agent CLI và runtime mà Desktop đóng gói và khởi chạy. Kho không phát hành giao diện web, TUI hay gói CLI độc lập.
 
 ## Khởi tạo
 
@@ -58,34 +58,18 @@ ZCODE_DATA_BASE_DIR="$HOME/.zcode-dev-home" pnpm dev:desktop:test
 
 Chạy `pnpm bootstrap:with-remote` để chuẩn bị tài nguyên từ xa (mock-cdn), rồi chạy `pnpm dev:desktop`; khi kết nối dự án từ xa, chọn tài nguyên theo kiểu "tải cục bộ rồi upload". Tài nguyên ở chế độ phát triển lấy từ `packages/desktop/mock-cdn` và sản phẩm build cục bộ, được upload qua SFTP lên máy từ xa, không truy cập CDN.
 
-### Bản dòng lệnh HCode
+### Phát triển Agent CLI từ mã nguồn
 
-Gói phát hành dòng lệnh gồm TUI và Agent, dùng thống nhất lệnh `zcode`: không có tham số thì vào TUI; các tham số khác được chuyển cho Agent CLI hiện có. Không cần Electron.
-
-```bash
-# Mặc định vào giao diện tương tác trên terminal
-zcode
-
-# Xem tham số CLI
-zcode --help
-```
-
-Cách build xem ở mục đóng gói bên dưới. `pnpm build:zcode` chỉ tạo gói phát hành, không thay thế lệnh `zcode` đang có trong `PATH`. Nếu lệnh vẫn trỏ tới bản cài cũ hoặc thư mục mã nguồn khác, trên macOS / Linux dùng `command -v zcode`, trên Windows dùng `where.exe zcode` để kiểm tra.
-
-### Phát triển từ mã nguồn CLI
-
-Khi phát triển trực tiếp TUI hoặc Agent, chạy điểm vào mã nguồn:
+Agent CLI là runtime không giao diện, được Desktop gọi qua `dist/zcode.cjs`:
 
 ```bash
 pnpm --filter @zcode/cli dev --help
-pnpm --filter @zcode/cli dev
+pnpm --filter @zcode/cli dev -p "summarize this repository"
 
 # Build CLI và các phụ thuộc workspace của nó
 pnpm --filter @zcode/cli... build
 node apps/zcode-cli/packages/cli/dist/zcode.cjs --help
 ```
-
-Điểm vào này chạy trực tiếp Agent CLI. Muốn kiểm chứng lệnh `zcode` thống nhất, dùng `bin/zcode.mjs` sau khi giải nén ở phần dưới.
 
 ### Phát triển UI Plugin
 
@@ -101,7 +85,6 @@ Tệp [.env.example](.env.example) ở thư mục gốc cung cấp ví dụ về
 | ------------------------------------ | --------------------------------------------------------------------- |
 | `ZCODE_DATA_BASE_DIR`                | Thư mục gốc lưu dữ liệu ứng dụng; dữ liệu ghi vào `.zcode/` bên trong |
 | `ZCODE_BUILTIN_PROVIDER_CONFIG_FILE` | Đường dẫn tệp cấu hình Provider cục bộ; dùng cấu hình tích hợp khi không đặt |
-| `ZCODE_DIST_BASE_URL`                | Địa chỉ gốc tải xuống mà script cài đặt dòng lệnh sử dụng             |
 
 Các biến runtime có thể đặt tường minh trong môi trường của lệnh khởi chạy. Cấu hình mặc định đi kèm client xem tại [config/README.md](config/README.md).
 
@@ -128,46 +111,6 @@ Cài đặt: nhấp đúp để mở tệp DMG, kéo HCode vào "Applications". 
 sudo xattr -rd com.apple.quarantine /Applications/HCode.app
 ```
 
-### Bản dòng lệnh HCode
-
-Điểm vào build là `pnpm build:zcode`. Script lần lượt build CLI/TUI và Agent, thu thập thư viện native, worker cùng phụ thuộc runtime của TUI, rồi lắp gói phát hành; chạy gói phát hành vẫn cần Node.js, phiên bản lấy theo `mise.toml`.
-
-Trước khi đóng gói phải đặt địa chỉ gốc tải xuống `ZCODE_DIST_BASE_URL` (có thể đặt trong `.env`, `.env.local` hoặc biến môi trường), cũng có thể truyền qua `--base-url`. Địa chỉ dưới đây chỉ là ví dụ, khi phát hành hãy thay bằng địa chỉ lưu trữ thực tế:
-
-```bash
-pnpm build:zcode --base-url https://downloads.example.com/zcode/
-
-# Khi đã cấu hình ZCODE_DIST_BASE_URL
-pnpm build:zcode
-
-# Chỉ đóng gói lại, tái sử dụng sản phẩm build Agent đã có
-pnpm build:zcode --skip-build
-
-# Xem phiên bản, thư mục đầu ra và các tham số tùy chọn khác
-pnpm build:zcode --help
-```
-
-Phiên bản mặc định lấy từ `package.json` ở thư mục gốc, thư mục đầu ra là `dist/zcode/`:
-
-- `releases/<version>/zcode-<version>.tar.gz`: gói chạy.
-- `releases/<version>/sha256.txt`: mã kiểm tra.
-- `latest.json`, `install.sh`: chỉ mục phiên bản và script cài đặt.
-
-Có thể upload toàn bộ thư mục lên địa chỉ gốc tải xuống đã cấu hình. Script cài đặt tải gói chạy từ địa chỉ đó, mặc định cài vào `~/.zcode/runtime` và tạo lệnh `zcode` trong `~/.local/bin`. Thư mục cài đặt có thể đổi bằng `ZCODE_DIST_HOME`, thư mục lệnh đổi bằng `ZCODE_DIST_BIN_DIR`.
-
-Người dùng Lite cũ cần chuyển sang lệnh build, biến môi trường và script cài đặt mới ở trên. Bản cài mới không xoá thư mục Lite cũ, cũng không di chuyển hay xoá dữ liệu phiên đã có.
-
-Khi cần gỡ lỗi cục bộ gói đóng gói, có thể giải nén chạy trực tiếp, không cần upload hay cài đặt:
-
-```bash
-zcode_version=$(node -p "require('./dist/zcode/latest.json').version")
-mkdir -p dist/zcode/debug
-tar -xzf "dist/zcode/releases/$zcode_version/zcode-$zcode_version.tar.gz" \
-  -C dist/zcode/debug
-# Mặc định khởi chạy TUI
-node dist/zcode/debug/zcode/bin/zcode.mjs
-```
-
 ## Cấu trúc kho
 
 | Thư mục                                              | Trách nhiệm                                                |
@@ -178,7 +121,7 @@ node dist/zcode/debug/zcode/bin/zcode.mjs
 | `packages/services`                                  | Dịch vụ nghiệp vụ và lưu trữ                               |
 | `packages/shared`, `packages/rpc`, `packages/client` | Giao thức và kiểu dùng chung, framework RPC, SDK client Agent |
 | `packages/provider`, `packages/provider-node`        | Năng lực chung của Provider và bản triển khai trên Node    |
-| `apps/zcode-cli`                                     | Agent CLI, TUI, runtime và công cụ                         |
+| `apps/zcode-cli`                                     | Agent CLI, runtime và công cụ                              |
 | `scripts`, `config`, `third-party`                   | Script build và bảo trì, cấu hình tích hợp và tài liệu khai báo bên thứ ba |
 
 ## Tuyên bố dự án

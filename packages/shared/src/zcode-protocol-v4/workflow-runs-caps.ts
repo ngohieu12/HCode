@@ -9,7 +9,7 @@
 //   - 计数器让它们**可数**——`truncated` 只说得出「有东西没进来」，说不出多少；
 //   - 条目预算让整个状态键**有界**——单条 run 的界乘以 maxRuns 离快照上限太近；
 //   - workflowRunStepCounts 是唯一允许的步数读法——表内 + 表外，读面三处（run 卡、时间线摘要、
-//     TUI 镜像）曾经各数各的，于是同一条 run 在三个地方显示三个步数。
+//     客户端镜像）曾经各数各的，于是同一条 run 在三个地方显示三个步数。
 
 import {
   WORKFLOW_RUNS_LIMITS,
@@ -113,7 +113,7 @@ export function evictForEntryBudget(
 /**
  * 一条 run 走了多少步、结算了多少步——**表内 + 表外**。
  *
- * 读面（run 卡、时间线摘要、TUI 镜像）必须都走这一个函数：它们此前各自数 `nodes`，于是同一条
+ * 读面（run 卡、时间线摘要、客户端镜像）必须都走这一个函数：它们此前各自数 `nodes`，于是同一条
  * 撞过界的 run 在三个地方显示三个数字，而且三个都比真实步数小。
  */
 export function workflowRunStepCounts(run: WorkflowRunState): { total: number; settled: number } {

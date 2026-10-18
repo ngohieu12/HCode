@@ -429,10 +429,10 @@ describe("ConversationShareReadonlyTimeline", () => {
   });
 
   it("不注入 artifactOpenAction 时本地 artifact 不渲染任何打开控件", () => {
-    // 与静态守卫（conversationShareBundleBoundary.test.ts）互补的运行时负例：公开页
-    // （packages/web/src/share）不传 artifactOpenAction。锁住 ArtifactOpenContext 门控里的
+    // 与静态守卫（conversationShareBundleBoundary.test.ts）互补的运行时负例：只读分享视图
+    // 不传 artifactOpenAction。锁住 ArtifactOpenContext 门控里的
     // !artifactOpenAction 条件——即使 workspacePath、合法相对路径、打开回调齐备，也必须
-    // 退回纯只读卡片，防止后续加默认回退实现让公开页重新获得本地打开入口。
+    // 退回纯只读卡片，防止后续加默认回退实现让只读视图重新获得本地打开入口。
     const artifactRows = [rows[0], rows[1], buildArtifactRow(80, "artifact-1")];
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {

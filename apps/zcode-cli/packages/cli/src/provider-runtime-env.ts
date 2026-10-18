@@ -2,15 +2,12 @@ import { existsSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
-  materializeZCodeBuiltinProviderConfig,
   PERSONAL_PROVIDER_CONFIG_FILE_NAME,
   ZCODE_BUILTIN_PROVIDER_CONFIG_FILE_ENV,
   ZCODE_PERSONAL_PROVIDER_CONFIG_FILE_ENV,
   type ZCodeBuiltinRefreshEvent,
 } from "@zcode/provider-node";
 import type { CliEnv } from "./env.js";
-
-export const SEA_ZCODE_BUILTIN_PROVIDER_CONFIG_ASSET_KEY = "zcode-provider/zcode-builtin.json";
 
 export function createCliProviderRefreshReporter(
   stderr: Pick<NodeJS.WriteStream, "write"> = process.stderr,
@@ -32,14 +29,11 @@ export function createCliProviderRefreshReporter(
   };
 }
 
-type SeaProviderConfigAssets = Pick<typeof import("node:sea"), "getAsset" | "isSea">;
-
 interface PrepareCliProviderRuntimeEnvOptions {
   readonly argv: readonly string[];
   readonly env: CliEnv;
   readonly dataBaseDir?: string;
   readonly entrypoint?: string;
-  readonly sea?: SeaProviderConfigAssets;
 }
 
 /** 为运行 Core 或写入模型选择的 CLI Entry 定位同一 Environment 的 Provider Config。 */
@@ -61,9 +55,7 @@ export async function prepareCliProviderRuntimeEnv(
   const zcodeBuiltinFilePath =
     explicitZCodeBuiltin ??
     (await resolveBundledZCodeBuiltinProviderConfig({
-      dataBaseDir,
       entrypoint: options.entrypoint ?? process.argv[1],
-      sea: options.sea ?? getSeaProviderConfigAssets(),
     }));
   const personalFilePath =
     explicitPersonal ?? join(dataBaseDir, ".zcode", "v2", PERSONAL_PROVIDER_CONFIG_FILE_NAME);
@@ -93,7 +85,6 @@ function requiresProviderRuntime(argv: readonly string[]): boolean {
   const command = argv[0];
   if (command === undefined || command.startsWith("-")) return true;
   return (
-    command === "tui" ||
     command === "app-server" ||
     command === "agent-server" ||
     command === "login" ||
@@ -102,18 +93,8 @@ function requiresProviderRuntime(argv: readonly string[]): boolean {
 }
 
 async function resolveBundledZCodeBuiltinProviderConfig(input: {
-  readonly dataBaseDir: string;
   readonly entrypoint: string | undefined;
-  readonly sea: SeaProviderConfigAssets | undefined;
 }): Promise<string> {
-  if (input.sea?.isSea()) {
-    const content = input.sea.getAsset(SEA_ZCODE_BUILTIN_PROVIDER_CONFIG_ASSET_KEY, "utf8");
-    return materializeZCodeBuiltinProviderConfig({
-      environmentConfigRoot: join(input.dataBaseDir, ".zcode", "v2"),
-      content,
-    });
-  }
-
   const entrypoint = input.entrypoint?.trim();
   if (!entrypoint) throw new Error("Cannot locate the CLI ZCode Built-in Provider Config: entrypoint path is missing");
   // 全局 bin 可以是软链接，随包配置必须相对真实入口定位。
@@ -127,9 +108,3 @@ async function resolveBundledZCodeBuiltinProviderConfig(input: {
   throw new Error(`Cannot locate the CLI ZCode Built-in Provider Config: ${candidates.join(", ")}`);
 }
 
-function getSeaProviderConfigAssets(): SeaProviderConfigAssets | undefined {
-  const getBuiltinModule = process.getBuiltinModule as
-    | ((id: "node:sea") => typeof import("node:sea"))
-    | undefined;
-  return getBuiltinModule?.("node:sea");
-}

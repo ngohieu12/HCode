@@ -23,7 +23,7 @@ import {
 } from "./standalone-account-provider-runtime.js";
 
 export interface ProcessProviderRegistryRuntimeOptions {
-  /** Standalone Prompt CLI / TUI 自己拥有账号凭据与旧配置的一次性导入。 */
+  /** Standalone Prompt CLI 自己拥有账号凭据与旧配置的一次性导入。 */
   readonly standalone?: {
     readonly credentialStore?: SharedZCodeCredentialStore;
     readonly legacyCliUserConfigFilePath?: string;

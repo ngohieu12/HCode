@@ -13,7 +13,7 @@ import {
 export interface ListProtocolSlashCommandsOptions extends ListZCodeCustomCommandsOptions {
   /**
    * 动态工作流灰度门（docs/dynamic-workflow/launch.md「Gray release」）。**只有显式 false
-   * 才剔除** 内置 `workflow`：CLI 自身的目录装配（TUI / 未参与灰度的调用方）缺席该字段，
+   * 才剔除** 内置 `workflow`：CLI 自身的目录装配（未参与灰度的调用方）缺席该字段，
    * 必须保持原样。协议服务端一律从 appRuntimePreferences 传入显式布尔。
    */
   dynamicWorkflowEnabled?: boolean;

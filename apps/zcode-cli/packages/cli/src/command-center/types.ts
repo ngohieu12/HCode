@@ -1,11 +1,11 @@
 import type {
-  TuiPromptAttachment,
-  TuiPromptInput,
-  TuiSendInput,
-  TuiSendInputResult,
-  TuiSubmitPrompt,
-  TuiSubmitPromptResult,
-} from "@zcode/tui";
+  CliPromptAttachment,
+  CliPromptInput,
+  CliSendInput,
+  CliSendInputResult,
+  CliSubmitPrompt,
+  CliSubmitPromptResult,
+} from "./contracts.js";
 import type { SupportedLocale, UiLocale } from "@zcode/i18n";
 import type { ModelSelection, ZCodeModelOption } from "@zcode/shared";
 import type { DynamicWorkflowMode } from "@zcode/shared";
@@ -24,9 +24,9 @@ import type {
   CommandCenterCustomCommandListOutcome,
 } from "../command-center-custom.js";
 
-export type TuiSubmitOptions = Parameters<TuiSubmitPrompt>[1];
-export type TuiSendInputOptions = Parameters<TuiSendInput>[1];
-export type CommandCenterMode = NonNullable<TuiSubmitPromptResult["mode"]>;
+export type CliSubmitOptions = Parameters<CliSubmitPrompt>[1];
+export type CliSendInputOptions = Parameters<CliSendInput>[1];
+export type CommandCenterMode = NonNullable<CliSubmitPromptResult["mode"]>;
 export type SwitchableCommandCenterMode = Extract<
   CommandCenterMode,
   "plan" | "build" | "edit" | "yolo" | "guarded"
@@ -193,12 +193,12 @@ export type CommandCenterApp = {
   getMode?(): CommandCenterMode;
   getModel?(): string | undefined;
   getCurrentModelOption?(): CommandCenterModelOption | undefined;
-  getLocale?(): TuiSubmitPromptResult["locale"];
-  getTheme?(): TuiSubmitPromptResult["theme"];
+  getLocale?(): CliSubmitPromptResult["locale"];
+  getTheme?(): CliSubmitPromptResult["theme"];
   getThoughtLevel?(): string | undefined;
-  loadSessionTranscript?(): Promise<NonNullable<TuiSubmitPromptResult["restoredMessages"]>>;
-  readSubagents?: import("@zcode/tui").TuiReadSubagents;
-  readSubagentTranscript?: import("@zcode/tui").TuiReadSubagentTranscript;
+  loadSessionTranscript?(): Promise<NonNullable<CliSubmitPromptResult["restoredMessages"]>>;
+  readSubagents?: import("./contracts.js").CliReadSubagents;
+  readSubagentTranscript?: import("./contracts.js").CliReadSubagentTranscript;
   readTarget?(): Promise<CommandCenterTarget | null>;
   setTarget?(input: {
     objective: string;
@@ -209,8 +209,8 @@ export type CommandCenterApp = {
   clearTarget?(): Promise<boolean>;
   continueActiveTarget?(options?: {
     abortSignal?: AbortSignal;
-    onEvent?: TuiSubmitOptions["onEvent"];
-  }): Promise<TuiSubmitPromptResult | null>;
+    onEvent?: CliSubmitOptions["onEvent"];
+  }): Promise<CliSubmitPromptResult | null>;
   listModels?(): CommandCenterModelOption[] | Promise<CommandCenterModelOption[]>;
   listThoughtLevels?(): string[] | Promise<string[]>;
   listPlugins?(): Promise<CommandCenterPluginListOutcome>;
@@ -231,7 +231,7 @@ export type CommandCenterApp = {
    */
   listDynamicWorkflowRuns?(input: { limit?: number }): Promise<DynamicWorkflowRunSessionSummary[]>;
   /**
-   * workflow run 的冷回放，服务 TUI 镜像的冷启动：
+   * workflow run 的冷回放，服务于客户端镜像的冷启动：
    * journal → 与 live 同一种进度载荷。可选能力，缺席条件同 {@link listDynamicWorkflowRuns}。
    */
   replayDynamicWorkflowRuns?(input: {
@@ -252,8 +252,8 @@ export type CommandCenterApp = {
   forkFromCheckpoint?(options?: { targetCheckpointId?: string }): Promise<CommandCenterForkResult>;
   recallPreviousInputHistory?(
     skip?: number,
-  ): Promise<{ attachments?: TuiPromptAttachment[]; text: string } | null>;
-  resume(options?: { onEvent?: TuiSubmitOptions["onEvent"] }): Promise<{
+  ): Promise<{ attachments?: CliPromptAttachment[]; text: string } | null>;
+  resume(options?: { onEvent?: CliSubmitOptions["onEvent"] }): Promise<{
     appliedMessageCount: number;
     directory: string;
     interruptedToolCount: number;
@@ -263,24 +263,24 @@ export type CommandCenterApp = {
   }>;
   resumeExpertWorkflow?(options?: {
     abortSignal?: AbortSignal;
-    onEvent?: TuiSubmitOptions["onEvent"];
+    onEvent?: CliSubmitOptions["onEvent"];
     runId?: string;
   }): Promise<CommandCenterExpertWorkflowResult>;
   submitPrompt(
-    prompt: TuiPromptInput,
+    prompt: CliPromptInput,
     options?: {
       abortSignal?: AbortSignal;
-      onEvent?: TuiSubmitOptions["onEvent"];
+      onEvent?: CliSubmitOptions["onEvent"];
     },
-  ): Promise<TuiSubmitPromptResult>;
+  ): Promise<CliSubmitPromptResult>;
   runExpertWorkflow?(
     input: { task: string },
     options?: {
       abortSignal?: AbortSignal;
-      onEvent?: TuiSubmitOptions["onEvent"];
+      onEvent?: CliSubmitOptions["onEvent"];
     },
   ): Promise<CommandCenterExpertWorkflowResult>;
-  sendInput?(input: TuiPromptInput, options?: TuiSendInputOptions): Promise<TuiSendInputResult>;
+  sendInput?(input: CliPromptInput, options?: CliSendInputOptions): Promise<CliSendInputResult>;
   setModel?(
     modelId: string | ModelSelection,
   ):
@@ -301,7 +301,7 @@ export type CommandCenterApp = {
 export type CommandCenterDeps = {
   forkApp?: (targetCheckpointId?: string) => Promise<CommandCenterForkResult>;
   getApp(): Promise<CommandCenterApp>;
-  getLocale?: () => TuiSubmitPromptResult["locale"];
+  getLocale?: () => CliSubmitPromptResult["locale"];
   getMode?: () => CommandCenterMode;
   hasSelectableModels?: () => Promise<boolean> | boolean;
   listSessions?: () => Promise<CommandCenterSession[]>;
@@ -315,7 +315,7 @@ export type CommandCenterDeps = {
   loadCustomCommand?: (name: string) => Promise<CommandCenterCustomCommandContent>;
   newApp?: () => Promise<CommandCenterApp>;
   recordInputHistory?: (
-    input: TuiPromptInput,
+    input: CliPromptInput,
     kind?: "slash_command",
   ) => Promise<unknown> | unknown;
   resumeApp(sessionId?: string): Promise<CommandCenterApp>;
