@@ -5638,9 +5638,7 @@ export function SessionPane({
                   emptyState={
                     isDraft ? (
                       <div data-testid={TID_CHAT_EMPTY} className="w-full">
-                        <ConversationDraftEmptyState
-                          compactForRemoteControl={compactForRemoteControl}
-                        />
+                        <ConversationDraftEmptyState />
                       </div>
                     ) : null
                   }

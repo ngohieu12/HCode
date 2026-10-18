@@ -47,10 +47,11 @@
 
 ## 4. 草稿态空态不展示 Z 形背景
 
-- 规则：草稿态欢迎区只显示问候语，不再渲染 Z 形线框或深色 Z 图片。
+- 规则：草稿态欢迎区只显示问候语，不再渲染 Z 形线框或深色 Z 图片。问候语使用统一的 `text-ui-xl` 字级，窄屏自然换行；不通过 DOM 测量或运行时改字号适配窗口。欢迎语与输入框保持紧凑的 24px 间距。
 - 唯一所有者：`packages/ui/src/v4/ConversationDraftEmptyState.tsx`。
 - 已删除资源：`packages/ui/src/assets/Z.svg`（仅此组件引用）。
-- 验收：草稿页在浅色与深色主题下均无 Z 形背景，问候语布局保持居中。
+- 保留：按本地时间显示问候语，并在下一个时段边界更新；手机远控的草稿居中方式仍由 `ConversationTimeline` 控制。
+- 验收：草稿页在浅色与深色主题下均无 Z 形背景；问候语使用 `text-ui-xl`、保持居中，窄屏可换行且不溢出；源组件不订阅 `ResizeObserver` 或设置动态字号。
 
 ## 5. 工作流与插件市场迁入设置页
 
@@ -250,7 +251,6 @@
 - 清理：删除菜单专用的 `WorkspaceSidebarFooterUsageSummaryContent`；`WorkspaceSidebarFooter` 去掉 theme、语言、主题、用量、升级、登录、退出相关 props，新增 `onAccountClick`。无用的回调与 props 随之清理。
 - 保留：`useWorkspaceSidebarFooterUsageSummaryState`（套餐徽标依赖）与 `WorkspaceSidebarFooterPlanBadge`。
 - 验收：点击账户按钮不再出现下拉菜单；设置页“通用”顶部可看到账户分组，桌面端“外观”可缩放界面；`pnpm typecheck`、`pnpm lint` 通过。
-
 
 ## 22. General 移除引导记录回写
 

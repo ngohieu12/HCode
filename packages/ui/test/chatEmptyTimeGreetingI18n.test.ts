@@ -1,7 +1,16 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import enUS from "@/i18n/locales/en-US.js";
+import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 import zhCN from "./fixtures/zhCNLegacy.js";
-import { resolveGreetingFontSizePx } from "@/v4/ConversationDraftEmptyState.js";
+import {
+  ConversationDraftEmptyState,
+  getChatEmptyGreetingMessageId,
+  getNextChatEmptyGreetingDelayMs,
+} from "@/v4/ConversationDraftEmptyState.js";
+
+const localDateAt = (hour: number, minute = 0) => new Date(2026, 5, 15, hour, minute);
 
 describe("chat empty time greeting i18n", () => {
   it("下午和夜深问候保持自然、克制的关怀语气", () => {
@@ -16,55 +25,35 @@ describe("chat empty time greeting i18n", () => {
     );
   });
 
-  it("标题只在自身文字真实受到水平挤压后按 1px 档位缩小", () => {
-    expect(
-      resolveGreetingFontSizePx({
-        availableWidthPx: 406,
-        naturalTextWidthPx: 360,
-      }),
-    ).toBe(30);
-    expect(
-      resolveGreetingFontSizePx({
-        availableWidthPx: 359,
-        naturalTextWidthPx: 360,
-      }),
-    ).toBe(29);
-    expect(
-      resolveGreetingFontSizePx({
-        availableWidthPx: 300,
-        naturalTextWidthPx: 360,
-      }),
-    ).toBe(25);
-    expect(
-      resolveGreetingFontSizePx({
-        availableWidthPx: 120,
-        naturalTextWidthPx: 360,
-      }),
-    ).toBe(20);
+  it("renders one compact greeting with the shared UI type scale", () => {
+    const html = renderToStaticMarkup(
+      createElement(
+        ZCodeIntlProvider,
+        { initialLocale: "en-US" },
+        createElement(ConversationDraftEmptyState),
+      ),
+    );
+
+    expect(html).toContain('data-v4-draft-greeting="true"');
+    expect(html).toContain("text-ui-xl");
+    expect(html).toContain("mb-6");
+    expect(html).not.toContain("font-size");
   });
 
-  it("标题测量暂不可用时保留默认字号而不是随窗口缩小", () => {
-    expect(
-      resolveGreetingFontSizePx({
-        availableWidthPx: 0,
-        naturalTextWidthPx: 360,
-      }),
-    ).toBe(30);
-    expect(
-      resolveGreetingFontSizePx({
-        availableWidthPx: 406,
-        naturalTextWidthPx: Number.NaN,
-      }),
-    ).toBe(30);
+  it.each([
+    [4, 59, "chat.empty.greeting.lateNight"],
+    [5, 0, "chat.empty.greeting.morningEarly"],
+    [9, 0, "chat.empty.greeting.morning"],
+    [12, 0, "chat.empty.greeting.noon"],
+    [14, 0, "chat.empty.greeting.afternoon"],
+    [18, 0, "chat.empty.greeting.evening"],
+    [23, 0, "chat.empty.greeting.lateNight"],
+  ] as const)("uses the greeting for local time %i:%i", (hour, minute, messageId) => {
+    expect(getChatEmptyGreetingMessageId(localDateAt(hour, minute))).toBe(messageId);
   });
 
-  it("手机远控保持原有 20px 紧凑标题，不启用桌面自适应测量", () => {
-    expect(
-      resolveGreetingFontSizePx({
-        availableWidthPx: 406,
-        naturalTextWidthPx: 360,
-        compactForRemoteControl: true,
-      }),
-    ).toBe(20);
+  it("schedules the next greeting refresh at the nearest time boundary", () => {
+    expect(getNextChatEmptyGreetingDelayMs(localDateAt(8, 30))).toBe(30 * 60 * 1000);
+    expect(getNextChatEmptyGreetingDelayMs(localDateAt(23, 30))).toBe(5.5 * 60 * 60 * 1000);
   });
 });
