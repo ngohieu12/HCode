@@ -38,7 +38,7 @@ export function RunStatusBadge({ status }: { status: RunSummary["status"] }) {
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",

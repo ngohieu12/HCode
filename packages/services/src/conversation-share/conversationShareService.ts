@@ -235,13 +235,12 @@ function previewPreflightKey(
  * 前缀在导入时定型并持久化为 session.title（titleSource: "custom"），之后切界面语言不再改写。
  */
 const IMPORTED_SHARE_TITLE_PREFIX: Readonly<Record<Locale, string>> = {
-  "zh-CN": "来自分享：",
   "en-US": "From Share: ",
   "vi-VN": "Từ chia sẻ: ",
 };
 
 function formatImportedShareSessionTitle(shareTitle: string, locale: Locale | undefined): string {
-  return `${IMPORTED_SHARE_TITLE_PREFIX[locale ?? "zh-CN"]}${shareTitle.trim()}`;
+  return `${IMPORTED_SHARE_TITLE_PREFIX[locale ?? "vi-VN"]}${shareTitle.trim()}`;
 }
 
 function localizePublishedShare(
@@ -249,7 +248,7 @@ function localizePublishedShare(
   locale: Locale | undefined,
 ): ConversationShareRecord {
   if (!locale) return share;
-  const shareUrl = localizeConversationShareUrl(share.share_url, locale);
+  const shareUrl = localizeConversationShareUrl(share.share_url);
   return shareUrl === share.share_url ? share : { ...share, share_url: shareUrl };
 }
 

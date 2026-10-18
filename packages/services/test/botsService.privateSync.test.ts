@@ -272,7 +272,7 @@ describe("private task continuous delivery", () => {
     });
     await h.run("failed", "RETRY_ME");
     const runtime = (await h.service.getStatus()).botRuntime[0]!;
-    expect(runtime.deliveryError).toContain("微信");
+    expect(runtime.deliveryError).toContain("Weixin");
     expect(runtime.deliveryRetryId).toBeTruthy();
     const count = h.sent.filter((item) => item.url.includes("sendmessage")).length;
     await h.service.handleInboundMessage({

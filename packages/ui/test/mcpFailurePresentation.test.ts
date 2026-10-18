@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ZCodeIntlProvider } from "../src/i18n/IntlProvider.js";
@@ -25,13 +26,13 @@ describe("MCP failure presentation", () => {
   });
 
   it.each([
-    ["zh-CN" as const, "MCP 服务暂时不可用，请稍后重试。"],
+    ["vi-VN" as const, "MCP 服务暂时不可用，请稍后重试。"],
     ["en-US" as const, "The MCP service is temporarily unavailable. Try again later."],
   ])("keeps diagnostics inside the click-only popover for %s", (locale, message) => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: locale },
+        { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
         createElement(McpFailurePresentation, {
           error: "raw sdk error",
           failureKind: "server_unavailable",
@@ -51,13 +52,13 @@ describe("MCP failure presentation", () => {
   });
 
   it.each([
-    ["zh-CN" as const, "当前未登录，请先登录 HCode。"],
+    ["vi-VN" as const, "当前未登录，请先登录 HCode。"],
     ["en-US" as const, "You are not signed in. Sign in to HCode to use this MCP server."],
   ])("localizes the not-authenticated diagnosis for %s", (locale, message) => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: locale },
+        { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
         createElement(McpFailurePresentation, { failureKind: "not_authenticated" }),
       ),
     );
@@ -65,7 +66,7 @@ describe("MCP failure presentation", () => {
   });
 
   it.each([
-    ["zh-CN" as const, "当前账号没有 Coding Plan，请先购买或配置 Coding Plan。"],
+    ["vi-VN" as const, "当前账号没有 Coding Plan，请先购买或配置 Coding Plan。"],
     [
       "en-US" as const,
       "This account has no Coding Plan. Purchase or configure a Coding Plan to use this MCP server.",
@@ -74,7 +75,7 @@ describe("MCP failure presentation", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: locale },
+        { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
         createElement(McpFailurePresentation, { failureKind: "coding_plan_required" }),
       ),
     );

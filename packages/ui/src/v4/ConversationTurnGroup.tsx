@@ -649,18 +649,14 @@ function AssistantHistoryStatus({
   highspeedMeta?: HighspeedMessageMeta;
   sourceCommandIds: readonly string[];
 }) {
-  const { intl, locale } = useZCodeIntl();
+  const { intl } = useZCodeIntl();
   const topicInterrupted = useBotTopicInterruption(sourceCommandIds);
-  const durationLabel = formatConversationWorkDuration(
-    segment.workStatus?.durationMs,
-    intl,
-    locale,
-  );
+  const durationLabel = formatConversationWorkDuration(segment.workStatus?.durationMs, intl);
   const savedDurationLabel =
     segment.workStatus?.state === "completed" &&
     highspeedMeta?.savedDurationMs !== undefined &&
     highspeedMeta.savedDurationMs > 0
-      ? formatConversationWorkDuration(highspeedMeta.savedDurationMs, intl, locale)
+      ? formatConversationWorkDuration(highspeedMeta.savedDurationMs, intl)
       : null;
   const label =
     segment.workStatus?.state === "interrupted"

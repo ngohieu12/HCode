@@ -134,7 +134,7 @@ describe("GitCommitMessageGenerator", () => {
     await generator.generate({
       workspacePath: "/repo",
       branchName: "main",
-      locale: "zh-CN",
+      locale: "en-US",
       files: [],
       diffs: [],
     });
@@ -192,7 +192,7 @@ describe("GitCommitMessageGenerator", () => {
     await generator.generate({
       workspacePath: "/repo",
       branchName: "main",
-      locale: "zh-CN",
+      locale: "en-US",
       files: [createFileChange()],
       diffs: [createDiff()],
       conversationContext: {

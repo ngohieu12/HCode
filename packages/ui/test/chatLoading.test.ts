@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { ActiveWorkSummary, PendingInteraction } from "@zcode/shared/zcode-protocol-v4";
@@ -13,7 +14,7 @@ function renderChatLoading() {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(ChatLoading, { loading: true }),
     ),
   );

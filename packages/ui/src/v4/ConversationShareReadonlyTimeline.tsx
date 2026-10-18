@@ -781,15 +781,13 @@ function ReadonlyHistoryStatus({
   segment,
   open,
   labels,
-  locale,
 }: {
   segment: ConversationTurnWorkSegment;
   open: boolean;
   labels: ReadonlyLabels;
-  locale: Locale;
 }) {
   const { intl } = useZCodeIntl();
-  const duration = formatConversationWorkDuration(segment.workStatus?.durationMs, intl, locale);
+  const duration = formatConversationWorkDuration(segment.workStatus?.durationMs, intl);
   const label =
     segment.workStatus?.state === "interrupted"
       ? intl.formatMessage({ id: "chat.history.stopped" })
@@ -971,7 +969,7 @@ function ReadonlySegment({
         );
       })}
       {hasHistory && segment.flowItems.length === 0 ? (
-        <ReadonlyHistoryStatus segment={segment} open={open} labels={labels} locale={locale} />
+        <ReadonlyHistoryStatus segment={segment} open={open} labels={labels} />
       ) : null}
     </Collapsible>
   );
@@ -1070,7 +1068,7 @@ function ReadonlyTurn({
 
 export function ConversationShareReadonlyTimeline({
   rows,
-  locale = "zh-CN",
+  locale = "vi-VN",
   theme = "system",
   codePreviewSettings = DEFAULT_CODE_PREVIEW_SETTINGS,
   artifactUrls = EMPTY_ARTIFACT_URLS,
@@ -1094,30 +1092,17 @@ export function ConversationShareReadonlyTimeline({
       // 外链来自不可信 Markdown；解析失败时保持不可操作，不交给浏览器未知协议。
     }
   }, []);
-  const labels: ReadonlyLabels =
-    locale === "zh-CN"
-      ? {
-          history: "思考过程",
-          computerUse: "电脑操作",
-          explore: "探索",
-          execute: "执行",
-          changes: "修改",
-          artifactPreview: "下载文件",
-          markerCompact: "上下文已压缩",
-          markerModelChange: "模型已切换",
-          unsupportedRows: "部分内容需要更新 HCode 查看",
-        }
-      : {
-          history: "Reasoning",
-          computerUse: "Computer use",
-          explore: "Explore",
-          execute: "Execute",
-          changes: "Changes",
-          artifactPreview: "Download file",
-          markerCompact: "Context compacted",
-          markerModelChange: "Model switched",
-          unsupportedRows: "Some content requires a newer version of HCode",
-        };
+  const labels: ReadonlyLabels = {
+    history: "Reasoning",
+    computerUse: "Computer use",
+    explore: "Explore",
+    execute: "Execute",
+    changes: "Changes",
+    artifactPreview: "Download file",
+    markerCompact: "Context compacted",
+    markerModelChange: "Model switched",
+    unsupportedRows: "Some content requires a newer version of HCode",
+  };
   const artifactOpenContext = useMemo<ArtifactOpenContextValue | null>(() => {
     if (
       !workspacePath ||

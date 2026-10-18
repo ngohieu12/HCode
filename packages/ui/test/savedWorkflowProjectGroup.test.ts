@@ -4,6 +4,7 @@
 // **本项目**的 target（不变式 8）。useWorkspaceServices 按 workspacePath 返回不同 agent，钉住
 // 组用的是 ITS project 而不是活动 workspace。
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -204,7 +205,7 @@ function mount(props: Partial<Parameters<typeof SavedWorkflowProjectGroup>[0]> =
   const result = render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(SavedWorkflowProjectGroup, {
         project: BETA,
         isCurrent: false,
@@ -340,7 +341,7 @@ describe("SavedWorkflowProjectGroup", () => {
     rerender(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(SavedWorkflowProjectGroup, {
           project: BETA,
           isCurrent: false,
@@ -395,7 +396,7 @@ describe("SavedWorkflowProjectGroup", () => {
     await screen.findByTestId(testId(TID_WORKFLOW_CARD, "x"));
     fireEvent.click(screen.getByTestId("revise-x"));
     expect(onCreateViaChat).toHaveBeenCalledTimes(1);
-    expect(onCreateViaChat.mock.calls[0]?.[0]).toContain("请修订已保存的工作流「x」");
+    expect(onCreateViaChat.mock.calls[0]?.[0]).toContain('Please revise the saved workflow "x"');
     expect(onCreateViaChat.mock.calls[0]?.[1]).toEqual({ workspacePath: "/beta" });
   });
 
@@ -405,7 +406,7 @@ describe("SavedWorkflowProjectGroup", () => {
     await screen.findByTestId(testId(TID_WORKFLOW_CARD, "x"));
     fireEvent.click(screen.getByTestId(testId(TID_WORKFLOWS_CREATE_VIA_CHAT, "/beta")));
     expect(onCreateViaChat.mock.calls[0]?.[1]).toEqual({ workspacePath: "/beta" });
-    expect(onCreateViaChat.mock.calls[0]?.[0]).toContain("帮我设计一个工作流");
+    expect(onCreateViaChat.mock.calls[0]?.[0]).toContain("Help me design a workflow");
   });
 
   // 「提升为全局」（docs/dynamic-workflow/launch.md「Promote to global」）：不搬文件，在本项目开
@@ -424,7 +425,7 @@ describe("SavedWorkflowProjectGroup", () => {
     expect(promoteMock.mock.calls[0]?.[1]).toEqual({
       name: "x",
       path: "/beta/.zcode/workflows/x.dwf.ts",
-      locale: "zh-CN",
+      locale: "vi-VN",
     });
     expect(toastMock).not.toHaveBeenCalled();
     // 列表不重拉：源文件没动，全局档由模型另存后靠全局组的目录监听出现。

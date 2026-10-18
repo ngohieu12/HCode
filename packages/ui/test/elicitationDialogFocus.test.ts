@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ZCodeElicitationRequest } from "@zcode/shared";
@@ -45,7 +46,7 @@ describe("ElicitationDialog custom answer focus", () => {
       const { container } = render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ElicitationDialog, { request, onRespond }),
         ),
       );

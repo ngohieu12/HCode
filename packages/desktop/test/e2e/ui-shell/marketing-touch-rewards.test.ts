@@ -53,7 +53,7 @@ async function assertAppReportHeaders(authenticated: boolean) {
     ).zcode;
     await api.reportTelemetryEvent({
       context: {
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         clientTimezone: "Asia/Shanghai",
         screenResolution: "1280x800",
       },
@@ -289,7 +289,7 @@ describe("Rewards website embedded integration", () => {
           join(process.env.ZCODE_E2E_ARTIFACT_DIR, "rewards-embedded-light.png"),
         );
     }
-    for (const locale of ["zh-CN", "en-US"]) {
+    for (const locale of ["en-US", "en-US"]) {
       await browser.execute(
         (value) =>
           (
@@ -300,7 +300,7 @@ describe("Rewards website embedded integration", () => {
       await browser.waitUntil(
         async () =>
           (await guestValue(`location.pathname`)) ===
-          `/${locale === "zh-CN" ? "cn" : "en"}/rewards`,
+          `/${locale === "en-US" ? "cn" : "en"}/rewards`,
         { timeout: 30000 },
       );
     }

@@ -279,7 +279,7 @@ describe("Feishu group sessions", () => {
       await emit({ ...base, type: "task_complete", stopReason: "end_turn" });
       const deliveries = Object.values((await repo.readState()).bots[key]!.group!.deliveries ?? {});
       expect(deliveries).toHaveLength(mentionedBot ? 1 : 0);
-      if (mentionedBot) expect(deliveries[0]!.text).toMatch(/任务已完成|Task completed/);
+      if (mentionedBot) expect(deliveries[0]!.text).toMatch(/Task completed/);
     },
   );
 
@@ -1147,8 +1147,8 @@ describe("Feishu group sessions", () => {
         expect(replies[0]?.text).toContain("im:message.group_msg");
         expect(replies[0]?.mentionedUserIds).toBeUndefined();
         expect(replies[0]?.text).toContain("im:chat.members:read");
-        expect(replies[0]?.text).toContain("缺少此权限不影响任务执行");
-        expect(replies[0]?.text).toContain("发布");
+        expect(replies[0]?.text).toContain("does not block task execution");
+        expect(replies[0]?.text).toContain("Publish");
       }
     },
   );
@@ -1198,7 +1198,7 @@ describe("Feishu group sessions", () => {
     const { send, taskService } = setup();
     await send("/enable");
     const reply = await send("");
-    expect(reply[0]?.text).toContain("补充需求");
+    expect(reply[0]?.text).toContain("add a request");
     expect(taskService.submitBotGroupInput).not.toHaveBeenCalled();
     expect(reactionMock).not.toHaveBeenCalled();
   });
@@ -1206,7 +1206,7 @@ describe("Feishu group sessions", () => {
   it("does not execute a bare topic mention without history opt-in", async () => {
     const { send, taskService } = setup();
     await send("/enable");
-    expect((await send("", "oc_a", "ou_user", "omt_empty"))[0]?.text).toContain("补充需求");
+    expect((await send("", "oc_a", "ou_user", "omt_empty"))[0]?.text).toContain("add a request");
     expect(taskService.submitBotGroupInput).not.toHaveBeenCalled();
   });
 
@@ -1363,7 +1363,7 @@ describe("Feishu group sessions", () => {
     expect(historyMock).toHaveBeenCalledOnce();
     expect(taskService.createTask).not.toHaveBeenCalled();
     expect(taskService.submitBotGroupInput).not.toHaveBeenCalled();
-    expect(replies[0]?.text).toMatch(/retry|重试/);
+    expect(replies[0]?.text).toMatch(/retry/i);
     expect((reactionMock.mock.lastCall as unknown[] | undefined)?.[2]).toBe("failed");
   });
 
@@ -1418,7 +1418,7 @@ describe("Feishu group sessions", () => {
     await send("/enable");
     await send("/history on");
     historyMock.mockRejectedValueOnce(new Error("history unavailable"));
-    expect((await send("", "oc_a", "ou_user", "omt_empty"))[0]?.text).toContain("重试");
+    expect((await send("", "oc_a", "ou_user", "omt_empty"))[0]?.text).toContain("retry");
     expect(taskService.submitBotGroupInput).not.toHaveBeenCalled();
   });
 
@@ -1574,7 +1574,7 @@ describe("Feishu group sessions", () => {
       ]);
       expect(after.bots[key]?.activeTaskId).toBe("original-task");
       const [reply] = await send("/new", "oc_a", "ou_user", "omt_reply");
-      expect(reply.text).toMatch(/another topic|另开/);
+      expect(reply.text).toMatch(/another topic/i);
     },
   );
   it("reads history only on entry or explicit reconciliation and keeps the accepted checkpoint", async () => {
@@ -1630,7 +1630,7 @@ describe("Feishu group sessions", () => {
     );
     expect(reply).toBeUndefined();
     const [newReply] = await send("/new", "oc_a", "ou_user", "omt_a");
-    expect(newReply.text).toMatch(/another topic|另开/);
+    expect(newReply.text).toMatch(/another topic/i);
   });
   it("creates independent topic drafts from group defaults and keeps the default draft", async () => {
     const { send, repo } = setup();
@@ -1657,7 +1657,7 @@ describe("Feishu group sessions", () => {
     expect(groups).toHaveLength(3);
     expect(groups.every((s) => s.group?.enabled === false)).toBe(true);
     const [reply] = await send("/status", "oc_a", "member", "omt_b");
-    expect(reply?.text).toMatch(/not enabled|未启用/i);
+    expect(reply?.text).toMatch(/not enabled/i);
   });
   it.each([undefined, "omt_fast"])(
     "keeps completed progress and reaction before admission returns (%s)",
@@ -2011,7 +2011,7 @@ describe("Feishu group sessions", () => {
 
   it("requires owner activation, keeps private state and two groups independent", async () => {
     const { service, send, repo } = setup();
-    expect((await send("/enable", "oc_a", "member"))[0]?.text).toContain("绑定");
+    expect((await send("/enable", "oc_a", "member"))[0]?.text).toContain("bind");
     expect((await service.getBotStates()).filter((s) => s.group)).toHaveLength(0);
     await service.handleInboundMessage({
       botId: "feishu-1",
@@ -2035,7 +2035,7 @@ describe("Feishu group sessions", () => {
     const memberStatus = await send("/status", "oc_a", "member");
     expect(memberStatus[0]?.providerUserId).toBe("oc_a");
     expect(memberStatus.map((r) => r.text).join("\n")).not.toContain("/tmp/workspace");
-    expect((await send("/new", "oc_a", "member"))[0]?.text).toContain("绑定");
+    expect((await send("/new", "oc_a", "member"))[0]?.text).toContain("bind");
   });
 
   it("disables only the selected group and re-enables without resetting it", async () => {
@@ -2046,7 +2046,7 @@ describe("Feishu group sessions", () => {
     let states = await service.getBotStates();
     expect(states.find((s) => s.group?.chatId === "oc_a")?.group?.enabled).toBe(false);
     expect(states.find((s) => s.group?.chatId === "oc_b")?.group?.enabled).toBe(true);
-    expect((await send("hello", "oc_a", "member"))[0]?.text).toContain("启用");
+    expect((await send("hello", "oc_a", "member"))[0]?.text).toContain("enable");
     await send("/enable");
     states = await service.getBotStates();
     expect(states.find((s) => s.group?.chatId === "oc_a")?.group?.enabled).toBe(true);
@@ -2062,15 +2062,15 @@ describe("Feishu group sessions", () => {
     );
     await expect(send("uncertain-once", "oc_a", "member")).rejects.toThrow("lost acknowledgement");
     const retry = await send("uncertain-once", "oc_a", "member");
-    expect(retry[0]?.text).toContain("核对");
+    expect(retry[0]?.text).toContain("Check the task");
     expect(taskService.submitBotGroupInput).toHaveBeenCalledTimes(2);
   });
 
   it("admits member inputs through the canonical queue without legacy send or yolo", async () => {
     const { send, taskService } = setup();
     await send("/enable");
-    expect((await send("first", "oc_a", "member"))[0]?.text).toContain("等待执行");
-    expect((await send("second", "oc_a", "other"))[0]?.text).toContain("等待执行");
+    expect((await send("first", "oc_a", "member"))[0]?.text).toContain("Waiting to run");
+    expect((await send("second", "oc_a", "other"))[0]?.text).toContain("Waiting to run");
     expect(taskService.createTask).toHaveBeenCalledTimes(1);
     expect(taskService.createTask).toHaveBeenCalledWith(
       expect.objectContaining({ permissionScope: "session" }),
@@ -2194,14 +2194,14 @@ describe("Feishu group sessions", () => {
     await send("work", "oc_a", "member");
     const taskId = (await service.getBotStates()).find((s) => s.group)?.activeTaskId;
     const reply = await send("/new");
-    expect(reply[0]?.text).toContain("排队");
+    expect(reply[0]?.text).toContain("queued");
     expect((await service.getBotStates()).find((s) => s.group)?.activeTaskId).toBe(taskId);
   });
 
   it.each([
-    ["running", "运行"],
-    ["queued", "排队"],
-    ["interaction", "回答或审批"],
+    ["running", "still running"],
+    ["queued", "queued inputs"],
+    ["interaction", "waiting for an answer or approval"],
   ] as const)("reports the CLI blocking reason %s", async (reason, expected) => {
     const { send, taskService, service } = setup();
     taskService.getBotGroupTaskBlockReason = vi.fn(async () => reason);
@@ -2408,7 +2408,7 @@ describe("Feishu group sessions", () => {
       },
     });
     expect(reply[0]?.callbackToastOnly).toBe(true);
-    expect(reply[0]?.text).toContain("过期");
+    expect(reply[0]?.text).toContain("expired");
   });
   it("requires fresh group authorization after owner replacement, including changing back", async () => {
     const { send, service } = setup();
@@ -2419,7 +2419,7 @@ describe("Feishu group sessions", () => {
     config.bots[0]!.providerUserId = "ou_user";
     await service.saveConfig(config);
     expect((await service.getBotStates()).find((s) => s.group)?.group?.enabled).toBe(false);
-    expect((await send("hello", "oc_a", "member"))[0]?.text).toContain("启用");
+    expect((await send("hello", "oc_a", "member"))[0]?.text).toContain("enable");
   });
 
   it("lets a replacement owner explicitly authorize a fresh group context", async () => {

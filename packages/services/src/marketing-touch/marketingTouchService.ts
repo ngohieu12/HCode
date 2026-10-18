@@ -4,7 +4,7 @@ import { parseMarketingTouchResponse, type ApiClient } from "@zcode/shared";
 import { readApiJson } from "#src/providers/api/apiJson.js";
 import type { IMarketingTouchService } from "#src/marketing-touch/marketingTouch.js";
 
-const localeSchema = z.enum(["zh-CN", "en-US"]);
+const localeSchema = z.literal("en-US");
 // 序号属于本次服务进程启动，不能随组件、账号或服务实例重建而归零。
 let bootRequestSeq = 0;
 const reportSchema = z.object({
@@ -24,7 +24,7 @@ export function createMarketingTouchService(options: {
 }): IMarketingTouchService {
   let previousToken: string | undefined;
   let scope = randomUUID();
-  async function context(locale: "zh-CN" | "en-US") {
+  async function context(locale: "en-US") {
     const token = (await options.getToken())?.trim() || "";
     if (previousToken !== token) {
       previousToken = token;

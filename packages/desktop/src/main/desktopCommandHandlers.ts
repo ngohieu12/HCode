@@ -93,9 +93,9 @@ async function clearAllDataAndRelaunch(options: {
     defaultId: 0,
     cancelId: 0,
     title: "Clear All Data",
-    message: "确定要清除所有数据吗？",
+    message: "Clear all data?",
     detail:
-      "将删除 ~/.zcode/v2（配置、凭据、日志）和浏览器缓存（localStorage）。操作不可恢复，清除后应用将自动重启。",
+      "This deletes ~/.zcode/v2 (settings, credentials, logs) and browser storage (localStorage). This cannot be undone; the app restarts afterwards.",
   });
   if (response !== 1) {
     return;
@@ -456,7 +456,7 @@ function resolveChangelogUrl(
   // 帮助菜单里的外链以前只有固定英文地址，切到中文界面后仍会落到英文 changelog。
   // 这里统一收口到主进程按当前应用语言分流，避免菜单模板里手写分支后续再出现多处不一致。
   const origin = buildZCodeEndpointUrls(endpointOrigin).origin;
-  return locale === "zh-CN" ? `${origin}/cn/changelog` : `${origin}/en/changelog`;
+  return `${origin}/en/changelog`;
 }
 
 export async function openChangelog(
@@ -662,7 +662,7 @@ export async function executeDesktopCommand(options: {
         await showMessageBoxWithOptionalParent(targetWindow, {
           type: "error",
           title: "HCode Endpoint",
-          message: "Endpoint 无效",
+          message: "Invalid endpoint",
           detail: error instanceof Error ? error.message : String(error),
         });
       }

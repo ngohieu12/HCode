@@ -32,7 +32,7 @@ describe("Feishu runtime error Desktop UI", () => {
     };
     await mkdir(appDataDir, { recursive: true });
     await writeFile(join(appDataDir, "bot-config.v3.json"), `${JSON.stringify(config, null, 2)}\n`);
-    await seedSettings({ locale: "zh-CN", localePreference: "zh-CN" });
+    await seedSettings({ locale: "en-US", localePreference: "en-US" });
   });
 
   it("BOT-E2E-CF-01 keeps the binding visible when the Feishu connection fails", async () => {

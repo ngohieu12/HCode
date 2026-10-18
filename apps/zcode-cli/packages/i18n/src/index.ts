@@ -1,6 +1,5 @@
 import type { UiLocale, SupportedLocale } from "@zcode/contracts";
 import { enUS } from "./locales/en-US.js";
-import { zhCN } from "./locales/zh-CN.js";
 import {
   DEFAULT_LOCALE,
   detectLocale,
@@ -24,7 +23,8 @@ export type { CliCopy, TuiCopy, UiLocale, SupportedLocale, ZCodeCopy } from "./t
 
 const CATALOGS: Record<SupportedLocale, ZCodeCopy> = {
   "en-US": enUS,
-  "zh-CN": zhCN,
+  // CLI 尚未提供越南语文案，先以英文兜底，避免出现未翻译的空界面。
+  "vi-VN": enUS,
 };
 
 export function getZCodeCopy(locale?: UiLocale | string, detected?: string | null): ZCodeCopy {

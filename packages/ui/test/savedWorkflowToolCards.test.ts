@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { cleanup, render, screen } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -75,12 +76,12 @@ function buildContext(
 function renderCard(
   component: (context: ToolCallBlockRenderContext) => unknown,
   context: ToolCallBlockRenderContext,
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(component as never, context),
     ),
   );
@@ -251,7 +252,7 @@ describe("SaveWorkflowToolCallBlock", () => {
     renderCard(
       SaveWorkflowToolCallBlock,
       buildContext(buildSaveToolCall({ overwrite: true })),
-      "zh-CN",
+      "vi-VN",
     );
     expect(screen.getByText("已保存工作流")).toBeTruthy();
     expect(document.querySelector('[data-workflow-overwrite-badge="true"]')?.textContent).toBe(
@@ -309,7 +310,7 @@ describe("SaveWorkflowToolCallBlock", () => {
     renderCard(
       SaveWorkflowToolCallBlock,
       buildContext(buildSaveToolCall({ scope: "global" })),
-      "zh-CN",
+      "vi-VN",
     );
     expect(screen.getByText("作用域")).toBeTruthy();
     expect(screen.getByText("全局 · 对所有项目可见")).toBeTruthy();
@@ -371,7 +372,7 @@ describe("CreateWorkflowToolCallBlock saved source line", () => {
           saved: { name: "release-check", path: SAVED_PATH, scope: "project", args: {} },
         }),
       ),
-      "zh-CN",
+      "vi-VN",
     );
 
     expect(
@@ -471,7 +472,7 @@ describe("ListSavedWorkflowsToolCallBlock", () => {
   });
 
   it("renders both locales", () => {
-    renderCard(ListSavedWorkflowsToolCallBlock, buildContext(buildListToolCall()), "zh-CN");
+    renderCard(ListSavedWorkflowsToolCallBlock, buildContext(buildListToolCall()), "vi-VN");
     expect(screen.getByText("已保存的工作流")).toBeTruthy();
     expect(screen.getByText("2 个工作流")).toBeTruthy();
     expect(screen.getByText("1 个文件无法解析")).toBeTruthy();

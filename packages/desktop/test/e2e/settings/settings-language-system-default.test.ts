@@ -29,7 +29,7 @@ describe("设置语言 System default E2E", () => {
     await clearAppData();
   });
 
-  it("SL-01: 系统首选中文且 app locale 为英文时 System default 应解析为中文", async function () {
+  it("SL-01: 系统首选中文且 app locale 为英文时 System default 应解析为默认语言越南语", async function () {
     this.timeout(90000);
 
     await prepareEnglishPreference();
@@ -49,15 +49,15 @@ describe("设置语言 System default E2E", () => {
 
     await selectLocalePreference("system");
 
-    await assertBodyTextIncludes(["界面语言", "系统默认"]);
+    await assertBodyTextIncludes(["Ngôn ngữ", "Theo hệ thống"]);
     await browser.waitUntil(
       async () => {
         const settings = await readSettings();
-        return settings.localePreference === "system" && settings.locale === "zh-CN";
+        return settings.localePreference === "system" && settings.locale === "vi-VN";
       },
       {
         timeout: 15000,
-        timeoutMsg: "System default 没有按 Electron 首选系统语言写回 zh-CN",
+        timeoutMsg: "System default 没有按 Electron 首选系统语言写回 vi-VN",
       },
     );
   });
@@ -88,7 +88,7 @@ async function openGeneralSettings() {
   });
 }
 
-async function selectLocalePreference(preference: "system" | "zh-CN" | "en-US") {
+async function selectLocalePreference(preference: "system" | "vi-VN" | "en-US") {
   await clickTestIdByWebDriver(TID_SETTINGS_LOCALE_SELECT_TRIGGER, {
     timeout: 15000,
     timeoutMsg: "界面语言下拉触发器没有出现",

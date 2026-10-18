@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
@@ -51,11 +52,11 @@ function createTicket(id: string): FeedbackTicketDetail {
   };
 }
 
-function renderFeedbackSubmitForm(locale: "zh-CN" | "en-US" = "zh-CN") {
+function renderFeedbackSubmitForm(locale: "vi-VN" | "en-US" = "vi-VN") {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(
         TabStoreProvider,
         null,
@@ -219,7 +220,7 @@ describe("FeedbackSubmitForm", () => {
       ticketSeverity: "P3-低",
       ticketModule: "其它",
       modelContext: {},
-      locale: "zh-CN",
+      locale: "vi-VN",
       formatMessage: (descriptor: { id: string }) => descriptor.id,
       copy: {
         connectingLabel: "connecting",

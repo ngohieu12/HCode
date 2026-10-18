@@ -935,7 +935,6 @@ function CodingPlanPurchaseChoiceBanners({
     fallbackTitle: intl.formatMessage({
       id: "settings.modelProvider.codingPlan.purchaseBanner.startPlanTitle",
     }),
-    locale,
     remoteTitle: startPlanPreview?.name,
   });
   const bannerItems = [
@@ -1174,20 +1173,12 @@ export function resolveEnterprisePurchaseChoiceBannerPrice(
 
 function resolveStartPlanPurchaseChoiceBannerTitle({
   fallbackTitle,
-  locale,
   remoteTitle,
 }: {
   fallbackTitle: string;
-  locale: string;
   remoteTitle?: string;
 }): string {
-  const title = remoteTitle?.trim() || fallbackTitle;
-  if (locale.startsWith("zh") && /^start\s+plan$/i.test(title)) {
-    // Start Plan banner 的名称来自远端 preview；当前远端默认只返回英文。
-    // 这里只本地化这个已知默认名，避免覆盖真实远端自定义套餐名。
-    return fallbackTitle;
-  }
-  return title;
+  return remoteTitle?.trim() || fallbackTitle;
 }
 
 function PurchaseChoiceBannerPrice({
@@ -1201,33 +1192,12 @@ function PurchaseChoiceBannerPrice({
 }) {
   const { intl } = useZCodeIntl();
   const formattedAmount = formatCodingPlanAmount(price, currency, locale);
-  const isChineseLocale = locale.toLowerCase().startsWith("zh");
-  if (!isChineseLocale) {
-    return (
-      <span className="mt-1 block text-lg font-semibold leading-6 text-foreground">
-        {intl.formatMessage(
-          { id: "settings.modelProvider.codingPlan.purchase.fromPrice" },
-          { price: formattedAmount },
-        )}
-      </span>
-    );
-  }
-
-  const [amount, ...labelParts] = formattedAmount.split(" ");
-  const label = labelParts.join(" ").trim();
   return (
-    <span className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
-      <span className="text-lg font-semibold leading-6 text-foreground">{amount}</span>
-      <span className="text-ui-base font-medium text-foreground-subtle">
-        {[
-          label,
-          intl.formatMessage({
-            id: "settings.modelProvider.codingPlan.purchase.fromPriceSuffix",
-          }),
-        ]
-          .filter(Boolean)
-          .join(" ")}
-      </span>
+    <span className="mt-1 block text-lg font-semibold leading-6 text-foreground">
+      {intl.formatMessage(
+        { id: "settings.modelProvider.codingPlan.purchase.fromPrice" },
+        { price: formattedAmount },
+      )}
     </span>
   );
 }

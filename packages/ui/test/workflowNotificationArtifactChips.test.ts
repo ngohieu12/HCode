@@ -8,6 +8,7 @@
 // ⚠ 术语：chip 上的 artifact 是脚本经 `artifact.*` 交付给用户的产出，不是引擎内部那个
 // 「脚本顶层返回值」的同名词（spec 的「术语」表）。
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TID_CHAT_WORKFLOW_ARTIFACT_CHIP } from "@zcode/shared";
@@ -59,7 +60,7 @@ function renderRow(notification: WorkflowNotificationMeta, options: { openable?:
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(
         TooltipProvider,
         null,
@@ -232,7 +233,7 @@ describe("ConversationTurnGroup 把通知行的 chip 变成打开请求", () => 
     return render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           PlatformProvider,
           { platform: noopPlatform },

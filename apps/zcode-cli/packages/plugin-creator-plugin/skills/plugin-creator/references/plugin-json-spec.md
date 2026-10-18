@@ -50,7 +50,7 @@ Use this development layout. When Node is already available, `upsert-dev-marketp
     skills/my-plugin/SKILL.md
 ```
 
-The listing source in this layout is `./my-plugin`, and its version and description follow the plugin manifest. Names and Chinese presentation metadata stay in the listing. Read the helper's JSON output for the actual ID. Without Node, create the same catalog with file tools, choose a distinct `dev-` prefixed marketplace name and retain it on later edits. An existing chosen market keeps its own name; pass its file explicitly if later using the helper. Creating this file alone does not register or install anything. Follow [the manual UI handoff](installing-and-updating.md) to guide the user through addition, installation and later updates.
+The listing source in this layout is `./my-plugin`, and its version and description follow the plugin manifest. Names and localized presentation metadata stay in the listing. Read the helper's JSON output for the actual ID. Without Node, create the same catalog with file tools, choose a distinct `dev-` prefixed marketplace name and retain it on later edits. An existing chosen market keeps its own name; pass its file explicitly if later using the helper. Creating this file alone does not register or install anything. Follow [the manual UI handoff](installing-and-updating.md) to guide the user through addition, installation and later updates.
 
 ## Optional authoring helpers
 
@@ -58,7 +58,7 @@ Use only an already available Node runtime, with actual absolute script paths:
 
 ```bash
 node "<skill-root>/scripts/create-basic-plugin.mjs" my-plugin --with-skills
-node "<skill-root>/scripts/upsert-dev-marketplace.mjs" "<plugin-path>" --display-name "My Plugin" --name-zh "我的插件" --description-zh "实际用途说明"
+node "<skill-root>/scripts/upsert-dev-marketplace.mjs" "<plugin-path>" --display-name "My Plugin" --name-en "My Localized Plugin" --description-en "What the plugin actually does"
 ```
 
 Scaffold components are selected with `--with-skills`, `--with-mcp`, `--with-hooks`, `--with-commands`, `--with-scripts`, `--with-assets`. `--path <parent-directory>` changes the plugin's parent directory. The helper refuses existing files by default. `--marketplace-path <existing-file>` on the listing helper explicitly selects a previously chosen market and preserves its name. Ordinary updates edit source instead of using scaffold `--force`.

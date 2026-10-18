@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ExecuteToolCallBlock } from "@/ToolCallBlocks/renderers/execute.js";
@@ -9,7 +10,7 @@ function renderPreview(isPermissionPreview: boolean) {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(ExecuteToolCallBlock, {
         toolCallNode: {
           toolCall: {

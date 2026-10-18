@@ -244,7 +244,7 @@ export function acquireWorkspaceConnection(
       // runtimeRestart listener 更新外部 store 并发起 RPC。租约只捕获候选 service，
       // 由 Provider 在 commit 阶段显式激活，同时保持 generation 单向切换。
       if (!entry.replaceableTransport) {
-        throw new Error("远程 conversation registry 条目缺少可换代 transport");
+        throw new Error("Remote conversation registry entry is missing a replaceable transport");
       }
       entry.agentService = agentService;
       entry.agentServiceGeneration = incomingServiceGeneration;

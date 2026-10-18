@@ -4,6 +4,7 @@
 // 语法——方瓦片代替圆头像，尾槽放版本号；永远是 <button>，没有回调即禁用；条 ≤ 3 枚 + `+N`，
 // 事件在条这一层止步。四处（工具卡、轮尾摘要、通知行、中枢）共用这两个组件。
 import { cleanup, fireEvent, render } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -13,7 +14,7 @@ import {
 } from "@/components/workflow-timeline/WorkflowArtifactPill.js";
 import { WorkflowArtifactStrip } from "@/components/workflow-timeline/WorkflowArtifactStrip.js";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 afterEach(() => {
   cleanup();
@@ -23,12 +24,12 @@ const BOOK: ArtifactPillData = { id: "book", kind: "file", title: "Audit report"
 
 function renderPill(
   props: Partial<Parameters<typeof WorkflowArtifactPill>[0]> = {},
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowArtifactPill, { artifact: BOOK, ...props }),
     ),
   );
@@ -38,12 +39,12 @@ function renderStrip(
   props: Partial<Parameters<typeof WorkflowArtifactStrip>[0]> & {
     artifacts: readonly ArtifactPillData[];
   },
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowArtifactStrip, {
         testId: "strip",
         pillTestId: "pill",
@@ -112,7 +113,7 @@ describe("WorkflowArtifactPill", () => {
   });
 
   it("zh-CN：tooltip 用中文 kind 词，尾槽仍是 v2，长写「第 2 版」进 title", () => {
-    const view = renderPill({}, "zh-CN");
+    const view = renderPill({}, "vi-VN");
     expect(view.getByTestId("workflow-artifact-pill").getAttribute("title")).toBe(
       "文件 · Audit report",
     );

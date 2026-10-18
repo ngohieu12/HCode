@@ -1,4 +1,5 @@
 import type { IBroadcastService, IServiceAccessor } from "@zcode/services";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { testId, TID_TOOL_SUMMARY_TRIGGER } from "@zcode/shared";
@@ -64,7 +65,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -132,7 +133,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -203,7 +204,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -289,7 +290,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -350,7 +351,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -411,7 +412,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -476,7 +477,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -562,7 +563,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -647,7 +648,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -728,7 +729,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -808,7 +809,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -904,7 +905,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -979,7 +980,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -1051,7 +1052,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -1113,7 +1114,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -1204,7 +1205,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -1279,7 +1280,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },
@@ -1349,7 +1350,7 @@ describe("AgentToolCallBlock", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           ServiceProvider,
           { services: mockServices },

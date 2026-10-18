@@ -1,4 +1,5 @@
 import { createElement, type ComponentType, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ConversationSnapshot } from "@zcode/shared/zcode-protocol-v4";
@@ -168,7 +169,7 @@ function renderComposerWithError(
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(AnyConversationComposer, {
         snapshot: null,
         sessionId: "session-1",
@@ -199,7 +200,7 @@ function renderComposerWithSnapshot(
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(AnyConversationComposer, {
         snapshot,
         sessionId: "session-1",
@@ -220,7 +221,7 @@ function renderHighspeedComposer(overrides: Record<string, unknown> = {}): strin
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(AnyConversationComposer, {
         snapshot: makeSnapshot(),
         sessionId: "session-1",
@@ -249,7 +250,7 @@ function renderBlockedComposer(): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(AnyConversationComposer, {
         snapshot: makeSnapshot(),
         sessionId: "session-1",

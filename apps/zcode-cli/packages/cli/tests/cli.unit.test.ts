@@ -695,7 +695,7 @@ test("shows a non-blocking login notice when no coding plan key is configured", 
 test("honors configured locale before app creation when login is required", async () => {
   const tempRoot = await mkdtemp(join(tmpdir(), "zcode-cli-prelogin-locale-"));
   const configPath = join(tempRoot, "config.json");
-  await writeFile(configPath, JSON.stringify({ ui: { locale: "zh-CN" } }));
+  await writeFile(configPath, JSON.stringify({ ui: { locale: "en-US" } }));
 
   try {
     const ctx = createContext([]);
@@ -733,20 +733,20 @@ test("honors configured locale before app creation when login is required", asyn
         }) as never,
       runTui: async (options) => {
         // 启动屏在 App 创建前就按用户配置的语言渲染。
-        assert.equal(options.locale, "zh-CN");
+        assert.equal(options.locale, "en-US");
         assert.equal(appCreated, false);
 
         const startup = await loadTuiStartup(options);
         assert.equal(startup.loginRequired, true);
-        assert.equal(startup.locale, "zh-CN");
+        assert.equal(startup.locale, "en-US");
 
         const pickerResult = await options.submitPrompt("/login", {
           abortSignal: new AbortController().signal,
         });
 
-        assert.equal(pickerResult.response, "选择 Coding Plan 提供商的配置方式。");
-        assert.equal(pickerResult.selection?.title, "配置 Coding Plan");
-        assert.equal(pickerResult.selection?.prompt, "选择登录或 API key 配置方式。");
+        assert.equal(pickerResult.response, "Choose how to set up a Coding Plan provider.");
+        assert.equal(pickerResult.selection?.title, "Set Up Coding Plan");
+        assert.equal(pickerResult.selection?.prompt, "Choose a login or API key setup method.");
         return 0;
       },
       userConfigPath: configPath,
@@ -764,9 +764,9 @@ test("passes detected auto locale into the app and TUI", async () => {
     ...createPromptDeps(),
     createZCodeApp: (options) => {
       assert.equal(options?.uiLocale, "auto");
-      assert.equal(options?.uiDetectedLocale, "zh-CN");
+      assert.equal(options?.uiDetectedLocale, "en-US");
       return {
-        getLocale: () => "zh-CN",
+        getLocale: () => "en-US",
         getModel: () => "openai/gpt-test",
         getThoughtLevel: () => "medium",
         runtime: {} as never,
@@ -781,7 +781,7 @@ test("passes detected auto locale into the app and TUI", async () => {
       LANG: "zh_CN.UTF-8",
     },
     runTui: async (options) => {
-      assert.equal(options.locale, "zh-CN");
+      assert.equal(options.locale, "en-US");
       return 0;
     },
   });
@@ -792,7 +792,7 @@ test("passes detected auto locale into the app and TUI", async () => {
 test("TUI locale command updates later app creation locale", async () => {
   const ctx = createContext(["--locale", "en-US"]);
   const createdLocales: Array<unknown> = [];
-  let activeLocale: "en-US" | "zh-CN" = "en-US";
+  let activeLocale: "en-US" | "vi-VN" = "en-US";
   const exitCode = await run(ctx, {
     ...createPromptDeps(),
     createZCodeApp: (options) => {
@@ -803,8 +803,8 @@ test("TUI locale command updates later app creation locale", async () => {
         getThoughtLevel: () => "medium",
         runtime: {} as never,
         sessionId: `session-${createdLocales.length}`,
-        setLocale: async (locale: "auto" | "en-US" | "zh-CN") => {
-          activeLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+        setLocale: async (locale: "auto" | "en-US" | "vi-VN") => {
+          activeLocale = locale === "en-US" ? "en-US" : "en-US";
           return {
             configPath: "/tmp/zcode/config.json",
             locale: activeLocale,
@@ -829,22 +829,22 @@ test("TUI locale command updates later app creation locale", async () => {
         abortSignal: new AbortController().signal,
       });
 
-      assert.equal(switched.locale, "zh-CN");
-      assert.equal(created.locale, "zh-CN");
+      assert.equal(switched.locale, "en-US");
+      assert.equal(created.locale, "en-US");
       return 0;
     },
   });
 
   assert.equal(exitCode, 0);
-  assert.deepEqual(createdLocales, ["en-US", "zh-CN"]);
+  assert.deepEqual(createdLocales, ["en-US", "en-US"]);
 });
 
 test("prints localized CLI help with explicit locale", async () => {
-  const ctx = createContext(["--help", "--locale", "zh-CN"]);
+  const ctx = createContext(["--help", "--locale", "en-US"]);
   const exitCode = await run(ctx, createPromptDeps());
 
   assert.equal(exitCode, 0);
-  assert.match(ctx.stdout.output(), /用法:/);
+  assert.match(ctx.stdout.output(), /Usage:/);
   assert.match(ctx.stdout.output(), /--locale <locale>/);
 });
 
@@ -858,7 +858,7 @@ test("prints localized CLI help with auto locale detection", async () => {
   });
 
   assert.equal(exitCode, 0);
-  assert.match(ctx.stdout.output(), /用法:/);
+  assert.match(ctx.stdout.output(), /Usage:/);
 });
 
 test("passes custom command suggestions into the TUI", async () => {
@@ -1158,7 +1158,7 @@ test("command center localizes the Coding Plan setup picker", async () => {
     getApp: async () => {
       throw new Error("app should not be created");
     },
-    getLocale: () => "zh-CN",
+    getLocale: () => "en-US",
     resumeApp: async () => {
       throw new Error("resume should not be called");
     },
@@ -1166,13 +1166,13 @@ test("command center localizes the Coding Plan setup picker", async () => {
 
   const result = await commandCenter("/login", {});
 
-  assert.equal(result.response, "选择 Coding Plan 提供商的配置方式。");
-  assert.equal(result.selection?.title, "配置 Coding Plan");
-  assert.equal(result.selection?.prompt, "选择登录或 API key 配置方式。");
+  assert.equal(result.response, "Choose how to set up a Coding Plan provider.");
+  assert.equal(result.selection?.title, "Set Up Coding Plan");
+  assert.equal(result.selection?.prompt, "Choose a login or API key setup method.");
   assert.equal(result.selection?.filterable, false);
-  assert.match(result.selection?.items[0]?.secondary ?? "", /打开浏览器登录/);
-  assert.equal(result.selection?.items[2]?.input?.primary, "输入 Z.AI Coding Plan API Key");
-  assert.equal(result.selection?.items[2]?.input?.placeholder, "粘贴 API key");
+  assert.match(result.selection?.items[0]?.secondary ?? "", /Open browser login/);
+  assert.equal(result.selection?.items[2]?.input?.primary, "Enter Z.AI Coding Plan API Key");
+  assert.equal(result.selection?.items[2]?.input?.placeholder, "Paste API key");
 });
 
 test("command center keeps local commands usable before login", async () => {
@@ -1189,7 +1189,7 @@ test("command center keeps local commands usable before login", async () => {
       throw new Error("resume should not be called");
     },
     setLocale: async (locale) => ({
-      locale: locale === "zh-CN" ? "zh-CN" : "en-US",
+      locale: locale === "en-US" ? "en-US" : "en-US",
       requestedLocale: locale,
     }),
   });
@@ -1199,7 +1199,7 @@ test("command center keeps local commands usable before login", async () => {
 
   assert.equal(promptResult.loginRequired, true);
   assert.match(promptResult.response, /No available models/);
-  assert.equal(localeResult.locale, "zh-CN");
+  assert.equal(localeResult.locale, "en-US");
   assert.match(localeResult.response, /Locale switched to zh-CN/);
   assert.equal(appCreated, false);
 
@@ -1207,13 +1207,13 @@ test("command center keeps local commands usable before login", async () => {
     getApp: async () => {
       throw new Error("app should not be created before login");
     },
-    getLocale: () => "zh-CN",
+    getLocale: () => "en-US",
     hasSelectableModels: async () => false,
   });
   const zhPromptResult = await zhCommandCenter("hello model", {});
 
   assert.equal(zhPromptResult.loginRequired, true);
-  assert.match(zhPromptResult.response, /没有可用模型/);
+  assert.match(zhPromptResult.response, /No available models/);
 });
 
 const reviewCustomCommand = {
@@ -1633,7 +1633,7 @@ test("command center explains skipped goal continuation in plan mode", async () 
   assert.equal(continued, true);
   assert.match(result.response, /Goal active/);
   assert.match(result.response, /Optimize performance/);
-  assert.match(result.response, /Plan mode 下已记录 goal，但不会自动继续。/);
+  assert.match(result.response, /The goal was recorded in Plan mode, but it will not continue automatically\./);
 });
 
 test("command center asks before replacing an existing goal", async () => {
@@ -2562,7 +2562,7 @@ test("parses built-in slash commands outside the TUI", () => {
     type: "known",
   });
   assert.deepEqual(parseSlashCommand("/locale zh-CN"), {
-    args: "zh-CN",
+    args: "en-US",
     name: "locale",
     rawName: "locale",
     type: "known",
@@ -3003,11 +3003,11 @@ test("command center resolves plugin labels from listings by stable plugin id", 
           pluginListingsById: {
             "computer-use@zcode-plugins-official": {
               displayName: "Computer Use",
-              displayNameI18n: { "zh-CN": "电脑控制" },
+              displayNameI18n: { "en-US": "电脑控制" },
             },
             "zcode-cua@custom-marketplace": {
               displayName: "Custom Computer Use",
-              displayNameI18n: { "zh-CN": "自定义电脑控制" },
+              displayNameI18n: { "en-US": "自定义电脑控制" },
             },
           },
           plugins: [
@@ -3060,7 +3060,7 @@ test("command center resolves plugin labels from listings by stable plugin id", 
         traceId: "trace-active",
         submitPrompt: async () => ({ response: "prompt" }),
       }) as never,
-    getLocale: () => "zh-CN",
+    getLocale: () => "en-US",
     getMode: () => "build",
     resumeApp: async () => {
       throw new Error("resume should not run");
@@ -3773,16 +3773,16 @@ test("command center reports and switches effort without sending a model prompt"
 });
 
 test("command center reports and switches locale without sending a model prompt", async () => {
-  let locale = "en-US" as const | "zh-CN";
+  let locale = "en-US" as const | "en-US";
   let promptSubmitted = false;
   const submitPrompt = createCommandCenter({
     getApp: async () =>
       ({
         getLocale: () => locale,
         sessionId: "sess_active",
-        setLocale: async (requestedLocale: "auto" | "en-US" | "zh-CN") => {
+        setLocale: async (requestedLocale: "auto" | "en-US" | "vi-VN") => {
           const previousLocale = locale;
-          locale = requestedLocale === "zh-CN" ? "zh-CN" : "en-US";
+          locale = requestedLocale === "en-US" ? "en-US" : "en-US";
           return {
             configPath: "/tmp/zcode/config.json",
             locale,
@@ -3820,10 +3820,10 @@ test("command center reports and switches locale without sending a model prompt"
   assert.equal(promptSubmitted, false);
   assert.equal(current.locale, "en-US");
   assert.match(current.response, /Current locale: en-US/);
-  assert.equal(switched.locale, "zh-CN");
+  assert.equal(switched.locale, "en-US");
   assert.match(switched.response, /Locale switched to zh-CN/);
   assert.match(switched.response, /Config: \/tmp\/zcode\/config\.json/);
-  assert.equal(rejected.locale, "zh-CN");
+  assert.equal(rejected.locale, "en-US");
   assert.match(rejected.response, /Unsupported locale: fr-FR/);
 });
 

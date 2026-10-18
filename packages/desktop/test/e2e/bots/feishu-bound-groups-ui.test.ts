@@ -49,7 +49,7 @@ describe("bound groups Desktop controls", () => {
     const stateFile = join(appDataDir, "bot-state.v3.json");
     await writeFile(join(appDataDir, "bot-config.v3.json"), JSON.stringify(config));
     await writeFile(stateFile, JSON.stringify(state));
-    await seedSettings({ locale: "zh-CN", localePreference: "zh-CN" });
+    await seedSettings({ locale: "en-US", localePreference: "en-US" });
     await browser.refresh();
     await waitForDefaultWorkspaceReady(60000);
     const remote = await $('button[aria-label="移动端远程控制"]');

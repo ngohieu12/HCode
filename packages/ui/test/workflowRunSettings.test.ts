@@ -27,7 +27,7 @@ import {
 } from "@/lib/workspaceSidePane.js";
 import { resolveWorkflowRunGraph } from "@/v4/workflowRunCardJoin.js";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 function run(overrides: Partial<WorkflowRunState> = {}): WorkflowRunState {
   return {

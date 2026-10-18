@@ -241,7 +241,7 @@ describe("createLocalServices remote authority", () => {
           personalModelIds: [],
         },
       });
-      await services.get(serviceDescriptors.ISettingService).update({ locale: "zh-CN" });
+      await services.get(serviceDescriptors.ISettingService).update({ locale: "vi-VN" });
       await services
         .get(serviceDescriptors.ISettingService)
         .update({ providerFamilyDomain: "zai" });

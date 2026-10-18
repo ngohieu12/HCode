@@ -1,4 +1,5 @@
 import { createElement, forwardRef, type ForwardedRef } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -108,13 +109,13 @@ beforeEach(() => {
 });
 
 function renderConfigSelect(
-  locale: "zh-CN" | "en-US",
+  locale: "vi-VN" | "en-US",
   props: Parameters<typeof ConfigSelect>[0],
 ) {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(ConfigSelect, props),
     ),
   );
@@ -122,7 +123,7 @@ function renderConfigSelect(
 
 describe("ConfigSelect mode options", () => {
   it.each([
-    ["zh-CN", "自主模式", "在有风险时询问"],
+    ["vi-VN", "自主模式", "在有风险时询问"],
     ["en-US", "Autonomous mode", "Ask when there’s risk"],
   ] as const)(
     "Guarded 在 %s 下使用浅蓝色和 Edit 图标，不复用 YOLO 警示样式",
@@ -152,7 +153,7 @@ describe("ConfigSelect mode options", () => {
     },
   );
 
-  it.each([ ["zh-CN", "自动编辑"], ["en-US", "Edit automatically"] ] as const)(
+  it.each([ ["vi-VN", "自动编辑"], ["en-US", "Edit automatically"] ] as const)(
     "历史 edit 在 %s 下保留本地化回显，但不重新加入候选", (locale, label) => {
       const onValueChange = vi.fn();
       const html = renderConfigSelect(locale, {
@@ -171,7 +172,7 @@ describe("ConfigSelect mode options", () => {
   );
 
   it("允许 composer 在窄宽度隐藏 mode 下拉箭头", () => {
-    const html = renderConfigSelect("zh-CN", {
+    const html = renderConfigSelect("vi-VN", {
       provider: "codex",
       option: {
         id: "mode",
@@ -218,7 +219,7 @@ describe("ConfigSelect mode options", () => {
     });
 
     try {
-      renderConfigSelect("zh-CN", {
+      renderConfigSelect("vi-VN", {
         provider: "codex",
         option: {
           id: "mode",
@@ -257,7 +258,7 @@ describe("ConfigSelect mode options", () => {
   });
 
   it("中文环境下显示中文标签，并在菜单项中显示 description", () => {
-    const html = renderConfigSelect("zh-CN", {
+    const html = renderConfigSelect("vi-VN", {
         provider: "glm",
         option: {
           id: "mode",
@@ -289,7 +290,7 @@ describe("ConfigSelect mode options", () => {
   });
 
   it("mode trigger 使用当前文案而不是 SelectValue 自动回填", () => {
-    const html = renderConfigSelect("zh-CN", {
+    const html = renderConfigSelect("vi-VN", {
         provider: "glm",
         option: {
           id: "mode",
@@ -346,7 +347,7 @@ describe("ConfigSelect mode options", () => {
   });
 
   it("GLM 模式列表只渲染 agent 返回的可用模式", () => {
-    const html = renderConfigSelect("zh-CN", {
+    const html = renderConfigSelect("vi-VN", {
         provider: "glm",
         option: {
           id: "mode",
@@ -374,7 +375,7 @@ describe("ConfigSelect mode options", () => {
   });
 
   it("选中 edit 模式时不会显示高权限 warning 色", () => {
-    const html = renderConfigSelect("zh-CN", {
+    const html = renderConfigSelect("vi-VN", {
         provider: "glm",
         option: {
           id: "mode",
@@ -407,7 +408,7 @@ describe("ConfigSelect mode options", () => {
   ] as const)(
     "选中高权限模式 %s/%s 时，trigger 文本会显示 warning 色",
     (provider, currentValue) => {
-      const html = renderConfigSelect("zh-CN", {
+      const html = renderConfigSelect("vi-VN", {
           provider,
           option: {
             id: "mode",
@@ -463,7 +464,7 @@ describe("ConfigSelect mode options", () => {
     });
 
     try {
-      renderConfigSelect("zh-CN", {
+      renderConfigSelect("vi-VN", {
         provider: "glm",
         option: {
           id: "mode",
@@ -504,7 +505,7 @@ describe("ConfigSelect mode options", () => {
 
   it("不传 provider 时 label/description 回退到预本地化 entry", () => {
     // ConfigSelect 仍支持没有 provider 词表的调用方直接提供本地化名称与说明。
-    const html = renderConfigSelect("zh-CN", {
+    const html = renderConfigSelect("vi-VN", {
         option: {
           id: "mode",
           name: "Permission",

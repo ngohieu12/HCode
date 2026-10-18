@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { IPlatformService } from "@zcode/shared";
@@ -22,7 +23,7 @@ function renderNewTaskButtonGroup() {
         { platform: {} as unknown as IPlatformService },
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(
             TabStoreProvider,
             null,

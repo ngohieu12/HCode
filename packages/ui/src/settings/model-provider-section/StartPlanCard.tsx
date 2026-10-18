@@ -196,13 +196,7 @@ function groupEntitlementsByGrantUnits(
   }));
 }
 
-function formatModelList(modelNames: string[], locale: string): string {
-  if (locale.toLowerCase().startsWith("zh")) {
-    return modelNames.join("、");
-  }
-  if (modelNames.length <= 2) {
-    return modelNames.join(" / ");
-  }
+function formatModelList(modelNames: string[], _locale: string): string {
   return modelNames.join(" / ");
 }
 

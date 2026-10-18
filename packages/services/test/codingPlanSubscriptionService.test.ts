@@ -1011,10 +1011,10 @@ describe("BigModelCodingPlanSubscriptionProvider", () => {
           data: {
             configs: {
               codingPlanBillingDiscount: {
-                "zh-CN": {
-                  cardTitle: "限时 150% 配额活动",
-                  cardBody: "升级 Coding Plan，可在活动期内获得150% 配额",
-                  badgeBody: "150% 配额",
+                "vi-VN": {
+                  cardTitle: "Chiến độp 150% hạn mục",
+                  cardBody: "Nâng cấp Coding Plan để nhận 150% hạn mục trong thời gian chiến độp",
+                  badgeBody: "150% hạn mục",
                 },
                 "en-US": {
                   cardTitle: "Limited-time 150% Quota Campaign",
@@ -1035,10 +1035,10 @@ describe("BigModelCodingPlanSubscriptionProvider", () => {
     });
 
     await expect(provider.getBillingDiscount()).resolves.toEqual({
-      "zh-CN": {
-        cardTitle: "限时 150% 配额活动",
-        cardBody: "升级 Coding Plan，可在活动期内获得150% 配额",
-        badgeBody: "150% 配额",
+      "vi-VN": {
+        cardTitle: "Chiến độp 150% hạn mục",
+        cardBody: "Nâng cấp Coding Plan để nhận 150% hạn mục trong thời gian chiến độp",
+        badgeBody: "150% hạn mục",
       },
       "en-US": {
         cardTitle: "Limited-time 150% Quota Campaign",
@@ -1123,10 +1123,10 @@ describe("BigModelCodingPlanSubscriptionProvider", () => {
               ],
             },
             codingPlanBillingDiscount: {
-              "zh-CN": {
-                cardTitle: "限时 150% 配额活动",
-                cardBody: "升级 Coding Plan，可在活动期内获得150% 配额",
-                badgeBody: "150% 配额",
+              "en-US": {
+                cardTitle: "Limited-time 150% Quota Campaign",
+                cardBody: "Upgrade your Coding Plan to get 150% quota during the campaign period",
+                badgeBody: "150% Quota",
               },
             },
           },
@@ -1146,10 +1146,10 @@ describe("BigModelCodingPlanSubscriptionProvider", () => {
       "remote-bigmodel-lite",
     );
     expect(discount).toEqual({
-      "zh-CN": {
-        cardTitle: "限时 150% 配额活动",
-        cardBody: "升级 Coding Plan，可在活动期内获得150% 配额",
-        badgeBody: "150% 配额",
+      "en-US": {
+        cardTitle: "Limited-time 150% Quota Campaign",
+        cardBody: "Upgrade your Coding Plan to get 150% quota during the campaign period",
+        badgeBody: "150% Quota",
       },
     });
     await provider.getStartPlanPreview();
@@ -1171,8 +1171,8 @@ describe("BigModelCodingPlanSubscriptionProvider", () => {
             data: {
               configs: {
                 codingPlanBillingDiscount: {
-                  "zh-CN": {
-                    badgeBody: "第一版",
+                  "en-US": {
+                    badgeBody: "First version",
                   },
                 },
               },
@@ -1186,8 +1186,8 @@ describe("BigModelCodingPlanSubscriptionProvider", () => {
             data: {
               configs: {
                 codingPlanBillingDiscount: {
-                  "zh-CN": {
-                    badgeBody: "第二版",
+                  "en-US": {
+                    badgeBody: "Second version",
                   },
                 },
               },
@@ -1203,17 +1203,17 @@ describe("BigModelCodingPlanSubscriptionProvider", () => {
     });
 
     await expect(provider.getBillingDiscount()).resolves.toEqual({
-      "zh-CN": { badgeBody: "第一版" },
+      "en-US": { badgeBody: "First version" },
     });
     vi.setSystemTime(new Date("2026-06-12T00:59:59.000Z"));
     await expect(provider.getBillingDiscount()).resolves.toEqual({
-      "zh-CN": { badgeBody: "第一版" },
+      "en-US": { badgeBody: "First version" },
     });
     expect(apiClient.request).toHaveBeenCalledTimes(1);
 
     vi.setSystemTime(new Date("2026-06-12T01:00:01.000Z"));
     await expect(provider.getBillingDiscount()).resolves.toEqual({
-      "zh-CN": { badgeBody: "第二版" },
+      "en-US": { badgeBody: "Second version" },
     });
     expect(apiClient.request).toHaveBeenCalledTimes(2);
   });

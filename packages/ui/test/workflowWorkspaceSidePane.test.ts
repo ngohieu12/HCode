@@ -6,6 +6,7 @@
 // 「清单接到了 DOM 上」——章头、动词与对象、结果行、状态词、peek 与展开、占位、落点——
 // 派生规则在 workflowWorkspaceTranscript.test.ts 与 workflowWorkspaceLogbook.test.ts。
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type {
@@ -175,11 +176,11 @@ const NODES: V4ConversationWorkflowRunWorkspaceResult["nodes"] = [
   },
 ];
 
-function renderPane(tab = tabOf(), locale: "en-US" | "zh-CN" = "en-US") {
+function renderPane(tab = tabOf(), locale: "en-US" | "vi-VN" = "en-US") {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowWorkspaceSidePane, { tab, focused: true, onOpenCodeViewer }),
     ),
   );
@@ -403,7 +404,7 @@ describe("WorkflowWorkspaceSidePane", () => {
       "The script has not run anything yet",
     );
     cleanup();
-    const zh = renderPane(tabOf(), "zh-CN");
+    const zh = renderPane(tabOf(), "vi-VN");
     await waitFor(() => expect(zh.getByTestId("workflow-workspace-not-started")).toBeTruthy());
     expect(zh.getByTestId("workflow-workspace-not-started").textContent).toContain(
       "脚本还没执行任何步骤",

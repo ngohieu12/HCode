@@ -16,7 +16,7 @@ test("renders localized sidebar rows without section title glyph tails", async (
         { style: { height: 44, width: 42 } },
         React.createElement(Sidebar, {
           ...baseSidebarState,
-          copy: getZCodeCopy("zh-CN").tui,
+          copy: getZCodeCopy("en-US").tui,
           developerMode: true,
           status: "就绪。",
         }),
@@ -40,11 +40,11 @@ test("renders localized sidebar rows without section title glyph tails", async (
 
     // Todos 改为可折叠区块，标题与 API 等区块一样带展开标记。
     assert.ok(lines.includes(" ▼ Todos"));
-    assert.ok(lines.includes(" 进度      0/0"));
+    assert.ok(lines.includes(" Progress 0/0"));
     assert.ok(lines.includes(" ▼ API"));
-    assert.ok(lines.includes(" 模型      -"));
+    assert.ok(lines.includes(" Model     -"));
     assert.equal(
-      lines.some((line) => line.includes("进度s")),
+      lines.some((line) => line.includes("Progresss")),
       false,
     );
     assert.equal(

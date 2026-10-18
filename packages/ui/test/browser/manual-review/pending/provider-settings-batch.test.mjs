@@ -65,10 +65,7 @@ registerOffPeakEligibilityCases(() => ({ browser, origin }));
 registerProviderPresentationCases(() => ({ browser, origin, artifacts }));
 registerProviderModelEditorCases(() => ({ browser, origin, artifacts }));
 registerProgressiveModelEditorCases(() => ({ browser, origin, artifacts }));
-for (const [width, locale, theme] of [
-  [390, "zh-CN", "light"],
-  [1200, "en-US", "dark"],
-]) {
+for (const [width, locale, theme] of [[1200, "en-US", "dark"]]) {
   test(`header name and option feedback ${width}/${theme}`, async () => {
     await mkdir(artifacts, { recursive: true });
     const page = await browser.newPage({ viewport: { width, height: 1100 } });
@@ -106,10 +103,7 @@ for (const [width, locale, theme] of [
         toggleBox.x + toggleBox.width - expansion < menuBox.x,
         "switch expanded hit area must not reach menu",
       );
-      assert.equal(
-        await toggle.getAttribute("aria-label"),
-        locale === "zh-CN" ? "禁用供应商" : "Disable provider",
-      );
+      assert.equal(await toggle.getAttribute("aria-label"), "Disable provider");
       const rename = async () => {
         await menu.click();
         await page.getByTestId("model-provider-name-edit-button").click();
@@ -229,10 +223,7 @@ for (const [width, locale, theme] of [
     }
   });
 }
-for (const [width, locale, theme] of [
-  [390, "zh-CN", "light"],
-  [1200, "en-US", "dark"],
-]) {
+for (const [width, locale, theme] of [[1200, "en-US", "dark"]]) {
   test(`account has no provider toggle ${width}/${locale}/${theme}`, async () => {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     const mutations = [];
@@ -256,10 +247,7 @@ for (const [width, locale, theme] of [
     }
   });
 }
-for (const [width, locale, theme] of [
-  [390, "zh-CN", "light"],
-  [1200, "en-US", "dark"],
-])
+for (const [width, locale, theme] of [[1200, "en-US", "dark"]])
   test(`provider batch ${width}/${locale}/${theme}`, async () => {
     await mkdir(artifacts, { recursive: true });
     const page = await browser.newPage({ viewport: { width, height: 900 } });
@@ -306,10 +294,7 @@ for (const [width, locale, theme] of [
             .getAttribute("aria-checked") === "false",
       );
       assert.equal(await page.locator('[data-provider-status="disabled"]').count(), 2);
-      const disabledTests = page.getByTitle(
-        locale === "zh-CN" ? "请先启用供应商" : "Enable the provider first",
-        { exact: true },
-      );
+      const disabledTests = page.getByTitle("Enable the provider first", { exact: true });
       assert.ok((await disabledTests.count()) > 0);
       assert.equal(await disabledTests.first().isDisabled(), true);
       const save = mutations.find((m) => m.action === "save").payload;
@@ -324,7 +309,7 @@ for (const [width, locale, theme] of [
             .getAttribute("aria-checked") === "true",
       );
       const keyLink = page.getByRole("button", {
-        name: locale === "zh-CN" ? "获取 API Key" : "Get API key",
+        name: "Get API key",
         exact: true,
       });
       const allKeyLinks = page.getByRole("button", { name: /获取.*Key|Get.*[Kk]ey/ });
@@ -346,28 +331,20 @@ for (const [width, locale, theme] of [
       await page.mouse.up();
       await page.getByTestId("model-provider-model-delete-button-2").click();
       await page.getByRole("alert").waitFor();
-      assert.match(
-        await page.getByRole("alert").innerText(),
-        locale === "zh-CN" ? /删除失败/ : /delete/i,
-      );
-      await page
-        .getByRole("button", { name: locale === "zh-CN" ? "重试" : "Retry", exact: true })
-        .click();
+      assert.match(await page.getByRole("alert").innerText(), /delete/i);
+      await page.getByRole("button", { name: "Retry", exact: true }).click();
       await page.waitForFunction(
         () => !document.querySelector('[data-testid="model-provider-model-delete-button-2"]'),
       );
       assert.match(
         await page.locator('[data-provider-detail-feedback-state="success"]').last().innerText(),
-        locale === "zh-CN" ? /已删除/ : /deleted/i,
+        /deleted/i,
       );
       assert.equal(mutations.filter((m) => m.action === "delete").length, 2);
-      await page
-        .getByTitle(locale === "zh-CN" ? "测试模型" : "Test model", { exact: true })
-        .first()
-        .click();
+      await page.getByTitle("Test model", { exact: true }).first().click();
       const success = page
         .locator('[data-provider-detail-feedback-state="success"]')
-        .filter({ hasText: locale === "zh-CN" ? "连接成功" : "connected" });
+        .filter({ hasText: "connected" });
       await success.waitFor();
       assert.match(await success.innerText(), /Fixture Provider/);
       const visual = await success.evaluate((node) => ({
@@ -389,7 +366,7 @@ for (const [width, locale, theme] of [
       await success.locator("button").click();
       await success.waitFor({ state: "hidden" });
       // 清空 Key 会触发异步草稿保存，放在独立操作完成后，避免与删除回归竞争保存门禁。
-      const keyInput = page.getByPlaceholder(locale === "zh-CN" ? "输入 API Key" : "Enter API key");
+      const keyInput = page.getByPlaceholder("Enter API key");
       await keyInput.fill("");
       assert.equal(await allKeyLinks.count(), 1);
       await keyLink.click();

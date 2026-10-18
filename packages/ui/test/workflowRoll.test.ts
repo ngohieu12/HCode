@@ -3,6 +3,7 @@
 // 门后的名单（docs/dynamic-workflow/presentation.md「The spine」）：按状态分组、组头是计数行
 // 的那一项、行由调用方渲染、依次落地 8 ms 封顶 400。
 import { cleanup, render } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import type { StepRunStatus } from "@/components/workflow-graph/types.js";
@@ -36,12 +37,12 @@ function pill(index: number, status: StepRunStatus | undefined): TimelinePill {
 const pills = (statuses: readonly (StepRunStatus | undefined)[]) =>
   statuses.map((status, index) => pill(index + 1, status));
 
-function renderRoll(list: TimelinePill[], locale: "en-US" | "zh-CN" = "en-US", unlisted?: number) {
+function renderRoll(list: TimelinePill[], locale: "en-US" | "vi-VN" = "en-US", unlisted?: number) {
   const roster = stationRoster(list, { pins: 5 })!;
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowRoll, {
         groups: rosterRoll(roster),
         ...(unlisted === undefined ? {} : { unlisted }),
@@ -110,7 +111,7 @@ describe("WorkflowRoll", () => {
 
   it("落地延迟封顶 400 ms；zh-CN 组头本地化", () => {
     const many = Array.from({ length: 70 }, (_, i) => pill(i + 1, "done"));
-    const view = renderRoll(many, "zh-CN");
+    const view = renderRoll(many, "vi-VN");
     const rows = view.getAllByTestId("workflow-agent-pill");
     expect(rows).toHaveLength(65);
     expect(rows[64]!.style.animationDelay).toBe(`${ROW_STAGGER_CAP_MS}ms`);
@@ -142,7 +143,7 @@ describe("WorkflowRoll", () => {
       "1 more agent not listed",
     );
     cleanup();
-    expect(renderRoll(list, "zh-CN", 300).getByTestId("workflow-roll-unlisted").textContent).toBe(
+    expect(renderRoll(list, "vi-VN", 300).getByTestId("workflow-roll-unlisted").textContent).toBe(
       "另有 300 个子代理未列出",
     );
   });

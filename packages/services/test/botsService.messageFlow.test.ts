@@ -95,7 +95,7 @@ describe("botsService messageFlow", () => {
           ),
         );
       } else {
-        await expect(submission).rejects.toThrow("原选择已保留");
+        await expect(submission).rejects.toThrow("preserved");
         expect(tasks.sendPrompt).not.toHaveBeenCalled();
         expect(tasks.setModel).not.toHaveBeenCalled();
       }
@@ -152,7 +152,7 @@ describe("botsService messageFlow", () => {
       },
     });
 
-    expect(activationReplies[0]?.text).toContain("微信 Bot 已激活");
+    expect(activationReplies[0]?.text).toContain("Weixin bot is active");
     expect(legacyTaskService.createTask).not.toHaveBeenCalled();
 
     const replies = await service.handleInboundMessage({
@@ -201,12 +201,12 @@ describe("botsService messageFlow", () => {
       providerUserId: "wx_user",
     });
     expect(replies[0]).not.toHaveProperty("selection");
-    expect(replies[0]?.text).toContain("选择 workspace");
+    expect(replies[0]?.text).toContain("Select workspace");
     expect(replies[0]?.text).toContain("1.");
-    expect(replies[0]?.text).toContain("[远端]");
-    expect(replies[0]?.text).not.toContain("[本地]");
-    expect(replies[0]?.text).toContain("0. 取消");
-    expect(replies[0]?.text).toContain("回复数字选择，0 取消。");
+    expect(replies[0]?.text).toContain("[Remote]");
+    expect(replies[0]?.text).not.toContain("[Local]");
+    expect(replies[0]?.text).toContain("0. Cancel");
+    expect(replies[0]?.text).toContain("Reply with a number to choose, or 0 to cancel.");
     expect(replies[0]?.text).not.toContain("/workspace");
     expect(replies[0]?.text).not.toContain("ssh://host/tmp/workspace");
     service.disposeAll();
@@ -227,7 +227,7 @@ describe("botsService messageFlow", () => {
       actor,
     });
 
-    expect(replies[0]?.selection?.options[0]?.label).toContain("[远端]");
+    expect(replies[0]?.selection?.options[0]?.label).toContain("[Remote]");
     expect(replies[0]?.selection?.options[0]).not.toHaveProperty("description");
     service.disposeAll();
   });
@@ -280,7 +280,7 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
 
-    expect(replies[0]?.text).toContain("工作区:");
+    expect(replies[0]?.text).toContain("Workspace:");
     expect(replies[0]?.text).not.toContain("Provider:");
     service.disposeAll();
   });
@@ -328,31 +328,31 @@ describe("botsService messageFlow", () => {
       text: "1",
       actor: weixinActor,
     });
-    expect(workspaceReplies[0]?.text).toContain("工作区:");
-    expect(workspaceReplies[0]?.text).toContain("任务: 草稿");
+    expect(workspaceReplies[0]?.text).toContain("Workspace:");
+    expect(workspaceReplies[0]?.text).toContain("Task: draft");
 
     const modelReplies = await service.handleInboundMessage({
       botId: "weixin-1",
       text: "/model",
       actor: weixinActor,
     });
-    expect(modelReplies[0]?.text).toContain("选择模型供应商");
+    expect(modelReplies[0]?.text).toContain("Select model provider");
 
     const replyList = await service.handleInboundMessage({
       botId: "weixin-1",
       text: "/reply",
       actor: weixinActor,
     });
-    expect(replyList[0]?.text).toContain("标准回复");
-    expect(replyList[0]?.text).toContain("完整回复");
-    expect(replyList[0]?.text).toContain("摘要回复");
-    expect(replyList[0]?.text).not.toContain("流式卡片");
+    expect(replyList[0]?.text).toContain("Standard reply");
+    expect(replyList[0]?.text).toContain("Full reply");
+    expect(replyList[0]?.text).toContain("Summary reply");
+    expect(replyList[0]?.text).not.toContain("Streaming card");
     const rejectedStreamingCard = await service.handleInboundMessage({
       botId: "weixin-1",
       text: "/reply streaming_card",
       actor: weixinActor,
     });
-    expect(rejectedStreamingCard[0]?.text).toContain("未找到回复颗粒度");
+    expect(rejectedStreamingCard[0]?.text).toContain("Reply detail option not found.");
 
     await service.handleInboundMessage({
       botId: "weixin-1",
@@ -364,8 +364,8 @@ describe("botsService messageFlow", () => {
       text: "2",
       actor: weixinActor,
     });
-    expect(replyReplies[0]?.text).toContain("工作区:");
-    expect(replyReplies[0]?.text).toContain("任务: 草稿");
+    expect(replyReplies[0]?.text).toContain("Workspace:");
+    expect(replyReplies[0]?.text).toContain("Task: draft");
     expect((await repo.readConfig()).bots[0]).toMatchObject({
       currentOptions: {},
       replyMode: "assistant_toolcalls_changes",
@@ -398,7 +398,7 @@ describe("botsService messageFlow", () => {
     expect(listReplies[0]?.selection?.options).toEqual([
       expect.objectContaining({
         id: "streaming_card",
-        label: expect.stringContaining("流式卡片"),
+        label: expect.stringContaining("Streaming card"),
       }),
     ]);
     expect(listReplies[0]?.selection?.currentId).toBe("streaming_card");
@@ -409,7 +409,7 @@ describe("botsService messageFlow", () => {
       actor: feishuActor,
     });
 
-    expect(rejectedReplies[0]?.text).toContain("未找到回复颗粒度");
+    expect(rejectedReplies[0]?.text).toContain("Reply detail option not found.");
     expect((await repo.readConfig()).bots[0]?.replyMode).toBe("assistant_changes");
 
     const acceptedReplies = await service.handleInboundMessage({
@@ -418,7 +418,7 @@ describe("botsService messageFlow", () => {
       actor: feishuActor,
     });
 
-    expect(acceptedReplies[0]?.text).toContain("工作区:");
+    expect(acceptedReplies[0]?.text).toContain("Workspace:");
     expect((await repo.readConfig()).bots[0]?.replyMode).toBe("streaming_card");
     service.disposeAll();
   });
@@ -442,7 +442,7 @@ describe("botsService messageFlow", () => {
       credentialService: f.createCredentialService({ "weixin-token": "token" }),
       legacyTaskService: f.createLegacyTaskService(),
       settingService: f.createSettingService({
-        locale: "zh-CN",
+        locale: "en-US",
         lastWorkspaceSession: [
           {
             kind: "local",
@@ -458,7 +458,7 @@ describe("botsService messageFlow", () => {
       text: "/workspace",
       actor: weixinActor,
     });
-    expect(listReplies[0]?.text).toContain("[远端]");
+    expect(listReplies[0]?.text).toContain("[Remote]");
 
     const switchReplies = await service.handleInboundMessage({
       botId: "weixin-1",
@@ -466,8 +466,8 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
 
-    expect(switchReplies[0]?.text).toContain("工作区:");
-    expect(switchReplies[0]?.text).toContain("任务: 草稿");
+    expect(switchReplies[0]?.text).toContain("Workspace:");
+    expect(switchReplies[0]?.text).toContain("Task: draft");
     expect((await repo.readState()).bots["weixin-1"]).toMatchObject({
       workspacePath: "/tmp/workspace",
       workspaceIdentity: "ssh://host/tmp/workspace",
@@ -547,8 +547,8 @@ describe("botsService messageFlow", () => {
       text: "1",
       actor: weixinActor,
     });
-    expect(thoughtReplies[0]?.text).toContain("工作区:");
-    expect(thoughtReplies[0]?.text).toContain("任务:");
+    expect(thoughtReplies[0]?.text).toContain("Workspace:");
+    expect(thoughtReplies[0]?.text).toContain("Task:");
 
     const modeReplies = await service.handleInboundMessage({
       botId: "weixin-1",
@@ -570,7 +570,7 @@ describe("botsService messageFlow", () => {
           actor: weixinActor,
         })
       )[0]?.text,
-    ).toContain("工作区:");
+    ).toContain("Workspace:");
 
     expect((await repo.readConfig()).bots[0]?.currentOptions).toEqual({});
     expect(legacyTaskService.setConfigOption).toHaveBeenCalledWith(
@@ -645,7 +645,7 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
 
-    expect(switchReplies[0]?.text).toContain("工作区:");
+    expect(switchReplies[0]?.text).toContain("Workspace:");
     expect((await repo.readState()).bots["weixin-1"]).toMatchObject({
       activeTaskId: "task-2",
       mode: "task",
@@ -910,8 +910,8 @@ describe("botsService messageFlow", () => {
       text: "1",
       actor: weixinActor,
     });
-    expect(modelReplies[0]?.text).not.toContain("未找到模型供应商");
-    expect(modelReplies[0]?.text).toContain("工作区:");
+    expect(modelReplies[0]?.text).not.toContain("Model provider not found.");
+    expect(modelReplies[0]?.text).toContain("Workspace:");
     const modeReplies = await service.handleInboundMessage({
       botId: "weixin-1",
       text: "/mode",
@@ -1032,7 +1032,7 @@ describe("botsService messageFlow", () => {
       text: `/model provider ${providerId}`,
       actor: weixinActor,
     });
-    expect(providerReplies[0]?.text).toContain("选择模型");
+    expect(providerReplies[0]?.text).toContain("Select model");
     await service.handleInboundMessage({
       botId: "weixin-1",
       text: "1",
@@ -1094,7 +1094,7 @@ describe("botsService messageFlow", () => {
       zcodeTaskService,
       zcodeSessionService,
       settingService: f.createSettingService({
-        locale: "zh-CN",
+        locale: "en-US",
         lastWorkspaceSession: [{ kind: "local", workspacePath: "/tmp/workspace" }],
       }),
       modelSelectionService: {
@@ -1126,13 +1126,13 @@ describe("botsService messageFlow", () => {
       text: `/model provider ${providerId}`,
       actor: weixinActor,
     });
-    expect(providerReplies[0]?.text).toContain("选择模型");
+    expect(providerReplies[0]?.text).toContain("Select model");
     const modelReplies = await service.handleInboundMessage({
       botId: "weixin-1",
       text: "1",
       actor: weixinActor,
     });
-    expect(modelReplies[0]?.text).toContain("工作区:");
+    expect(modelReplies[0]?.text).toContain("Workspace:");
 
     expect(zcodeTaskService.setModel).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -1308,7 +1308,7 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
 
-    expect(replies[0]?.text).toContain("当前模型不支持思考级别");
+    expect(replies[0]?.text).toContain("The current model does not support thought level.");
     expect(replies[0]?.text).not.toContain("Medium");
     service.disposeAll();
   });
@@ -1400,7 +1400,7 @@ describe("botsService messageFlow", () => {
     });
 
     expect(replies[0]?.text).toContain("Runtime Provider");
-    expect(replies[0]?.text).toContain("当前模型 gpt-5.3");
+    expect(replies[0]?.text).toContain("Current model gpt-5.3");
     await service.handleInboundMessage({
       botId: "weixin-1",
       text: "1",
@@ -1411,7 +1411,7 @@ describe("botsService messageFlow", () => {
       text: "1",
       actor: weixinActor,
     });
-    expect(modelReplies[0]?.text).toContain("工作区:");
+    expect(modelReplies[0]?.text).toContain("Workspace:");
     expect(legacyTaskService.setModel).toHaveBeenCalledWith(
       expect.objectContaining({
         taskId: "task-1",
@@ -1476,7 +1476,7 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
 
-    expect(replies[0]?.text).toContain(`模型: Registry Label/${modelId}`);
+    expect(replies[0]?.text).toContain(`Model: Registry Label/${modelId}`);
     service.disposeAll();
   });
 
@@ -1593,7 +1593,7 @@ describe("botsService messageFlow", () => {
       actor: feishuActor,
     });
 
-    expect(replies[0]?.text).toContain("未找到模型供应商");
+    expect(replies[0]?.text).toContain("Model provider not found.");
     expect(replies[0]?.selection).toBeUndefined();
     service.disposeAll();
   });
@@ -1619,7 +1619,7 @@ describe("botsService messageFlow", () => {
       providerUserId: "ou_user",
       selection: expect.objectContaining({ action: "workspace.set" }),
     });
-    expect(replies[0]?.text).toContain("选择 workspace");
+    expect(replies[0]?.text).toContain("Select workspace");
     expect(replies[0]?.text).not.toContain("/workspace");
     service.disposeAll();
   });
@@ -2056,7 +2056,7 @@ describe("botsService messageFlow", () => {
     expect(messagePosts).toHaveLength(1);
     expect(messagePatches.length).toBeGreaterThanOrEqual(2);
     const runningToolPatch = messagePatches.find(([, init]) =>
-      String(init?.body).includes("工具摘要"),
+      String(init?.body).includes("Tool summaries"),
     );
     const runningBody = JSON.parse(String(runningToolPatch?.[1]?.body)) as { content?: string };
     const runningCard = JSON.parse(String(runningBody.content)) as Record<string, unknown>;
@@ -2428,7 +2428,7 @@ describe("botsService messageFlow", () => {
         String(url).includes("/open-apis/im/v1/messages/om_streaming") && init?.method === "PATCH",
     );
     expect(sealedStreamUpdate).toBeDefined();
-    expect(String(sealedStreamUpdate?.[1]?.body)).not.toContain("运行中");
+    expect(String(sealedStreamUpdate?.[1]?.body)).not.toContain("Running");
     const interactionPost = fetchMock.mock.calls
       .filter(([url]) => String(url).includes("/open-apis/im/v1/messages?receive_id_type=open_id"))
       .at(-1);
@@ -2690,7 +2690,7 @@ describe("botsService messageFlow", () => {
 
     expect(deliveredTexts[0]).toContain("操作方式");
     expect(deliveredTexts[0]).toContain("继续说明。");
-    expect(deliveredTexts[1]).toContain("变更摘要");
+    expect(deliveredTexts[1]).toContain("Change summary");
     service.disposeAll();
   });
 
@@ -2793,7 +2793,7 @@ describe("botsService messageFlow", () => {
       },
     });
 
-    expect(replies[0]?.text).toContain("已提交问答响应");
+    expect(replies[0]?.text).toContain("Question response submitted.");
     expect(legacyTaskService.respondElicitation).toHaveBeenCalledWith({
       taskId: "task-1",
       workspacePath: "/tmp/workspace",
@@ -2878,7 +2878,7 @@ describe("botsService messageFlow", () => {
       text: "/elicitation 1",
       actor,
     });
-    expect(staleReplies[0]?.text).toContain("问答请求已过期");
+    expect(staleReplies[0]?.text).toContain("This question request has expired.");
     expect(legacyTaskService.respondElicitation).not.toHaveBeenCalled();
 
     await service.handleInboundMessage({
@@ -2923,7 +2923,7 @@ describe("botsService messageFlow", () => {
       actor,
     });
 
-    expect(doneReplies[0]?.text).toContain("已提交问答响应");
+    expect(doneReplies[0]?.text).toContain("Question response submitted.");
     expect(legacyTaskService.respondElicitation).toHaveBeenCalledWith(
       expect.objectContaining({
         taskId: "task-1",
@@ -3467,8 +3467,8 @@ describe("botsService messageFlow", () => {
     deferredRespond.resolve(true);
 
     const [firstReplies, secondReplies] = await Promise.all([firstReply, secondReply]);
-    expect(firstReplies[0]?.text).toContain("已提交问答响应");
-    expect(secondReplies[0]?.text).toContain("问答请求已过期");
+    expect(firstReplies[0]?.text).toContain("Question response submitted.");
+    expect(secondReplies[0]?.text).toContain("This question request has expired.");
     expect(legacyTaskService.respondElicitation).toHaveBeenCalledTimes(1);
     service.disposeAll();
   });
@@ -3527,7 +3527,7 @@ describe("botsService messageFlow", () => {
       text: "继续",
       actor: weixinActor,
     });
-    expect(retry[0]?.text).toContain("已提交问答响应");
+    expect(retry[0]?.text).toContain("Question response submitted.");
     expect(legacyTaskService.respondElicitation).toHaveBeenCalledTimes(2);
     service.disposeAll();
   });
@@ -3547,7 +3547,7 @@ describe("botsService messageFlow", () => {
               requestId: "permission-retry",
               optionId: "allow_once",
               command: "approve",
-              label: "允许",
+              label: "Allow",
               response: { decision: "allow", reason: "Approved by bot" },
             },
           ],
@@ -3587,7 +3587,7 @@ describe("botsService messageFlow", () => {
       text: "/permission 1",
       actor: telegramActor,
     });
-    expect(retry[0]?.text).toContain("已提交权限响应");
+    expect(retry[0]?.text).toContain("Permission response submitted.");
     expect(legacyTaskService.respondPermission).toHaveBeenCalledTimes(2);
     service.disposeAll();
   });
@@ -3607,7 +3607,7 @@ describe("botsService messageFlow", () => {
               requestId: "permission-provider-retry",
               optionId: "allow_once",
               command: "approve",
-              label: "允许",
+              label: "Allow",
               response: { decision: "allow", reason: "Approved by bot" },
             },
           ],
@@ -3703,7 +3703,7 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
 
-    expect(replies[0]?.text).toContain("已提交问答响应");
+    expect(replies[0]?.text).toContain("Question response submitted.");
     expect(legacyTaskService.respondElicitation).toHaveBeenCalledWith(
       expect.objectContaining({
         requestId: "elicit-text",
@@ -3770,7 +3770,7 @@ describe("botsService messageFlow", () => {
       text: "",
       actor: weixinActor,
     });
-    expect(promptReplies[0]?.text).toContain("3. 跳过");
+    expect(promptReplies[0]?.text).toContain("3. Skip");
 
     const skipReplies = await service.handleInboundMessage({
       botId: "weixin-1",
@@ -3790,7 +3790,7 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
 
-    expect(replies[0]?.text).toContain("已提交问答响应");
+    expect(replies[0]?.text).toContain("Question response submitted.");
     expect(legacyTaskService.respondElicitation).toHaveBeenCalledWith(
       expect.objectContaining({
         requestId: "elicit-partial",
@@ -3848,7 +3848,7 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
 
-    expect(replies[0]?.text).toContain("已提交问答响应");
+    expect(replies[0]?.text).toContain("Question response submitted.");
     expect(legacyTaskService.respondElicitation).toHaveBeenCalledWith(
       expect.objectContaining({
         requestId: "elicit-empty",
@@ -3947,7 +3947,7 @@ describe("botsService messageFlow", () => {
     expect(legacyTaskService.sendPrompt).toHaveBeenCalledWith(
       expect.objectContaining({
         content: expect.stringContaining(
-          "请查看附件并根据内容协助我。\n\n附件：demo.png (image/png, 3B)，已作为图片输入提供，并保存到：",
+          "Please review the attachment and help based on its content.\n\nAttachment: demo.png (image/png, 3B) was provided as image input and saved to:",
         ),
         attachments: [
           expect.objectContaining({
@@ -3962,7 +3962,7 @@ describe("botsService messageFlow", () => {
     );
     expect(legacyTaskService.sendPrompt).toHaveBeenCalledWith(
       expect.objectContaining({
-        content: expect.stringContaining("不要下载或访问临时/远程 URL"),
+        content: expect.stringContaining("do not download or access temporary or remote URLs"),
       }),
     );
     service.disposeAll();
@@ -4000,7 +4000,7 @@ describe("botsService messageFlow", () => {
     expect(legacyTaskService.sendPrompt).toHaveBeenCalledWith(
       expect.objectContaining({
         content: expect.stringContaining(
-          "总结这个文件\n\n附件：notes.txt (text/plain, 5B)，已保存到：",
+          "总结这个文件\n\nAttachment: notes.txt (text/plain, 5B) saved to:",
         ),
         attachments: undefined,
       }),
@@ -4038,7 +4038,7 @@ describe("botsService messageFlow", () => {
     });
 
     expect(replies.map((reply) => reply.text)).toEqual([
-      "附件处理失败：无法下载附件。文件可能已过期、已撤回，或机器人没有读取权限。请重新发送附件后再试。",
+      "Failed to process attachment: Could not download the attachment. The file may have expired, been removed, or the bot may not have permission to read it. Please send the attachment again and try once more.",
     ]);
     expect(legacyTaskService.createTask).not.toHaveBeenCalled();
     service.disposeAll();
@@ -4069,7 +4069,7 @@ describe("botsService messageFlow", () => {
     });
 
     expect(replies.map((reply) => reply.text)).toEqual([
-      "当前远端项目 /tmp/workspace 未连接。请先发送 **/重连**，连接恢复后再重试。上一条请求未执行。",
+      "The remote workspace /tmp/workspace is not connected. Send **/reconnect** first, then try again. The previous request was not executed.",
     ]);
     expect(isConnected).toHaveBeenCalledWith({
       workspacePath: "/tmp/workspace",
@@ -4107,7 +4107,7 @@ describe("botsService messageFlow", () => {
     });
 
     expect(replies.map((reply) => reply.text)).toEqual([
-      "当前远端项目 /tmp/workspace 重连失败：SSH 认证失败\n上一条请求没有执行。",
+      "Remote workspace /tmp/workspace reconnect failed: SSH 认证失败\nThe previous request was not executed.",
     ]);
     expect(ensureConnected).toHaveBeenCalledWith({
       workspacePath: "/tmp/workspace",
@@ -4135,7 +4135,7 @@ describe("botsService messageFlow", () => {
     });
 
     expect(replies.map((reply) => reply.text)).toEqual([
-      "当前远端项目 /tmp/workspace 未连接。请先发送 **/重连**，连接恢复后再重试。上一条请求未执行。",
+      "The remote workspace /tmp/workspace is not connected. Send **/reconnect** first, then try again. The previous request was not executed.",
     ]);
     expect(legacyTaskService.createTask).not.toHaveBeenCalled();
     service.disposeAll();
@@ -4166,12 +4166,12 @@ describe("botsService messageFlow", () => {
 
     expect(replies.map((reply) => reply.text)).toEqual([
       [
-        "工作区: workspace",
-        "模型: -",
+        "Workspace: workspace",
+        "Model: -",
         "------",
-        "任务: 草稿",
-        "状态: 远端未连接",
-        "当前远端项目 /tmp/workspace 未连接。请发送 **/重连** 恢复连接。",
+        "Task: draft",
+        "State: remote disconnected",
+        "The remote workspace /tmp/workspace is not connected. Send **/reconnect** to restore the connection.",
       ].join("\n"),
     ]);
     expect(ensureConnected).not.toHaveBeenCalled();
@@ -4202,9 +4202,9 @@ describe("botsService messageFlow", () => {
       actor,
     });
 
-    expect(helpReplies[0]?.text).toContain("ZCode 机器人命令");
-    expect(statusReplies[0]?.text).toContain("状态: 远端未连接");
-    expect(statusReplies[0]?.text).toContain("**/重连**");
+    expect(helpReplies[0]?.text).toContain("ZCode bot commands");
+    expect(statusReplies[0]?.text).toContain("State: remote disconnected");
+    expect(statusReplies[0]?.text).toContain("**/reconnect**");
     expect(legacyTaskService.listTasks).not.toHaveBeenCalled();
     expect(legacyTaskService.createTask).not.toHaveBeenCalled();
     service.disposeAll();
@@ -4233,8 +4233,8 @@ describe("botsService messageFlow", () => {
       actor,
     });
 
-    expect(replies[0]?.text).toContain("工作区: workspace");
-    expect(replies[0]?.text).toContain("状态:");
+    expect(replies[0]?.text).toContain("Workspace: workspace");
+    expect(replies[0]?.text).toContain("State:");
     expect(ensureConnected).toHaveBeenCalledWith({
       workspacePath: "/tmp/workspace",
       workspaceIdentity: "ssh://host/tmp/workspace",
@@ -4286,14 +4286,16 @@ describe("botsService messageFlow", () => {
       userId: "user-1",
     });
     await vi.waitFor(() =>
-      expect(sentTexts).toEqual(["当前远端项目 /tmp/workspace 未连接，正在为你重连..."]),
+      expect(sentTexts).toEqual([
+        "The remote workspace /tmp/workspace is not connected. Reconnecting now...",
+      ]),
     );
     reconnectDeferred.resolve({ ok: true });
     await callback;
 
     expect(sentTexts).toEqual([
-      "当前远端项目 /tmp/workspace 未连接，正在为你重连...",
-      expect.stringContaining("工作区: workspace"),
+      "The remote workspace /tmp/workspace is not connected. Reconnecting now...",
+      expect.stringContaining("Workspace: workspace"),
     ]);
     service.disposeAll();
   });
@@ -4320,27 +4322,27 @@ describe("botsService messageFlow", () => {
 
     const firstReconnect = service.handleInboundMessage({
       botId: "webhook-1",
-      text: "/重连",
+      text: "/reconnect",
       actor,
     });
     await vi.waitFor(() => expect(ensureConnected).toHaveBeenCalledTimes(1));
 
     const duplicateReconnect = service.handleInboundMessage({
       botId: "webhook-1",
-      text: "/重连",
+      text: "/reconnect",
       actor,
     });
     reconnectDeferred.resolve({ ok: true });
 
     await expect(firstReconnect).resolves.toEqual([
       expect.objectContaining({
-        text: expect.stringContaining("工作区: workspace"),
+        text: expect.stringContaining("Workspace: workspace"),
       }),
     ]);
     await expect(duplicateReconnect).resolves.toEqual([]);
     const immediateRetry = await service.handleInboundMessage({
       botId: "webhook-1",
-      text: "/重连",
+      text: "/reconnect",
       actor,
     });
     expect(immediateRetry).toEqual([]);
@@ -4368,17 +4370,17 @@ describe("botsService messageFlow", () => {
     const replayedActor = { ...actor, providerMessageId: "provider-message-1" };
     const firstReplies = await service.handleInboundMessage({
       botId: "webhook-1",
-      text: "/重连",
+      text: "/reconnect",
       actor: replayedActor,
     });
     const replayReplies = await service.handleInboundMessage({
       botId: "webhook-1",
-      text: "/重连",
+      text: "/reconnect",
       actor: replayedActor,
     });
 
-    expect(firstReplies[0]?.text).toContain("工作区: workspace");
-    expect(firstReplies[0]?.text).toContain("状态:");
+    expect(firstReplies[0]?.text).toContain("Workspace: workspace");
+    expect(firstReplies[0]?.text).toContain("State:");
     expect(replayReplies).toEqual([]);
     expect(ensureConnected).toHaveBeenCalledTimes(1);
     service.disposeAll();
@@ -4467,7 +4469,7 @@ describe("botsService messageFlow", () => {
     expect(response).toMatchObject({ ok: false, status: 503 });
     expect(response.replies[0]?.text).toContain("/new task");
     expect(response.replies[0]?.text).not.toContain(missingSessionId);
-    expect(response.replies[0]?.text).not.toContain("处理机器人回调失败");
+    expect(response.replies[0]?.text).not.toContain("Failed to process bot callback");
     service.disposeAll();
   });
 
@@ -4707,7 +4709,7 @@ describe("botsService messageFlow", () => {
       actor,
     });
 
-    expect(newReplies[0]?.text).toContain("当前任务正在运行");
+    expect(newReplies[0]?.text).toContain("The current task is still running.");
     expect(legacyTaskService.createTask).not.toHaveBeenCalled();
     expect((await repo.readState()).bots["webhook-1"]).toMatchObject({
       activeTaskId: "task-1",
@@ -4742,7 +4744,7 @@ describe("botsService messageFlow", () => {
         text,
         actor: weixinActor,
       });
-      expect(replies[0]?.text).toContain("当前任务正在运行");
+      expect(replies[0]?.text).toContain("The current task is still running.");
       expect(replies[0]).not.toHaveProperty("selection");
     }
     const modeReplies = await service.handleInboundMessage({
@@ -4823,7 +4825,7 @@ describe("botsService messageFlow", () => {
     });
 
     expect(replies[0]?.text).not.toContain("Provider:");
-    expect(replies[0]?.text).toContain("任务: 草稿");
+    expect(replies[0]?.text).toContain("Task: draft");
     expect((await repo.readState()).bots["weixin-1"]).toMatchObject({
       mode: "draft",
       activeTaskId: null,
@@ -4843,8 +4845,8 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
     expect(statusReplies[0]?.text).not.toContain("Provider:");
-    expect(statusReplies[0]?.text).toContain("模型: claude-sonnet");
-    expect(statusReplies[0]?.text).toContain("任务: 草稿");
+    expect(statusReplies[0]?.text).toContain("Model: claude-sonnet");
+    expect(statusReplies[0]?.text).toContain("Task: draft");
     service.disposeAll();
   });
 
@@ -5105,7 +5107,7 @@ describe("botsService messageFlow", () => {
       actor: weixinActor,
     });
 
-    expect(replies[0]?.text).toContain("当前任务正在运行");
+    expect(replies[0]?.text).toContain("The current task is still running.");
     expect((await repo.readState()).bots["weixin-1"]).toMatchObject({
       activeTaskId: "task-1",
       mode: "task",
@@ -5368,10 +5370,10 @@ describe("botsService messageFlow", () => {
       expect(text).toContain("# Complete plan");
       expect(text).toContain("1. Build");
       expect(text).toContain("------");
-      expect(text).toContain("请审阅此实施计划。");
+      expect(text).toContain("Review this implementation plan.");
       const options = `${text}\n${readOptions(body)}`;
-      expect(options).toContain("批准");
-      expect(options).toContain("自定义回答");
+      expect(options).toContain("Approve");
+      expect(options).toContain("Custom answer");
       service.disposeAll();
     },
   );
@@ -5429,7 +5431,7 @@ describe("botsService messageFlow", () => {
           actor: weixinActor,
         });
         if (incomplete) {
-          await expect(sending).rejects.toThrow("Submission 模型");
+          await expect(sending).rejects.toThrow("Submission model");
           expect(taskService.createTask).not.toHaveBeenCalled();
           expect((await repo.readState()).bots["weixin-1"]?.draftOptions?.modelSelection).toEqual(
             original,
@@ -5480,7 +5482,7 @@ describe("botsService messageFlow", () => {
       text: "/model",
       actor: weixinActor,
     });
-    expect(empty[0]?.text).toContain("未找到模型供应商");
+    expect(empty[0]?.text).toContain("Model provider not found.");
     expect(empty[0]?.text).not.toContain("Runtime Provider");
     service.disposeAll();
   });

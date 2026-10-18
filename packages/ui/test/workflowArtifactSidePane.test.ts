@@ -12,6 +12,7 @@
 //   3. 「在工作区显示」与 html 的「在浏览器中打开」的门（desktop-local ∧ sourcePath ∧ 最新版）。
 //   4. 「作为文件打开」：宿主能落副本才出入口，落的是**正在看的那一版**的字节。
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TID_WORKFLOW_ARTIFACT_PANE, type IPlatformService } from "@zcode/shared";
@@ -157,7 +158,7 @@ function textChunk(text: string, mediaType: string): V4ConversationWorkflowRunAr
 function renderPane(
   options: {
     tab?: WorkflowArtifactSidePaneTab;
-    locale?: "en-US" | "zh-CN";
+    locale?: "en-US" | "vi-VN";
     withBrowser?: boolean;
     withReveal?: boolean;
     /** 缺席即不挂 PlatformProvider（与既有用例一致：没有宿主能力）。 */
@@ -172,7 +173,10 @@ function renderPane(
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: options.locale ?? "zh-CN" },
+      {
+        initialLocale: options.locale === "vi-VN" ? "vi-VN" : (options.locale ?? "vi-VN"),
+        messages: options.locale === "vi-VN" ? zhCNLegacy : undefined,
+      },
       options.platform === undefined
         ? pane
         : createElement(PlatformProvider, {

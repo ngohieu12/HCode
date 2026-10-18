@@ -306,29 +306,30 @@ const WARNING_MESSAGE_IDS: Readonly<
   input_attachment_unavailable: "conversationShare.warning.inputAttachmentUnavailable",
 };
 
-const ARTIFACT_TYPE_LABELS: Readonly<Record<string, { zh: string; en: string }>> = {
-  pdf: { zh: "PDF", en: "PDF" },
-  pptx: { zh: "PPT", en: "PowerPoint" },
-  docx: { zh: "Word 文档", en: "Word document" },
-  xlsx: { zh: "Excel 表格", en: "Excel spreadsheet" },
-  image: { zh: "图片", en: "image" },
-  html: { zh: "HTML", en: "HTML" },
-  md: { zh: "Markdown", en: "Markdown" },
-  text: { zh: "纯文本", en: "plain text" },
-  video: { zh: "视频", en: "video" },
-  audio: { zh: "音频", en: "audio" },
+// 应用语言只有 vi-VN / en-US，文件类别名统一用英文，不再保留中文副本。
+const ARTIFACT_TYPE_LABELS: Readonly<Record<string, string>> = {
+  pdf: "PDF",
+  pptx: "PowerPoint",
+  docx: "Word document",
+  xlsx: "Excel spreadsheet",
+  image: "image",
+  html: "HTML",
+  md: "Markdown",
+  text: "plain text",
+  video: "video",
+  audio: "audio",
 };
 
-function artifactLabel(value: string, locale: string): string {
+function artifactLabel(value: string, _locale: string): string {
   const key = value.replace(/^\./u, "").toLowerCase();
-  return ARTIFACT_TYPE_LABELS[key]?.[locale === "en-US" ? "en" : "zh"] ?? value.toUpperCase();
+  return ARTIFACT_TYPE_LABELS[key] ?? value.toUpperCase();
 }
 
 export function formatConversationShareArtifactType(
   issue: ConversationShareFailureIssue,
   locale: string,
 ): string {
-  const value = issue.artifactType || issue.extension || issue.mimeType || "文件";
+  const value = issue.artifactType || issue.extension || issue.mimeType || "File";
   return artifactLabel(value, locale);
 }
 
@@ -340,12 +341,12 @@ export function formatConversationShareAllowedArtifacts(
     const labels = issue.allowedArtifacts.map((artifact) =>
       artifactLabel(artifact.displayName || artifact.type, locale),
     );
-    return [...new Set(labels)].join(locale === "en-US" ? ", " : "、");
+    return [...new Set(labels)].join(", ");
   }
   if (issue.allowedFormats && issue.allowedFormats.length > 0) {
-    return issue.allowedFormats.join(locale === "en-US" ? ", " : "、");
+    return issue.allowedFormats.join(", ");
   }
-  return locale === "en-US" ? "temporarily unavailable" : "暂时无法获取";
+  return "temporarily unavailable";
 }
 
 export function resolveConversationShareWarningMessageId(

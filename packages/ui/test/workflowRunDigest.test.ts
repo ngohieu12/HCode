@@ -3,6 +3,7 @@
 // 轮尾摘要（docs/dynamic-workflow/presentation.md「The run card」）：两态、默认收起——收起是表头 +
 // 阶段线，展开是药丸落到站下；冷态只剩一行。交互（chevron、⤢、Resume、芯片、药丸）走真实 DOM。
 import { cleanup, fireEvent, render } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, Profiler, type ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { WorkflowRunState } from "@zcode/shared/zcode-protocol-v4";
@@ -48,7 +49,7 @@ import type { ConversationRowRenderContext } from "@/v4/conversationRowContext.j
 // eslint-disable-next-line import/first -- 同上；词条只用于双语言存在性断言。
 import enUS from "../src/i18n/locales/en-US.js";
 // eslint-disable-next-line import/first -- 同上。
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 afterEach(() => {
   cleanup();
@@ -141,12 +142,12 @@ function joined(
 
 function renderDigest(
   props: Partial<WorkflowRunDigestProps> & { summary: WorkflowRunCardSummary | undefined },
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowRunDigest, {
         graph: LOOP_GRAPH as unknown as WorkflowRunDigestProps["graph"],
         name: "implement-verify",
@@ -186,7 +187,7 @@ describe("WorkflowRunDigest 中性卡（summary 缺席）", () => {
   it("双语言词条在场", () => {
     expect(enUS["chat.toolCall.workflow.card.ended"]).toBe("Workflow ended");
     expect(zhCN["chat.toolCall.workflow.card.ended"]).toBe("工作流已结束");
-    const view = renderDigest({ summary: undefined }, "zh-CN");
+    const view = renderDigest({ summary: undefined }, "vi-VN");
     expect(view.getByTestId("workflow-card-kind").textContent).toBe("工作流已结束");
   });
 });
@@ -579,7 +580,7 @@ describe("WorkflowRunDigest 撞界提示", () => {
   });
 
   it("zh-CN 念「仅展示 2/1502 步的详情」", () => {
-    const view = renderDigest({ summary: truncated() }, "zh-CN");
+    const view = renderDigest({ summary: truncated() }, "vi-VN");
     expect(view.getByTestId("workflow-digest-truncated").textContent).toBe(
       "仅展示 2/1502 步的详情",
     );
@@ -627,7 +628,7 @@ describe("WorkflowRunDigest 文案", () => {
       expect(enUS[id as keyof typeof enUS]).toBeTruthy();
       expect(zhCN[id as keyof typeof zhCN]).toBeTruthy();
     }
-    const view = renderDigest({ summary: joined(), pendingQuestions: 1 }, "zh-CN");
+    const view = renderDigest({ summary: joined(), pendingQuestions: 1 }, "vi-VN");
     expect(view.getByTestId("workflow-card-kind").textContent).toBe("工作流运行中");
     expect(view.getByTestId("workflow-digest-questions").textContent).toBe("1 个待答问题");
     expect(view.queryByTestId("workflow-card-toggle")).toBeNull();
@@ -738,7 +739,7 @@ describe("WorkflowRunDigest Stop run", () => {
   });
 
   it("zh-CN：停止运行 / 正在停止…", () => {
-    const view = renderDigest({ summary: joined(), onCancel: vi.fn() }, "zh-CN");
+    const view = renderDigest({ summary: joined(), onCancel: vi.fn() }, "vi-VN");
     const cancel = view.getByTestId("workflow-digest-cancel");
     expect(cancel.getAttribute("aria-label")).toBe("停止运行");
     fireEvent.click(cancel);
@@ -762,7 +763,7 @@ describe("WorkflowRunDigest Stop run", () => {
   });
 
   it("zh-CN 的提示第二行同样在场", () => {
-    renderDigest({ summary: joined(), onCancel: vi.fn() }, "zh-CN");
+    renderDigest({ summary: joined(), onCancel: vi.fn() }, "vi-VN");
     expect(tooltips.calls.find((call) => call.title === "停止运行")?.description).toBe(
       "停止后可以随时恢复，已完成的步骤会保留。",
     );
@@ -793,7 +794,7 @@ describe("WorkflowRunDigest lineage", () => {
 
   it.each([
     ["en-US", "Workflow superseded"],
-    ["zh-CN", "工作流已被替代"],
+    ["vi-VN", "工作流已被替代"],
   ] as const)("被替代的 run：只换种类词，没有 Resume，也没有后继链接：%s", (locale, kind) => {
     const onResume = vi.fn();
     const view = renderDigest({ summary: superseded, onResume }, locale);

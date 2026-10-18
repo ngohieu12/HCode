@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { cleanup, render, screen } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { BUILTIN_MODEL_PROVIDER_IDS } from "@zcode/shared";
@@ -92,12 +93,12 @@ function buildContext(
 function renderCard(
   component: (context: ToolCallBlockRenderContext) => unknown,
   context: ToolCallBlockRenderContext,
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(component as never, context),
     ),
   );
@@ -265,7 +266,7 @@ describe("ListModelsToolCallBlock", () => {
   });
 
   it("renders both locales", () => {
-    renderCard(ListModelsToolCallBlock, buildContext(buildListModelsToolCall()), "zh-CN");
+    renderCard(ListModelsToolCallBlock, buildContext(buildListModelsToolCall()), "vi-VN");
     expect(screen.getByText("可用模型")).toBeTruthy();
     expect(screen.getByText("4 个模型")).toBeTruthy();
     expect(document.querySelector('[data-model-current="true"]')?.textContent).toBe("当前");
@@ -277,7 +278,7 @@ describe("ListModelsToolCallBlock", () => {
     renderCard(
       ListModelsToolCallBlock,
       buildContext(buildListModelsToolCall(), { isRunning: true }),
-      "zh-CN",
+      "vi-VN",
     );
     expect(screen.getByText("正在列出模型")).toBeTruthy();
   });

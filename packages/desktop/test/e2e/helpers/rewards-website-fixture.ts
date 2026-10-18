@@ -15,7 +15,8 @@ function sync() {
   const lang = bridge.getLang();
   if (lang) {
     const url = new URL(location.href);
-    url.pathname = '/' + (lang === 'zh-CN' ? 'cn' : 'en') + '/rewards';
+    // App 只提供 en-US / vi-VN，奖励站没有越南语入口，两者都落到英文页。
+    url.pathname = '/en/rewards';
     history.replaceState(null, '', url);
   }
 }

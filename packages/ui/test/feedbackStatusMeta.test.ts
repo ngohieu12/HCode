@@ -10,7 +10,7 @@ import {
   STATUS_USER_HINT,
 } from "@/feedback/feedbackUserView.js";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 function mockFormatMessage(
   descriptor: { id: string },
@@ -36,7 +36,7 @@ describe("feedback status metadata", () => {
 
     expect(STATUS_META[archivedStatus]?.className).toBeTruthy();
     expect(STATUS_META[archivedStatus]?.dot).toBeTruthy();
-    expect(STATUS_USER_HINT[archivedStatus]).toContain("关闭");
+    expect(STATUS_USER_HINT[archivedStatus]).toContain("closed");
     expect(FEEDBACK_STATUS_MESSAGE_IDS[archivedStatus]).toBe(
       "feedback.status.completed",
     );

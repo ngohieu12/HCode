@@ -159,7 +159,7 @@ export function createFakeApp(
     sessionId,
     setLocale: async (locale) => ({
       configPath: "/tmp/zcode/config.json",
-      locale: locale === "zh-CN" ? "zh-CN" : "en-US",
+      locale: locale === "en-US" ? "en-US" : "en-US",
       previousLocale: "en-US",
       requestedLocale: locale,
       traceId,

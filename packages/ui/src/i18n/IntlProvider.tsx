@@ -4,13 +4,11 @@ import type { Locale, LocalePreference } from "@zcode/shared";
 import { DEFAULT_LOCALE, resolveLocaleFromSystemLanguage } from "@zcode/shared";
 import type { BroadcastMessage, IBroadcastService, ISettingService } from "@zcode/services";
 import { readNavigatorLanguage, readSafeLocalStorage, writeSafeLocalStorage } from "@/lib/browserEnvironment.js";
-import zhCN from "./locales/zh-CN.js";
 import enUS from "./locales/en-US.js";
 import viVN from "./locales/vi-VN.js";
 
 /** 语言 → 翻译消息映射 */
 const MESSAGES: Record<Locale, Record<string, string>> = {
-  "zh-CN": zhCN,
   "en-US": enUS,
   // 越南语只翻译了一部分；缺失的键先用英文兜底，避免界面直接显示 message id 或中文。
   "vi-VN": { ...enUS, ...viVN },
@@ -30,7 +28,7 @@ interface LocaleBroadcastPayload {
 }
 
 function isLocale(value: unknown): value is Locale {
-  return value === "zh-CN" || value === "en-US";
+  return value === "en-US" || value === "vi-VN";
 }
 
 function isLocalePreference(value: unknown): value is LocalePreference {
@@ -104,9 +102,12 @@ export function shouldApplyLocaleBroadcastMessage(
   return true;
 }
 
-function createIntl(locale: Locale): IntlInstance {
+function createIntl(
+  locale: Locale,
+  messagesOverride?: Record<string, string>,
+): IntlInstance {
   // noUncheckedIndexedAccess：用 ?? 回退到默认语言的翻译
-  const messages = MESSAGES[locale] ?? MESSAGES[DEFAULT_LOCALE]!;
+  const messages = messagesOverride ?? MESSAGES[locale] ?? MESSAGES[DEFAULT_LOCALE]!;
   return {
     formatMessage({ id }, values) {
       let msg = messages[id] ?? id;
@@ -139,6 +140,7 @@ export function ZCodeIntlProvider({
   settingService,
   broadcastService,
   initialLocale,
+  messages,
   preferSettingServiceLocale = false,
   resolveSystemLocale: resolveHostSystemLocale,
 }: {
@@ -146,6 +148,8 @@ export function ZCodeIntlProvider({
   settingService?: ISettingService;
   broadcastService?: Pick<IBroadcastService, "send" | "onMessage">;
   initialLocale?: Locale;
+  /** 测试可注入固定文案表；生产环境始终使用内置的 en-US / vi-VN 目录。 */
+  messages?: Record<string, string>;
   preferSettingServiceLocale?: boolean;
   resolveSystemLocale?: () => Locale | Promise<Locale>;
 }) {
@@ -345,7 +349,7 @@ export function ZCodeIntlProvider({
     [setLocalePreference],
   );
 
-  const intl = useMemo(() => createIntl(locale), [locale]);
+  const intl = useMemo(() => createIntl(locale, messages), [locale, messages]);
 
   const value = useMemo<IntlContextValue>(
     () => ({ intl, locale, localePreference, setLocale, setLocalePreference }),

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import {
   createQuickPickCommands,
   QUICK_PICK_SECTION_ORDER,

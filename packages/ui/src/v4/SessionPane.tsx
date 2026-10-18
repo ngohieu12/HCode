@@ -4598,7 +4598,7 @@ export function SessionPane({
   const handleOpenImportedShareUrl = useCallback(() => {
     if (!shareHandoverContext || !onOpenBrowserUrl) return;
     // 持久化的是规范 /cn/share/ 路径；展示/打开时才按界面语言本地化。
-    onOpenBrowserUrl(localizeConversationShareUrl(shareHandoverContext.shareUrl, locale));
+    onOpenBrowserUrl(localizeConversationShareUrl(shareHandoverContext.shareUrl));
   }, [locale, onOpenBrowserUrl, shareHandoverContext]);
   const initialDraftConfigForDiagnostics = isDraft ? resolveInitialDraftConfig() : undefined;
   const telemetryDraftConfig = draftConfig;
@@ -4987,7 +4987,7 @@ export function SessionPane({
   const handleOpenPublishedShare = useCallback(() => {
     if (!publishedShareUrl || !onOpenBrowserUrl) return;
     // 服务端保存规范 /cn/share/ 路径；打开时再按当前界面语言切换落地页路径。
-    onOpenBrowserUrl(localizeConversationShareUrl(publishedShareUrl, locale));
+    onOpenBrowserUrl(localizeConversationShareUrl(publishedShareUrl));
   }, [locale, onOpenBrowserUrl, publishedShareUrl]);
 
   const handleCopyShareRequestId = useCallback(() => {

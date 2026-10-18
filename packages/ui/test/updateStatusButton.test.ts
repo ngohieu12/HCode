@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, isValidElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { UpdateStatusButton } from "@/UpdateStatusButton.js";
@@ -13,7 +14,7 @@ import {
   getLocalizedUpdateReleaseNotes,
 } from "@/updateReleaseNotes.js";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 import type { IntlInstance } from "@/i18n/IntlProvider.js";
 import { TooltipProvider } from "@/components/ui/tooltip.js";
@@ -57,7 +58,7 @@ function renderUpdateStatusButton(
           { platform: noopPlatform },
           createElement(
             ZCodeIntlProvider,
-            { initialLocale: "zh-CN" },
+            { initialLocale: "vi-VN", messages: zhCNLegacy },
             createElement(UpdateStatusButton, {
               platform: noopPlatform,
               version,
@@ -400,7 +401,7 @@ describe("UpdateStatusButton release notes", () => {
       title: "Release v3.1.3",
       markdown: "- 默认说明",
       releaseNotesByLocale: {
-        "zh-CN": {
+        "vi-VN": {
           title: "ZCode v3.1.3",
           markdown: "- 中文说明",
         },
@@ -415,7 +416,7 @@ describe("UpdateStatusButton release notes", () => {
       title: "ZCode v3.1.3",
       markdown: "- English notes",
     });
-    expect(getLocalizedUpdateReleaseNotes(payload, "zh-CN")).toEqual({
+    expect(getLocalizedUpdateReleaseNotes(payload, "vi-VN")).toEqual({
       title: "ZCode v3.1.3",
       markdown: "- 中文说明",
     });
@@ -451,7 +452,7 @@ describe("UpdateStatusButton release notes", () => {
             },
           },
         },
-        "zh-CN",
+        "vi-VN",
       ),
     ).toEqual({
       title: "Release v3.1.4",
@@ -463,7 +464,7 @@ describe("UpdateStatusButton release notes", () => {
     expect(formatUpdateReleaseDate("2026-06-23T13:48:54.438Z", "en-US")).toBe(
       "June 23, 2026",
     );
-    expect(formatUpdateReleaseDate("2026-06-23T13:48:54.438Z", "zh-CN")).toBe(
+    expect(formatUpdateReleaseDate("2026-06-23T13:48:54.438Z", "vi-VN")).toBe(
       "2026年6月23日",
     );
   });
@@ -477,7 +478,7 @@ describe("UpdateStatusButton release notes", () => {
   it("shows dialog release date as a plain date without suffix text", () => {
     const formattedDate = formatUpdateReleaseDate(
       "2026-06-23T13:48:54.438Z",
-      "zh-CN",
+      "vi-VN",
     );
 
     expect(zhCN["updateDialog.releaseDate"].replace("{date}", formattedDate!)).toBe(

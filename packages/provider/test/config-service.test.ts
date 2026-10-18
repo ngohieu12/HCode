@@ -824,7 +824,7 @@ describe("ProviderConfigService", () => {
   it("使用调用方提供的 Template 名称种子并在原子创建中去重", async () => {
     const template = new ProviderTemplate({
       templateId: "deepseek",
-      templateNameMap: { "zh-CN": "深度求索", "en-US": "DeepSeek" },
+      templateNameMap: { "vi-VN": "DeepSeek VN", "en-US": "DeepSeek" },
       config: createApiKeyProviderConfig({
         label: "DeepSeek",
         apiFormat: "anthropic-messages",
@@ -855,7 +855,7 @@ describe("ProviderConfigService", () => {
 
     const created = await service.createPersonalProvider({
       templateId: "deepseek",
-      locale: "zh-CN",
+      locale: "en-US",
     });
 
     expect(personal.current.providers.getRule(created.providerId)).toMatchObject({
@@ -874,7 +874,7 @@ describe("ProviderConfigService", () => {
   it("并发创建同一 Template 时仍生成唯一名称", async () => {
     const template = new ProviderTemplate({
       templateId: "deepseek",
-      templateNameMap: { "zh-CN": "深度求索", "en-US": "DeepSeek" },
+      templateNameMap: { "vi-VN": "DeepSeek VN", "en-US": "DeepSeek" },
       config: createApiKeyProviderConfig({
         label: "DeepSeek",
         apiFormat: "anthropic-messages",
@@ -892,8 +892,8 @@ describe("ProviderConfigService", () => {
     });
 
     await Promise.all([
-      service.createPersonalProvider({ templateId: "deepseek", locale: "zh-CN" }),
-      service.createPersonalProvider({ templateId: "deepseek", locale: "zh-CN" }),
+      service.createPersonalProvider({ templateId: "deepseek", locale: "en-US" }),
+      service.createPersonalProvider({ templateId: "deepseek", locale: "en-US" }),
     ]);
 
     expect(

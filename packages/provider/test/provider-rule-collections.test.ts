@@ -21,7 +21,7 @@ describe("Todo104 Provider 规则身份与内容分离", () => {
       templateRules: [
         {
           templateId: "template",
-          templateNameMap: { "zh-CN": "模板", "en-US": "Template" },
+          templateNameMap: { "vi-VN": "Mẫu", "en-US": "Template" },
           config: { builtinModelIds: ["m"] },
         },
       ],
@@ -31,11 +31,11 @@ describe("Todo104 Provider 规则身份与内容分离", () => {
     expect(parsed.providerTemplates.toJSON()).toEqual(source.templateRules);
     expect(parsed.providers.get("account:test")?.toJSON()).toEqual({ group: "zai-family" });
     const template = parsed.providerTemplates.get("template")!;
-    expect(resolveProviderTemplateName("template", template, "zh-CN")).toBe("模板");
+    expect(resolveProviderTemplateName("template", template, "en-US")).toBe("模板");
     expect(
-      resolveProviderTemplateName("template", { templateNameMap: { "en-US": "English" } }, "zh-CN"),
+      resolveProviderTemplateName("template", { templateNameMap: { "en-US": "English" } }, "en-US"),
     ).toBe("English");
-    expect(resolveProviderTemplateName("template", { templateNameMap: {} }, "zh-CN")).toBe(
+    expect(resolveProviderTemplateName("template", { templateNameMap: {} }, "en-US")).toBe(
       "template",
     );
   });

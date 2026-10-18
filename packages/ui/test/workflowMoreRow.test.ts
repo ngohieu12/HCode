@@ -4,6 +4,7 @@
 // 第六枚药丸——三张脸一叠、`还有 n 个`、藏着失败时一枚 `✕ n`、↗ 常驻；一扇门不是状态。侧板上同一具身体
 // 是门（追记「一扇门与一卷名单」）：尾槽换下箭头、关着带其余人的计数行、开着计数行走人。
 import { cleanup, fireEvent, render } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { StepRunStatus } from "@/components/workflow-graph/types.js";
@@ -39,12 +40,12 @@ const pills = (statuses: readonly StepRunStatus[]) =>
 
 function renderRow(
   props: Parameters<typeof WorkflowMoreRow>[0],
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowMoreRow, props),
     ),
   );
@@ -117,7 +118,7 @@ describe("WorkflowMoreRow", () => {
 
   it("zh-CN：「还有 n 个」与整句 title", () => {
     const more = rosterMore(stationRoster(pills(STATUSES), { pins: 5 })!);
-    const view = renderRow({ more, onOpen: vi.fn() }, "zh-CN");
+    const view = renderRow({ more, onOpen: vi.fn() }, "vi-VN");
     const row = view.getByTestId("workflow-roster-more-row");
     expect(row.textContent).toBe("还有 4 个");
     expect(row.getAttribute("title")).toBe("还有 4 个子代理 · 在运行侧栏里列出全部");
@@ -187,7 +188,7 @@ describe("WorkflowMoreRow", () => {
         more: rosterMore(roster),
         onOpen: vi.fn(),
       },
-      "zh-CN",
+      "vi-VN",
     );
     expect(zh.getByTestId("workflow-roster-more-row").getAttribute("title")).toBe(
       "还有 4 个子代理 · 在这里列出",
@@ -199,7 +200,7 @@ describe("WorkflowMoreRow", () => {
         more: rosterMore(roster),
         onOpen: vi.fn(),
       },
-      "zh-CN",
+      "vi-VN",
     );
     expect(zhOpen.getByTestId("workflow-roster-more-row").getAttribute("title")).toBe(
       "还有 4 个子代理 · 收起",

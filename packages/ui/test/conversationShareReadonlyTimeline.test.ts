@@ -101,14 +101,14 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows,
-        locale: "zh-CN",
+        locale: "vi-VN",
       }),
     );
     expect(html).toContain('data-v4-user-input-bubble="true"');
     expect(html).toContain("rounded-tr-xs");
     expect(html).toContain("这是");
     expect(html).toContain('data-conversation-share-turn="turn-1"');
-    expect(html).toContain("搜索");
+    expect(html).toContain("Search");
     expect(html).toContain("tool-summary");
     expect(html).not.toContain("<details");
     expect(html).not.toContain("canEdit");
@@ -169,13 +169,13 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: historyRows,
-        locale: "zh-CN",
+        locale: "vi-VN",
       }),
     );
     expect(html.indexOf('data-v4-user-input-bubble="true"')).toBeLessThan(
       html.indexOf('data-conversation-share-history-trigger="true"'),
     );
-    expect(html).toContain("已工作 2 分 45 秒");
+    expect(html).toContain("Worked for 2m 45s");
   });
 
   it("renders headings and tables through the Desktop MessageResponse pipeline", () => {
@@ -206,7 +206,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: markdownRows,
-        locale: "zh-CN",
+        locale: "vi-VN",
       }),
     );
     expect(html).toContain('data-streamdown="heading-1"');
@@ -255,12 +255,12 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: executeRows,
-        locale: "zh-CN",
+        locale: "vi-VN",
       }),
     );
 
     expect(html).toContain('data-conversation-share-work-group="executeGroup"');
-    expect(html).toContain("执行");
+    expect(html).toContain("Execute");
     expect(html).toContain("lucide-square-terminal");
   });
 
@@ -277,7 +277,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: searchRows,
-        locale: "zh-CN",
+        locale: "vi-VN",
       }),
     );
 
@@ -315,11 +315,11 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: markerRows as never,
-        locale: "zh-CN",
+        locale: "vi-VN",
       }),
     );
 
-    expect(html).toContain("上下文已压缩");
+    expect(html).toContain("Context compacted");
     expect(html).not.toContain(">compact<");
     // 识别不了的类型整行不渲染，而不是退化成打印枚举名。
     expect(html).not.toContain("goalVerify");
@@ -350,7 +350,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: artifactRows as never,
-        locale: "zh-CN",
+        locale: "vi-VN",
         artifactUrls: new Map([["artifact-1", "https://example.invalid/a.pdf"]]),
       }),
     );
@@ -365,7 +365,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     expect(html).toContain("flex size-11 shrink-0 items-center justify-center rounded-md");
     expect(html).toContain("pdf.svg");
     // 副标题复用正文同一套词汇，并且不再直接印裸字节数。
-    expect(html).toContain("文档 · PDF");
+    expect(html).toContain("Document · PDF");
     expect(html).toContain("169 KB");
     expect(html).not.toContain("172974 bytes");
     // 动作按钮与 OpenSplitButton 同一视觉，不再是蓝色文字链；语义锁定用结构性标记，
@@ -399,7 +399,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: artifactRows as never,
-        locale: "zh-CN",
+        locale: "vi-VN",
         workspacePath: "/workspace",
         artifactWorkspaceRelativePaths: new Map([
           ["artifact-1", ".zcode-share/share-1/shared-artifacts/晨报.pdf"],
@@ -437,7 +437,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: artifactRows as never,
-        locale: "zh-CN",
+        locale: "vi-VN",
         workspacePath: "/workspace",
         artifactWorkspaceRelativePaths: new Map([
           ["artifact-1", ".zcode-share/share-1/shared-artifacts/晨报.pdf"],
@@ -477,7 +477,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: artifactRows as never,
-        locale: "zh-CN",
+        locale: "vi-VN",
         workspacePath: "/workspace",
         artifactWorkspaceRelativePaths: new Map([["artifact-1", "../secret.pdf"]]),
         onOpenCodeViewer: () => undefined,
@@ -502,7 +502,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: artifactRows as never,
-        locale: "zh-CN",
+        locale: "vi-VN",
         workspacePath: "/workspace",
         artifactWorkspaceRelativePaths: new Map([
           ["artifact-1", "/etc/passwd"],
@@ -533,7 +533,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: artifactRows as never,
-        locale: "zh-CN",
+        locale: "vi-VN",
         workspacePath: "/workspace",
         artifactWorkspaceRelativePaths: new Map([
           // 嵌套子目录：5 段。
@@ -558,7 +558,7 @@ describe("ConversationShareReadonlyTimeline", () => {
   });
 
   it.each([
-    ["zh-CN", "下载文件"],
+    ["vi-VN", "Download file"],
     ["en-US", "Download file"],
   ])("artifactUrls 与本地路径同时存在时 url 必须胜出（%s）", (locale, label) => {
     // 公开页隐私边界的关键前提：ArtifactPresentation 只在 !url 时解析本地路径；
@@ -580,7 +580,6 @@ describe("ConversationShareReadonlyTimeline", () => {
 
     // 资源 URL 实际下载文件，按钮文案必须对应下载，且注入的本地打开动作完全未挂载。
     expect(html).toContain(label);
-    expect(html).not.toContain("预览文件");
     expect(html).not.toContain("Preview file");
     expect(html).toContain('data-share-preview-button="true"');
     expect(html).not.toContain('data-open-split-button="true"');
@@ -631,7 +630,7 @@ describe("ConversationShareReadonlyTimeline", () => {
     const html = renderToStaticMarkup(
       createElement(ConversationShareReadonlyTimeline, {
         rows: remoteImageRows as never,
-        locale: "zh-CN",
+        locale: "vi-VN",
       }),
     );
 

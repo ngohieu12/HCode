@@ -100,12 +100,10 @@ export const completeProviderConfigDataSchema = providerConfigDataSchema.extend(
   api: completeProviderApiDataSchema,
 });
 
-export const providerTemplateNameMapDataSchema = z
-  .object({
-    "zh-CN": z.string().min(1).optional(),
-    "en-US": z.string().min(1).optional(),
-  })
-  .strict();
+export const providerTemplateNameMapDataSchema = z.object({
+  "en-US": z.string().min(1).optional(),
+  "vi-VN": z.string().min(1).optional(),
+});
 export const providerTemplateDataSchema = z
   .object({
     templateId: z.string().min(1),

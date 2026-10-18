@@ -1,4 +1,5 @@
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type {
@@ -369,7 +370,7 @@ function renderTurnWithContext(
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(ConversationTurnGroup, {
         unit,
         context,
@@ -385,7 +386,7 @@ function renderTurnWithCodeComments(
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(
         AssistantCodeCommentFeatureProvider,
         { enabled: true },
@@ -707,7 +708,7 @@ describe("SessionPane assistant preview card handler wiring", () => {
     renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(SessionPane, {
           paneId: "workspace-main",
           sessionId: "session-1",

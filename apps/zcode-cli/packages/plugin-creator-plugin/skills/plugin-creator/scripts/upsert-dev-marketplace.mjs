@@ -30,8 +30,8 @@ export async function upsertDevMarketplace({
   pluginPath,
   marketplacePath,
   displayName,
-  nameZh,
-  descriptionZh,
+  nameEn,
+  descriptionEn,
 }) {
   await rejectSymlink(resolve(pluginPath));
   const pluginRoot = await realpath(pluginPath);
@@ -74,9 +74,9 @@ export async function upsertDevMarketplace({
     const entry = market.plugins.find((item) => item.name === name);
     Object.assign(entry, { version: manifest.version, description: manifest.description ?? "" });
     entry.displayName = displayName ?? entry.displayName ?? name;
-    if (nameZh) entry.displayName_i18n = { ...entry.displayName_i18n, "zh-CN": nameZh };
-    if (descriptionZh)
-      entry.description_i18n = { ...entry.description_i18n, "zh-CN": descriptionZh };
+    if (nameEn) entry.displayName_i18n = { ...entry.displayName_i18n, "en-US": nameEn };
+    if (descriptionEn)
+      entry.description_i18n = { ...entry.description_i18n, "en-US": descriptionEn };
     const changed = JSON.stringify(previous) !== JSON.stringify(market);
     if (changed) await atomicJson(path, market);
     return {
@@ -97,20 +97,20 @@ async function main() {
     options: {
       "marketplace-path": { type: "string" },
       "display-name": { type: "string" },
-      "name-zh": { type: "string" },
-      "description-zh": { type: "string" },
+      "name-en": { type: "string" },
+      "description-en": { type: "string" },
     },
   });
   if (positionals.length !== 1)
     throw new Error(
-      "Usage: node upsert-dev-marketplace.mjs <plugin-path> [--marketplace-path file] [--display-name name] [--name-zh name] [--description-zh text]",
+      "Usage: node upsert-dev-marketplace.mjs <plugin-path> [--marketplace-path file] [--display-name name] [--name-en name] [--description-en text]",
     );
   const result = await upsertDevMarketplace({
     pluginPath: positionals[0],
     marketplacePath: values["marketplace-path"],
     displayName: values["display-name"],
-    nameZh: values["name-zh"],
-    descriptionZh: values["description-zh"],
+    nameEn: values["name-en"],
+    descriptionEn: values["description-en"],
   });
   console.log(JSON.stringify(result, null, 2));
 }

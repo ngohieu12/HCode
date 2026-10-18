@@ -21,7 +21,7 @@ import {
   shouldToggleRemoteSkillSyncCardSelection,
 } from "../src/settings/RemoteSkillSyncDialog.js";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 const controlHintTooltipMockState = vi.hoisted(() => ({
   latest: null as null | {
@@ -33,7 +33,7 @@ const controlHintTooltipMockState = vi.hoisted(() => ({
 }));
 
 const remoteSkillSyncIntlMockState = vi.hoisted(() => ({
-  locale: "en-US" as "en-US" | "zh-CN",
+  locale: "en-US" as "en-US" | "vi-VN",
 }));
 
 vi.mock("@/ControlHintTooltip.js", () => ({
@@ -123,7 +123,7 @@ vi.mock("@/i18n/IntlProvider.js", () => ({
             "settings.skills.remoteSync.selectionCount": `${values?.selected ?? 0}/${values?.total ?? 0} selected`,
             "settings.skills.remoteSync.noSelection": "Select at least one missing skill.",
             "settings.skills.remoteSync.sizeLimit.selectedContent":
-              locale === "zh-CN"
+              locale === "vi-VN"
                 ? "同步失败：所选 Skills 的内容总大小约为 {actualSize}，超过单次同步上限 {maxSize}。请取消选择部分 Skills 后重试；远端未写入任何内容。"
                 : "Sync failed: the selected Skills contain about {actualSize} of content, exceeding the {maxSize} per-sync limit. Deselect some Skills and try again. Nothing was written to the remote host.",
           };
@@ -364,7 +364,7 @@ describe("RemoteSkillSyncDialog", () => {
     };
 
     const view = render(createElement(RemoteSkillSyncDialog, props));
-    remoteSkillSyncIntlMockState.locale = "zh-CN";
+    remoteSkillSyncIntlMockState.locale = "vi-VN";
     view.rerender(createElement(RemoteSkillSyncDialog, props));
     rejectFirstLoad(sizeLimitError);
 

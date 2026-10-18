@@ -32,25 +32,25 @@ describe("taskTimelineGroups", () => {
 
   it("优先按相对日、周、月生成 timeline 分组", () => {
     expect(
-      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 21, 9, 0), now, "zh-CN"),
+      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 21, 9, 0), now, "vi-VN"),
     ).toEqual({ kind: "today" });
     expect(
-      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 20, 23, 59), now, "zh-CN"),
+      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 20, 23, 59), now, "vi-VN"),
     ).toEqual({ kind: "yesterday" });
     expect(
-      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 18, 8, 0), now, "zh-CN"),
+      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 18, 8, 0), now, "vi-VN"),
     ).toEqual({ kind: "daysAgo", daysAgo: 3 });
     expect(
-      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 17, 8, 0), now, "zh-CN"),
+      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 17, 8, 0), now, "vi-VN"),
     ).toEqual({ kind: "lastWeek" });
     expect(
-      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 1, 8, 0), now, "zh-CN"),
+      resolveTaskTimelineGroupKey(localTimestamp(2026, 5, 1, 8, 0), now, "vi-VN"),
     ).toEqual({ kind: "thisMonth" });
     expect(
-      resolveTaskTimelineGroupKey(localTimestamp(2026, 4, 30, 8, 0), now, "zh-CN"),
+      resolveTaskTimelineGroupKey(localTimestamp(2026, 4, 30, 8, 0), now, "vi-VN"),
     ).toEqual({ kind: "lastMonth" });
     expect(
-      resolveTaskTimelineGroupKey(localTimestamp(2026, 3, 31, 8, 0), now, "zh-CN"),
+      resolveTaskTimelineGroupKey(localTimestamp(2026, 3, 31, 8, 0), now, "vi-VN"),
     ).toEqual({ kind: "older" });
   });
 
@@ -65,14 +65,14 @@ describe("taskTimelineGroups", () => {
       groupTaskTimelineItems([task], {
         sortBy: "updated",
         now,
-        locale: "zh-CN",
+        locale: "vi-VN",
       })[0]?.key,
     ).toBe("today");
     expect(
       groupTaskTimelineItems([task], {
         sortBy: "created",
         now,
-        locale: "zh-CN",
+        locale: "vi-VN",
       })[0]?.key,
     ).toBe("lastMonth");
   });

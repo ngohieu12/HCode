@@ -3,6 +3,7 @@
 // 确认窗的留白行与「2 个阶段 · 2 处留白」、侧栏迷你轨道的虚线灯与「{name} · 等待补全」、
 // 已接进 run 的补全行摘要。静态渲染（renderToStaticMarkup），交互不在此。
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { WorkflowRunState } from "@zcode/shared/zcode-protocol-v4";
@@ -53,8 +54,14 @@ const H1 = "hole#a0000001"; // 决定分组
 const H2 = "hole#a0000002"; // 评判
 const H11 = "hole#a0000011"; // 挑选（在 H1 的体里）
 
-function html(node: ReactNode, locale: "zh-CN" | "en-US" = "zh-CN"): string {
-  return renderToStaticMarkup(createElement(ZCodeIntlProvider, { initialLocale: locale }, node));
+function html(node: ReactNode, locale: "vi-VN" | "en-US" = "vi-VN"): string {
+  return renderToStaticMarkup(
+    createElement(
+      ZCodeIntlProvider,
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
+      node,
+    ),
+  );
 }
 
 const OPEN: WorkflowCausalityGraphData = {

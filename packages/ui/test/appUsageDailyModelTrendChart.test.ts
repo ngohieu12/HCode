@@ -230,10 +230,6 @@ describe("AppUsageDailyModelTrendChart view model", () => {
   });
 
   it("tooltip 的每个模型值使用紧凑 Token 单位", () => {
-    expect(resolveDailyModelTooltipTokenParts("zh-CN", 419_884_094, "tokens")).toEqual({
-      number: "4.2亿",
-      unit: "tokens",
-    });
     expect(resolveDailyModelTooltipTokenParts("en-US", 419_884_094, "tokens")).toEqual({
       number: "419.9M",
       unit: "tokens",

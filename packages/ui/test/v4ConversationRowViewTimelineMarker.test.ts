@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { act, createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -25,11 +26,11 @@ function currentContext(): ConversationRowRenderContext {
   return { ...context, modelSelectionView: modelSelectionMock.view };
 }
 
-function renderMarker(row: TimelineMarkerRow, locale: "en-US" | "zh-CN" = "zh-CN"): string {
+function renderMarker(row: TimelineMarkerRow, locale: "en-US" | "vi-VN" = "vi-VN"): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(ConversationRowView, { context: currentContext(), row }),
     ),
   );
@@ -226,7 +227,7 @@ describe("ConversationRowView timeline marker contract", () => {
     const view = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationRowView, { context: currentContext(), row }),
       ),
     );
@@ -242,7 +243,7 @@ describe("ConversationRowView timeline marker contract", () => {
       view.rerender(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, { context: currentContext(), row: { ...row } }),
         ),
       );

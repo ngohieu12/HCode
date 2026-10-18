@@ -213,7 +213,7 @@ export function createZCodeStore(
       set({ theme: normalizedTheme });
     },
 
-    locale: readSafeLocalStorage("zcode-locale") || "zh-CN",
+    locale: readSafeLocalStorage("zcode-locale") || "vi-VN",
     setLocale: (locale: string) => {
       writeSafeLocalStorage("zcode-locale", locale);
       set({ locale });

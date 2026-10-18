@@ -4,7 +4,7 @@
 import { describe, expect, it } from "vitest";
 import type { WorkflowRunNode, WorkflowRunState } from "@zcode/shared/zcode-protocol-v4";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import { workflowRunEventLines } from "@/app-shell/workflowRunPanel.js";
 import {
   throttleReasonLabel,

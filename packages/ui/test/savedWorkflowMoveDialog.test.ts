@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // 「移到项目」窗（docs/dynamic-workflow/launch.md「Move to project」）：项目选择器 + 提交，空候选禁用。
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import {
@@ -42,7 +43,7 @@ function mount(props: Partial<Parameters<typeof SavedWorkflowMoveDialog>[0]> = {
   render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(SavedWorkflowMoveDialog, merged),
     ),
   );

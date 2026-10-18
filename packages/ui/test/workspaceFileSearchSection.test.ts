@@ -1,4 +1,5 @@
 import type { IFileService } from "@zcode/services";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import type { IServiceAccessor } from "@/hooks/useServices.js";
 import { readFileSync } from "node:fs";
 import { createElement } from "react";
@@ -19,7 +20,7 @@ function renderSection(props: { workspacePath?: string | null }): string {
       { services: emptyAccessor },
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(WorkspaceFileSearchSection, props),
       ),
     ),

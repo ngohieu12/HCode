@@ -1,4 +1,5 @@
 import { act, createElement, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ConversationSnapshot } from "@zcode/shared/zcode-protocol-v4";
@@ -509,7 +510,7 @@ function renderPane(root: Root, sessionId: string | null): void {
     root.render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(SessionPane, {
           paneId: "workspace-main",
           sessionId,
@@ -765,7 +766,7 @@ describe("SessionPane composer continuity", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: null,
@@ -787,7 +788,7 @@ describe("SessionPane composer continuity", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: null,

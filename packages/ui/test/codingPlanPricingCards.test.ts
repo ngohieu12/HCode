@@ -25,9 +25,9 @@ afterEach(() => {
 describe("CodingPlanProductCards", () => {
   it("formats coding plan prices by locale and currency", () => {
     expect(formatCodingPlanAmount(48.6, "USD", "en-US")).toBe("US$48.60");
-    expect(formatCodingPlanAmount(48.6, "USD", "zh-CN")).toBe("$48.60 美元");
+    expect(formatCodingPlanAmount(48.6, "USD", "vi-VN")).toBe("$48.60 美元");
     expect(formatCodingPlanAmount(132.3, "CNY", "en-US")).toBe("CN¥132.30");
-    expect(formatCodingPlanAmount(132.3, "CNY", "zh-CN")).toBe("¥132.30 人民币");
+    expect(formatCodingPlanAmount(132.3, "CNY", "vi-VN")).toBe("¥132.30 人民币");
   });
 
   it("maps unrenderable payment errors to system busy guidance", () => {

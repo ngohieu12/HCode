@@ -4,6 +4,7 @@
 // `packages/*/test/**/*.test.ts`（vitest.config.ts:68），`.test.tsx` 一个用例都不会被采集
 // （仓库里已有几个这样的死文件）。所以这里和其余 renderer 测试一样用 createElement，不写 JSX。
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getZCodeToolFamilyForName, normalizeZCodeToolName } from "@zcode/shared";
@@ -29,7 +30,7 @@ import { ToolCallBlock } from "@/ToolCallBlocks.js";
 // eslint-disable-next-line import/first -- 同上；词条只用于双语言存在性断言。
 import enUS from "../src/i18n/locales/en-US.js";
 // eslint-disable-next-line import/first -- 同上。
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 interface ToolCallOverrides {
   input?: unknown;
@@ -92,12 +93,12 @@ function buildContext(toolCall: ToolCallOverrides, contextOverrides: ContextOver
 function renderBlock(
   toolCall: ToolCallOverrides,
   contextOverrides: ContextOverrides = {},
-  locale: "en-US" | "zh-CN" = "zh-CN",
+  locale: "en-US" | "vi-VN" = "vi-VN",
 ): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(SubmitResultToolCallBlock, buildContext(toolCall, contextOverrides)),
     ),
   );
@@ -134,7 +135,7 @@ describe("submit_result 路由", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {

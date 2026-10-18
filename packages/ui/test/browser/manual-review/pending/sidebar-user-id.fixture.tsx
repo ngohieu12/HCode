@@ -6,10 +6,10 @@ import "@/styles.css";
 
 const params = new URLSearchParams(location.search);
 const theme = params.get("theme") === "dark" ? "dark" : "light";
-const locale = params.get("locale") === "en-US" ? "en-US" : "zh-CN";
+const locale = "en-US";
 document.documentElement.className = `theme-zai-${theme}`;
 createRoot(document.getElementById("root")!).render(
-  <ZCodeIntlProvider initialLocale={locale}>
+  <ZCodeIntlProvider initialLocale="en-US">
     <TooltipProvider>
       <div className="flex h-screen w-64 max-w-full flex-col justify-end bg-sidebar">
         <WorkspaceSidebarFooter

@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { AppUsageHeatmapCell, AppUsageHeatmapWeek } from "@zcode/shared";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import { UsageHeatmap } from "@/settings/usage-stats/UsageHeatmap.js";
 
 vi.mock("@/ControlHintTooltip.js", () => ({

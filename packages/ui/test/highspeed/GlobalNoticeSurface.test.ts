@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { createElement } from "react";
+import zhCNLegacy from "../fixtures/zhCNLegacy.js";
 import { act, cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
@@ -69,7 +70,7 @@ describe("GlobalNoticeSurface", () => {
     const { container } = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(GlobalNoticeSurface, { store }),
       ),
     );

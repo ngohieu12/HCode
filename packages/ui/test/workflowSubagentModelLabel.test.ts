@@ -10,7 +10,7 @@ import {
   workflowSubagentModelTooltip,
 } from "@/components/workflow-timeline/subagent-model-label.js";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 /** 与 IntlProvider 同形的极简 formatMessage：查表 + `{key}` 替换。 */
 function formatter(messages: Record<string, string>) {

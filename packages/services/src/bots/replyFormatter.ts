@@ -50,22 +50,6 @@ const DIFF_ADDED_MARKER = "🟢";
 const DIFF_REMOVED_MARKER = "🔴";
 
 const formatterMessages = {
-  "zh-CN": {
-    toolCalls: "工具调用：",
-    completed: "完成",
-    failed: "失败",
-    denied: "已拒绝",
-    inProgress: "⏳ 运行中",
-    pending: "等待中",
-    permissionRequired: "需要权限：",
-    editWriting: "写入中",
-    editUpdating: "更新中",
-    editDeleting: "删除中",
-    editEditing: "编辑中",
-    changeSummary: "变更摘要",
-    moreToolCalls: "还有 {count} 个工具调用",
-    moreFiles: "还有 {count} 个文件",
-  },
   "en-US": {
     toolCalls: "Tool calls:",
     completed: "Completed",
@@ -84,7 +68,7 @@ const formatterMessages = {
   },
 } as const;
 
-function t(locale: Locale | undefined, key: keyof (typeof formatterMessages)["zh-CN"]): string {
+function t(locale: Locale | undefined, key: keyof (typeof formatterMessages)["en-US"]): string {
   return formatterMessages[normalizeBotMessageLocale(locale)][key];
 }
 
@@ -349,9 +333,7 @@ function formatBotChangeSummary(
     return "";
   }
   const lines = [
-    options?.locale === "en-US"
-      ? `${t(options.locale, "changeSummary")}: ${changeSummary.fileCount} files, ${formatBotDiffCount(changeSummary)}`
-      : `${t(options?.locale, "changeSummary")}：${changeSummary.fileCount} 个文件，${formatBotDiffCount(changeSummary)}`,
+    `${t(options?.locale, "changeSummary")}: ${changeSummary.fileCount} files, ${formatBotDiffCount(changeSummary)}`,
   ];
   for (const file of changeSummary.files.slice(0, MAX_TOOL_SUMMARY_ITEMS)) {
     lines.push(`- ${formatMarkdownInlineCode(file.path)} (${formatBotDiffCount(file)})`);

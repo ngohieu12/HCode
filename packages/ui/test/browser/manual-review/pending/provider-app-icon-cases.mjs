@@ -4,10 +4,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 
 export function registerProviderAppIconCases(getContext) {
-  for (const [width, locale, theme] of [
-    [390, "zh-CN", "light"],
-    [1200, "en-US", "dark"],
-  ]) {
+  for (const [width, locale, theme] of [[1200, "en-US", "dark"]]) {
     test(`zai app icon ${width}/${locale}/${theme}`, async () => {
       const { browser, origin, artifacts } = getContext();
       await mkdir(artifacts, { recursive: true });

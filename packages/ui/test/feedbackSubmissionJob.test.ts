@@ -256,7 +256,7 @@ describe("feedback submission job", () => {
     expect(feedbackService.uploadAttachmentData).toHaveBeenCalledTimes(1);
     expect(feedbackService.uploadAttachmentWithProgress).toHaveBeenCalledTimes(1);
     expect(feedbackService.cleanupPreparedLogArchive).toHaveBeenCalledWith("/tmp/logs.zip");
-    expect(seen.some((progress) => progress.label === "正在连接反馈服务")).toBe(true);
+    expect(seen.some((progress) => progress.label === "Connecting to the feedback service")).toBe(true);
     expect(job.getState()).toMatchObject({
       status: "success",
       ticketId: "ticket-1",
@@ -603,15 +603,15 @@ describe("feedback submission job", () => {
 
     await job.cancelSubmission();
 
-    await expect(job.done).rejects.toThrow("反馈提交已取消");
+    await expect(job.done).rejects.toThrow("Feedback submission cancelled");
     expect(feedbackService.cancelCreate).toHaveBeenCalledWith(createOperationId);
     expect(feedbackService.uploadAttachmentData).not.toHaveBeenCalled();
     expect(feedbackService.prepareCompactLogArchive).not.toHaveBeenCalled();
     expect(job.getState()).toMatchObject({
       status: "error",
-      error: "反馈提交已取消",
+      error: "Feedback submission cancelled",
       progress: {
-        label: "反馈提交已取消",
+        label: "Feedback submission cancelled",
       },
     });
   });
@@ -658,15 +658,15 @@ describe("feedback submission job", () => {
     await job.cancelSubmission();
     resolveCreate?.();
 
-    await expect(job.done).rejects.toThrow("反馈提交已取消");
+    await expect(job.done).rejects.toThrow("Feedback submission cancelled");
     expect(feedbackService.cancelCreate).toHaveBeenCalledWith(createOperationId);
     expect(feedbackService.uploadAttachmentData).not.toHaveBeenCalled();
     expect(feedbackService.prepareCompactLogArchive).not.toHaveBeenCalled();
     expect(job.getState()).toMatchObject({
       status: "error",
-      error: "反馈提交已取消",
+      error: "Feedback submission cancelled",
       progress: {
-        label: "反馈提交已取消",
+        label: "Feedback submission cancelled",
       },
     });
   });
@@ -712,12 +712,12 @@ describe("feedback submission job", () => {
     expect(job.getState()).toMatchObject({
       status: "running",
       progress: {
-        label: "正在连接反馈服务",
+        label: "Connecting to the feedback service",
       },
     });
 
     resolveCreate?.();
-    await expect(job.done).rejects.toThrow("反馈提交已取消");
+    await expect(job.done).rejects.toThrow("Feedback submission cancelled");
     dismissFeedbackSubmissionJob(job.id);
   });
 });

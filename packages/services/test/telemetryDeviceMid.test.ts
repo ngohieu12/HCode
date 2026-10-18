@@ -70,7 +70,7 @@ describe("ensureTelemetryDeviceMid", () => {
       ensureTelemetryDeviceMid({ homeDir: dataBaseDir }),
     ]);
     await core.reportAppLaunch({
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       clientTimezone: "Asia/Shanghai",
       screenResolution: "1x1",
     });

@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { BotGroupMemberNamesContext } from "@/v4/BotGroupMemberNamesContext.js";
@@ -6,13 +7,13 @@ import { BotGroupSourceLabel } from "@/v4/BotGroupSourceLabel.js";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 
 describe("group input attribution", () => {
-  it.each(["zh-CN", "en-US"] as const)(
+  it.each(["vi-VN", "en-US"] as const)(
     "renders provider and stable sender in %s without exposing routing ids",
     (locale) => {
       const html = renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: locale },
+          { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
           createElement(BotGroupSourceLabel, {
             source: {
               botId: "secret-bot-id",
@@ -26,7 +27,7 @@ describe("group input attribution", () => {
         ),
       );
       expect(html).toContain("ou_member");
-      expect(html).toContain(locale === "zh-CN" ? "飞书" : "Feishu");
+      expect(html).toContain(locale === "vi-VN" ? "飞书" : "Feishu");
       expect(html).not.toContain("secret-chat-id");
       expect(html).not.toContain("secret-bot-id");
     },
@@ -37,7 +38,7 @@ it("shows a short fallback instead of the raw ID as visible label", () => {
   const html = renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(BotGroupSourceLabel, {
         source: {
           provider: "feishu",

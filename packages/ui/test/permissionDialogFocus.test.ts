@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ZCodePermissionRequest } from "@zcode/shared";
@@ -114,7 +115,7 @@ describe("PermissionDialog focus", () => {
     const view = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(PermissionDialog, {
           request: {
             ...request,
@@ -289,7 +290,7 @@ describe("PermissionDialog focus", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(PermissionDialog, {
           request: {
             type: "permission_request",
@@ -339,7 +340,7 @@ describe("PermissionDialog focus", () => {
     const renderDialog = (interactionId: string) =>
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(V4InteractionDialogs, {
           sessionId: "task-focus",
           workspacePath: "/tmp/workspace",

@@ -154,7 +154,7 @@ describe("Coding Plan upgrade E2E mock server", () => {
       `${server.baseUrl}/api/v1/marketing/touch?seq=0`,
       {
         headers: {
-          "X-Client-Language": "zh-CN",
+          "X-Client-Language": "en-US",
           "X-ZCode-App-Version": "fixture",
           Authorization: "Bearer must-not-be-recorded",
         },
@@ -170,7 +170,7 @@ describe("Coding Plan upgrade E2E mock server", () => {
         path: "/api/v1/marketing/touch",
         seq: "0",
         headers: expect.objectContaining({
-          language: "zh-CN",
+          language: "en-US",
           appVersion: "fixture",
           authenticated: true,
         }),

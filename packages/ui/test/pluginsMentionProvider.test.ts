@@ -45,10 +45,10 @@ describe("plugins mention provider mapping", () => {
   it("按界面语言显示描述，缺翻译回退默认描述，旧 Host 留空", () => {
     const plugin = entry({
       description: "Default description",
-      descriptionI18n: { "zh-CN": "处理文档", "en-US": "Work with documents" },
+      descriptionI18n: { "vi-VN": "处理文档", "en-US": "Work with documents" },
     });
     for (const [locale, description] of [
-      ["zh-CN", "处理文档"],
+      ["vi-VN", "处理文档"],
       ["zh-TW", "处理文档"],
       ["en-US", "Work with documents"],
       ["fr-FR", "Default description"],
@@ -87,11 +87,11 @@ describe("plugins mention provider mapping", () => {
       [
         entry({
           displayName: "Demo Plugin",
-          displayNameI18n: { "zh-CN": "演示插件" },
+          displayNameI18n: { "vi-VN": "演示插件" },
         }),
       ],
       LABELS,
-      "zh-CN",
+      "vi-VN",
     );
     expect(items[0]?.displayLabel).toBe("演示插件");
     // Bugfix：chip 节点复用 item.label、消息气泡按 markdown label 重建，二者必须同源；
@@ -105,7 +105,7 @@ describe("plugins mention provider mapping", () => {
       [
         entry({
           displayName: "Demo Plugin",
-          displayNameI18n: { "zh-CN": "演示插件" },
+          displayNameI18n: { "vi-VN": "演示插件" },
         }),
       ],
       LABELS,
@@ -286,7 +286,7 @@ it("市场和 Picker 的官方子集同序，查询同分保序且匹配度优�
     const picker = mapPluginCatalogToMentionItemsForTest(
       catalog,
       { conflictReason: "conflict" },
-      "zh-CN",
+      "vi-VN",
       order,
     );
     const store = catalog.map(
@@ -302,7 +302,7 @@ it("市场和 Picker 的官方子集同序，查询同分保序且匹配度优�
         }) satisfies StorePluginItem,
     );
     expect(picker.map((x) => x.value)).toEqual(
-      groupItemsByCategory(store, "zh-CN", order).flatMap((x) => x.items.map((y) => y.id)),
+      groupItemsByCategory(store, "vi-VN", order).flatMap((x) => x.items.map((y) => y.id)),
     );
     const sameScoreItems = picker.map((item) => ({
       ...item,

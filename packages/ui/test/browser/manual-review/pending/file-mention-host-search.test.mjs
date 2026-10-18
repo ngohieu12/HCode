@@ -98,10 +98,7 @@ after(async () => {
   if (workspace) await rm(workspace, { recursive: true, force: true });
 });
 
-for (const [width, locale, theme] of [
-  [1200, "en-US", "light"],
-  [390, "zh-CN", "dark"],
-]) {
+for (const [width, locale, theme] of [[1200, "en-US", "light"]]) {
   test(`MFH01 真实 Host 查询与 @ 选择 ${width}/${locale}/${theme}`, async () => {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     const errors = [];

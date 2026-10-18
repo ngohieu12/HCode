@@ -1,7 +1,6 @@
 {
   "remote": {
     "community_urls": {
-      "zh-CN": "https://example.com/E2E_HELP_ZH",
       "en-US": "https://example.com/E2E_HELP_EN"
     },
     "feedback_url": "https://example.com/E2E_HELP_FEEDBACK",
@@ -9,7 +8,6 @@
   },
   "local": {
     "community_urls": {
-      "zh-CN": "https://example.com/E2E_LOCAL_ZH",
       "en-US": "https://example.com/E2E_LOCAL_EN"
     },
     "feedback_url": "https://example.com/E2E_LOCAL_FEEDBACK",

@@ -66,7 +66,7 @@ for (const source of ["root", "recent", "default", "empty", "delayed"])
       const getConfig = async () => JSON.parse(await page.getByTestId("config").textContent());
       try {
         await page.goto(
-          `${origin}fixture?source=${source}&locale=${width === 390 ? "zh-CN" : "en-US"}&theme=${width === 390 ? "light" : "dark"}`,
+          `${origin}fixture?source=${source}&locale=${width === 390 ? "en-US" : "en-US"}&theme=${width === 390 ? "light" : "dark"}`,
         );
         await page.getByRole("button", { name: "Import", exact: true }).click();
         assert.equal(await page.getByTestId("content").textContent(), "IMPORTED CONTENT");

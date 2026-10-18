@@ -6,10 +6,7 @@ import { registerProviderAppIconCases } from "./provider-app-icon-cases.mjs";
 
 export function registerProviderPresentationCases(getEnvironment) {
   registerProviderAppIconCases(getEnvironment);
-  for (const [width, locale, theme] of [
-    [390, "zh-CN", "light"],
-    [1200, "en-US", "dark"],
-  ]) {
+  for (const [width, locale, theme] of [[1200, "en-US", "dark"]]) {
     test(`openrouter template label ${width}/${locale}`, async () => {
       const { browser, origin, artifacts } = getEnvironment();
       const page = await browser.newPage({ viewport: { width, height: 1000 } });
@@ -40,15 +37,12 @@ export function registerProviderPresentationCases(getEnvironment) {
         await page.goto(
           `${origin}fixture?${new URLSearchParams({ locale, theme, access: "account", selectionError: "1" })}`,
         );
-        await page
-          .getByTestId("subagent-error")
-          .getByText(locale === "zh-CN" ? "执行失败" : "Failed", { exact: true })
-          .hover();
+        await page.getByTestId("subagent-error").getByText("Failed", { exact: true }).hover();
         const detail = page
           .locator('[data-slot="tooltip-content"]')
           .filter({ hasText: "reasoning-level-missing" });
         await detail.waitFor();
-        assert.match(await detail.innerText(), /未选择思考档位/);
+        assert.match(await detail.innerText(), /No reasoning level selected/);
         // Radix 还生成一份 aria 隐藏描述，点击实际展示的复制按钮。
         await detail.locator('button:not([role="tooltip"] button)').click();
         const copied = await page.evaluate(() => navigator.clipboard.readText());
@@ -62,10 +56,7 @@ export function registerProviderPresentationCases(getEnvironment) {
       }
     });
   }
-  for (const [width, locale, theme] of [
-    [390, "zh-CN", "light"],
-    [1200, "en-US", "dark"],
-  ]) {
+  for (const [width, locale, theme] of [[1200, "en-US", "dark"]]) {
     test(`coding plan vision badge in settings and picker ${width}/${theme}`, async () => {
       const { browser, origin, artifacts } = getEnvironment();
       const page = await browser.newPage({ viewport: { width, height: 1100 } });
@@ -74,7 +65,7 @@ export function registerProviderPresentationCases(getEnvironment) {
           await page.goto(
             `${origin}fixture?${new URLSearchParams({ locale, theme, access, vision: "1" })}`,
           );
-          const label = locale === "zh-CN" ? "视觉" : "Vision";
+          const label = "Vision";
           const detail = page.getByTestId("detail");
           await detail.getByText("GLM-5.3", { exact: true }).waitFor();
           const main = detail.getByText("GLM-5.3", { exact: true }).locator("..");

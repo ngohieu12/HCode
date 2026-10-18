@@ -3,7 +3,7 @@ import { createHelpAppConfigReader, resolveHelpAppConfig } from "../src/helpAppC
 
 const envelope = (feedbackUrl: unknown) => ({ code: 0, data: { configs: { feedbackUrl } } });
 const local = {
-  community_urls: { "zh-CN": "https://local.cn", "en-US": "https://local.en" },
+  community_urls: { "en-US": "https://local.example" },
   feedback_url: "https://local.feedback",
   feedback_use_external_form: true,
 };
@@ -12,11 +12,14 @@ describe("help app config", () => {
   it("按字段和语言回退，远端 false 覆盖本地 true", () => {
     expect(
       resolveHelpAppConfig(
-        { community_urls: { "zh-CN": "https://remote.cn" }, feedback_use_external_form: false },
+        {
+          community_urls: { "en-US": "https://remote.example" },
+          feedback_use_external_form: false,
+        },
         local,
       ),
     ).toEqual({
-      community_urls: { "zh-CN": "https://remote.cn", "en-US": "https://local.en" },
+      community_urls: { "en-US": "https://remote.example" },
       feedback_url: "https://local.feedback",
       feedback_use_external_form: false,
     });

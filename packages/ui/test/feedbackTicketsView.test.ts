@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
@@ -29,11 +30,11 @@ function createFeedbackService(): IFeedbackService {
   } as unknown as IFeedbackService;
 }
 
-function renderTicketsView(locale: "zh-CN" | "en-US") {
+function renderTicketsView(locale: "vi-VN" | "en-US") {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(TicketsView, {
         feedbackService: createFeedbackService(),
         onCreateNew: vi.fn(),
@@ -83,7 +84,7 @@ describe("TicketsView", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(TicketsInitialLoadingState),
       ),
     );

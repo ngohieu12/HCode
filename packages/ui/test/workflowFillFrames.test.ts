@@ -3,6 +3,7 @@
 // 「Filled without phases」「The pane」）：几何是纯函数，钉数；点亮只认头——卡上的头与笔标、侧板的标题行
 // 与笔标——站与药丸不点亮任何东西；一次只亮一个；侧板不缩进。
 import { cleanup, fireEvent, render, within } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import type { WorkflowRunState } from "@zcode/shared/zcode-protocol-v4";
@@ -105,7 +106,9 @@ function run(filledAt = 1): WorkflowRunState {
 }
 
 function wrap(node: ReturnType<typeof createElement>) {
-  return render(createElement(ZCodeIntlProvider, { initialLocale: "zh-CN" }, node));
+  return render(
+    createElement(ZCodeIntlProvider, { initialLocale: "vi-VN", messages: zhCNLegacy }, node),
+  );
 }
 
 afterEach(cleanup);

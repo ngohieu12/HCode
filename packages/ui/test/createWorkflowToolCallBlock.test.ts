@@ -2,6 +2,7 @@
 
 // 启动前 ToolLayout 与旧宿主运行卡的渲染回归；v4 run 摘要另由 workflowToolSummary 测试覆盖。
 import { act, cleanup, fireEvent, render, within } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -64,7 +65,7 @@ import { PlatformProvider } from "@/hooks/usePlatform.js";
 // eslint-disable-next-line import/first -- 同上；词条只用于双语言存在性断言。
 import enUS from "../src/i18n/locales/en-US.js";
 // eslint-disable-next-line import/first -- 同上。
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 type ToolCallOverrides = {
   /** 工具名（kind / title 同值）；缺省 CreateWorkflow，修订行传 AmendWorkflow。 */
@@ -101,11 +102,11 @@ type ContextOverrides = {
 function createBlock(
   toolCall: ToolCallOverrides,
   contextOverrides: ContextOverrides = {},
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   return createElement(
     ZCodeIntlProvider,
-    { initialLocale: locale },
+    { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
     createElement(CreateWorkflowToolCallBlock, {
       toolCallNode: {
         toolCall: {
@@ -157,7 +158,7 @@ function createBlock(
 function renderBlock(
   toolCall: ToolCallOverrides,
   contextOverrides: ContextOverrides = {},
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ): string {
   return renderToStaticMarkup(createBlock(toolCall, contextOverrides, locale));
 }
@@ -165,7 +166,7 @@ function renderBlock(
 function renderBlockDom(
   toolCall: ToolCallOverrides,
   contextOverrides: ContextOverrides = {},
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   return render(createBlock(toolCall, contextOverrides, locale));
 }
@@ -621,7 +622,7 @@ describe("CreateWorkflowToolCallBlock 编译反馈", () => {
     const view = renderBlockDom(
       FEEDBACK_CALL,
       { workflowDraft: { ordinal: 1, superseded: false }, forceOpen: true },
-      "zh-CN",
+      "vi-VN",
     );
     expect(view.container.querySelector(".tool-summary-kind-label")?.textContent).toBe(
       "工作流草稿",
@@ -770,7 +771,7 @@ describe("CreateWorkflowToolCallBlock 启动前 ToolLayout", () => {
     expect(view.queryByTestId("workflow-timeline-station")).toBeNull();
   });
 
-  it.each(["en-US", "zh-CN"] as const)("等待确认可展开脚本、再次收起：%s", (locale) => {
+  it.each(["en-US", "vi-VN"] as const)("等待确认可展开脚本、再次收起：%s", (locale) => {
     const view = renderBlockDom(
       {
         ...LOOP_TOOL_CALL,
@@ -1039,7 +1040,7 @@ describe("CreateWorkflowToolCallBlock 运行态", () => {
   });
 
   it("zh-CN 下卡面全部本地化", () => {
-    const view = renderBlockDom(LOOP_TOOL_CALL, { workflowRun: joined() }, "zh-CN");
+    const view = renderBlockDom(LOOP_TOOL_CALL, { workflowRun: joined() }, "vi-VN");
     const card = view.getByTestId("workflow-card");
     expect(view.getByTestId("workflow-card-kind").textContent).toBe("工作流运行中");
     expect(view.getByTestId("workflow-card-status").textContent).toBe("运行中");
@@ -1392,7 +1393,7 @@ describe("CreateWorkflowToolCallBlock kind 文案分相", () => {
     const writing = renderBlock(
       { input: IN_FLIGHT_INPUT, raw: { v4Status: "inputStreaming" }, status: "running" },
       { isRunning: true },
-      "zh-CN",
+      "vi-VN",
     );
     expect(writing).toContain("正在编写工作流");
     expect(writing).not.toContain("正在校验工作流");
@@ -1400,14 +1401,14 @@ describe("CreateWorkflowToolCallBlock kind 文案分相", () => {
     const awaiting = renderBlock(
       { input: IN_FLIGHT_INPUT, raw: { v4Status: "pendingApproval" }, status: "running" },
       { isRunning: true },
-      "zh-CN",
+      "vi-VN",
     );
     expect(awaiting).toContain("工作流待确认");
 
     const validating = renderBlock(
       { input: IN_FLIGHT_INPUT, raw: { v4Status: "running" }, status: "running" },
       { isRunning: true },
-      "zh-CN",
+      "vi-VN",
     );
     expect(validating).toContain("正在校验工作流");
   });
@@ -1459,7 +1460,7 @@ describe("CreateWorkflowToolCallBlock kind 文案分相", () => {
     const view = renderBlockDom(
       { input: IN_FLIGHT_INPUT, raw: { v4Status: "inputStreaming" }, status: "running" },
       { isRunning: true, workflowDraft: { ordinal: 2, superseded: false } },
-      "zh-CN",
+      "vi-VN",
     );
     expect(view.container.textContent).toContain("正在修改工作流");
     expect(view.getByTestId("workflow-draft-ordinal").textContent).toBe("第 2 稿");
@@ -1718,7 +1719,7 @@ describe("CreateWorkflowToolCallBlock 名册站", () => {
     const view = renderBlockDom(
       fanoutToolCall(60),
       { workflowRun: fanoutRun(60, () => "done") },
-      "zh-CN",
+      "vi-VN",
     );
     const row = view.getByTestId("workflow-roster-more-row");
     expect(row.textContent).toBe("还有 55 个");
@@ -1735,7 +1736,7 @@ describe("CreateWorkflowToolCallBlock as AmendWorkflow", () => {
 
   it.each([
     ["en-US", "Amending workflow"],
-    ["zh-CN", "正在调整工作流"],
+    ["vi-VN", "正在调整工作流"],
   ] as const)("writing: %s", (locale, word) => {
     const view = renderBlockDom(
       {
@@ -1755,7 +1756,7 @@ describe("CreateWorkflowToolCallBlock as AmendWorkflow", () => {
 
   it.each([
     ["en-US", "Awaiting amendment confirmation"],
-    ["zh-CN", "等待调整确认"],
+    ["vi-VN", "等待调整确认"],
   ] as const)("awaiting confirmation: %s", (locale, word) => {
     const view = renderBlockDom(
       {
@@ -1773,7 +1774,7 @@ describe("CreateWorkflowToolCallBlock as AmendWorkflow", () => {
 
   it.each([
     ["en-US", "Workflow amendment", "Amends run"],
-    ["zh-CN", "工作流调整", "调整 run"],
+    ["vi-VN", "工作流调整", "调整 run"],
   ] as const)("static card: kind word and the lineage row: %s", (locale, word, amends) => {
     const view = renderBlockDom(
       {
@@ -1832,7 +1833,7 @@ describe("CreateWorkflowToolCallBlock as AmendWorkflow", () => {
 
   it.each([
     ["en-US", "Amends run", "script unchanged"],
-    ["zh-CN", "调整 run", "脚本不变"],
+    ["vi-VN", "调整 run", "脚本不变"],
   ] as const)("static card of an amend that kept the script: %s", (locale, amends, unchanged) => {
     const view = renderBlockDom(
       { kind: "AmendWorkflow", input: SETTINGS_ONLY_INPUT, raw: LOOP_TOOL_CALL.raw },

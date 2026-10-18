@@ -10,7 +10,7 @@ export function registerOffPeakEligibilityCases(getContext) {
     try {
       for (const family of ["bigmodel", "zai"]) {
         for (const gate of ["", "&inactive=1", "&noPlan=1", "&grayOff=1"]) {
-          await page.goto(`${origin}fixture?teamEntry=1&family=${family}&locale=zh-CN${gate}`);
+          await page.goto(`${origin}fixture?teamEntry=1&family=${family}&locale=en-US${gate}`);
           await page.waitForFunction(
             () => document.querySelector('[data-testid="team-loaded"]')?.textContent === "true",
           );
@@ -50,7 +50,7 @@ export function registerOffPeakEligibilityCases(getContext) {
         status,
       );
     try {
-      await page.goto(`${origin}fixture?offpeak=1&locale=zh-CN&theme=dark`);
+      await page.goto(`${origin}fixture?offpeak=1&locale=en-US&theme=dark`);
       await settled("idle");
       assert.equal(await page.getByTestId("create-automation").isDisabled(), true);
       assert.equal(calls.length, 1, "two entries share initialization");

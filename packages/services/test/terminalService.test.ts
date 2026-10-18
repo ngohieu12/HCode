@@ -75,7 +75,7 @@ function createTestTerminalService(settings = {}) {
     settingService: {
       get: vi.fn().mockResolvedValue({
         recentProjects: [],
-        locale: "zh-CN",
+        locale: "en-US",
         terminalInheritSystemProfile: true,
         lastWorkspaceSession: [],
         lastActiveTabIndex: 0,

@@ -107,7 +107,7 @@ describe("botsService config", () => {
       actor,
     });
 
-    expect(replies[0]?.text).toContain("绑定成功");
+    expect(replies[0]?.text).toContain("Bound successfully");
     expect((await repo.readConfig()).bots[0]).toMatchObject({
       id: "webhook-1",
       providerUserId: "user-1",
@@ -417,7 +417,7 @@ describe("botsService config", () => {
     ]);
     const getRemote = vi.fn(async () => remote);
     const settingService = f.createSettingService({
-      locale: "zh-CN",
+      locale: "en-US",
       lastWorkspaceSession: [{ kind: "local", workspacePath: "/tmp/workspace" }],
     });
     const service = f.createBotsService({
@@ -442,7 +442,7 @@ describe("botsService config", () => {
       const original = state.bots[contextKey]!;
       vi.mocked(settingService.get).mockImplementation(
         f.createSettingService({
-          locale: "zh-CN",
+          locale: "en-US",
           lastWorkspaceSession: [
             {
               kind: "remote",
@@ -470,7 +470,7 @@ describe("botsService config", () => {
         workspacePath: "/tmp/workspace",
         workspaceIdentity: "ssh://other/tmp/workspace",
       });
-      expect(unavailable[0]?.text).toContain("未找到模型供应商");
+      expect(unavailable[0]?.text).toContain("Model provider not found");
       expect(unavailable[0]?.selection).toBeUndefined();
       expect((await repo.readState()).bots[contextKey]?.draftOptions).toEqual(
         before.bots[contextKey]?.draftOptions,
@@ -510,7 +510,7 @@ describe("botsService config", () => {
       actor,
     });
 
-    expect(replies[0]?.text).toContain("未找到模型供应商");
+    expect(replies[0]?.text).toContain("Model provider not found");
     expect(replies[0]?.text).not.toContain("Cached Provider");
     service.disposeAll();
   });

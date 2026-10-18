@@ -3,6 +3,7 @@
 // 其下按已打开项目分组。两个组都换成桩——桩把 props.onStateChange 回报由可控 map 驱动、暴露按钮，
 // 只看页层的组顺序、当前标记、总数（含全局）、空态（只看项目组）、spinner、刷新广播、详情态与深链。
 import { createElement, useEffect, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -211,7 +212,7 @@ function mount(props: Partial<Parameters<typeof SavedWorkflowsSection>[0]> = {})
   const utils = render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(SavedWorkflowsSection, {
         workspacePath: tabStoreState.activeWorkspacePath,
         onNavigateToLaunchedRun,

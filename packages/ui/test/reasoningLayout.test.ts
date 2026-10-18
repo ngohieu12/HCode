@@ -1,4 +1,5 @@
 import type { IBroadcastService, IServiceAccessor } from "@zcode/services";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import type { IPlatformService } from "@zcode/shared";
 import { PlatformProvider } from "@/hooks/usePlatform.js";
 import { ServiceProvider } from "@/hooks/useServices.js";
@@ -62,12 +63,12 @@ function renderReasoningContent(
   content: string,
   reasoningProps: Partial<ComponentProps<typeof Reasoning>> = {},
   contentProps: Partial<ComponentProps<typeof ReasoningContent>> = {},
-  locale: "zh-CN" | "en-US" = "zh-CN",
+  locale: "vi-VN" | "en-US" = "vi-VN",
 ) {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(
         ServiceProvider,
         { services: mockServices },

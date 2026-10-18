@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import type { IPlatformService } from "@zcode/shared";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -24,7 +25,7 @@ function renderPanel() {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(
         PlatformProvider,
         { platform },

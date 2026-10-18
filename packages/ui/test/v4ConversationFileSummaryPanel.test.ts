@@ -1,4 +1,5 @@
 import { act, createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -103,7 +104,7 @@ function renderPanel(contextOverrides: Partial<ConversationRowRenderContext> = {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(ConversationFileSummaryPanel, {
         header: header(),
         context,
@@ -258,7 +259,7 @@ describe("ConversationFileSummaryPanel", () => {
         root.render(
           createElement(
             ZCodeIntlProvider,
-            { initialLocale: "zh-CN" },
+            { initialLocale: "vi-VN", messages: zhCNLegacy },
             createElement(ConversationFileSummaryPanel, {
               header: header({
                 fileChanges: { files: 2, additions: 77, deletions: 3, state: "active" },
@@ -296,7 +297,7 @@ describe("ConversationFileSummaryPanel", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationFileSummaryPanel, {
             header: header(),
             assistantText: `::visualize${JSON.stringify({ path })}`,
@@ -339,7 +340,7 @@ describe("ConversationFileSummaryPanel", () => {
     const render = (rowId: number) =>
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationFileSummaryPanel, {
           header: header({ rowId, entityId: `header-${rowId}` }),
           context,
@@ -377,7 +378,7 @@ describe("ConversationFileSummaryPanel", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationFileSummaryPanel, {
             header: header(),
             assistantText: `::visualize${JSON.stringify({ path })}`,
@@ -446,7 +447,7 @@ describe("ConversationFileSummaryPanel", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationFileSummaryPanel, {
             header: header(),
             context,
@@ -532,7 +533,7 @@ describe("ConversationFileSummaryPanel", () => {
     const renderPanelForState = (state: TurnHeaderRow["state"]) =>
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationFileSummaryPanel, {
           header: header({ state }),
           context,
@@ -595,7 +596,7 @@ describe("ConversationFileSummaryPanel", () => {
     const renderPanelForFileState = (state: "active" | "reverted") =>
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationFileSummaryPanel, {
           header: header({
             fileChanges: {

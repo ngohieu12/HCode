@@ -284,7 +284,6 @@ describe("coding plan embedded webview bridge", () => {
     const script = createCodingPlanAuthInjectionScript({
       provider: "zai",
       theme: "zai-dark",
-      locale: "en-US",
       credentials: {
         zaiAccessToken: "zai-business-token",
         zcodeJwtToken: "zcode-jwt",
@@ -319,7 +318,6 @@ describe("coding plan embedded webview bridge", () => {
     const script = createCodingPlanAuthInjectionScript({
       provider: "bigmodel",
       theme: "zai-light",
-      locale: "zh-CN",
       credentials: {
         bigmodelAccessToken: "bigmodel-business-token",
         zcodeJwtToken: "zcode-jwt",
@@ -538,9 +536,8 @@ describe("coding plan embedded webview bridge", () => {
     expect(source).toContain("return value as CodingPlanReportContext");
   });
 
-  it("exposes webview i18n keys in both locales", () => {
+  it("exposes webview i18n keys in English", () => {
     const enUs = readFileSync(resolve("packages/ui/src/i18n/locales/en-US.ts"), "utf8");
-    const zhCn = readFileSync(resolve("packages/ui/src/i18n/locales/zh-CN.ts"), "utf8");
 
     const keys = [
       "settings.modelProvider.codingPlan.webview.title",
@@ -551,7 +548,6 @@ describe("coding plan embedded webview bridge", () => {
     ];
     for (const key of keys) {
       expect(enUs).toContain(`"${key}":`);
-      expect(zhCn).toContain(`"${key}":`);
     }
   });
 
