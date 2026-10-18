@@ -14,7 +14,6 @@ import type {
 import type { ICredentialService } from "../src/credential/credential.js";
 import { FeedbackHttpClient } from "../src/feedback/feedbackHttpClient.js";
 import { createFeedbackService } from "../src/feedback/feedbackService.js";
-import type { IOAuthService } from "../src/oauth/oauth.js";
 import { setDataBaseDir } from "../src/paths.js";
 import type { ServiceLogger } from "../src/logger/serviceLogger.js";
 import { createNodeApiClient } from "#src/providers/api/nodeApiClient.js";
@@ -68,21 +67,6 @@ function makeCredentialService(
     save: vi.fn(async () => {}),
     delete: vi.fn(async () => {}),
   };
-}
-
-function makeOAuthService(): IOAuthService {
-  return {
-    getProviders: vi.fn(async () => []),
-    getActiveProvider: vi.fn(async () => null),
-    restoreCachedSession: vi.fn(async () => null),
-    restoreSession: vi.fn(async () => null),
-    startOAuth: vi.fn(),
-    handleCallback: vi.fn(),
-    refreshToken: vi.fn(),
-    logout: vi.fn(),
-    logoutAll: vi.fn(),
-    cancelPending: vi.fn(),
-  } as unknown as IOAuthService;
 }
 
 function makeFetchApiClient(): ApiClient {
@@ -903,23 +887,23 @@ describe("createFeedbackService", () => {
       // Bugfix: feedback 默认 base 已收敛到统一 ZCode endpoint resolver；
       // ZCODE_ENV=test 不能继续断言生产域，否则会掩盖测试环境请求边界。
       expect(String(url)).toBe("https://zcode.z.ai/api/v1/feedback/ticket");
-      return new Response(JSON.stringify({ code: 0, msg: "ok", data: { items: [] } }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ code: 0, msg: "ok", data: { ticket_id: "fbk_env_test" } }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     });
     vi.stubGlobal("fetch", fetchMock);
 
     const service = createFeedbackService({
       apiClient: makeFetchApiClient(),
-      credentialService: makeCredentialService((key) => {
-        if (key === "zcodejwttoken") return "shared-backend-jwt";
-        return null;
-      }),
-      oauthService: makeOAuthService(),
+      getDeviceMid: () => "desktop-device-mid-env-test",
     });
 
-    await service.list({ mine: true });
+    // list 只读本地票据存储，不发请求；默认 base 只能经 create 验证。
+    await service.create({ title: "env base", description: "desc", type: "bug" });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -930,23 +914,22 @@ describe("createFeedbackService", () => {
     vi.stubEnv("ZCODE_ENDPOINT_ORIGIN", "");
     const fetchMock = vi.fn(async (url: string | URL | Request) => {
       expect(String(url)).toBe("https://zcode.z.ai/api/v1/feedback/ticket");
-      return new Response(JSON.stringify({ code: 0, msg: "ok", data: { items: [] } }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ code: 0, msg: "ok", data: { ticket_id: "fbk_env_prod" } }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     });
     vi.stubGlobal("fetch", fetchMock);
 
     const service = createFeedbackService({
       apiClient: makeFetchApiClient(),
-      credentialService: makeCredentialService((key) => {
-        if (key === "zcodejwttoken") return "shared-backend-jwt";
-        return null;
-      }),
-      oauthService: makeOAuthService(),
+      getDeviceMid: () => "desktop-device-mid-env-prod",
     });
 
-    await service.list({ mine: true });
+    await service.create({ title: "env base", description: "desc", type: "bug" });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -955,23 +938,22 @@ describe("createFeedbackService", () => {
     vi.stubEnv("ZCODE_FEEDBACK_API_BASE", "https://feedback-override.example.com/api/v1");
     const fetchMock = vi.fn(async (url: string | URL | Request) => {
       expect(String(url)).toBe("https://feedback-override.example.com/api/v1/feedback/ticket");
-      return new Response(JSON.stringify({ code: 0, msg: "ok", data: { items: [] } }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ code: 0, msg: "ok", data: { ticket_id: "fbk_override" } }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     });
     vi.stubGlobal("fetch", fetchMock);
 
     const service = createFeedbackService({
       apiClient: makeFetchApiClient(),
-      credentialService: makeCredentialService((key) => {
-        if (key === "zcodejwttoken") return "shared-backend-jwt";
-        return null;
-      }),
-      oauthService: makeOAuthService(),
+      getDeviceMid: () => "desktop-device-mid-override",
     });
 
-    await service.list({ mine: true });
+    await service.create({ title: "override base", description: "desc", type: "bug" });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -1018,7 +1000,6 @@ describe("createFeedbackService", () => {
         apiBaseUrl: "https://zcode.z.ai/api/v1",
         getDeviceMid: () => hostDeviceMid,
         credentialService,
-        oauthService: makeOAuthService(),
       });
 
       await service.create({ title: "匿名反馈", description: "desc", type: "bug" });
@@ -1041,32 +1022,21 @@ describe("createFeedbackService", () => {
     }
   });
 
-  it("uses Bearer JWT for logged-in server lists", async () => {
+  it("reads tickets from the local store only: no server list, no Bearer JWT", async () => {
     const tempDir = await mkdtemp(join(tmpdir(), "feedback-service-"));
     setDataBaseDir(tempDir);
-    const updatedAt = epochSeconds(2026, 6, 25, 13);
-    const fetchMock = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+    const createdAt = epochSeconds(2026, 6, 25, 13);
+    const fetchMock = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
       const headers = init?.headers as Record<string, string>;
-      expect(String(url)).toBe("https://zcode.z.ai/api/v1/feedback/ticket");
-      expect(headers.Authorization).toBe("Bearer shared-backend-jwt");
+      // 本地票据不再回读服务端列表：没有登录态就没有 Bearer，也没有 X-Feedback-Client-Id。
+      expect(headers.Authorization).toBeUndefined();
       expect(headers["X-Device-Mid"]).toBe("desktop-device-mid-222");
       expect(headers["X-Feedback-Client-Id"]).toBeUndefined();
       return new Response(
         JSON.stringify({
           code: 0,
           msg: "ok",
-          data: {
-            items: [
-              {
-                ticket_id: "fbk_login",
-                device_mid: "desktop-device-mid-222",
-                title: "登录反馈",
-                status: "closed",
-                created_at: updatedAt,
-                updated_at: updatedAt,
-              },
-            ],
-          },
+          data: { ticket_id: "fbk_local", created_at: createdAt },
         }),
         { status: 200, headers: { "Content-Type": "application/json" } },
       );
@@ -1078,23 +1048,18 @@ describe("createFeedbackService", () => {
         apiClient: makeFetchApiClient(),
         apiBaseUrl: "https://zcode.z.ai/api/v1",
         getDeviceMid: () => "desktop-device-mid-222",
-        credentialService: makeCredentialService((key) => {
-          if (key === "zcodejwttoken") return "shared-backend-jwt";
-          return null;
-        }),
-        oauthService: makeOAuthService(),
       });
 
-      await expect(service.list({ mine: true })).resolves.toEqual({
-        total: 1,
-        items: [
-          expect.objectContaining({
-            id: "fbk_login",
-            title: "登录反馈",
-            status: "已归档",
-          }),
-        ],
-      });
+      // list 不发请求：空库返回空列表。
+      await expect(service.list({ mine: true })).resolves.toEqual({ items: [], total: 0 });
+      expect(fetchMock).not.toHaveBeenCalled();
+
+      await service.create({ title: "本地反馈", description: "desc", type: "bug" });
+      const list = await service.list({ mine: true });
+      expect(list.total).toBe(1);
+      expect(list.items[0]?.title).toBe("本地反馈");
+      // 列表来自本地存储，不因服务端返回内容变化。
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     } finally {
       await rm(tempDir, { recursive: true, force: true });
     }
@@ -1124,7 +1089,6 @@ describe("createFeedbackService", () => {
       apiBaseUrl: "https://zcode.z.ai/api/v1",
       getDeviceMid: () => "desktop-device-mid-cancel",
       credentialService: makeCredentialService(),
-      oauthService: makeOAuthService(),
     });
 
     const createPromise = service.create(

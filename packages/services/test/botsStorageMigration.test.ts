@@ -19,14 +19,16 @@ async function migrate(options: unknown) {
   return botsStateFileSchema.parse(importLegacyBotState(raw)).bots.bot?.draftOptions;
 }
 describe("Bot 一次性旧身份转换", () => {
-  it("官方 GLM 旧选择规范大小写，自定义同名模型不改", async () => {
+  it("旧选择原样搬入 v3：内置供应商已下线，不再改写 ID 或规范模型名大小写", async () => {
+    // Bug 根因：内置供应商体系下线后 builtin:* 已无迁移落点，改写只会把用户明确的选择
+    // 换成一个不存在的供应商；保留原值让用户下次手动重选，比静默换供应商安全。
     for (const providerId of ["builtin:zai-start-plan", "personal-proxy"]) {
       expect(
         (await migrate({ model: `${providerId}/glm-5.3-flash`, thoughtLevel: "high" }))
           ?.modelSelection,
       ).toEqual({
-        providerId: providerId === "personal-proxy" ? providerId : "account:zai-start-plan",
-        modelId: providerId === "personal-proxy" ? "glm-5.3-flash" : "GLM-5.3-Flash",
+        providerId,
+        modelId: "glm-5.3-flash",
         options: { reasoningLevel: "high" },
       });
     }
@@ -38,8 +40,8 @@ describe("Bot 一次性旧身份转换", () => {
       options: { reasoningLevel: "high" },
     });
   });
-  it.each(["model", "builtin:zapi/model"])("不按模型名猜供应商 %s", async (model) => {
-    expect((await migrate({ model }))?.modelSelection).toBeUndefined();
+  it("裸模型名没有供应商身份，不猜 Agent Provider", async () => {
+    expect((await migrate({ model: "model" }))?.modelSelection).toBeUndefined();
   });
   it.each(["missing/model", "custom:missing:model", "glm/model"])(
     "候选没有 %s 也保留明确身份",
@@ -66,10 +68,10 @@ describe("Bot 一次性旧身份转换", () => {
         ?.modelSelection,
     ).toBeUndefined();
   });
-  it("旧 Coding Plan 固定迁为 Individual，当前连接和候选均不参与", async () => {
+  it("旧 Coding Plan 身份不再改写为 account:*，旧列与新列都原样保留", async () => {
     const options = { model: "builtin:bigmodel-coding-plan/GLM", thoughtLevel: "high" };
     expect((await migrate(options))?.modelSelection?.providerId).toBe(
-      "account:bigmodel-individual-coding-plan",
+      "builtin:bigmodel-coding-plan",
     );
     expect(
       (
@@ -77,6 +79,6 @@ describe("Bot 一次性旧身份转换", () => {
           modelSelection: { providerId: "builtin:bigmodel-coding-plan", modelId: "GLM" },
         })
       )?.modelSelection?.providerId,
-    ).toBe("account:bigmodel-individual-coding-plan");
+    ).toBe("builtin:bigmodel-coding-plan");
   });
 });

@@ -1,39 +1,44 @@
-# App Usage 模型用量：饼图改为 Top 10 横向柱状图
+# App Usage 模型用量：图表改为可排序表格
+
+> 变更历史：本页原先规定「饼图改为 Top 10 横向柱状图」。图表现已整体移除，
+> 模型用量改为一张可按 Token / 请求数排序的表格，因此全文按当前实现重写。
 
 ## 1. 规则
 
-- 设置页 Usage → App Usage 的「模型用量」不再使用环形饼图，改为同一小节内上下排列的两张横向柱状图：
-  - 按 Token 用量取前 10 的模型（`metric="tokens"`）。
-  - 按请求数取前 10 的模型（`metric="requests"`）。
-- 榜长固定为 10（`APP_USAGE_TOP_MODELS_LIMIT`），两个榜共用同一个 `AppUsageSnapshot`。
-- 排名与过滤按各自指标独立进行：
-  - 过滤：当前指标为 0 的模型不占榜位（只有 token 的历史模型不会把有请求的模型挤出请求榜）。
-  - 排序：按当前指标降序；同分时沿用协议顺序（协议侧已按 token 降序），避免刷新后榜内顺序抖动。
-  - 占比 `share` 的分母是该指标下**全部**有量模型之和，不是榜内 10 项之和，因此模型较多时占比之和小于 100%。
-- 超过 10 个模型时，榜下用一行说明还有多少模型未展示，不再合并成「其他模型」扇区。
-- 配色：每个榜使用单一色相（token → `--color-usage-chart-1`，请求数 → `--color-usage-chart-2`）。模型名已经画在 Y 轴刻度上，颜色不承载模型身份，轮转 6 色会让第 7~10 名出现重复色。
-- 名称截断：Y 轴刻度超过 18 个字符时截断为 `前 17 字符 + …`，完整名称只在 tooltip 中出现，避免长模型名挤压绘图区。
-- 空态：任一指标在当前时间范围内没有任何模型数据时，对应榜显示空态文案（沿用 `settings.usage.emptyTitle`）。
+- 设置页 Usage → App Usage 不再渲染任何图表（每日 Token 趋势图、两张 Top 10 柱状图、Token 活动热力图均已删除），
+  模型用量以表格呈现：一行一个模型，列为「模型 / Token 用量 / 请求数」。
+- 行过滤：token 与请求数都为 0 的历史模型不进表（`hasAppUsageModelVolume`），
+  否则只被选中过、从未真正调用的模型会占满表格，把真正产生消耗的模型挤下去。
+- 排序：点击「Token 用量」或「请求数」表头按钮排序；
+  - 切换到另一列时默认降序（打开这张表的默认问题是「谁吃得最多」）。
+  - 点击当前排序列在升 / 降之间切换，表头显示对应方向箭头并用 `aria-sort` 暴露状态。
+  - 同分时沿用协议顺序（协议侧已按 token 降序），避免刷新后表内顺序抖动。
+- 不再截断前 10：表格行高固定、横向滚动，长尾模型不需要被折叠成「其他模型」。
+- 表尾「合计」行给出当前筛选结果下的 Token 与请求数总和。
+- 空态：当前时间范围内没有任何有量模型时显示空态文案，不渲染表头。
+- 未记录 `modelId` 的归组行回退显示为「未知模型」，`title` 属性保留完整名称。
 
 ## 2. 不变更
 
-- 聚合与协议不变：`AppUsageModelUsage` 仍由 `buildAppUsageSnapshot` 从 `model_usage` 表产出，`models` 仍按 token 降序下发；请求数榜在 UI 侧重排，不改 SQL。
-- 「每日 Token 趋势图」仍为折线图，其 top 6 模型图例与 6 色轮转保持不变。
-- 其余 App Usage 区块（累计摘要、Token 活动热力图、时间范围切换）不变。
+- 聚合与协议不变：`AppUsageModelUsage` 仍由 `buildAppUsageSnapshot` 从 `model_usage` 表产出，
+  `models` 仍按 token 降序下发；两个维度的排序都在 UI 侧完成，不改 SQL。
+- 「App Usage」的时间范围切换（全部 / 近 7 日 / 近 30 日）与顶部累计摘要条不变。
+- 用量数据仍来自 CLI 侧 session 库，经 `v4/usage/stats` 读取
+  （服务面：`packages/services/src/usage/appUsageService.ts`）。
 
 ## 3. 唯一所有者
 
-- `packages/ui/src/settings/usage-stats/appUsageTopModelsBarChartViewModel.ts`：过滤、排序、截断榜长与占比计算。
-- `packages/ui/src/settings/usage-stats/AppUsageTopModelsBarChart.tsx`：单个榜的标题、总量、横向柱状图、tooltip 与空态。
-- `packages/ui/src/settings/usage-stats/AppUsagePanel.tsx`：`AppUsageModelTopCharts` 组合两个榜，并复用原有 lazy + `UsageChartLoadBoundary` 边界。
-- 文案：`packages/ui/src/i18n/locales/{en-US,zh-CN,vi-VN}.ts` 的 `settings.usage.modelChart.*`。
+- `packages/ui/src/settings/usage-stats/AppUsageModelTable.tsx`：
+  `buildAppUsageModelRows`（过滤 + 名称回退）、`sortAppUsageModelRows`（双指标排序与稳定同分）、
+  以及表格组件本体（表头排序按钮、合计行、空态）。
+- `packages/ui/src/settings/usage-stats/AppUsagePanel.tsx`：累计摘要条 + 时间范围 + 模型用量表 + 刷新。
+- 文案：`packages/ui/src/i18n/locales/{en-US,zh-CN,vi-VN}.ts` 的 `settings.usage.modelTable*`。
 
 ## 4. 验收
 
-- 「模型用量」小节内先是按 token 的 Top 10，再是按请求数的 Top 10；第 1 名在最上方。
-- 同一模型在两个榜中的排名可以不同（token 高 ≠ 请求多）。
-- 模型超过 10 个时显示「另有 N 个模型未展示」，不出现「其他模型」扇区。
+- App Usage 页面没有图表：查不到「每日 Token 趋势图」「Token 活动」等旧标题。
+- 表格默认按 Token 用量降序；点「请求数」后按请求数降序，再点一次变升序，点回「Token 用量」恢复 token 降序。
+- token 与请求数都为 0 的模型不出现在表中；未记录 `modelId` 的行显示「未知模型」。
+- 表尾合计等于所有可见行之和。
 - 测试：
-  - `packages/ui/test/appUsageTopModelsBarChart.test.ts`（排序、过滤、截断、占比、渲染方式）。
-  - `packages/ui/test/appUsagePanel.test.ts`（饼图已替换为两张横向柱状图）。
-  - `packages/desktop/test/e2e/usage-stats/usage-stats-app-usage.test.ts`（三语标题断言）。
+  - `packages/ui/test/appUsagePanel.test.ts`（渲染顺序、图表已移除、表头排序交互、排序纯函数）。

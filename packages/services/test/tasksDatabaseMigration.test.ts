@@ -54,11 +54,8 @@ describe("DB109 App 库统一迁移", () => {
     insert.run("default", null, null, null, null);
     runTasksDatabaseMigrations(db);
     const known = db.prepare("SELECT * FROM automations WHERE automation_id='known'").get()!;
-    expect(JSON.parse(String(known.model_selection))).toEqual({
-      providerId: "account:bigmodel-individual-coding-plan",
-      modelId: "GLM-5.3",
-      options: { reasoningLevel: "high" },
-    });
+    // 内置供应商下线后 0002 空转：旧编码不再被解码成 account:* ，新列保持原值（JSON null）。
+    expect(known.model_selection).toBe("null");
     expect(known).toMatchObject({
       model: "custom:builtin%3Abigmodel-coding-plan:GLM-5.3",
       provider: "zcode",
@@ -67,14 +64,16 @@ describe("DB109 App 库统一迁移", () => {
       created_at: 1,
       updated_at: 2,
     });
+    // 0002 空转：未解码的旧选择不再被清成 SQL NULL，插入时的原值原样保留；
+    // 无旧来源的行也不再被补写成 JSON null 字符串。
     expect(
       db.prepare("SELECT model_selection FROM automations WHERE automation_id='unknown'").get()
         ?.model_selection,
-    ).toBeNull();
+    ).toBe("null");
     expect(
       db.prepare("SELECT model_selection FROM automations WHERE automation_id='default'").get()
         ?.model_selection,
-    ).toBe("null");
+    ).toBeNull();
     db.exec("UPDATE automations SET model_selection=NULL WHERE automation_id='known'");
     runTasksDatabaseMigrations(db);
     expect(
@@ -126,9 +125,8 @@ describe("DB109 App 库统一迁移", () => {
         created_at: 1,
         updated_at: 2,
       });
-      expect(row.model_selection).toBe(
-        id === "official" ? selection?.replace("glm-5.3-flash", "GLM-5.3-Flash") : selection,
-      );
+      // 0003 空转：官方 GLM 大小写规范已随内置供应商体系下线，选择一律原样保留。
+      expect(row.model_selection).toBe(selection ?? null);
     }
     const ledger = db.prepare("SELECT * FROM tasks_schema_migration ORDER BY id").all();
     db.exec("UPDATE automations SET model_selection=NULL WHERE automation_id='official'");
@@ -185,7 +183,8 @@ describe("DB109 App 库统一迁移", () => {
       provider: "zcode",
       run_count: 7,
       scheduled_run_count: 7,
-      model_selection: JSON.stringify({ providerId: "p", modelId: "model" }),
+      // 0002 空转：补列照做，旧选择不再被解码写入新列。
+      model_selection: null,
     });
   });
 
@@ -207,12 +206,9 @@ describe("DB109 App 库统一迁移", () => {
       VALUES('legacy','* * * * *','正文','ws','/ws',1,2,?,'zcode','high')`).run(model);
     runTasksDatabaseMigrations(db);
     const row = db.prepare("SELECT model,model_selection FROM automations").get()!;
+    // 0002 空转：旧编码一律不再解码，原列保留、新列留空，等用户重选。
     expect(row.model).toBe(model);
-    expect(JSON.parse(String(row.model_selection))).toEqual({
-      providerId,
-      modelId,
-      options: { reasoningLevel },
-    });
+    expect(row.model_selection).toBeNull();
   });
 
   it("DB109-06：两个独立线程同时打开旧库，数据转换只发生一次", async () => {
@@ -258,7 +254,8 @@ describe("DB109 App 库统一迁移", () => {
       Atomics.notify(new Int32Array(gate), 0);
       expect(await Promise.all(exits)).toEqual([[0], [0]]);
       expect(db.prepare("SELECT * FROM tasks_schema_migration").all()).toHaveLength(3);
-      expect(db.prepare("SELECT * FROM migration_probe").all()).toHaveLength(1);
+      // 0002/0003 已空转，转换触发器不再被触发；并发安全由三条迁移记录的写入结果证明。
+      expect(db.prepare("SELECT * FROM migration_probe").all()).toHaveLength(0);
       expect(db.prepare("PRAGMA integrity_check").get()?.integrity_check).toBe("ok");
     } finally {
       await Promise.all(workers.map((worker) => worker.terminate()));

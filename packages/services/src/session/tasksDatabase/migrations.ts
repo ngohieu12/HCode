@@ -6,8 +6,6 @@ import {
   OFF_PEAK_SCHEMA,
   TASK_INDEX_SCHEMA,
 } from "#src/session/tasksDatabase/schema-v1.js";
-import { importLegacyAutomationSelections } from "#src/session/tasksDatabase/provider-selection-v2.js";
-import { OFFICIAL_GLM_SELECTION_MIGRATION_SQL } from "#src/session/tasksDatabase/official-glm-selection-v3.js";
 
 // 冻结历史列声明，不能以实时 Repo/schema 代替，否则新版构建会改变已应用 checksum。
 const columns = [
@@ -57,12 +55,14 @@ const definitions = [
     ],
   },
   {
+    // 旧 builtin:* / account:* 供应商身份已随内置供应商体系下线，迁移不再改写历史选择：
+    // 保留迁移号（checksum 冻结）但空执行，用户下次手动重选模型。
     id: "0002_provider_selection",
     checksumInput: ["legacy-automation-selection-v1", "no-provider-for-legacy-off-peak-v1"],
   },
   {
     id: "0003_official_glm_selection",
-    checksumInput: [OFFICIAL_GLM_SELECTION_MIGRATION_SQL],
+    checksumInput: ["official-glm-selection-v3"],
   },
 ] as const;
 
@@ -111,9 +111,8 @@ export function runTasksDatabaseMigrations(
       }
       if (migrationFacts.kind === "none") migrationFacts.kind = "upgrade";
       options.onProgress?.("migrating", { ...migrationFacts });
+      // 0002/0003 只改写已下线的内置供应商身份，保留为空操作。
       if (migration.id === "0001_adopt_task_schema") adoptSchema(db);
-      else if (migration.id === "0002_provider_selection") importLegacyAutomationSelections(db);
-      else db.exec(OFFICIAL_GLM_SELECTION_MIGRATION_SQL);
       migrationFacts.executedCount++;
       db.prepare("INSERT INTO tasks_schema_migration VALUES(?,?,?)").run(
         migration.id,

@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  OFFICIAL_GLM_MODEL_IDS,
-  TELEMETRY_SAFE_BUILTIN_MODEL_IDS,
   redactTelemetryText,
   redactTelemetryUrl,
   resolveTelemetryProviderScope,
@@ -113,15 +111,8 @@ describe("redactTelemetryUrl", () => {
 });
 
 describe("resolveTelemetryProviderScope", () => {
-  it("内置 provider 保留稳定 ID", () => {
-    expect(resolveTelemetryProviderScope("account:zai-individual-coding-plan")).toEqual({
-      providerId: "account:zai-individual-coding-plan",
-      providerScope: "builtin",
-    });
-  });
-
   it("自定义 provider 归一为 custom，不泄露用户命名", () => {
-    const resolved = resolveTelemetryProviderScope("我的内网代理");
+    const resolved = resolveTelemetryProviderScope("\u6211\u7684\u5185\u7f51\u4ee3\u7406");
     expect(resolved).toEqual({ providerId: "custom", providerScope: "custom" });
   });
 
@@ -132,77 +123,51 @@ describe("resolveTelemetryProviderScope", () => {
     });
   });
 
-  it("旧报表身份 builtin:* 是 ZCode 固定 ID，判为内置并原样保留", () => {
-    // supervisor 投影 /report detail 时会把 account:* 映射成这些旧身份，plan_ttft / perf_ui_* 复用同一份 detail。
+  it("内置 provider 已下线：account:* 与 builtin:* 旧身份同样只归一为 custom", () => {
+    // 报表里仍可能看到历史会话写下的 account:* / builtin:*；内置供应商已删除，
+    // 这些 ID 不再对应任何真实供应商，继续原样上报只会把它们当成稳定 ID 长期留存。
     for (const legacyId of [
+      "account:zai-individual-coding-plan",
       "builtin:zai",
       "builtin:bigmodel",
       "builtin:zai-coding-plan",
       "builtin:bigmodel-coding-plan",
       "builtin:zai-start-plan",
       "builtin:bigmodel-start-plan",
+      "builtin:my-proxy",
     ]) {
       expect(resolveTelemetryProviderScope(legacyId)).toEqual({
-        providerId: legacyId,
-        providerScope: "builtin",
+        providerId: "custom",
+        providerScope: "custom",
       });
     }
-  });
-
-  it("未知的 builtin: 前缀不能借前缀混入内置", () => {
-    expect(resolveTelemetryProviderScope("builtin:my-proxy")).toEqual({
-      providerId: "custom",
-      providerScope: "custom",
-    });
-  });
-});
-
-describe("TELEMETRY_SAFE_BUILTIN_MODEL_IDS", () => {
-  it("覆盖官方 GLM 模型名单全部条目，旗舰模型不会被降级为 custom", () => {
-    for (const id of OFFICIAL_GLM_MODEL_IDS) {
-      expect(TELEMETRY_SAFE_BUILTIN_MODEL_IDS.has(id.toLowerCase())).toBe(true);
-    }
-    expect(TELEMETRY_SAFE_BUILTIN_MODEL_IDS.has("glm-5.3")).toBe(true);
-    expect(TELEMETRY_SAFE_BUILTIN_MODEL_IDS.has("glm-5.3-flash")).toBe(true);
   });
 });
 
 describe("resolveTelemetryModelId", () => {
-  it("内置 provider 下命中白名单的模型原样保留（小写）", () => {
-    expect(resolveTelemetryModelId("builtin", "GLM-4.6")).toBe("glm-4.6");
-  });
-
-  it("内置 provider 下未命中白名单的模型降级为 custom", () => {
-    expect(resolveTelemetryModelId("builtin", "glm-未来型号")).toBe("custom");
-  });
-
-  it("自定义 provider 的模型固定写 custom", () => {
+  it("任何非空模型 ID 都归一为 custom，不泄露用户命名", () => {
+    expect(resolveTelemetryModelId("custom", "GLM-4.6")).toBe("custom");
+    expect(resolveTelemetryModelId("custom", "glm-\u672a\u6765\u578b\u53f7")).toBe("custom");
     expect(resolveTelemetryModelId("custom", "internal-llm-v3")).toBe("custom");
   });
 
   it("scope 未知或模型缺失时留空", () => {
     expect(resolveTelemetryModelId("unknown", "glm-4.6")).toBe("");
-    expect(resolveTelemetryModelId("builtin", undefined)).toBe("");
+    expect(resolveTelemetryModelId("custom", undefined)).toBe("");
   });
 
-  it("内置 provider 下的复合值与 custom: 编码值先剥出裸模型 ID 再查白名单", () => {
-    expect(resolveTelemetryModelId("builtin", "builtin:zai-start-plan/GLM-5.3")).toBe("glm-5.3");
-    expect(resolveTelemetryModelId("builtin", "custom:builtin%3Azai-start-plan:glm-5.3")).toBe(
-      "glm-5.3",
-    );
-    expect(resolveTelemetryModelId("builtin", "builtin:zai-start-plan/private-model")).toBe(
+  it("复合值与 custom: 编码值也不回显模型名", () => {
+    expect(resolveTelemetryModelId("custom", "builtin:zai-start-plan/GLM-5.3")).toBe("custom");
+    expect(resolveTelemetryModelId("custom", "custom:builtin%3Azai-start-plan:glm-5.3")).toBe(
       "custom",
     );
   });
 });
 
 describe("sanitizeTelemetryModelValue", () => {
-  it("白名单内置模型原样保留", () => {
-    expect(sanitizeTelemetryModelValue("glm-4.6")).toBe("glm-4.6");
-    expect(sanitizeTelemetryModelValue("GLM-4.6")).toBe("glm-4.6");
-  });
-
-  it("未命中白名单的裸模型 ID 降级为 custom", () => {
+  it("内置模型白名单已移除：裸模型 ID 也归一为 custom", () => {
+    expect(sanitizeTelemetryModelValue("glm-4.6")).toBe("custom");
+    expect(sanitizeTelemetryModelValue("GLM-4.6")).toBe("custom");
     expect(sanitizeTelemetryModelValue("some-internal-model")).toBe("custom");
   });
 
@@ -211,14 +176,14 @@ describe("sanitizeTelemetryModelValue", () => {
     expect(value).toBe("custom");
   });
 
-  it("provider/model 复合值按 provider 判定", () => {
-    expect(sanitizeTelemetryModelValue("account:zai-start-plan/glm-4.6")).toBe("glm-4.6");
+  it("provider/model 复合值按 provider 判定，用户命名不回显", () => {
+    expect(sanitizeTelemetryModelValue("account:zai-start-plan/glm-4.6")).toBe("custom");
     expect(sanitizeTelemetryModelValue("my-proxy/secret-model")).toBe("custom");
   });
 
-  it("supervisor 投影出的旧身份复合值与 custom: 编码值都保留白名单模型", () => {
-    expect(sanitizeTelemetryModelValue("builtin:zai-start-plan/GLM-5.3")).toBe("glm-5.3");
-    expect(sanitizeTelemetryModelValue("custom:builtin%3Azai-start-plan:glm-5.3")).toBe("glm-5.3");
+  it("supervisor 投影出的旧身份复合值与 custom: 编码值都不回显模型名", () => {
+    expect(sanitizeTelemetryModelValue("builtin:zai-start-plan/GLM-5.3")).toBe("custom");
+    expect(sanitizeTelemetryModelValue("custom:builtin%3Azai-start-plan:glm-5.3")).toBe("custom");
   });
 
   it("空值保持空，便于与既有留空口径一致", () => {

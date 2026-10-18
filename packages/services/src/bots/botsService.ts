@@ -2265,7 +2265,7 @@ export function createBotsService(
       glm: {
         default: "Default",
         yolo: "Yolo",
-        plan: isEnglish ? "Plan" : "Plan",
+        plan: "Plan",
       },
     };
     return labels[provider]?.[option.id] ?? option.label;

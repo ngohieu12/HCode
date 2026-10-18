@@ -38,7 +38,6 @@ import {
 import type { ISubagentsService } from "./subagents.js";
 import { atomicWriteText } from "#src/fs/atomicFileUtils.js";
 import {
-  migrateUserSubagentMarkdown,
   migrateSubagentStateFile,
   scanOfficialPluginCacheRoots,
 } from "@zcode/shared/node";
@@ -596,11 +595,6 @@ export function createSubagentsService(options?: SubagentsServiceOptions): ISuba
     },
     async prepareRuntimeState(workspace?: { workspacePath: string; workspaceIdentity?: string }) {
       return enqueue(async () => {
-        const markdownMigration = await migrateUserSubagentMarkdown(
-          await resolveUserSubagentRoot(storageOptions),
-        );
-        for (const failure of markdownMigration.failures)
-          subagentLogger.warn(undefined, "用户 Subagent Markdown 迁移失败，保留原文件", failure);
         // state 的迁移由缓存读取入口统一执行，IO 失败同样发布回退，不能提前阻断 CLI 启动。
         await runtimeConfig.prepare(workspace);
       });
@@ -615,17 +609,6 @@ export function createSubagentsService(options?: SubagentsServiceOptions): ISuba
       const capability = resolveCapabilities(options);
       const mode = params.mode ?? "allRuntimeScopes";
       const diagnostics: AgentDiagnostic[] = [];
-      if (capability.userScopeAvailable) {
-        const migration = await migrateUserSubagentMarkdown(
-          await resolveUserSubagentRoot(storageOptions),
-        );
-        for (const failure of migration.failures)
-          diagnostics.push({
-            code: "agent_read_failed",
-            message: "Subagent Markdown migration failed; original file preserved",
-            path: failure.path,
-          });
-      }
       const state = await readAgentStateFile(storageOptions);
       const builtInAgents = createBuiltInAgents(state.builtInModelSelectionOverrides);
       const fileAgents = await discoverFileAgents({

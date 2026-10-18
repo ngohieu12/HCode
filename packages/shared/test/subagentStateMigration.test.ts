@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { importSubagentStateSelections } from "../src/subagent-state-migration.js";
 
-describe("Subagent 内置 state 单向导入", () => {
+describe("Subagent 内置 state 单向导入（内置供应商已下线，旧身份原样保留）", () => {
   const pluginId = "plugin:document-skills@zcode-plugins-official:judge";
   const pluginLegacy = {
     pluginAgentModelOverrides: { [pluginId]: "custom:builtin%3Azai-coding-plan:GLM" },
@@ -11,7 +11,7 @@ describe("Subagent 内置 state 单向导入", () => {
     const next = importSubagentStateSelections(pluginLegacy);
     expect(next.pluginAgentModelSelectionOverrides).toEqual({
       [pluginId]: {
-        providerId: "account:zai-individual-coding-plan",
+        providerId: "builtin:zai-coding-plan",
         modelId: "GLM",
         options: { reasoningLevel: "high" },
       },
@@ -51,7 +51,7 @@ describe("Subagent 内置 state 单向导入", () => {
     expect(next).toMatchObject(legacy);
     expect(next.builtInModelSelectionOverrides).toEqual({
       Explore: {
-        providerId: "account:zai-individual-coding-plan",
+        providerId: "builtin:zai-coding-plan",
         modelId: "m",
         options: { reasoningLevel: "high" },
       },
