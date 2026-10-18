@@ -52,7 +52,6 @@ describe("PLM-LC-008 插件管理关键可恢复失败 E2E", () => {
 
     let fixture = await createPluginLifecycleFixture("1.0.0");
     await addLifecycleMarketplaceThroughUi(fixture);
-    await clickPluginControl("plugin-store-segment-personal");
 
     await corruptLifecycleMarketplaceManifest(fixture);
     await openManageView();
@@ -66,7 +65,6 @@ describe("PLM-LC-008 插件管理关键可恢复失败 E2E", () => {
       timeoutMsg: "Catalog refresh retry did not clear the visible error",
     });
     await clickPluginControl("plugin-store-manage-back");
-    await clickPluginControl("plugin-store-segment-personal");
 
     await removeLifecyclePluginSource(fixture);
     await openPluginCard(PLUGIN_LIFECYCLE_ID);

@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { clearAppData, getE2EAppDataPaths } from "../../../helpers/desktop-app.js";
 import {
   addMarketplaceSourceThroughAgent,
-  clickPluginControl,
   createPluginLifecycleFixture,
   getPluginList,
   getPluginOverview,
@@ -55,7 +54,6 @@ describe("WPL-009 Global Plugin Marketplace install E2E", () => {
     expect(await hasPluginControl("plugin-store-scope-trigger")).toBe(false);
     expect(await hasPluginControl("plugin-store-enabled-switch")).toBe(false);
     expect(await hasPluginControl("plugin-store-config")).toBe(false);
-    await clickPluginControl("plugin-store-segment-personal");
     await waitForPluginCard(PLUGIN_LIFECYCLE_ID);
     await openPluginCard(PLUGIN_LIFECYCLE_ID);
     await installPluginThroughUi(PLUGIN_LIFECYCLE_ID);

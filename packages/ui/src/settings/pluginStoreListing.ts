@@ -153,7 +153,7 @@ export interface StoreCategoryGroup {
   items: StorePluginItem[];
 }
 
-/** 个人分段的市场分组：marketplace 是排序键，title 是展示名。 */
+/** 个人来源的市场分组：marketplace 是排序键，title 是展示名。 */
 export interface PersonalMarketplaceGroup {
   marketplace: string;
   title: string;
@@ -192,8 +192,8 @@ export function sortMarketplaceSources(
 }
 
 /**
- * 个人分段市场分组排序：按 lastUpdated 倒序——最近刷新/添加的市场在最上，
- * 用户添加成功跳转过来第一眼就能看到；无 lastUpdated（官方 seed 未刷新过）的沉底，
+ * 个人市场分组排序：按 lastUpdated 倒序——最近刷新/添加的市场在个人分组中排最前；
+ * 无 lastUpdated（官方 seed 未刷新过）的沉底，
  * 同刻或都缺失时按显示名字母序稳定兜底。ISO 时间串的字典序即时间序。
  */
 export function sortPersonalMarketplaceGroups(
@@ -304,7 +304,7 @@ export function buildStoreItems(input: {
   return [...items.values()];
 }
 
-/** 公开分段：Featured（CDN featured 名单按序）+ 分类聚合（无分类归 other，排最后）。 */
+/** 官方目录：Featured（CDN featured 名单按序）+ 分类聚合（无分类归 other，排最后）。 */
 export function selectFeaturedItems(
   publicItems: StorePluginItem[],
   marketplaces: ZCodePluginMarketplaceSummary[],

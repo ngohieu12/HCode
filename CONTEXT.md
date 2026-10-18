@@ -32,21 +32,25 @@ _Avoid_: 刷新、检查更新（口语可用，文档统一"手动刷新"）
 
 ### 商店页结构
 
-**Public Segment（公开）**:
-商店列表页的分段之一，展示且仅展示官方市场的目录（Featured + 分类区块）。
-_Avoid_: 官方 tab、商店 tab
+**Unified Store List（统一市场列表）**:
+市场发现页的单一连续列表：先显示官方市场目录（Featured + 分类），再显示个人来源的市场分组。搜索覆盖两类来源；页面不再提供公开/个人切换标签。
+_Avoid_: Public/Personal tabs、在不同分段间切换
 
-**Personal Segment（个人）**:
-商店列表页的另一分段，展示全部个人来源的目录，按市场分组。
-_Avoid_: 第三方 tab、我的 tab
+**Official Catalog（官方目录）**:
+仅包含 ZCode 官方市场的目录，按 Featured 和分类展示，位于统一列表前部。
+_Avoid_: 把 claude-plugins-official 称为官方目录
+
+**Personal Marketplace Groups（个人市场分组）**:
+统一列表中按个人来源分别展示的插件组，沿用市场名称和现有市场排序。
+_Avoid_: 与官方目录按分类混排
 
 **Featured（精选）**:
-公开分段顶部的策展区，名单由官方 CDN 目录的 `featured` 字段远程控制。仅存在于公开分段。
+官方市场顶部的策展区，名单由官方 CDN 目录的 `featured` 字段远程控制。
 _Avoid_: 与 Recommended 混用
 
 **Recommended（推荐）**:
-个人分段顶部的策展区，名单由仓内 `recommendedPlugins.json` 维护（当前推 claude-plugins-official 的精选插件）。仅存在于个人分段。
-_Avoid_: 与 Featured 混用
+个人来源顶部的策展区已下线；`recommendedPlugins.json` 目前仅保留默认市场 id，不渲染推荐插件列表。
+_Avoid_: 描述成当前可见的商店区域；与 Featured 混用
 
 **Installed Strip（已安装条）**:
 列表页顶部的一排已安装插件图标，点击图标进入详情页。
@@ -77,7 +81,7 @@ _Avoid_: 快捷指令、prompt 模板、立即试用
 _Avoid_: 仅把“安装成功”称为完整生命周期
 
 **Restorable Builtin（可恢复内置插件）**:
-被用户卸载并进入持久化抑制状态的 Builtin Plugin。应用重启不得自动重新播种；它继续出现在 Public Segment，并通过“安装”入口执行干净恢复。
+被用户卸载并进入持久化抑制状态的 Builtin Plugin。应用重启不得自动重新播种；它继续出现在官方目录，并通过“安装”入口执行干净恢复。
 _Avoid_: 未安装 CDN 插件、临时禁用的内置插件
 
 **Orphaned Installed Plugin（孤立已安装插件）**:

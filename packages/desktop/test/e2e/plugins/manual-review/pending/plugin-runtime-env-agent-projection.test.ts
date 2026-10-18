@@ -30,7 +30,6 @@ import {
 import {
   addMarketplaceSourceThroughUi,
   capturePluginManualReview,
-  clickPluginControl,
   hasPluginControl,
   installPluginThroughUi,
   openPluginCard,
@@ -112,7 +111,6 @@ describe("PLM-LC-010 插件 secret env 与 agent 资源投影 E2E", () => {
             "Plugin runtime env marketplace completed but the source dialog remained open",
         },
       );
-      await clickPluginControl("plugin-store-segment-personal");
       await openPluginCard(PLUGIN_RUNTIME_ENV_ID);
       await waitForPluginControl("plugin-store-component-section", {
         componentKind: "mcp",

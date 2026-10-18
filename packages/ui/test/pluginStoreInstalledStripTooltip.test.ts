@@ -59,8 +59,6 @@ describe("PluginStoreListView installed strip", () => {
         loading: false,
         query: "",
         onQueryChange: () => {},
-        segment: "public",
-        onSegmentChange: () => {},
         onOpenManage: () => {},
       }),
     );

@@ -7,7 +7,7 @@ import { ServiceProvider } from "@/hooks/useServices.js";
 import { usePluginStoreOrder } from "@/hooks/usePluginStoreOrder.js";
 import { StoreContext } from "@/store/StoreProvider.js";
 import { createZCodeStore } from "@/store/index.js";
-import { PluginStoreListView, type PluginStoreSegment } from "@/settings/PluginStoreListView.js";
+import { PluginStoreListView } from "@/settings/PluginStoreListView.js";
 import { buildStoreItems, type StorePluginItem } from "@/settings/pluginStoreListing.js";
 import "@/styles.css";
 
@@ -107,7 +107,6 @@ const services = {
 function Fixture() {
   const { order, refresh } = usePluginStoreOrder();
   const [query, setQuery] = useState("");
-  const [segment, setSegment] = useState<PluginStoreSegment>("public");
   return (
     <main className="min-h-screen bg-background p-4 text-foreground">
       <button data-testid="code" onClick={() => store.getState().setInterfaceMode("coding")}>
@@ -135,8 +134,6 @@ function Fixture() {
         loading={false}
         query={query}
         onQueryChange={setQuery}
-        segment={segment}
-        onSegmentChange={setSegment}
         onOpenManage={() => {}}
         actions={{
           onOpenDetail: () => {},

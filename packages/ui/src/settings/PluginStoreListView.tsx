@@ -1,4 +1,4 @@
-/* eslint-disable max-lines -- 商店列表页把标题/搜索/已安装条/公开-个人分段/Featured/分类折叠聚合成一个连贯浏览面，拆散反而难以维持 1:1 布局。 */
+/* eslint-disable max-lines -- 商店列表页把搜索/已安装条/官方目录/个人市场分组/Featured/分类折叠聚合成一个连贯浏览面，拆散反而难以维持一致布局。 */
 import { useMemo, useState } from "react";
 import { Download, Loader2, Settings2 } from "lucide-react";
 import type { PluginStoreOrder, ZCodePluginMarketplaceSummary } from "@zcode/shared";
@@ -30,8 +30,6 @@ import { resolveMarketplaceDisplayName } from "@/settings/pluginSourceLabel.js";
 const CATEGORY_VISIBLE_LIMIT = 6;
 const RETIRED_STORE_PLUGIN_ID = `restore-legacy-sessions@${ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_ID}`;
 
-export type PluginStoreSegment = "public" | "personal";
-
 export function PluginStoreListView({
   items: allItems,
   order,
@@ -40,8 +38,6 @@ export function PluginStoreListView({
   loading,
   query,
   onQueryChange,
-  segment,
-  onSegmentChange,
   onOpenManage,
 }: {
   items: StorePluginItem[];
@@ -51,8 +47,6 @@ export function PluginStoreListView({
   loading: boolean;
   query: string;
   onQueryChange: (query: string) => void;
-  segment: PluginStoreSegment;
-  onSegmentChange: (segment: PluginStoreSegment) => void;
   onOpenManage: () => void;
 }) {
   const { intl, locale } = useZCodeIntl();
@@ -99,7 +93,7 @@ export function PluginStoreListView({
     [locale, publicItems, modeOrder],
   );
 
-  // 个人分段：按市场分组，最近刷新的市场排最前（见 sortPersonalMarketplaceGroups）。
+  // 个人来源：按市场分组，最近刷新的市场排最前（见 sortPersonalMarketplaceGroups）。
   const personalGroups = useMemo(() => {
     const claudeCodePlugins = intl.formatMessage({
       id: "settings.plugins.marketplace.claudeCodePlugins",
@@ -144,7 +138,7 @@ export function PluginStoreListView({
   return (
     <div className="space-y-8" data-testid="plugin-store-list">
       {/* 大标题由设置页头部渲染（settings.plugins.title），此处从搜索框开始，避免双标题。 */}
-      {/* 搜索：横跨公开+个人；输入时下方分段布局让位于统一结果流。 */}
+      {/* 搜索覆盖官方目录和个人来源；输入时目录区域让位于统一结果流。 */}
       <SettingsSearchInput
         data-testid="plugin-store-search"
         value={query}
@@ -230,26 +224,7 @@ export function PluginStoreListView({
         </section>
       ) : null}
 
-      {/* 公开 / 个人分段。 */}
-      <div className="flex items-center gap-1.5">
-        <SegmentPill
-          active={segment === "public"}
-          testId="plugin-store-segment-public"
-          label={intl.formatMessage({
-            id: "settings.plugins.store.segment.public",
-          })}
-          onClick={() => onSegmentChange("public")}
-        />
-        <SegmentPill
-          active={segment === "personal"}
-          testId="plugin-store-segment-personal"
-          label={intl.formatMessage({
-            id: "settings.plugins.store.segment.personal",
-          })}
-          onClick={() => onSegmentChange("personal")}
-        />
-      </div>
-
+      {/* 官方目录与个人市场按固定顺序连续展示；搜索已在上方统一覆盖两类来源。 */}
       {keyword ? (
         <StoreSection
           key="search"
@@ -266,25 +241,26 @@ export function PluginStoreListView({
             <CardGrid items={searchResults} actions={actions} locale={locale} />
           )}
         </StoreSection>
-      ) : segment === "public" ? (
-        <PublicSegment
-          actions={actions}
-          categoryGroups={categoryGroups}
-          expandedGroups={expandedGroups}
-          featuredItems={featuredItems}
-          loading={loading}
-          locale={locale}
-          resolveCategoryLabel={resolveCategoryLabel}
-          onToggleGroup={toggleGroup}
-        />
       ) : (
-        <PersonalSegment
-          actions={actions}
-          expandedGroups={expandedGroups}
-          groups={personalGroups}
-          locale={locale}
-          onToggleGroup={toggleGroup}
-        />
+        <div className="space-y-8" data-testid="plugin-store-catalog">
+          <OfficialCatalog
+            actions={actions}
+            categoryGroups={categoryGroups}
+            expandedGroups={expandedGroups}
+            featuredItems={featuredItems}
+            loading={loading}
+            locale={locale}
+            resolveCategoryLabel={resolveCategoryLabel}
+            onToggleGroup={toggleGroup}
+          />
+          <PersonalMarketplaceGroups
+            actions={actions}
+            expandedGroups={expandedGroups}
+            groups={personalGroups}
+            locale={locale}
+            onToggleGroup={toggleGroup}
+          />
+        </div>
       )}
     </div>
   );
@@ -430,7 +406,7 @@ function CollapsibleCardGroup({
   );
 }
 
-function PublicSegment({
+function OfficialCatalog({
   actions,
   categoryGroups,
   expandedGroups,
@@ -453,19 +429,21 @@ function PublicSegment({
   const isEmpty = featuredItems.length === 0 && categoryGroups.length === 0;
   if (isEmpty) {
     return (
-      <p className="rounded-xl border border-dashed border-border px-4 py-3 text-ui-base text-foreground-subtle">
-        {loading
-          ? intl.formatMessage({
-              id: "settings.plugins.marketplace.catalogLoading",
-            })
-          : intl.formatMessage({
-              id: "settings.plugins.marketplacePlugins.empty",
-            })}
-      </p>
+      <div data-testid="plugin-store-official-catalog">
+        <p className="rounded-xl border border-dashed border-border px-4 py-3 text-ui-base text-foreground-subtle">
+          {loading
+            ? intl.formatMessage({
+                id: "settings.plugins.marketplace.catalogLoading",
+              })
+            : intl.formatMessage({
+                id: "settings.plugins.marketplacePlugins.empty",
+              })}
+        </p>
+      </div>
     );
   }
   return (
-    <div>
+    <div data-testid="plugin-store-official-catalog">
       {featuredItems.length > 0 ? (
         <StoreSection
           title={intl.formatMessage({ id: "settings.plugins.store.featured" })}
@@ -500,7 +478,7 @@ function PublicSegment({
   );
 }
 
-function PersonalSegment({
+function PersonalMarketplaceGroups({
   actions,
   expandedGroups,
   groups,
@@ -513,16 +491,9 @@ function PersonalSegment({
   locale: string;
   onToggleGroup: (key: string) => void;
 }) {
-  const { intl } = useZCodeIntl();
-  if (groups.length === 0) {
-    return (
-      <p className="rounded-xl border border-dashed border-border px-4 py-3 text-ui-base text-foreground-subtle">
-        {intl.formatMessage({ id: "settings.plugins.store.personalEmpty" })}
-      </p>
-    );
-  }
+  if (groups.length === 0) return null;
   return (
-    <div>
+    <div data-testid="plugin-store-personal-catalog">
       {groups.map((group) => (
         <StoreSection
           key={group.marketplace}

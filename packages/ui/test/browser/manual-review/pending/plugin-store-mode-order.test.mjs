@@ -98,9 +98,13 @@ for (const [width, locale, theme] of [
       page
         .locator("section")
         .filter({ has: page.locator('[data-group-key="category:productivity"]') });
+    const personalSection = () => page.getByTestId("plugin-store-personal-catalog");
     try {
       await page.goto(`${origin}fixture?locale=${locale}&theme=${theme}`);
       await page.getByTestId("plugin-store-list").waitFor();
+      assert.equal(await page.getByTestId("plugin-store-segment-public").count(), 0);
+      assert.equal(await page.getByTestId("plugin-store-segment-personal").count(), 0);
+      assert.deepEqual(await cards(personalSection()), ["personal-a", "personal-b"]);
       // 配置尚未返回，默认分类已经可以展开和浏览。
       assert.deepEqual(await cards(productSection()), ["p0", "p1", "p2", "p3", "p4", "p5"]);
       release();
@@ -147,17 +151,13 @@ for (const [width, locale, theme] of [
         await page.evaluate(() => localStorage.getItem("zcode-interface-mode")),
         "general",
       );
-      // 个人与全量搜索继续按各自原来的名称顺序。
-      await page.getByTestId("plugin-store-segment-personal").click();
-      assert.deepEqual(await cards(page), ["personal-a", "personal-b"]);
-      await page.getByTestId("code").click();
-      assert.deepEqual(await cards(page), ["personal-a", "personal-b"]);
+      // 个人市场始终与官方目录同时显示；搜索继续覆盖整个列表。
+      assert.deepEqual(await cards(personalSection()), ["personal-a", "personal-b"]);
       await page.getByTestId("plugin-store-search").fill("p");
       const searchOrder = await cards(page);
       await page.getByTestId("work").click();
       assert.deepEqual(await cards(page), searchOrder);
       await page.getByTestId("plugin-store-search").fill("");
-      await page.getByTestId("plugin-store-segment-public").click();
       // 失败刷新保留现有投影，成功撤销则恢复默认顺序。
       status = 503;
       const failed = page.waitForResponse((response) => response.url().endsWith("/order"));
@@ -245,7 +245,6 @@ for (const [width, locale, theme] of [
         );
         await page.getByTestId("plugin-store-search").fill("");
       }
-      await page.getByTestId("plugin-store-segment-personal").click();
       assert.equal(
         await page
           .locator(

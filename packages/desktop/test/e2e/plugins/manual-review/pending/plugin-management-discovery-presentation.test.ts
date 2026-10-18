@@ -26,7 +26,7 @@ describe("PLM-LC-001/002 插件商店发现、入口与展示 E2E", () => {
     await clearAppData();
   });
 
-  it("覆盖默认分段、搜索、折叠、Card/Installed/Manage 入口与 pairwise 展示", async function () {
+  it("覆盖统一列表、搜索、折叠、Card/Installed/Manage 入口与 pairwise 展示", async function () {
     this.timeout(DISCOVERY_TIMEOUT_MS);
     requirePluginManualReview();
 
@@ -34,10 +34,12 @@ describe("PLM-LC-001/002 插件商店发现、入口与展示 E2E", () => {
     await openPluginSettings();
     await setPluginPresentation({ locale: "zh-CN", theme: "zai-light", width: 1440, height: 1000 });
 
-    expect(await isPressed("plugin-store-segment-public")).toBe(true);
+    expect(await hasPluginControl("plugin-store-segment-public")).toBe(false);
+    expect(await hasPluginControl("plugin-store-segment-personal")).toBe(false);
+    expect(await hasPluginControl("plugin-store-official-catalog")).toBe(true);
     await addLifecycleMarketplaceThroughUi(fixture);
-    await clickPluginControl("plugin-store-segment-personal");
-    expect(await isPressed("plugin-store-segment-personal")).toBe(true);
+    await waitForPluginControl("plugin-store-card", { pluginId: PLUGIN_LIFECYCLE_ID });
+    expect(await hasPluginControl("plugin-store-personal-catalog")).toBe(true);
 
     await setInputValueByTestIdDom("plugin-store-search", "生命周期测试插件");
     await waitForPluginControl("plugin-store-card", { pluginId: PLUGIN_LIFECYCLE_ID });
@@ -46,11 +48,11 @@ describe("PLM-LC-001/002 插件商店发现、入口与展示 E2E", () => {
 
     const groupKey = `marketplace:${PLUGIN_LIFECYCLE_MARKETPLACE_ID}`;
     await waitForPluginControl("plugin-store-group-toggle", { groupKey });
-    expect(await countPluginCards()).toBeGreaterThanOrEqual(8);
+    expect(await countPluginCards(PLUGIN_LIFECYCLE_MARKETPLACE_ID)).toBeGreaterThanOrEqual(8);
     await clickPluginControl("plugin-store-group-toggle", { groupKey });
-    expect(await countPluginCards()).toBe(6);
+    expect(await countPluginCards(PLUGIN_LIFECYCLE_MARKETPLACE_ID)).toBe(6);
     await clickPluginControl("plugin-store-group-toggle", { groupKey });
-    expect(await countPluginCards()).toBeGreaterThanOrEqual(8);
+    expect(await countPluginCards(PLUGIN_LIFECYCLE_MARKETPLACE_ID)).toBeGreaterThanOrEqual(8);
 
     await setInputValueByTestIdDom("plugin-store-search", "生命周期测试插件");
     await setMainScrollTop(180);
@@ -58,7 +60,7 @@ describe("PLM-LC-001/002 插件商店发现、入口与展示 E2E", () => {
     await capturePluginManualReview("PLM-LC-001", "detail-from-card");
     await clickPluginControl("plugin-store-detail-back");
     expect(await inputValue("plugin-store-search")).toBe("生命周期测试插件");
-    expect(await isPressed("plugin-store-segment-personal")).toBe(true);
+    expect(await hasPluginControl("plugin-store-segment-personal")).toBe(false);
     expect(await mainScrollTop()).toBeGreaterThanOrEqual(0);
 
     await installPluginThroughUi(PLUGIN_LIFECYCLE_ID);
@@ -82,18 +84,13 @@ describe("PLM-LC-001/002 插件商店发现、入口与展示 E2E", () => {
   });
 });
 
-async function isPressed(testIdValue: string): Promise<boolean> {
+async function countPluginCards(marketplaceId: string): Promise<number> {
   return browser.execute(
     (id) =>
-      document.querySelector<HTMLElement>(`[data-testid="${id}"]`)?.getAttribute("aria-pressed") ===
-      "true",
-    testIdValue,
-  );
-}
-
-async function countPluginCards(): Promise<number> {
-  return browser.execute(
-    () => document.querySelectorAll('[data-testid="plugin-store-card"]').length,
+      Array.from(document.querySelectorAll<HTMLElement>('[data-testid="plugin-store-card"]')).filter(
+        (card) => card.dataset.pluginId?.endsWith(`@${id}`),
+      ).length,
+    marketplaceId,
   );
 }
 

@@ -55,7 +55,6 @@ describe("PLG12 Plugin 商店试用状态视觉验收", () => {
     const fixture = await createPluginLifecycleFixture("1.0.0");
     await seedLifecycleMarketplaceCache(fixture.marketplaceRoot);
     await openPluginSettings();
-    await clickPluginControl("plugin-store-segment-personal");
     await openPluginCard(PLUGIN_LIFECYCLE_ID);
     await waitForPluginControl("plugin-store-example-prompt", {
       pluginId: PLUGIN_LIFECYCLE_ID,
@@ -97,7 +96,6 @@ describe("PLG12 Plugin 商店试用状态视觉验收", () => {
 
       // disabled：仍允许生成同形草稿；disabled_in_session 只在真正发送时由 Agent 判定。
       await openPluginSettings();
-      await clickPluginControl("plugin-store-segment-personal");
       await openPluginCard(PLUGIN_LIFECYCLE_ID);
       await clickPluginControl("plugin-store-enabled-switch", {
         pluginId: PLUGIN_LIFECYCLE_ID,
