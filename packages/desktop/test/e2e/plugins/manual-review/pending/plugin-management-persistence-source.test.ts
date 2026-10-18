@@ -51,7 +51,6 @@ describe("PLM-LC-004/005 插件持久化、跨本地 workspace 与来源孤立 E
     const fixture = await createPluginLifecycleFixture();
     await openPluginSettings();
     await addLifecycleMarketplaceThroughUi(fixture);
-    await clickPluginControl("plugin-store-segment-personal");
     await openPluginCard(PLUGIN_LIFECYCLE_ID);
     await installPluginThroughUi(PLUGIN_LIFECYCLE_ID);
     await configureLifecyclePluginThroughUi(PLUGIN_LIFECYCLE_CONFIG_VALUE);
@@ -124,7 +123,6 @@ describe("PLM-LC-004/005 插件持久化、跨本地 workspace 与来源孤立 E
         (marketplace) => marketplace.id === PLUGIN_LIFECYCLE_MARKETPLACE_ID,
       ),
     ).toBe(true);
-    await clickPluginControl("plugin-store-segment-personal");
     await waitForPluginCard(PLUGIN_LIFECYCLE_ID);
     await openPluginCard(PLUGIN_LIFECYCLE_ID);
     await uninstallPluginThroughUi(PLUGIN_LIFECYCLE_ID, true);

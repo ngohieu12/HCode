@@ -58,7 +58,6 @@ describe("PLM-LC-003 Personal Source 插件主生命周期 E2E", () => {
     let fixture = await createPluginLifecycleFixture("1.0.0");
     await openPluginSettings();
     await addLifecycleMarketplaceThroughUi(fixture);
-    await clickPluginControl("plugin-store-segment-personal");
     await openPluginCard(PLUGIN_LIFECYCLE_ID);
 
     for (const kind of [
@@ -145,7 +144,6 @@ describe("PLM-LC-003 Personal Source 插件主生命周期 E2E", () => {
     expect(await countCapturedRequestsContaining(PLUGIN_LIFECYCLE_EXAMPLE_PROMPT)).toBe(0);
 
     await openPluginSettings();
-    await clickPluginControl("plugin-store-segment-personal");
     await openPluginCard(PLUGIN_LIFECYCLE_ID);
     await configureLifecyclePluginThroughUi(PLUGIN_LIFECYCLE_CONFIG_VALUE);
     await setPluginEnabledThroughUi(PLUGIN_LIFECYCLE_ID, false, "detail");
@@ -206,7 +204,6 @@ describe("PLM-LC-003 Personal Source 插件主生命周期 E2E", () => {
     );
 
     await openPluginSettings();
-    await clickPluginControl("plugin-store-segment-personal");
     await openPluginCard(PLUGIN_LIFECYCLE_ID);
     await uninstallPluginThroughUi(PLUGIN_LIFECYCLE_ID, false);
     expect(

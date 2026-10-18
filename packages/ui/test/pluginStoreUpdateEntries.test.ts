@@ -86,8 +86,6 @@ async function renderListView(item: StorePluginItem, actions: PluginStoreActions
       loading: false,
       query: "",
       onQueryChange: () => {},
-      segment: "public",
-      onSegmentChange: () => {},
       onOpenManage: () => {},
     }),
   );

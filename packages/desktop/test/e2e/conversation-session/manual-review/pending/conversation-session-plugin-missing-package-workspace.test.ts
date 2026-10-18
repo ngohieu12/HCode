@@ -1,10 +1,6 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import {
-  clearAppData,
-  clickTestIdByDom,
-  getE2EAppDataPaths,
-} from "../../../helpers/desktop-app.js";
+import { clearAppData, getE2EAppDataPaths } from "../../../helpers/desktop-app.js";
 import {
   addLifecycleMarketplaceThroughUi,
   createPluginLifecycleFixture,
@@ -61,7 +57,6 @@ describe("WPL-006 Workspace Plugin missing package E2E", () => {
 
     await openPluginSettings();
     await addLifecycleMarketplaceThroughUi(fixture);
-    await clickTestIdByDom("plugin-store-segment-personal");
     await waitForPluginCard(PLUGIN_LIFECYCLE_ID);
 
     const beforeInstall = await getPluginOverview();

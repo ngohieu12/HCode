@@ -41,8 +41,6 @@ function Fixture() {
             loading={false}
             query=""
             onQueryChange={() => {}}
-            segment="public"
-            onSegmentChange={() => {}}
             onOpenManage={() => {}}
             actions={{
               onOpenDetail: setOpened,

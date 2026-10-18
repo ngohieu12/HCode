@@ -12,7 +12,7 @@ describe("Settings usage provider tabs", () => {
     expect(activeSnapshotSource).toContain('snapshot.unavailableReason === "unavailable"');
   });
 
-  it("reuses the plugin store Public and Personal segment pill style", async () => {
+  it("reuses the shared segment pill style from the plugin store list", async () => {
     const settingsPageSource = await readFile("packages/ui/src/SettingsPage.tsx", "utf8");
     const pluginStoreSource = await readFile(
       "packages/ui/src/settings/PluginStoreListView.tsx",

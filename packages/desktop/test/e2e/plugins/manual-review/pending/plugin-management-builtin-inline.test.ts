@@ -82,7 +82,6 @@ describe("PLM-LC-006/009 Builtin 抑制恢复与 inline smoke E2E", () => {
     await seedInlineLifecyclePlugin();
     await restartPluginLifecycleApp();
     await openPluginSettings();
-    await clickPluginControl("plugin-store-segment-personal");
     await waitForPluginCard(PLUGIN_INLINE_ID, 60000);
     await openPluginCard(PLUGIN_INLINE_ID);
     await waitForPluginControl("plugin-store-component-section", { componentKind: "skill" });
