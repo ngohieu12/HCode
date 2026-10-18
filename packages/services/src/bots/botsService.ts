@@ -212,27 +212,27 @@ function parseBotModelOptionValue(value: string): ModelSelection | undefined {
 const BOT_REPLY_GRANULARITY_OPTIONS = [
   {
     id: "assistant_changes",
-    label: { "zh-CN": "标准回复", "en-US": "Standard reply" },
-    aliases: ["assistant", "assistant_changes", "normal", "default", "standard", "标准回复"],
+    label: "Standard reply",
+    aliases: ["assistant", "assistant_changes", "normal", "default", "standard"],
   },
   {
     id: "assistant_toolcalls_changes",
-    label: { "zh-CN": "完整回复", "en-US": "Full reply" },
-    aliases: ["full", "tool", "toolcalls", "assistant_toolcalls_changes", "完整回复"],
+    label: "Full reply",
+    aliases: ["full", "tool", "toolcalls", "assistant_toolcalls_changes"],
   },
   {
     id: "summary_changes",
-    label: { "zh-CN": "摘要回复", "en-US": "Summary reply" },
-    aliases: ["summary", "summary_changes", "latest", "摘要回复"],
+    label: "Summary reply",
+    aliases: ["summary", "summary_changes", "latest"],
   },
   {
     id: "streaming_card",
-    label: { "zh-CN": "流式卡片", "en-US": "Streaming card" },
-    aliases: ["stream", "streaming", "streaming_card", "流式", "流式卡片"],
+    label: "Streaming card",
+    aliases: ["stream", "streaming", "streaming_card"],
   },
 ] as const satisfies ReadonlyArray<{
   id: BotReplyGranularity;
-  label: Record<"zh-CN" | "en-US", string>;
+  label: string;
   aliases: readonly string[];
 }>;
 
@@ -437,14 +437,13 @@ function normalizeText(value: string): string {
   return value.trim().toLowerCase();
 }
 
-function getReplyGranularityOptions(locale: Locale | undefined, provider?: BotProvider) {
-  const messageLocale = locale === "en-US" ? "en-US" : "zh-CN";
+function getReplyGranularityOptions(_locale: Locale | undefined, provider?: BotProvider) {
   const supportedIds = provider ? new Set(getSupportedBotReplyGranularities(provider)) : null;
   return BOT_REPLY_GRANULARITY_OPTIONS.filter(
     (option) => !supportedIds || supportedIds.has(option.id),
   ).map((option) => ({
     id: option.id,
-    label: option.label[messageLocale],
+    label: option.label,
   }));
 }
 
@@ -463,8 +462,7 @@ function resolveReplyGranularityByValue(
   const option = BOT_REPLY_GRANULARITY_OPTIONS.find(
     (item) =>
       (item.aliases as readonly string[]).includes(normalized) ||
-      normalizeText(item.label["zh-CN"]) === normalized ||
-      normalizeText(item.label["en-US"]) === normalized,
+      normalizeText(item.label) === normalized,
   );
   return option ? (options.find((item) => item.id === option.id) ?? null) : null;
 }
@@ -586,11 +584,9 @@ function getBotPermissionOptionDisplayKind(
   option: ZCodePermissionOption,
 ): BotPermissionOptionDisplayKind {
   const text = `${option.optionId} ${option.kind} ${option.name}`.toLowerCase();
-  const isAlways =
-    /\b(always|persistent|permanent|remember)\b/u.test(text) ||
-    /始终|永久|记住|不再询问/u.test(text);
-  const isAllow = /\b(allow|approve|accept|yes)\b/u.test(text) || /允许|同意|批准/u.test(text);
-  const isReject = /\b(deny|reject|decline|no)\b/u.test(text) || /拒绝|不允许|否/u.test(text);
+  const isAlways = /\b(always|persistent|permanent|remember)\b/u.test(text);
+  const isAllow = /\b(allow|approve|accept|yes)\b/u.test(text);
+  const isReject = /\b(deny|reject|decline|no)\b/u.test(text);
   if (isAllow) {
     return isAlways ? "allowAlways" : "allowOnce";
   }
@@ -610,31 +606,16 @@ function sortBotPermissionOptions(
   });
 }
 
-function formatBotPermissionOptionLabel(option: ZCodePermissionOption, locale?: Locale): string {
-  const displayKind = getBotPermissionOptionDisplayKind(option);
-  if (locale === "en-US") {
-    switch (displayKind) {
-      case "allowOnce":
-        return "Allow";
-      case "allowAlways":
-        return "Always Allow";
-      case "rejectOnce":
-        return "Deny";
-      case "rejectAlways":
-        return "Always Deny";
-      case "custom":
-        return option.name;
-    }
-  }
-  switch (displayKind) {
+function formatBotPermissionOptionLabel(option: ZCodePermissionOption, _locale?: Locale): string {
+  switch (getBotPermissionOptionDisplayKind(option)) {
     case "allowOnce":
-      return "允许";
+      return "Allow";
     case "allowAlways":
-      return "始终允许";
+      return "Always Allow";
     case "rejectOnce":
-      return "拒绝";
+      return "Deny";
     case "rejectAlways":
-      return "始终拒绝";
+      return "Always Deny";
     case "custom":
       return option.name;
   }
@@ -643,51 +624,31 @@ function formatBotPermissionOptionLabel(option: ZCodePermissionOption, locale?: 
 function formatBotPermissionOptionDescription(
   option: ZCodePermissionOption,
   request: Pick<ZCodePermissionRequest, "title" | "description" | "kind" | "raw">,
-  locale?: Locale,
+  _locale?: Locale,
 ): string | undefined {
   const displayKind = getBotPermissionOptionDisplayKind(option);
   if (displayKind === "custom") {
     return option.kind;
   }
   const scope = getPermissionRequestPreview(request).scope;
-  if (locale === "en-US") {
-    if (displayKind === "allowOnce") {
-      return "Allow this time only";
-    }
-    if (displayKind === "rejectOnce") {
-      return "Reject this time";
-    }
-    if (displayKind === "allowAlways") {
-      return scope === "command"
-        ? "Do not ask again for the same command"
-        : scope === "file"
-          ? "Do not ask again for the same file operation"
-          : "Do not ask again for the same permission request";
-    }
-    return scope === "command"
-      ? "Always reject the same command"
-      : scope === "file"
-        ? "Always reject the same file operation"
-        : "Always reject the same permission request";
-  }
   if (displayKind === "allowOnce") {
-    return "仅允许这一次";
+    return "Allow this time only";
   }
   if (displayKind === "rejectOnce") {
-    return "这次先拒绝";
+    return "Reject this time";
   }
   if (displayKind === "allowAlways") {
     return scope === "command"
-      ? "后续相同命令不再询问"
+      ? "Do not ask again for the same command"
       : scope === "file"
-        ? "后续相同文件操作不再询问"
-        : "后续相同权限请求不再询问";
+        ? "Do not ask again for the same file operation"
+        : "Do not ask again for the same permission request";
   }
   return scope === "command"
-    ? "后续相同命令也会直接拒绝"
+    ? "Always reject the same command"
     : scope === "file"
-      ? "后续相同文件操作也会直接拒绝"
-      : "后续相同权限请求也会直接拒绝";
+      ? "Always reject the same file operation"
+      : "Always reject the same permission request";
 }
 
 function isBotPermissionRejectOption(option: ZCodePermissionOption): boolean {
@@ -710,11 +671,11 @@ function stripModelProviderDescriptionsForTextSelection(
   };
 }
 
-function formatWorkspaceOptionLabel(workspace: BotWorkspaceRef, locale?: Locale): string {
+function formatWorkspaceOptionLabel(workspace: BotWorkspaceRef, _locale?: Locale): string {
   if (!workspace.workspaceIdentity) {
     return workspace.label;
   }
-  const remoteLabel = locale === "en-US" ? "[Remote]" : "[远端]";
+  const remoteLabel = "[Remote]";
   return `${workspace.label} ${remoteLabel}`;
 }
 
@@ -1039,7 +1000,7 @@ export function createBotsService(
           topicTitle = actor.threadId;
         }
       }
-      // 话题只继承配置快照；不能复制默认任务的输入、问答或审批授权。
+      // 话题只继承配置快照；不能复制Default任务的输入、问答或审批授权。
       const topic: BotContextState = {
         botId: bot.id,
         workspacePath: parent.workspacePath,
@@ -1130,26 +1091,15 @@ export function createBotsService(
       const scope = await readQueueCardScope(key);
       // 话题复用单向状态记录，但不渲染或更新历史遗留排队卡。
       if (!scope || scope.context.group?.threadId) return;
-      const english = (await readMessageLocale()) === "en-US";
-      const text: Record<BotGroupInputStatus, string> = english
-        ? {
-            waiting: "Waiting to run",
-            working: "Running",
-            done: "Completed",
-            failed: "Failed",
-            stopped: "Stopped",
-            cancelled: "Cancelled",
-            discarded: "Not executed",
-          }
-        : {
-            waiting: "等待执行",
-            working: "正在执行",
-            done: "已完成",
-            failed: "执行失败",
-            stopped: "已停止",
-            cancelled: "已取消",
-            discarded: "未执行",
-          };
+      const text: Record<BotGroupInputStatus, string> = {
+        waiting: "Waiting to run",
+        working: "Running",
+        done: "Completed",
+        failed: "Failed",
+        stopped: "Stopped",
+        cancelled: "Cancelled",
+        discarded: "Not executed",
+      };
       const adapter = providers[scope.bot.provider];
       if (!adapter?.updateTransientInteractionCard)
         throw new Error("Queue card update unavailable");
@@ -1710,14 +1660,7 @@ export function createBotsService(
     const auth = await withAuthorizedContext(message, "workspace");
     if (!auth.ok) return auth.reply;
     if (!auth.context.group)
-      return [
-        createOutbound(
-          message.actor,
-          auth.locale === "en-US"
-            ? "Topic history is configured in a group."
-            : "请在群里配置话题历史读取。",
-        ),
-      ];
+      return [createOutbound(message.actor, "Topic history is configured in a group.")];
     const key = getBotConversationKey({
       ...message.actor,
       threadId: undefined,
@@ -1743,13 +1686,9 @@ export function createBotsService(
     return [
       createOutbound(
         message.actor,
-        auth.locale === "en-US"
-          ? active
-            ? "Topic history enabled. The next topic input reconciles discussion history."
-            : "Topic history is off. Topic input is paused."
-          : active
-            ? "已开启话题历史读取。下次话题输入会补齐讨论历史。"
-            : "话题历史读取已关闭，话题输入已暂停。",
+        active
+          ? "Topic history enabled. The next topic input reconciles discussion history."
+          : "Topic history is off. Topic input is paused.",
       ),
     ];
   }
@@ -1848,9 +1787,7 @@ export function createBotsService(
       return reply;
     const hint =
       error.reason === "model"
-        ? cachedLocale === "en-US"
-          ? "Please check this conversation's model configuration."
-          : "请机器人管理员检查当前会话的模型配置。"
+        ? "Please check this conversation's model configuration."
         : undefined;
     return administratorReply(
       actor,
@@ -2026,11 +1963,7 @@ export function createBotsService(
   ): Promise<PreparedBotMessageContent> {
     const isGroup = message.actor.chatType === "group";
     if (isGroup && (message.attachments?.length ?? 0) > BOT_MAX_ATTACHMENTS_PER_MESSAGE) {
-      throw new Error(
-        locale === "en-US"
-          ? "Attach at most 4 files per message."
-          : "每条消息最多提交 4 个附件，请拆分后发送。",
-      );
+      throw new Error("Attach at most 4 files per message.");
     }
     const rawAttachments = (message.attachments ?? []).slice(0, BOT_MAX_ATTACHMENTS_PER_MESSAGE);
     const zcodeAttachments: ZCodePromptAttachment[] = [];
@@ -2040,7 +1973,7 @@ export function createBotsService(
       if (!resolved) {
         if (isGroup) throw new Error("attachment download failed");
         fileLines.push(
-          `附件：${rawAttachment.filename} (${rawAttachment.mimeType}, ${formatAttachmentSize(rawAttachment.sizeBytes)})，未能下载。`,
+          `Attachment: ${rawAttachment.filename} (${rawAttachment.mimeType}, ${formatAttachmentSize(rawAttachment.sizeBytes)}) could not be downloaded.`,
         );
         continue;
       }
@@ -2080,12 +2013,12 @@ export function createBotsService(
         // 下游 agent 可能把内部临时 URL 再 curl 到 /tmp，导致重复下载、额外权限请求和模型安全拦截。
         // 因此同时把本地缓存路径写进 prompt，明确后续工具操作只能围绕本地文件进行。
         fileLines.push(
-          `附件：${cached.filename} (${cached.mimeType}, ${formatAttachmentSize(cached.sizeBytes)})，已作为${cached.kind === "image" ? "图片" : "音频"}输入提供，并保存到：${cached.localPath}。如需读取附件，请直接使用这个本地路径，不要下载或访问临时/远程 URL。`,
+          `Attachment: ${cached.filename} (${cached.mimeType}, ${formatAttachmentSize(cached.sizeBytes)}) was provided as ${cached.kind === "image" ? "image" : "audio"} input and saved to: ${cached.localPath}. To read the attachment, use this local path directly; do not download or access temporary or remote URLs.`,
         );
         continue;
       }
       fileLines.push(
-        `附件：${cached.filename} (${cached.mimeType}, ${formatAttachmentSize(cached.sizeBytes)})，已保存到：${cached.localPath}`,
+        `Attachment: ${cached.filename} (${cached.mimeType}, ${formatAttachmentSize(cached.sizeBytes)}) saved to: ${cached.localPath}`,
       );
     }
     const trimmed = message.text.trim();
@@ -2114,7 +2047,7 @@ export function createBotsService(
       return true;
     }
     if (!deps.remoteWorkspaceService) {
-      // Bugfix: 远端 workspace 没有注入重连服务时，不能默认当作已连接。
+      // Bugfix: 远端 workspace 没有注入重连服务时，不能Default当作已连接。
       // 否则 Bot 会继续使用缓存模型创建 task，最终在远端 API 层才暴露“模型不存在”等误导性错误。
       return false;
     }
@@ -2161,7 +2094,7 @@ export function createBotsService(
     // 否则 /root 这类远端路径会在 macOS/Windows 本地 host 创建任务，模型和文件系统都错位。
     throw new BotAdminRequiredError(
       "remote",
-      `当前远端项目 ${context.workspacePath} runtime 不可用，请发送 **/重连** 后重试。`,
+      `Remote project ${context.workspacePath} runtime is unavailable. Send **/reconnect** and try again.`,
     );
   }
 
@@ -2176,7 +2109,7 @@ export function createBotsService(
     if (service) return service;
     throw new BotAdminRequiredError(
       "remote",
-      `当前远端项目 ${context.workspacePath} runtime 不可用，请发送 **/重连** 后重试。`,
+      `Remote project ${context.workspacePath} runtime is unavailable. Send **/reconnect** and try again.`,
     );
   }
 
@@ -2197,7 +2130,7 @@ export function createBotsService(
       return null;
     }
     // Bugfix: 普通消息、配置修改和权限响应不应该隐式改变远端连接状态。
-    // 远端恢复只允许显式 /reconnect 触发，避免同一条消息有时执行、有时只是在后台打开连接。
+    // 远端恢复只Allow显式 /reconnect 触发，避免同一条消息有时执行、有时只是在后台打开连接。
     return [
       administratorReply(
         params.message.actor,
@@ -2213,8 +2146,8 @@ export function createBotsService(
     ];
   }
 
-  function currentOptionSuffix(locale: Locale | undefined): string {
-    return locale === "en-US" ? "current" : "当前";
+  function currentOptionSuffix(_locale: Locale | undefined): string {
+    return "current";
   }
 
   function formatReplyGranularityLabel(
@@ -2261,7 +2194,7 @@ export function createBotsService(
     return [];
   }
   async function ensureBotStorageMigrated(): Promise<void> {
-    // 单向导入已收口到 Repo；这里只等待初始化，不再读取旧模型字段或重写当前状态。
+    // 单向导入已收口到 Repo；这里只等待初始化，不再读取旧模型字段或重写current状态。
     if (!botStorageMigrationPromise) {
       botStorageMigrationPromise = Promise.all([repo.readConfig(), repo.readState()])
         .then(() => undefined)
@@ -2328,12 +2261,11 @@ export function createBotsService(
     if (!provider) {
       return option.label;
     }
-    const isEnglish = locale === "en-US";
     const labels: Partial<Record<ZCodeProvider, Record<string, string>>> = {
       glm: {
-        default: isEnglish ? "Default" : "默认",
+        default: "Default",
         yolo: "Yolo",
-        plan: isEnglish ? "Plan" : "计划",
+        plan: isEnglish ? "Plan" : "Plan",
       },
     };
     return labels[provider]?.[option.id] ?? option.label;
@@ -2388,7 +2320,7 @@ export function createBotsService(
   ): Promise<BotModelProviderOption[]> {
     const view = await readModelSelectionView(context);
     // 旧缓存没有 workspaceIdentity 隔离，远端断连时会显示其他 Host 的候选。
-    // 当前菜单只消费目标 View；失败留空，下一次正常读取即可恢复，不借本地补选。
+    // current菜单只消费目标 View；失败留空，下一次正常读取即可恢复，不借本地补选。
     if (!view) return [];
     return view.providers
       .map(createModelSelectionProviderOption)
@@ -2594,7 +2526,7 @@ export function createBotsService(
     );
     if (context.workspaceIdentity && !(await isRemoteWorkspaceConnected(context))) {
       // Bugfix: 远端断连时初始化草稿也不能偷偷申请远端 ZCode Agent runtime。
-      // 只有 /reconnect 能恢复连接；草稿先保留最小默认值，重连成功后再刷新。
+      // 只有 /reconnect 能恢复连接；草稿先保留最小Default值，重连成功后再刷新。
       return { provider: requestedProvider };
     }
     const resolvedProvider = requestedProvider;
@@ -2615,7 +2547,7 @@ export function createBotsService(
       () => [],
     );
     const resolvedProvider = normalizeAgentProviderToZCodeAgent(activeTask.provider);
-    // Bot 硬锁 yolo：继承当前 task 时也强制 yolo，不沿用原 task 的 mode。
+    // Bot 硬锁 yolo：继承current task 时也强制 yolo，不沿用原 task 的 mode。
     const forcedMode = resolveSupportedDraftMode(
       configOptions,
       "group" in context && context.group ? "default" : BOT_FORCED_MODE,
@@ -2733,7 +2665,7 @@ export function createBotsService(
         mode: (forcedDraftMode ?? "default") as ZCodeTaskMode,
       });
     } else if (modeOption?.id) {
-      // provider 不支持 yolo（非 ZCode Agent）：保持其自身默认模式，避免首条消息回调失败。
+      // provider 不支持 yolo（非 ZCode Agent）：保持其自身Default模式，避免首条消息回调失败。
       botsLogger.debug(
         traceId,
         `skip forced yolo mode unsupported provider=${draftOptions.provider}`,
@@ -2806,13 +2738,13 @@ export function createBotsService(
     }
     if (actor.provider !== "weixin") {
       // Bugfix: 只有微信没有结构化选项，只能靠“回复数字”承接 pending selection。
-      // Telegram/飞书等 provider 有按钮回调，普通文本不应被隐式解析成菜单选择。
+      // Telegram/Feishu等 provider 有按钮回调，普通文本不应被隐式解析成菜单选择。
       clearPendingSelection(actor);
       return null;
     }
     if (!isSelectionIndexValue(value)) {
       // Bugfix: /task 等列表命令会留下 pending selection。
-      // 旧逻辑允许普通文本按 label 命中选项，用户输入与 task 标题同名的消息时会被误切 task。
+      // 旧逻辑Allow普通文本按 label 命中选项，用户输入与 task 标题同名的消息时会被误切 task。
       // 隐式选择只接受纯数字；按 id/label 选择仍通过显式 /task <value> 等命令完成。
       clearPendingSelection(actor);
       return null;
@@ -2890,7 +2822,7 @@ export function createBotsService(
     }
     const adapter = providers[existing.bot.provider];
     try {
-      // 修复原因：交互完成后撤回卡片会让问答和计划从聊天历史消失，用户无法回看
+      // 修复原因：交互完成后撤回卡片会让问答和Plan从聊天历史消失，用户无法回看
       // 决策上下文。终态只更新为无控件卡片并释放运行时句柄，后续交互会创建新卡。
       await adapter?.updateTransientInteractionCard?.(existing.bot, existing.handle, fallback);
     } catch (error) {
@@ -3083,13 +3015,10 @@ export function createBotsService(
       onDeliveryResult(bot, undefined);
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
-      const locale = await readMessageLocale();
       onDeliveryResult(
         bot,
         bot.provider === "weixin"
-          ? locale === "en-US"
-            ? `${detail}. Send a message to the bot in Weixin, then retry.`
-            : `${detail}。请在微信给机器人发一条消息后重试。`
+          ? `${detail}. Send a message to the bot in Weixin, then retry.`
           : detail,
       );
       throw error;
@@ -3192,7 +3121,7 @@ export function createBotsService(
     if (recentInboundDeliveryAtByKey.has(deliveryKey)) {
       return false;
     }
-    // Bugfix: 飞书 WebSocket 可能重投同一条 im.message.receive_v1，微信/Telegram 也可能在重试后重放同一 message id。
+    // Bugfix: Feishu WebSocket 可能重投同一条 im.message.receive_v1，微信/Telegram 也可能在重试后重放同一 message id。
     // 普通消息有创建/发送任务的副作用，必须在进入业务处理前按 provider message id 幂等，避免同一句 hello 被执行两轮。
     recentInboundDeliveryAtByKey.set(deliveryKey, now);
     return true;
@@ -3226,7 +3155,7 @@ export function createBotsService(
     if (isLongRunningTyping) {
       return;
     }
-    // Bugfix: 飞书 sendTyping 只负责给本次入站消息加 Typing reaction。
+    // Bugfix: Feishu sendTyping 只负责给本次入站消息加 Typing reaction。
     // 短命令回复发送完成后必须按同一 messageId 显式删除，避免依赖定时兜底或等下一条命令清理。
     await adapter
       .stopTyping(bot, {
@@ -3809,8 +3738,8 @@ export function createBotsService(
     }
     const parsedInboundMessages = adapter.parseCallback(parsePayload);
     if (isFeishuBotProvider(provider)) {
-      // Bugfix: 飞书 WebSocket connected 只代表长连接已建成，不代表事件订阅已经推到本机。
-      // 这里记录入口 payload 摘要和解析数量，方便区分“飞书未推事件”和“payload 形状未被解析”。
+      // Bugfix: Feishu WebSocket connected 只代表长连接已建成，不代表事件订阅已经推到本机。
+      // 这里记录入口 payload 摘要和解析数量，方便区分“Feishu未推事件”和“payload 形状未被解析”。
       botsLogger.debug(
         undefined,
         `provider callback parsed provider=${provider} count=${parsedInboundMessages.length} ${summarizeCallbackPayload(preparedPayload)}`,
@@ -3862,7 +3791,7 @@ export function createBotsService(
             };
           }
         } catch (error) {
-          // Bugfix: 飞书 displayName 需要额外通讯录权限，权限缺失时不能阻断消息处理和绑定。
+          // Bugfix: Feishu displayName 需要额外通讯录权限，权限缺失时不能阻断消息处理和绑定。
           botsLogger.debug(
             undefined,
             `resolve actor displayName failed provider=${provider} bot=${inbound.botId} user=${inbound.actor.providerUserId}: ${error instanceof Error ? error.message : String(error)}`,
@@ -3935,7 +3864,7 @@ export function createBotsService(
       replies.push(...outbound);
       if (inboundBusinessFailure) {
         // Bugfix：错误提示发送成功不等于业务消息已经消费成功。此处不能执行 callback ACK，
-        // 否则飞书会移除按钮；最终 ok=false 也会阻止 Telegram/微信提交外部游标。
+        // 否则Feishu会移除按钮；最终 ok=false 也会阻止 Telegram/微信提交外部游标。
         if (bot) {
           for (const outboundMessage of outbound) {
             await sendOutbound(bot, outboundMessage).catch((sendError) => {
@@ -3997,7 +3926,7 @@ export function createBotsService(
             }),
           ]);
         } catch (error) {
-          // 修复原因：飞书第二题原本必须等待 card/update 完成；credential 或 SDK 内部
+          // 修复原因：Feishu第二题原本必须等待 card/update 完成；credential 或 SDK 内部
           // 任一步骤悬挂都会压住 fallback。主流程自己设 deadline，超时后立即另发下一题。
           botsLogger.warn(
             undefined,
@@ -4024,13 +3953,13 @@ export function createBotsService(
           transientCard &&
           outbound[0]?.elicitation
         ) {
-          // 修复原因：真实飞书日志确认 card/update 返回成功后客户端仍可能停在旧题。
+          // 修复原因：真实Feishu日志确认 card/update 返回成功后客户端仍可能停在旧题。
           // callback token 负责点击 ACK，随后再 PATCH 同一 message_id 强制刷新可见结构；
           // 两次写入始终指向同一张卡，禁止退回“新建后撤回”的闪烁方案。
           await providers[transientCard.bot.provider]
             ?.updateTransientInteractionCard?.(transientCard.bot, transientCard.handle, outbound[0])
             .catch((error) => {
-              // 业务回答已被 Agent 接受且 callback token 已完成 ACK，PATCH 失败不能让
+              // 业务回答已被 Agent 接受且 callback token Completed ACK，PATCH 失败不能让
               // Telegram/微信式外部游标重试整次回答，否则会重复提交同一交互。
               botsLogger.warn(
                 undefined,
@@ -4297,7 +4226,7 @@ export function createBotsService(
     if (
       question.multiSelect &&
       options.includeSubmit !== false &&
-      ["submit", "done", "完成", "提交", BOT_ELICITATION_SUBMIT_OPTION_ID].includes(normalized)
+      ["submit", "done", BOT_ELICITATION_SUBMIT_OPTION_ID].includes(normalized)
     ) {
       return BOT_ELICITATION_SUBMIT_OPTION_ID;
     }
@@ -4421,7 +4350,7 @@ export function createBotsService(
     }
     if (outcome === "timeout") {
       // 修复原因：v4/UI 进度广播只是辅助同步。广播 RPC 悬挂时若一直 await，
-      // 飞书按钮回调无法生成下一题，也到不了 card/update，用户会永久停在第一题。
+      // Feishu按钮回调无法生成下一题，也到不了 card/update，用户会永久停在第一题。
       botsLogger.warn(
         undefined,
         `elicitation progress broadcast timed out task=${pending.taskId} request=${pending.requestId}`,
@@ -4441,7 +4370,7 @@ export function createBotsService(
       pending.expandedCustomAnswerQuestionIndexes?.includes(pending.currentQuestionIndex) === true;
     if (pending.renderContext?.kind === "plan_approval") {
       // Bugfix: Feishu 卡片能直接消费 schema.plan，但 Telegram/微信只渲染 message.text。
-      // 在共享出站标题中投影完整计划，确保所有纯文本渠道都保留审批上下文。
+      // 在共享出站标题中投影完整Plan，确保所有纯文本渠道都保留审批上下文。
       return [
         pending.renderContext.plan,
         "------",
@@ -4479,7 +4408,7 @@ export function createBotsService(
           ? `${selectedValues.has(option.value) ? "[x]" : "[ ]"} ${option.label}`
           : option.label,
         // Plan approval 的说明属于语义元数据；纯文本渠道只展示批准/自定义两个动作，
-        // 避免把“退出计划模式”展开成额外正文，保持与 Feishu 卡片一致。
+        // 避免把“退出Plan模式”展开成额外正文，保持与 Feishu 卡片一致。
         description:
           pending.renderContext?.kind === "plan_approval" ? undefined : option.description,
       })) ?? [];
@@ -4630,7 +4559,7 @@ export function createBotsService(
       // Bugfix: AskUserQuestion 只是在回复问题，不属于命令配置成功；这里保留原问答提交文案，避免误回 /status。
       return [createCompletedElicitationOutbound(actor, pending, auth.locale, action)];
     }
-    // Bugfix: 取消/拒绝问答也应使用问答自己的结果文案，避免第三方 Bot 里出现无关的任务状态。
+    // Bugfix: 取消/Deny问答也应使用问答自己的结果文案，避免第三方 Bot 里出现无关的任务状态。
     return [createCompletedElicitationOutbound(actor, pending, auth.locale, action)];
   }
 
@@ -4660,7 +4589,7 @@ export function createBotsService(
     };
     await writeContext({ ...auth.context, pendingElicitation: nextPending });
     // Bugfix: Bot 侧代选 AskUserQuestion 后，UI 只收到最终响应会停留在旧本地草稿。
-    // 每次推进题号都同步当前题号和已选答案，让桌面/移动 Web 能保持同一选中态。
+    // 每次推进题号都同步current题号和已选答案，让桌面/移动 Web 能保持同一选中态。
     await broadcastPendingElicitationProgress(auth.context, nextPending);
     return createElicitationReply(actor, nextPending, auth.locale);
   }
@@ -4689,8 +4618,8 @@ export function createBotsService(
     if (actor.provider !== "weixin") {
       const expectedToken = getPendingElicitationSelectionToken(pending);
       if (!parsedValue.token || parsedValue.token !== expectedToken) {
-        // Bugfix: Telegram/飞书/Webhook 的旧按钮可能在新一轮 AskUserQuestion 后才送达。
-        // 非微信通道必须带本轮短 token，避免把上一轮按钮编号误当成当前问题的答案。
+        // Bugfix: Telegram/Feishu/Webhook 的旧按钮可能在新一轮 AskUserQuestion 后才送达。
+        // 非微信通道必须带本轮短 token，避免把上一轮按钮编号误当成current问题的答案。
         return [createOutbound(actor, msg(auth.locale, "elicitationExpired"))];
       }
     }
@@ -4708,8 +4637,8 @@ export function createBotsService(
       if (nextValues.length === 0) {
         return createElicitationReply(actor, pending, auth.locale);
       }
-      // Bugfix: 飞书/Lark 平铺选项由按钮维护草稿，表单只负责提交和自定义输入。
-      // 提交时需要合并当前 radio/checkbox 草稿和自定义输入，避免空表单把已选项覆盖掉。
+      // Bugfix: Feishu/Lark 平铺选项由按钮维护草稿，表单只负责提交和自定义输入。
+      // 提交时需要合并current radio/checkbox 草稿和自定义输入，避免空表单把已选项覆盖掉。
       return advancePendingElicitation(auth, actor, pending, {
         ...pending.answers,
         [answerKey]: nextValues,
@@ -5037,13 +4966,7 @@ export function createBotsService(
         !(await deps.credentialService.load(weixinContextKey(bot, actor.providerUserId)))
       ) {
         privateDeliveryFailed = true;
-        const locale = await readMessageLocale();
-        onDeliveryResult(
-          bot,
-          locale === "en-US"
-            ? "Send a message to the bot in Weixin, then retry."
-            : "请在微信给机器人发一条消息后重试。",
-        );
+        onDeliveryResult(bot, "Send a message to the bot in Weixin, then retry.");
         return;
       }
       if (automationGroupKey) {
@@ -5285,13 +5208,13 @@ export function createBotsService(
               if (!streamingCardHandle) {
                 streamingCardHandle = result ?? null;
                 if (!streamingCardHandle) {
-                  // Bug 根因：飞书创建接口可能 code=0 却不返回 message_id。若把这种静默失败
+                  // Bug 根因：Feishu创建接口可能 code=0 却不返回 message_id。若把这种静默失败
                   // 当成成功推进 segmentIndex，未投递的中间段会被永久跳过；必须统一进入退避重试。
                   throw new Error("Feishu create streaming card returned no message_id.");
                 }
               }
               if (index < states.length - 1) {
-                // 修复原因：当前卡片达到飞书元素预算后必须保留为 sealed 历史段，
+                // 修复原因：current卡片达到Feishu元素预算后必须保留为 sealed 历史段，
                 // 后续 block 只写入新卡片，不能把已展示内容再次发送或继续更新旧 message_id。
                 streamingCardSegmentIndex = index + 1;
                 streamingCardHandle = null;
@@ -5476,15 +5399,10 @@ export function createBotsService(
             );
             // 话题不再提供排队/Steer 交互；旧运行丢弃事件只更新原输入状态与表情。
             if (latest.group.threadId) continue;
-            const locale = await readMessageLocale();
             const text =
               event.reason === "session_resumed"
-                ? locale === "en-US"
-                  ? "Queued input was discarded after runtime restart; it was not executed."
-                  : "排队输入已在运行时重启后丢弃，未执行。"
-                : locale === "en-US"
-                  ? "Queued input was removed or rejected; it will not execute."
-                  : "排队输入已删除或被拒绝，不会执行。";
+                ? "Queued input was discarded after runtime restart; it was not executed."
+                : "Queued input was removed or rejected; it will not execute.";
             const inputActor: BotActor = {
               ...actor,
               providerUserId: input.source.senderId,
@@ -5558,7 +5476,7 @@ export function createBotsService(
       if (shouldBroadcast) {
         await broadcastTaskStreamEvent(context, event);
       }
-      // Bugfix: 第三方默认回复需要随 AssistantMessageResponse 流式发送；
+      // Bugfix: 第三方Default回复需要随 AssistantMessageResponse 流式发送；
       // 但 /status Progress 仍然要独立缓存，避免受发送颗粒度影响。
       updateLiveStatusProgress(event);
       if (event.type === "agent_message_chunk") {
@@ -5573,7 +5491,7 @@ export function createBotsService(
         }
         if (getMode() !== "summary_changes") {
           assistantReplyBuffer += event.content;
-          // 第三方平台消息是离散气泡；formatter 负责把当前 buffer 按长度约束拆成可发送消息。
+          // 第三方平台消息是离散气泡；formatter 负责把current buffer 按长度约束拆成可发送消息。
           await flushAssistantReplyBuffer(false);
         }
         return;
@@ -5637,8 +5555,8 @@ export function createBotsService(
         await broadcastTaskListChange(context, event.taskId, "permission_request", {
           permissionRequest: event,
         });
-        // Bugfix: UI 会把 ZCode Agent 原始权限选项规整成“允许/始终允许/拒绝”的固定顺序和文案；
-        // 机器人之前直接展示 provider 原始英文 name，还额外加取消按钮，导致同一个权限请求在飞书和 UI 看起来不一致。
+        // Bugfix: UI 会把 ZCode Agent 原始权限选项规整成“Allow/始终Allow/Deny”的固定顺序和文案；
+        // 机器人之前直接展示 provider 原始英文 name，还额外加取消按钮，导致同一个权限请求在Feishu和 UI 看起来不一致。
         const permissionOptions = sortBotPermissionOptions(event.options);
         const permissionSelection: SelectionPrompt = {
           id: `permission-${event.requestId}`,
@@ -5660,7 +5578,7 @@ export function createBotsService(
           }),
         };
         // Bugfix: Telegram callback_data 只有 64 字节，真实 toolCallId/requestId 可能过长。
-        // 因此按钮只回传短序号，真实 requestId/optionId 暂存在当前 bot context 中再解析。
+        // 因此按钮只回传短序号，真实 requestId/optionId 暂存在current bot context 中再解析。
         const pendingPermissionOptions = permissionOptions.map((option) => {
           const isDenyCommand = isBotPermissionRejectOption(option);
           return {
@@ -5876,7 +5794,7 @@ export function createBotsService(
           const source = resultSourceCommandId
             ? context.group?.inputs?.[resultSourceCommandId]?.source
             : undefined;
-          // 无 @ 续聊允许模型不参与，空输出不能再被“任务已完成”兜底变成抢答。
+          // 无 @ 续聊Allow模型不参与，空输出不能再被“任务Completed”兜底变成抢答。
           if (
             context.group?.threadId &&
             source?.botIdentity &&
@@ -5884,10 +5802,7 @@ export function createBotsService(
             !source.messages?.some((message) => message.mentionedBot === true)
           )
             return;
-          await sendTaskOutbound(
-            bot,
-            createOutbound(actor, locale === "en-US" ? "Task completed." : "任务已完成。"),
-          );
+          await sendTaskOutbound(bot, createOutbound(actor, "Task completed."));
           return;
         }
         for (const text of replyMessages) {
@@ -5976,7 +5891,7 @@ export function createBotsService(
               taskId: context.activeTaskId!,
               // Bugfix: Bot channel 使用 direct stream 语义。
               // 手机远控 replayable 的 mirror replay / snapshot gap recovery 会改变 bot 回复边界，
-              // 这里使用 bot 专属 continuous 订阅，避免远控恢复逻辑影响飞书/微信等 channel。
+              // 这里使用 bot 专属 continuous 订阅，避免远控恢复逻辑影响Feishu/微信等 channel。
               deliveryKind: "bot-channel-continuous",
             })(receive)
           : zcodeTaskService.onDynamicStreamEvent(context.activeTaskId!)(receive),
@@ -6009,8 +5924,8 @@ export function createBotsService(
   ): Promise<BotOutboundMessage[]> {
     const markedSelection = markCurrentSelection(selection, locale);
     // Bugfix: 微信没有原生选项卡能力，只能走纯文本编号选项。
-    // 之前纯文本 fallback 会同时展示标题里的“当前”和选项上的“当前”标记，
-    // 微信回复看起来像重复状态文案；这里让标题负责说明当前状态，列表只保留可回复的编号。
+    // 之前纯文本 fallback 会同时展示标题里的“current”和选项上的“current”标记，
+    // 微信回复看起来像重复状态文案；这里让标题负责说明current状态，列表只保留可回复的编号。
     const supportsStructuredSelection = actor.provider !== "weixin";
     // Bugfix: 微信 /model 第一层选择的是供应商，之前复用 description 把模型列表也拼进同一行，
     // 导致用户还没选供应商就看到两层信息。纯文本通道先只展示供应商，模型放到下一层再展示。
@@ -6019,7 +5934,7 @@ export function createBotsService(
       ? markedSelection
       : { ...textSelection, cancelLabel: markedSelection.cancelLabel };
     pendingSelectionsByContext.set(getActorContextKey(actor), displaySelection);
-    // 其他 provider 保留 selection，让 Telegram/飞书/Lark 渲染原生选项，也让 Webhook 接收结构化选项。
+    // 其他 provider 保留 selection，让 Telegram/Feishu/Lark 渲染原生选项，也让 Webhook 接收结构化选项。
     const text = supportsStructuredSelection
       ? displaySelection.title
       : formatSelectionFallback(displaySelection, locale);
@@ -6173,7 +6088,7 @@ export function createBotsService(
       return [];
     }
     if (deliveryKey) {
-      // Bugfix: 飞书/微信/Telegram 都可能重投同一条 provider message。
+      // Bugfix: Feishu/微信/Telegram 都可能重投同一条 provider message。
       // /reconnect 有副作用，必须在真正执行前就按 provider message id 幂等，
       // 否则重投会再次命中“已连接”分支，用户会看到重复的成功提示。
       recentRemoteReconnectDeliveryAtByKey.set(deliveryKey, now);
@@ -6428,7 +6343,7 @@ export function createBotsService(
       return { ok: false, reply: remoteDisconnectedReply };
     }
     if (isFeishuBotProvider(bot.provider) && !context.group) {
-      // Bugfix: 飞书短命令 typing 现在由同步回复完成后显式删除。
+      // Bugfix: Feishu短命令 typing 现在由同步回复完成后显式删除。
       // 这里必须等 reaction 创建完成，否则 stopInboundTyping 可能先执行，最终留下无法清理的 Typing reaction。
       await sendTyping(bot, message.actor);
     } else if (!context.group) {
@@ -6461,7 +6376,7 @@ export function createBotsService(
     if (!bot) {
       return [createOutbound(message.actor, msg(locale, "bindBotMissing"))];
     }
-    // Bot 配置化后 /bind 只绑定当前 bot，不再向 bot 追加 allowedUsers。
+    // Bot 配置化后 /bind 只绑定current bot，不再向 bot 追加 allowedUsers。
     // 重新绑定会覆盖旧 providerUserId，保证一个 bot 同一时间只有一个沟通对象。
     const nextBot: BotConfig = {
       ...bot,
@@ -6520,14 +6435,11 @@ export function createBotsService(
     labelId: BotMessageId,
     value: string,
   ): string {
-    // Bugfix: /status 文案由服务层拼接，标签和值都要跟随 bot 当前 locale。
+    // Bugfix: /status 文案由服务层拼接，标签和值都要跟随 bot current locale。
     return `${msg(locale, labelId)}: ${value}`;
   }
 
   function formatStatusStateValue(locale: Locale | undefined, state: string): string {
-    if (locale === "en-US") {
-      return state;
-    }
     switch (state) {
       case "draft":
         return msg(locale, "statusDraft");
@@ -6612,7 +6524,7 @@ export function createBotsService(
       : [];
     const isDraftStatus = context.mode === "draft" || !context.activeTaskId;
     const draftOptions = !statusTask && isDraftStatus ? await ensureDraftOptions(context) : null;
-    // Bot Draft 属于 Select：未显式固定模型时只展示目标 Host 当前首选，不把默认值写回配置。
+    // Bot Draft 属于 Select：未显式固定模型时只展示目标 Host current首选，不把Default值写回配置。
     const draftView = draftOptions
       ? await readModelSelectionView(context, draftOptions.modelSelection)
       : null;
@@ -6629,7 +6541,7 @@ export function createBotsService(
       [
         formatStatusLine(locale, "statusWorkspace", workspace?.label ?? context.workspacePath),
         // Bugfix: active task 显示真实 task 状态；草稿态显示 draftOptions。
-        // /new 后草稿继承自当前 task，继续显示 "-" 会让用户误以为继承失败。
+        // /new 后草稿继承自current task，继续显示 "-" 会让用户误以为继承失败。
         formatStatusLine(locale, "statusModel", statusModelLabel),
         "------",
         statusTask
@@ -6676,11 +6588,7 @@ export function createBotsService(
   ): string {
     const lines = [msg(locale, "helpTitle")];
     if (groupRole) {
-      lines.push(
-        locale === "en-US"
-          ? "Mention this bot to submit a request. /answer answers your active question."
-          : "@当前机器人提交需求；/answer 回答自己发起请求中的问题。",
-      );
+      lines.push("Mention this bot to submit a request. /answer answers your active question.");
       if (groupRole === "owner") {
         lines.push("/enable · /disable · /task · /stop · /approve · /deny · /reconnect");
         if (bot.allowedCommands.workspace !== false) lines.push("/history on|off");
@@ -6956,7 +6864,7 @@ export function createBotsService(
           taskId: context.activeTaskId,
           workspacePath: context.workspacePath,
           workspaceIdentity: context.workspaceIdentity,
-          title: `${bot.provider === "lark" ? "Lark" : "飞书"} · ${context.group.name}${context.group.threadId ? ` · ${context.group.topicTitle || context.group.threadId}` : ""}`,
+          title: `${bot.provider === "lark" ? "Lark" : "Feishu"} · ${context.group.name}${context.group.threadId ? ` · ${context.group.topicTitle || context.group.threadId}` : ""}`,
         })
         .catch((error: unknown) => {
           // 输入已经被 CLI 接受，标题写入失败不能释放去重并重新执行输入。
@@ -6977,16 +6885,16 @@ export function createBotsService(
         ? [
             createOutbound(
               message.actor,
-              locale === "en-US" ? "Waiting to run" : "等待执行",
+              "Waiting to run",
               {
                 id: `queue-${commandId}`,
-                title: locale === "en-US" ? "Queued" : "已排队",
+                title: "Queued",
                 action: "queue.cancel",
                 showCancel: false,
                 options: [
                   {
                     id: `/queue-cancel ${commandId}`,
-                    label: locale === "en-US" ? "Cancel" : "取消",
+                    label: "Cancel",
                   },
                 ],
               },
@@ -7064,15 +6972,13 @@ export function createBotsService(
     if (!auth.ok) return auth.reply;
     const group = auth.context.group;
     const input = group?.inputs?.[sourceCommandId];
-    // 旧话题排队卡可能仍留在飞书，不能让它操作新话题的停止续接输入。
+    // 旧话题排队卡可能仍留在Feishu，不能让它操作新话题的停止续接输入。
     if (group?.threadId) {
       return [
         {
           ...createOutbound(
             message.actor,
-            auth.locale === "en-US"
-              ? "This topic queue card has expired. Use /stop to stop the topic."
-              : "该话题排队卡已失效，请使用 /stop 停止话题。",
+            "This topic queue card has expired. Use /stop to stop the topic.",
           ),
           callbackToastOnly: true,
         },
@@ -7117,12 +7023,8 @@ export function createBotsService(
       createOutbound(
         message.actor,
         accepted
-          ? auth.locale === "en-US"
-            ? "Queued input cancelled."
-            : "已取消该排队输入。"
-          : auth.locale === "en-US"
-            ? "Input changed or started; cancellation was not applied."
-            : "输入已变化或开始执行，未取消。",
+          ? "Queued input cancelled."
+          : "Input changed or started; cancellation was not applied.",
       ),
     ];
   }
@@ -7541,9 +7443,7 @@ export function createBotsService(
       return [
         createOutbound(
           message.actor,
-          auth.locale === "en-US"
-            ? "This message belongs to an earlier task and will not be executed again."
-            : "这条消息已关联到此前任务，不会在新任务中重复执行。",
+          "This message belongs to an earlier task and will not be executed again.",
         ),
       ];
     }
@@ -7553,9 +7453,7 @@ export function createBotsService(
       return [
         createOutbound(
           message.actor,
-          auth.locale === "en-US"
-            ? "This message already has an admission record. Check the task before submitting another request."
-            : "这条消息已有接收记录，请先在任务中核对执行状态，不会自动重复提交。",
+          "This message already has an admission record. Check the task before submitting another request.",
         ),
       ];
     }
@@ -7569,23 +7467,16 @@ export function createBotsService(
       );
     }
     if (history.historyDisabled || history.historyError) {
-      const en = auth.locale === "en-US";
       const permissionDenied = history.historyError instanceof TopicHistoryPermissionError;
       const platformUrl =
         auth.bot.provider === "lark"
           ? "https://open.larksuite.com/app"
           : "https://open.feishu.cn/app";
       const text = history.historyDisabled
-        ? en
-          ? "Topic history is disabled. Ask the bound user to enable /history on before using topics."
-          : "话题历史已关闭，暂时无法处理话题消息。请绑定用户发送 /history on 后重新 @。"
+        ? "Topic history is disabled. Ask the bound user to enable /history on before using topics."
         : permissionDenied
-          ? en
-            ? `Topic history permission is missing. No task was submitted. Ask the app administrator to open ${platformUrl}, select this bot app, enable the required application-identity message permissions (including im:message.group_msg), and publish the change. Then mention the bot again.`
-            : `机器人缺少话题历史读取权限，未提交任务。请应用管理员打开 ${platformUrl}，选择当前机器人应用，在权限管理中开通应用身份的消息读取权限（包括 im:message.group_msg，获取群组中所有消息），并发布生效后重新 @。无需安装或授权 lark-cli。`
-          : en
-            ? "Topic history could not be read. No task was submitted. Please retry by mentioning the bot again later."
-            : "暂时无法读取话题历史，未提交任务。请稍后重新 @ 重试。";
+          ? `Topic history permission is missing. No task was submitted. Ask the app administrator to open ${platformUrl}, select this bot app, enable the required application-identity message permissions (including im:message.group_msg), and publish the change. Then mention the bot again.`
+          : "Topic history could not be read. No task was submitted. Please retry by mentioning the bot again later.";
       return [
         history.historyDisabled
           ? administratorReply(
@@ -7612,9 +7503,7 @@ export function createBotsService(
         return [
           createOutbound(
             message.actor,
-            auth.locale === "en-US"
-              ? "Please add a request, or reply to the message you want me to handle and mention me."
-              : "请补充需求，或回复要处理的消息并 @我。",
+            "Please add a request, or reply to the message you want me to handle and mention me.",
           ),
         ];
       }
@@ -7622,15 +7511,13 @@ export function createBotsService(
       // 保留原文中的 @，由标准引用／附件承载材料，不重新解析材料里的命令。
     }
     if (message.referencedMessage) {
-      // 原先拼接消息 ID 会诱使模型再次查飞书；标准引用只携带真实原文，并复用 UI 展示。
+      // 原先拼接消息 ID 会诱使模型再次查Feishu；标准引用只携带真实原文，并复用 UI 展示。
       const quote = message.referencedMessage.text;
       if (quote.length > CONVERSATION_SELECTION_MAX_TEXT_LENGTH) {
         return [
           createOutbound(
             message.actor,
-            auth.locale === "en-US"
-              ? "The quoted text is too long. Please quote a shorter passage or attach it as a file."
-              : "引用文字过长，请缩小引用范围或作为文件提交。",
+            "The quoted text is too long. Please quote a shorter passage or attach it as a file.",
           ),
         ];
       }
@@ -7644,7 +7531,7 @@ export function createBotsService(
       });
       if (deletedTaskIds.includes(auth.context.activeTaskId)) {
         // 桌面软删除只留下 tombstone，CLI 仍可恢复旧 session。
-        // Bot 不能只凭 activeTaskId 续跑隐藏任务；先清旧交互，再复用当前草稿有效选择和 V4 首发。
+        // Bot 不能只凭 activeTaskId 续跑隐藏任务；先清旧交互，再复用current草稿有效选择和 V4 首发。
         // 仅以删除记录为准，不能把列表过滤、归档或查询失败当成删除。
         deletedTaskId = auth.context.activeTaskId;
         auth.context = await writeDraftContext(auth.context);
@@ -7709,7 +7596,10 @@ export function createBotsService(
         !submissionModelSelection ||
         (draftOptions.modelSelection && selectionView?.selectionIssue)
       ) {
-        throw new BotAdminRequiredError("model", "Bot 无法从目标 Host 解析 Submission 模型");
+        throw new BotAdminRequiredError(
+          "model",
+          "Bot could not resolve a Submission model from the target host",
+        );
       }
       const submissionDraftOptions: BotDraftOptions = {
         ...draftOptions,
@@ -7735,7 +7625,7 @@ export function createBotsService(
       });
       const taskTitle = auth.context.group
         ? [
-            auth.bot.provider === "lark" ? "Lark" : "飞书",
+            auth.bot.provider === "lark" ? "Lark" : "Feishu",
             auth.context.group.name,
             ...(auth.context.group.threadId
               ? [auth.context.group.topicTitle || auth.context.group.threadId]
@@ -7846,7 +7736,7 @@ export function createBotsService(
       workspaceIdentity: auth.context.workspaceIdentity,
     });
     // Bot 只是同一 Session 的输入端。菜单可能过滤无效值，不能拿它反推原选择，
-    // 更不能重新套用 Bot 创建默认值。解析只确定本次输入，不在此改写 Session。
+    // 更不能重新套用 Bot 创建Default值。解析只确定本次输入，不在此改写 Session。
     const originalSelection = await zcodeTaskService.getTaskModelSelection({
       taskId: auth.context.activeTaskId,
     });
@@ -7895,7 +7785,7 @@ export function createBotsService(
     const blockReason = await getContextTaskBlockReason(auth.context);
     if (blockReason) {
       // Bugfix: 运行中展示 /task 列表会让用户继续点选其它 task，
-      // 即使后续切换被拒绝，也会留下误导性的 pending selection。
+      // 即使后续切换被Deny，也会留下误导性的 pending selection。
       return [createOutbound(message.actor, msg(auth.locale, blockReason))];
     }
     const taskEntries = (await listContextTaskSelectionEntries(auth.context, auth.user)).slice(
@@ -8097,7 +7987,7 @@ export function createBotsService(
         warnAutomationDeliveryOnce({ target: params.target, reason: "group_not_authorized" });
         return;
       }
-      // 旧 alias 不能继续回退到默认任务；话题投递必须存在独立的授权会话。
+      // 旧 alias 不能继续回退到Default任务；话题投递必须存在独立的授权会话。
       conversationThreadId = state.group.threadId ?? null;
     }
     const actor: BotActor = {
@@ -8118,7 +8008,7 @@ export function createBotsService(
       activeTaskId: params.taskId,
       updatedAt: Date.now(),
     };
-    // Automation 回推固定为终态摘要；不能复用用户当前 replyMode，否则 streaming/card
+    // Automation 回推固定为终态摘要；不能复用用户current replyMode，否则 streaming/card
     // 会在后台任务执行过程中向原会话持续发送中间过程。
     await watchTaskStream(
       bot,
@@ -8211,7 +8101,7 @@ export function createBotsService(
         let lastResolveNameError: unknown;
         for (const retryDelayMs of resolveRetryDelaysMs) {
           if (retryDelayMs > 0) {
-            // Bugfix: 飞书 / Lark 扫码创建应用后，应用信息接口可能短暂不可读；重试后再回填 Bot 名称。
+            // Bugfix: Feishu / Lark 扫码创建应用后，应用信息接口可能短暂不可读；重试后再回填 Bot 名称。
             await delay(retryDelayMs);
           }
           try {
@@ -8714,14 +8604,14 @@ export function createBotsService(
         const actor: BotActor = { ...message.actor, conversationThreadId: undefined };
         const state = await repo.readState();
         if (!state.bots[getBotConversationKey(actor)]) {
-          // alias 仅用于一次性安全迁移检查，不能再把话题路由到默认任务。
+          // alias 仅用于一次性安全迁移检查，不能再把话题路由到Default任务。
           for (const candidate of Object.values(state.bots)) {
             const group = candidate.group;
             if (!group || candidate.botId !== actor.botId || group.chatId !== actor.chatId)
               continue;
             const alias = group.topicAliases?.[actor.threadId!];
             if (!alias) continue;
-            // 默认会话可能已切换工作区；迁移检查必须使用旧任务自己的完整工作区身份。
+            // Default会话可能已切换工作区；迁移检查必须使用旧任务自己的完整工作区身份。
             const workspace = group.taskWorkspaces?.[alias.taskId] ?? candidate;
             const service = await resolveZCodeTaskServiceForContext({ ...candidate, ...workspace });
             if (
@@ -8732,7 +8622,12 @@ export function createBotsService(
                 workspaceIdentity: workspace.workspaceIdentity,
               }))
             ) {
-              return [createOutbound(actor, "原话题任务仍在执行，请结束后重新接入话题。")];
+              return [
+                createOutbound(
+                  actor,
+                  "The original topic task is still running; finish it before rejoining the topic.",
+                ),
+              ];
             }
           }
         }
@@ -8746,7 +8641,7 @@ export function createBotsService(
             conversationThreadId: undefined,
           })
         ];
-        // 专用话题群根事件可能缺失 thread_id，必须通过原生消息解析，不能进入默认任务。
+        // 专用话题群根事件可能缺失 thread_id，必须通过原生消息解析，不能进入Default任务。
         if (
           parent?.group?.enabled &&
           parent.group.chatMode === "topic" &&
@@ -8851,14 +8746,7 @@ export function createBotsService(
             const auth = await withAuthorizedContext(message, "new");
             if (!auth.ok) return auth.reply;
             if (message.actor.threadId)
-              return [
-                createOutbound(
-                  message.actor,
-                  auth.locale === "en-US"
-                    ? "Open another topic to start a new task."
-                    : "请另开一个话题开始新任务。",
-                ),
-              ];
+              return [createOutbound(message.actor, "Open another topic to start a new task.")];
             const blockReason = await getContextTaskBlockReason(auth.context);
             if (blockReason) {
               return [createOutbound(message.actor, msg(auth.locale, blockReason))];
@@ -8888,7 +8776,7 @@ export function createBotsService(
             );
             const options = visibleWorkspaces.map((workspace) => ({
               id: workspace.id,
-              // Bugfix: Telegram/飞书等按钮通道只展示 label，不展示 description。
+              // Bugfix: Telegram/Feishu等按钮通道只展示 label，不展示 description。
               // 远端标识必须合进 label，避免 /workspace 列表看不出哪些项目来自远端。
               label: formatWorkspaceOptionLabel(workspace, auth.locale),
             }));
@@ -8897,7 +8785,7 @@ export function createBotsService(
               return [createOutbound(message.actor, msg(auth.locale, "workspaceMissing"))];
             }
             // Bugfix: 远端 workspace 选项必须在展示时保留 workspaceIdentity。
-            // Telegram/飞书按钮会把点击变成 /workspace 序号，切换阶段若重新从 settings 解析，
+            // Telegram/Feishu按钮会把点击变成 /workspace 序号，切换阶段若重新从 settings 解析，
             // current remote context 可能不在候选列表里，最终表现成 /workspace 不支持远端。
             pendingWorkspaceSelectionsByContext.set(
               getActorContextKey(message.actor),
@@ -9236,7 +9124,7 @@ export function createBotsService(
             }
             const blockReason = await getContextTaskBlockReason(auth.context);
             if (blockReason) {
-              // Bugfix: task 运行中不展示模式/思考级别选择，避免和正在执行的上下文配置混淆。
+              // Bugfix: task 运行中不展示模式/思考级别选择，避免和Running的上下文配置混淆。
               return [createOutbound(message.actor, msg(auth.locale, blockReason))];
             }
             if (auth.context.mode === "draft" || !auth.context.activeTaskId) {
@@ -9347,7 +9235,7 @@ export function createBotsService(
             const auth = await withAuthorizedContext(message, commandName);
             if (!auth.ok) return auth.reply;
             if (command.type === "mode.set" && !auth.context.group) {
-              // Bot 硬锁 yolo：拒绝任何模式切换请求。
+              // Bot 硬锁 yolo：Deny任何模式切换请求。
               return [createOutbound(message.actor, msg(auth.locale, "modeLocked"))];
             }
             const blockReason = await getContextTaskBlockReason(auth.context);
@@ -9365,7 +9253,7 @@ export function createBotsService(
                 originalOptions,
                 view,
               );
-              // 同一个快照给出候选与当前模型；失效原意图不能因副本为空退回 preferred。
+              // 同一个快照给出候选与current模型；失效原意图不能因副本为空退回 preferred。
               const draftOptions = {
                 ...originalOptions,
                 modelSelection:
@@ -9488,7 +9376,7 @@ export function createBotsService(
                 : null;
             if (blockReason) {
               // Bugfix: 运行中的旧 task 已经建立了第三方 stream 订阅。
-              // 如果此时允许 /task 改写 activeTaskId，后续输入会落到新 task，
+              // 如果此时Allow /task 改写 activeTaskId，后续输入会落到新 task，
               // 但旧 task 输出仍会继续回到同一 bot 会话，用户会误以为消息串线。
               return [createOutbound(message.actor, msg(auth.locale, blockReason))];
             }
@@ -9550,14 +9438,7 @@ export function createBotsService(
             const auth = await withAuthorizedContext(message, "workspace");
             if (!auth.ok) return auth.reply;
             if (!auth.context.group?.threadId)
-              return [
-                createOutbound(
-                  message.actor,
-                  auth.locale === "en-US"
-                    ? "Use /leave inside a topic."
-                    : "请在话题中使用 /leave。",
-                ),
-              ];
+              return [createOutbound(message.actor, "Use /leave inside a topic.")];
             await cancelTopicInputs(message.actor);
             await serializeStateWrite(async () => {
               const state = await repo.readState();
@@ -9578,12 +9459,7 @@ export function createBotsService(
               if (executionId) await stopTopicRun(auth.context, executionId.executionId);
             }
             return [
-              createOutbound(
-                message.actor,
-                auth.locale === "en-US"
-                  ? "Left this topic. Mention me to resume the same task."
-                  : "已退出话题。再次 @我可继续原任务。",
-              ),
+              createOutbound(message.actor, "Left this topic. Mention me to resume the same task."),
             ];
           }
           case "stop": {

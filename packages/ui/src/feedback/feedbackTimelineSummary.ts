@@ -25,7 +25,7 @@ export function getUserFacingEventSummary(
     return formatOptionalMessage(
       formatMessage,
       "feedback.timeline.assignedToDev",
-      "已交由研发跟进",
+      "Assigned to engineering",
     );
   }
   return event.summary;
@@ -47,7 +47,7 @@ function formatKnownSystemEventSummary(
     return formatOptionalMessage(
       formatMessage,
       "feedback.timeline.event.statusChanged",
-      `状态更新为「${status}」`,
+      `Status changed to "${status}"`,
       { status: formatStatusLabel(status, formatMessage) },
     );
   }
@@ -124,7 +124,7 @@ function formatProgressWithMessage(
   return formatOptionalMessage(
     formatMessage,
     "feedback.timeline.event.progressUpdatedWithMessage",
-    `进度更新：${message}`,
+    `Progress update: ${message}`,
     { message },
   );
 }

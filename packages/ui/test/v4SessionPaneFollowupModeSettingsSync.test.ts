@@ -1,4 +1,5 @@
 import { act, createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type {
@@ -354,7 +355,7 @@ describe("SessionPane followupMode app setting sync", () => {
         root.render(
           createElement(
             ZCodeIntlProvider,
-            { initialLocale: "zh-CN" },
+            { initialLocale: "vi-VN", messages: zhCNLegacy },
             createElement(SessionPane, {
               paneId: "workspace-main",
               sessionId: "session-1",
@@ -409,7 +410,7 @@ describe("SessionPane followupMode app setting sync", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",

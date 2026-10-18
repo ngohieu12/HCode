@@ -171,7 +171,7 @@ vi.mock("@/store/offPeakTaskStore.js", async (importOriginal) => {
 
 import { OffPeakNewTaskEntry } from "@/v4/OffPeakNewTaskEntry.js";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 function renderEntry(props: { onOpenAutomations?: () => void } = {}) {
   return render(createElement(OffPeakNewTaskEntry, props));
@@ -501,7 +501,7 @@ describe("OffPeakNewTaskEntry", () => {
 
   it.each([
     {
-      locale: "zh-CN",
+      locale: "vi-VN",
       messages: zhCN,
       bannerText: "订阅用户新功能体验：创建“闲时任务”，我们将免费在算力富余时段为你完成指派任务。",
       bannerTipText: "本功能不消耗订阅用户套餐额度、本功能仅面向订阅用户开放",
@@ -554,7 +554,7 @@ describe("OffPeakNewTaskEntry", () => {
         ],
       };
 
-      const copy = h.remoteTemplateCopy.standupGitSummary[locale === "zh-CN" ? "cn" : "en"];
+      const copy = h.remoteTemplateCopy.standupGitSummary[locale === "vi-VN" ? "cn" : "en"];
       const { title, description, prompt } = copy;
       const onOpenAutomations = vi.fn();
 

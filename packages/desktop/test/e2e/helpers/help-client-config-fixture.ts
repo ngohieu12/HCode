@@ -9,7 +9,7 @@ export const HELP_FIXTURE_PATH = resolve(
   "../fixtures/fs/settings/help-client-config/config.json",
 );
 export interface HelpFixtureConfig {
-  community_urls?: Partial<Record<"zh-CN" | "en-US", string>>;
+  community_urls?: Partial<Record<"en-US" | "vi-VN", string>>;
   feedback_url?: string;
   feedback_use_external_form?: boolean;
 }

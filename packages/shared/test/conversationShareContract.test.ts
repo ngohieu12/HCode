@@ -66,30 +66,24 @@ const artifactDescriptor = {
 
 describe("conversation share API revision 23 contract", () => {
   it("按语言前缀解析分享路径，只认已知形状", () => {
-    expect(parseConversationSharePathname("/cn/share/abc")).toEqual({
-      rawCode: "abc",
-      locale: "zh-CN",
-    });
-    expect(parseConversationSharePathname("/share/abc")).toEqual({
-      rawCode: "abc",
-      locale: "en-US",
-    });
+    expect(parseConversationSharePathname("/cn/share/abc")).toEqual({ rawCode: "abc" });
+    expect(parseConversationSharePathname("/share/abc")).toEqual({ rawCode: "abc" });
     expect(parseConversationSharePathname("/share/abc/extra")).toBeNull();
     expect(parseConversationSharePathname("/cn/shared/abc")).toBeNull();
     expect(parseConversationSharePathname("/share")).toBeNull();
   });
 
-  it("把分享链接改写到目标语言站点，且不改动 code 段", () => {
-    expect(localizeConversationShareUrl("https://zcode.z.ai/cn/share/abc", "en-US")).toBe(
+  it("把分享链接改写到分享站路径，且不改动 code 段", () => {
+    expect(localizeConversationShareUrl("https://zcode.z.ai/cn/share/abc")).toBe(
       "https://zcode.z.ai/share/abc",
     );
-    expect(localizeConversationShareUrl("https://zcode.z.ai/share/abc", "zh-CN")).toBe(
-      "https://zcode.z.ai/cn/share/abc",
+    expect(localizeConversationShareUrl("https://zcode.z.ai/share/abc")).toBe(
+      "https://zcode.z.ai/share/abc",
     );
-    // 已经是目标语言时保持原样，端口与 query 不受影响。
-    expect(
-      localizeConversationShareUrl("https://zcode.z.ai:8443/cn/share/a.b~c?x=1", "zh-CN"),
-    ).toBe("https://zcode.z.ai:8443/cn/share/a.b~c?x=1");
+    // 端口与 query 不受影响。
+    expect(localizeConversationShareUrl("https://zcode.z.ai:8443/cn/share/a.b~c?x=1")).toBe(
+      "https://zcode.z.ai:8443/share/a.b~c?x=1",
+    );
   });
 
   it("形状不认识的链接原样返回，绝不猜着改", () => {
@@ -101,7 +95,7 @@ describe("conversation share API revision 23 contract", () => {
       "not-a-url",
       "",
     ]) {
-      expect(localizeConversationShareUrl(url, "en-US")).toBe(url);
+      expect(localizeConversationShareUrl(url)).toBe(url);
     }
   });
 

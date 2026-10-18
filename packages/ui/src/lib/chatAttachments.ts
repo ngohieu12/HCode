@@ -74,10 +74,10 @@ function readFileAsDataUrl(file: File): Promise<string> {
         resolve(reader.result);
         return;
       }
-      reject(new Error("读取附件失败"));
+      reject(new Error("Failed to read attachment"));
     };
     reader.onerror = () => {
-      reject(reader.error ?? new Error("读取附件失败"));
+      reject(reader.error ?? new Error("Failed to read attachment"));
     };
     reader.readAsDataURL(file);
   });
@@ -477,6 +477,6 @@ export function isMediaChatComposerAttachment(attachment: ChatComposerAttachment
 async function readAttachmentText(file: File): Promise<string> {
   const text = await file.text();
   return text.length > INLINE_TEXT_ATTACHMENT_MAX_CHARS
-    ? `${text.slice(0, INLINE_TEXT_ATTACHMENT_MAX_CHARS)}\n\n[内容过长，已截断]`
+    ? `${text.slice(0, INLINE_TEXT_ATTACHMENT_MAX_CHARS)}\n\n[Content truncated: too long]`
     : text;
 }

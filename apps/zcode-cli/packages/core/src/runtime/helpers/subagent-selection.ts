@@ -3,12 +3,12 @@ import { cloneModelSelection } from "../model-selection.js";
 import type { EffectiveModelSelectionResult } from "@zcode/shared/model-selection";
 
 const SUBAGENT_SELECTION_MESSAGES = {
-  "selection-missing": "No model selected / 未选择模型",
-  "account-connection-unavailable": "Account connection unavailable / 当前账号连接不可用",
-  "provider-not-found": "Provider unavailable / 供应商不存在或不可用",
-  "model-not-found": "Model unavailable / 模型不存在或不可用",
-  "reasoning-level-missing": "No reasoning level selected / 未选择思考档位",
-  "reasoning-level-not-supported": "Reasoning level unsupported / 不支持所选思考档位",
+  "selection-missing": "No model selected",
+  "account-connection-unavailable": "Account connection unavailable",
+  "provider-not-found": "Provider unavailable",
+  "model-not-found": "Model unavailable",
+  "reasoning-level-missing": "No reasoning level selected",
+  "reasoning-level-not-supported": "Reasoning level unsupported",
 } satisfies Record<NonNullable<EffectiveModelSelectionResult["selectionIssue"]>, string>;
 
 /** 显式 profile 是待解析意图；继承与内部 override 已有执行归属，不重新对应账号。 */

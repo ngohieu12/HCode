@@ -2,6 +2,7 @@
 // 根 Vitest 只收集 .test.ts；本文件使用 createElement，不需要 TSX 扩展名。
 
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -12,7 +13,7 @@ import {
   TID_V4_WORKSPACE_HOOK_PENDING_REVIEW,
 } from "@zcode/shared";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import {
   WorkspaceHookPendingBanner,
   workspaceHookPendingDismissStore,
@@ -109,7 +110,7 @@ function renderBanner(props: {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(WorkspaceHookPendingBanner, {
         sessionId: props.sessionId ?? "sess-1",
         workspacePath: props.workspacePath ?? "/workspace",
@@ -126,7 +127,7 @@ function renderInteractiveBanner(admission = sampleAdmission) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(WorkspaceHookPendingBanner, {
         sessionId: "sess-1",
         workspacePath: "/workspace",
@@ -197,7 +198,7 @@ describe("WorkspaceHookPendingBanner（软门禁 D4）", () => {
     view.rerender(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(WorkspaceHookPendingBanner, {
           sessionId: "sess-1",
           workspacePath: "/workspace",

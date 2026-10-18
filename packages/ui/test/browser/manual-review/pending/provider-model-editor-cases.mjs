@@ -2,10 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 export function registerProviderModelEditorCases(getEnvironment) {
-  for (const [width, locale, theme] of [
-    [390, "zh-CN", "light"],
-    [1200, "en-US", "dark"],
-  ]) {
+  for (const [width, locale, theme] of [[1200, "en-US", "dark"]]) {
     test(`empty new model reasoning ${width}/${locale}`, { timeout: 30000 }, async () => {
       const { browser, origin } = getEnvironment();
       const page = await browser.newPage({ viewport: { width, height: 1000 } });
@@ -98,7 +95,7 @@ export function registerProviderModelEditorCases(getEnvironment) {
             `${origin}fixture?${new URLSearchParams({ editor: "1", locale, theme })}`,
           );
           const restore = page.getByRole("button", {
-            name: locale === "zh-CN" ? "重置表单" : "Reset form",
+            name: "Reset form",
             exact: true,
           });
           const toggle = page.locator('[data-model-recommended-config] [role="switch"]');
@@ -112,9 +109,7 @@ export function registerProviderModelEditorCases(getEnvironment) {
           if (action === "scope")
             await page.getByTestId("external-scope").evaluate((node) => node.click());
           if (action === "close")
-            await page
-              .getByRole("button", { name: locale === "zh-CN" ? "取消" : "Cancel", exact: true })
-              .click();
+            await page.getByRole("button", { name: "Cancel", exact: true }).click();
           if (action === "id")
             await page.locator("[data-model-identity-row] input").fill("new-identity");
           if (action === "repeat") {
@@ -136,23 +131,17 @@ export function registerProviderModelEditorCases(getEnvironment) {
             );
           }
           if (action === "save") {
-            await page
-              .getByRole("button", { name: locale === "zh-CN" ? "保存" : "Save", exact: true })
-              .click();
+            await page.getByRole("button", { name: "Save", exact: true }).click();
             for (const control of [restore, toggle]) assert.equal(await control.isDisabled(), true);
           }
           const before = await page.getByTestId("editor-draft").textContent();
-          await obsolete.fulfill(
-            locale === "zh-CN"
-              ? { status: 500, body: "obsolete failure" }
-              : {
-                  contentType: "application/json",
-                  body: JSON.stringify({
-                    inheritedConfig: { properties: { contextWindow: 999999 } },
-                    issues: [],
-                  }),
-                },
-          );
+          await obsolete.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify({
+              inheritedConfig: { properties: { contextWindow: 999999 } },
+              issues: [],
+            }),
+          });
           await page.waitForTimeout(50);
           assert.equal(await page.getByTestId("editor-draft").textContent(), before, action);
           assert.equal(await page.getByRole("alert").count(), 0, action);
@@ -283,7 +272,7 @@ export function registerProviderModelEditorCases(getEnvironment) {
       try {
         await page.goto(`${origin}fixture?${new URLSearchParams({ editor: "1", locale, theme })}`);
         const restore = page.getByRole("button", {
-          name: locale === "zh-CN" ? "重置表单" : "Reset form",
+          name: "Reset form",
           exact: true,
         });
         const capacity = page.locator('[data-model-settings-group="tokens"] input').first();
@@ -351,7 +340,7 @@ export function registerProviderModelEditorCases(getEnvironment) {
         assert.deepEqual(requests, []);
         await page
           .getByRole("button", {
-            name: locale === "zh-CN" ? "重置表单" : "Reset form",
+            name: "Reset form",
             exact: true,
           })
           .click();
@@ -377,20 +366,16 @@ export function registerProviderModelEditorCases(getEnvironment) {
         ]);
         await toggle.click();
         const before = await page.getByTestId("editor-draft").textContent();
-        await held.fulfill(
-          locale === "zh-CN"
-            ? { status: 500, body: "failed" }
-            : {
-                contentType: "application/json",
-                body: JSON.stringify({
-                  inheritedConfig: {
-                    properties: { contextWindow: 999999 },
-                    optionSpecs: { reasoningLevel: { values: ["late"], map: "{}" } },
-                  },
-                  issues: [],
-                }),
-              },
-        );
+        await held.fulfill({
+          contentType: "application/json",
+          body: JSON.stringify({
+            inheritedConfig: {
+              properties: { contextWindow: 999999 },
+              optionSpecs: { reasoningLevel: { values: ["late"], map: "{}" } },
+            },
+            issues: [],
+          }),
+        });
         await page.waitForTimeout(50);
         assert.equal(await page.getByTestId("editor-draft").textContent(), before);
         assert.equal(await toggle.getAttribute("aria-checked"), "false");

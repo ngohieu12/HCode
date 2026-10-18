@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { ZCodeTaskPendingInteraction } from "@zcode/shared";
@@ -103,21 +104,21 @@ describe("TaskInteractionBadge", () => {
   });
 
   it("keeps waiting/stop copy centered above a left-anchored fill in both locales", () => {
-    const render = (locale: "zh-CN" | "en-US") =>
+    const render = (locale: "vi-VN" | "en-US") =>
       renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: locale },
+          { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
           createElement(TaskInteractionBadge, {
             interaction: countdown,
             now: 180_000,
             onSnoozeCountdown: () => true,
             formatMessage: (id: string) => {
               if (id === "taskList.permissionTag" || id === "taskList.userInputTag") {
-                return locale === "zh-CN" ? "等待确认" : "Awaiting approval";
+                return locale === "vi-VN" ? "等待确认" : "Awaiting approval";
               }
               if (id === "taskList.stopCountdown") {
-                return locale === "zh-CN" ? "停止计时" : "Stop timer";
+                return locale === "vi-VN" ? "停止计时" : "Stop timer";
               }
               return id;
             },
@@ -125,7 +126,7 @@ describe("TaskInteractionBadge", () => {
         ),
       );
 
-    const zh = render("zh-CN");
+    const zh = render("vi-VN");
     expect(zh).toContain("等待确认");
     expect(zh).toContain("停止计时");
     expect(zh).toContain('aria-label="停止计时"');

@@ -61,14 +61,14 @@ describe("about", () => {
     });
   });
 
-  it("应按中文语言生成系统 About 面板信息", () => {
-    const options = createSystemAboutPanelOptions(appleSiliconSnapshot, 2026, "zh-CN");
+  it("应按越南语生成系统 About 面板信息", () => {
+    const options = createSystemAboutPanelOptions(appleSiliconSnapshot, 2026, "vi-VN");
 
     expect(options).toMatchObject({
       applicationName: "HCode Desktop App",
-      applicationVersion: "版本 0.1.7",
-      copyright: "版权所有 © 2026 HCode。",
-      credits: "已针对 Apple Silicon 优化。",
+      applicationVersion: "phiên bản 0.1.7",
+      copyright: "Bản quyền © 2026 HCode.",
+      credits: "Được tối ưu cho Apple Silicon.",
     });
   });
 
@@ -103,20 +103,20 @@ describe("about", () => {
     expect(html).not.toContain("box-shadow: 0 28px 70px");
   });
 
-  it("应生成中文自定义 About 内容", () => {
+  it("应生成越南语自定义 About 内容", () => {
     const html = createCustomAboutDialogHtml({
       applicationName: "HCode Desktop App",
       appVersion: appleSiliconSnapshot.appVersion,
-      copyright: "版权所有 © 2026 HCode。",
-      optimizationLine: "已针对 Apple Silicon 优化。",
-      versionLabel: "版本",
-      okButtonLabel: "确定",
+      copyright: "Bản quyền © 2026 HCode.",
+      optimizationLine: "Được tối ưu cho Apple Silicon.",
+      versionLabel: "phiên bản",
+      okButtonLabel: "OK",
     });
 
-    expect(html).toContain("版本 0.1.7");
-    expect(html).toContain("已针对 Apple Silicon 优化。");
-    expect(html).toContain("版权所有 © 2026 HCode。");
-    expect(html).toContain(">确定</button>");
+    expect(html).toContain("phiên bản 0.1.7");
+    expect(html).toContain("Được tối ưu cho Apple Silicon.");
+    expect(html).toContain("Bản quyền © 2026 HCode.");
+    expect(html).toContain(">OK</button>");
   });
 
   it("非 Apple Silicon 不展示 Apple Silicon 优化文案", () => {
@@ -126,6 +126,6 @@ describe("about", () => {
 
   it("版权年份可按调用方传入覆盖", () => {
     expect(formatAboutCopyright(2027, "en-US")).toBe("Copyright © 2027 HCode.");
-    expect(formatAboutCopyright(2027, "zh-CN")).toBe("版权所有 © 2027 HCode。");
+    expect(formatAboutCopyright(2027, "vi-VN")).toBe("Bản quyền © 2027 HCode.");
   });
 });

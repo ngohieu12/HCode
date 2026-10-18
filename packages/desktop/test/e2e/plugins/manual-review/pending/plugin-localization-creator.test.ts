@@ -32,7 +32,7 @@ describe("PLM-LC-018/019/020 本地化与插件创建入口", () => {
     requirePluginManualReview();
     const fixture = await createPluginLifecycleFixture();
     await openPluginSettings();
-    await setPluginPresentation({ locale: "zh-CN", theme: "zai-light", width: 1440, height: 1000 });
+    await setPluginPresentation({ locale: "en-US", theme: "zai-light", width: 1440, height: 1000 });
     await addLifecycleMarketplaceThroughUi(fixture);
     const countMarketCards = () =>
       browser.execute(

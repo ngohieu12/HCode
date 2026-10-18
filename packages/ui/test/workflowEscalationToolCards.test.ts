@@ -7,6 +7,7 @@
 // 主会话与子代理侧板共用同一条 ToolCallBlocks 管线（侧板挂的是嵌套只读 SessionPane），所以
 // 「从 ToolCallBlock 入口整链走下来就是专用卡」这一条同时钉住两个面。
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -31,7 +32,7 @@ import { ToolCallBlock } from "@/ToolCallBlocks.js";
 // eslint-disable-next-line import/first -- 同上；词条只用于双语存在性断言。
 import enUS from "../src/i18n/locales/en-US.js";
 // eslint-disable-next-line import/first -- 同上。
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 interface ToolCallOverrides {
   input?: unknown;
@@ -99,12 +100,12 @@ function buildContext(
 function renderEscalate(
   toolCall: ToolCallOverrides,
   contextOverrides: ContextOverrides = {},
-  locale: "en-US" | "zh-CN" = "zh-CN",
+  locale: "en-US" | "vi-VN" = "vi-VN",
 ): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(EscalateToolCallBlock, buildContext(toolCall, contextOverrides, "escalate")),
     ),
   );
@@ -113,12 +114,12 @@ function renderEscalate(
 function renderResolve(
   toolCall: ToolCallOverrides,
   contextOverrides: ContextOverrides = {},
-  locale: "en-US" | "zh-CN" = "zh-CN",
+  locale: "en-US" | "vi-VN" = "vi-VN",
 ): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(
         ResolveWorkflowQuestionToolCallBlock,
         buildContext(toolCall, contextOverrides, "ResolveWorkflowQuestion"),
@@ -149,7 +150,7 @@ describe("升级问答工具卡路由", () => {
     const escalateHtml = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -174,7 +175,7 @@ describe("升级问答工具卡路由", () => {
     const resolveHtml = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {

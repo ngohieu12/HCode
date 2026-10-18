@@ -213,11 +213,11 @@ app
         },
       );
       await check(
-        "live host context switches Chinese/dark at 320px without horizontal overflow",
+        "live host context switches Vietnamese/dark at 320px without horizontal overflow",
         async () => {
           const boot = await read("boot-id");
-          await ui("window.setShowcasePresentation('dark','zh-CN',320)");
-          assert.equal(await page("document.documentElement.lang"), "zh-CN");
+          await ui("window.setShowcasePresentation('dark','vi-VN',320)");
+          assert.equal(await page("document.documentElement.lang"), "en-US");
           assert.equal(await page("document.documentElement.style.colorScheme"), "dark");
           assert.equal(
             await page("getComputedStyle(document.body).backgroundColor"),

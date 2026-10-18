@@ -26,24 +26,24 @@ describe("botsService help", () => {
 
     expect(replies[0]?.text).toBe(
       [
-        "绑定成功。发送 **/帮助** 查看可用命令。",
+        "Bound successfully. Send **/help** to see available commands.",
         "",
-        "ZCode 机器人命令：",
-        "**/帮助** — 查看这份说明",
-        "**/状态** — 查看工作区、模型和任务状态",
-        "/新建 或 /clear — 开始新的任务草稿",
-        "**/项目** — 切换工作区",
-        "**/模型** — 切换模型",
-        "**/模式** — 切换运行模式",
-        "**/思考** — 切换思考级别",
-        "**/回复** — 切换回复详细程度",
-        "**/bind <code>** — 绑定当前聊天",
+        "ZCode bot commands:",
+        "**/help** — Show this guide",
+        "**/status** — Show workspace, model, and task status",
+        "/new or /clear — Start a new task draft",
+        "**/project** — Switch workspace",
+        "**/model** — Switch model",
+        "**/mode** — Switch run mode",
+        "**/think** — Switch thought level",
+        "**/reply** — Switch reply detail",
+        "**/bind <code>** — Bind this chat",
       ].join("\n"),
     );
     service.disposeAll();
   });
 
-  it("returns concise Chinese command help for /帮助", async () => {
+  it("returns concise command help for /help", async () => {
     const repo = f.createMemoryRepo(f.baseConfig);
     const service = f.createBotsService({
       credentialService: f.createCredentialService({ "secret-1": "secret" }),
@@ -59,22 +59,22 @@ describe("botsService help", () => {
     });
     const replies = await service.handleInboundMessage({
       botId: "webhook-1",
-      text: "/帮助",
+      text: "/help",
       actor,
     });
 
     expect(replies[0]?.text).toBe(
       [
-        "ZCode 机器人命令：",
-        "**/帮助** — 查看这份说明",
-        "**/状态** — 查看工作区、模型和任务状态",
-        "/新建 或 /clear — 开始新的任务草稿",
-        "**/项目** — 切换工作区",
-        "**/模型** — 切换模型",
-        "**/模式** — 切换运行模式",
-        "**/思考** — 切换思考级别",
-        "**/回复** — 切换回复详细程度",
-        "**/bind <code>** — 绑定当前聊天",
+        "ZCode bot commands:",
+        "**/help** — Show this guide",
+        "**/status** — Show workspace, model, and task status",
+        "/new or /clear — Start a new task draft",
+        "**/project** — Switch workspace",
+        "**/model** — Switch model",
+        "**/mode** — Switch run mode",
+        "**/think** — Switch thought level",
+        "**/reply** — Switch reply detail",
+        "**/bind <code>** — Bind this chat",
       ].join("\n"),
     );
     service.disposeAll();

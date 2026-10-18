@@ -99,7 +99,7 @@ describe("desktop second-instance workspace deep link routing", () => {
           },
         ),
       logger,
-      workspaceConfirmationCopy: resolveExternalWorkspaceOpenDialogCopy("zh-CN"),
+      workspaceConfirmationCopy: resolveExternalWorkspaceOpenDialogCopy("en-US"),
     });
 
     expect(handled).toBe(true);

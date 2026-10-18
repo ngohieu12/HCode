@@ -206,12 +206,10 @@ export function mapClientScenesToAutomationTemplates(
 
 export function resolveAutomationTemplateText(
   text: AutomationTemplateLocalizedText,
-  locale?: string,
+  _locale?: string,
 ): string {
-  const isChinese = locale?.startsWith("zh") ?? false;
-  const primary = isChinese ? text.cn : text.en;
-  const fallback = isChinese ? text.en : text.cn;
-  return primary?.trim() || fallback?.trim() || "";
+  // 应用语言只有 vi-VN / en-US，模板文案只认英文副本；中文副本不再被读到。
+  return text.en?.trim() || "";
 }
 
 export function resolveOffPeakTemplateText(

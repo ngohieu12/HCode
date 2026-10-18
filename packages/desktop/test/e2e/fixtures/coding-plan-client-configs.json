@@ -8,11 +8,6 @@
           "badgeBody": "150% Quota",
           "cardBody": "Upgrade your Coding Plan to get 150% quota during the campaign period",
           "cardTitle": "Limited-time 150% Quota Campaign"
-        },
-        "zh-CN": {
-          "badgeBody": "150% 配额",
-          "cardBody": "升级 Coding Plan，可在活动期内获得150% 配额",
-          "cardTitle": "限时 150% 配额活动"
         }
       },
       "codingPlanStaticProducts": {

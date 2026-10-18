@@ -1,4 +1,5 @@
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { StorePluginItem } from "../src/settings/pluginStoreListing.js";
@@ -41,14 +42,14 @@ const actions: PluginStoreActions = {
 
 async function renderCard(
   item: StorePluginItem,
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ): Promise<string> {
   const { PluginStoreCard } = await import("../src/settings/PluginStoreCard.js");
   const { ZCodeIntlProvider } = await import("@/i18n/IntlProvider.js");
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(PluginStoreCard, { item, actions, locale }),
     ),
   );
@@ -95,7 +96,7 @@ describe("plugin store paid plan badge", () => {
   });
 
   it("uses the concise coding plan label in Chinese", async () => {
-    const html = await renderCard(makeItem(true), "zh-CN");
+    const html = await renderCard(makeItem(true), "vi-VN");
     expect(html).toContain("编程套餐");
     expect(html).not.toContain("支持编程套餐");
   });

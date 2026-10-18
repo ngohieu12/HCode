@@ -3,6 +3,7 @@ import {
   type ZCodePermissionRequest,
   type ZCodeProvider,
 } from "@zcode/shared";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import type { ComponentType } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -29,7 +30,7 @@ function renderPermissionDialog(
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(Dialog, {
         request,
         onRespond: () => {},

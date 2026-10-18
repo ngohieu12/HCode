@@ -68,10 +68,7 @@ const config = {
   },
 };
 const artifacts = join(tmpdir(), "zcode-plugin-mode-order");
-for (const [width, locale, theme] of [
-  [1200, "en-US", "light"],
-  [390, "zh-CN", "dark"],
-]) {
+for (const [width, locale, theme] of [[1200, "en-US", "light"]]) {
   test(`PSO-01/04/06/07/09 ${width}/${locale}/${theme}`, async () => {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     const errors = [];
@@ -187,14 +184,14 @@ for (const [width, locale, theme] of [
       ]);
       assert.equal(requests, 3);
       const categoryTitles = await page.locator("section h2").allTextContents();
-      assert.equal(categoryTitles.includes(locale === "zh-CN" ? "指南" : "Guides"), false);
-      assert.equal(categoryTitles.includes(locale === "zh-CN" ? "法律" : "Legal"), false);
+      assert.equal(categoryTitles.includes("Guides"), false);
+      assert.equal(categoryTitles.includes("Legal"), false);
       const legacyCategory = await page
         .locator(
           '[data-testid="plugin-store-card"][data-plugin-id="legacy-guide@zcode-plugins-official"]',
         )
         .evaluate((element) => element.closest("section").querySelector("h2").textContent);
-      assert.equal(legacyCategory, locale === "zh-CN" ? "实用工具" : "Utilities");
+      assert.equal(legacyCategory, "Utilities");
       assert.equal(
         await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
         true,
@@ -216,7 +213,7 @@ for (const [width, locale, theme] of [
         await legalCard.evaluate(
           (element) => element.closest("section").querySelector("h2").textContent,
         ),
-        locale === "zh-CN" ? "法律" : "Legal",
+        "Legal",
       );
       await page.waitForFunction(() => {
         const sections = Array.from(document.querySelectorAll("section")).filter((s) =>
@@ -263,7 +260,7 @@ for (const [width, locale, theme] of [
 }
 
 for (const width of [1200, 390]) {
-  for (const locale of ["en-US", "zh-CN"]) {
+  for (const locale of ["en-US"]) {
     for (const theme of ["light", "dark"]) {
       test(`PLM-MISSING-CONFIG ${width}/${locale}/${theme}`, async () => {
         const page = await browser.newPage({ viewport: { width, height: 900 } });
@@ -279,9 +276,7 @@ for (const width of [1200, 390]) {
           for (const name of ["documents", "pdf", "presentations", "spreadsheets", "image-search"])
             assert.equal(await card(name).count(), 1, name);
           assert.equal(
-            await card("repairable")
-              .getByRole("button", { name: locale === "zh-CN" ? "安装" : "Install", exact: true })
-              .count(),
+            await card("repairable").getByRole("button", { name: "Install", exact: true }).count(),
             1,
           );
           const bundledIcons = [
@@ -320,7 +315,7 @@ for (const width of [1200, 390]) {
 }
 
 for (const width of [1200, 390]) {
-  for (const locale of ["en-US", "zh-CN"]) {
+  for (const locale of ["en-US"]) {
     for (const theme of ["light", "dark"]) {
       test(`PLM-DOCUMENT-ORDER ${width}/${locale}/${theme}`, async () => {
         const page = await browser.newPage({ viewport: { width, height: 900 } });

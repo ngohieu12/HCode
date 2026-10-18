@@ -51,7 +51,7 @@ describe("weixin bot provider", () => {
           context_token: "ctx-1",
           msg: {
             sender_name: "User",
-            item_list: [{ type: 1, text_item: { text: "/状态" } }],
+            item_list: [{ type: 1, text_item: { text: "/status" } }],
           },
         },
       ],
@@ -81,7 +81,7 @@ describe("weixin bot provider", () => {
     expect(result.messages).toEqual([
       {
         botId: "weixin-1",
-        text: "/状态",
+        text: "/status",
         actor: {
           provider: "weixin",
           botId: "weixin-1",

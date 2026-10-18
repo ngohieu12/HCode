@@ -204,7 +204,6 @@ import {
   primeCodingPlanBillingDiscountCacheForTest,
   resolveCodingPlanBillingDiscountCopy,
 } from "@/CodingPlanBillingDiscount.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
 import { TooltipProvider } from "@/components/ui/tooltip.js";
 
 const intlMockState = vi.hoisted(() => ({ locale: "en-US" }));
@@ -218,55 +217,29 @@ vi.mock("@/i18n/IntlProvider.js", () => ({
     locale: intlMockState.locale,
     intl: {
       formatMessage: (descriptor: { id: string }, values?: Record<string, string>) => {
-        const isZh = intlMockState.locale.toLowerCase().startsWith("zh");
         let message =
-          (isZh
-            ? {
-                "settings.modelProvider.startPlan.meta.today": "Today",
-                "settings.modelProvider.startPlan.meta.tomorrow": "Tomorrow",
-                "settings.modelProvider.startPlan.balance.used": "已用 {value}",
-                "settings.modelProvider.startPlan.preview.unit.tokens": "tokens",
-                "settings.modelProvider.startPlan.preview.period.daily": "{unit}/日",
-                "settings.modelProvider.startPlan.preview.entitlementSummary.daily":
-                  "每日额度 · {details}",
-                "settings.modelProvider.startPlan.preview.entitlementSummary.generic":
-                  "额度 · {details}",
-                "settings.modelProvider.startPlan.preview.entitlementGroup.single":
-                  "{model} {quota}",
-                "settings.modelProvider.startPlan.preview.entitlementGroup.each":
-                  "{models} 各{quota}",
-                "settings.modelProvider.codingPlan.purchase.fromPrice": "{price} 起",
-                "settings.modelProvider.codingPlan.purchase.fromPriceSuffix": "起",
-                "settings.modelProvider.codingPlan.purchaseBanner.startPlanTitle": "体验套餐",
-                "settings.modelProvider.connectionMode.startPlanCount": "体验套餐 × {count}",
-                "settings.modelProvider.connectionMode.switchToStartPlan": "切换至体验套餐",
-                "settings.modelProvider.codingPlan.enterprise.tier.lite": "基础版",
-                "settings.modelProvider.codingPlan.enterprise.tier.pro": "标准版",
-                "settings.modelProvider.codingPlan.enterprise.tier.max": "高级版",
-              }
-            : {
-                "settings.modelProvider.startPlan.meta.today": "Today",
-                "settings.modelProvider.startPlan.meta.tomorrow": "Tomorrow",
-                "settings.modelProvider.startPlan.balance.used": "Used {value}",
-                "settings.modelProvider.startPlan.preview.unit.tokens": "tokens",
-                "settings.modelProvider.startPlan.preview.period.daily": "{unit} per day",
-                "settings.modelProvider.startPlan.preview.entitlementSummary.daily":
-                  "Daily quota · {details}",
-                "settings.modelProvider.startPlan.preview.entitlementSummary.generic":
-                  "Quota · {details}",
-                "settings.modelProvider.startPlan.preview.entitlementGroup.single":
-                  "{model} {quota}",
-                "settings.modelProvider.startPlan.preview.entitlementGroup.each":
-                  "{models} {quota} each",
-                "settings.modelProvider.codingPlan.purchase.fromPrice": "{price}+",
-                "settings.modelProvider.codingPlan.purchase.fromPriceSuffix": "",
-                "settings.modelProvider.codingPlan.purchaseBanner.startPlanTitle": "Start Plan",
-                "settings.modelProvider.connectionMode.startPlanCount": "Start Plan × {count}",
-                "settings.modelProvider.connectionMode.switchToStartPlan": "Switch to Start Plan",
-                "settings.modelProvider.codingPlan.enterprise.tier.lite": "Lite",
-                "settings.modelProvider.codingPlan.enterprise.tier.pro": "Pro",
-                "settings.modelProvider.codingPlan.enterprise.tier.max": "Max",
-              })[descriptor.id] ?? descriptor.id;
+          {
+            "settings.modelProvider.startPlan.meta.today": "Today",
+            "settings.modelProvider.startPlan.meta.tomorrow": "Tomorrow",
+            "settings.modelProvider.startPlan.balance.used": "Used {value}",
+            "settings.modelProvider.startPlan.preview.unit.tokens": "tokens",
+            "settings.modelProvider.startPlan.preview.period.daily": "{unit} per day",
+            "settings.modelProvider.startPlan.preview.entitlementSummary.daily":
+              "Daily quota · {details}",
+            "settings.modelProvider.startPlan.preview.entitlementSummary.generic":
+              "Quota · {details}",
+            "settings.modelProvider.startPlan.preview.entitlementGroup.single": "{model} {quota}",
+            "settings.modelProvider.startPlan.preview.entitlementGroup.each":
+              "{models} {quota} each",
+            "settings.modelProvider.codingPlan.purchase.fromPrice": "{price}+",
+            "settings.modelProvider.codingPlan.purchase.fromPriceSuffix": "",
+            "settings.modelProvider.codingPlan.purchaseBanner.startPlanTitle": "Start Plan",
+            "settings.modelProvider.connectionMode.startPlanCount": "Start Plan × {count}",
+            "settings.modelProvider.connectionMode.switchToStartPlan": "Switch to Start Plan",
+            "settings.modelProvider.codingPlan.enterprise.tier.lite": "Lite",
+            "settings.modelProvider.codingPlan.enterprise.tier.pro": "Pro",
+            "settings.modelProvider.codingPlan.enterprise.tier.max": "Max",
+          }[descriptor.id] ?? descriptor.id;
         for (const [key, value] of Object.entries(values ?? {})) {
           message = message.replace(`{${key}}`, value);
         }
@@ -2644,8 +2617,8 @@ describe("model provider coding plan", () => {
     expect(html).not.toContain("settings.modelProvider.startPlan.summaryDescription");
   });
 
-  it("StartPlanCard 中文界面使用本地化紧凑单位展示体验套餐额度", () => {
-    intlMockState.locale = "zh-CN";
+  it("StartPlanCard 越南语界面使用本地化紧凑单位展示体验套餐额度", () => {
+    intlMockState.locale = "vi-VN";
     try {
       const html = renderToStaticMarkup(
         createElement(StartPlanCard, {
@@ -2672,8 +2645,8 @@ describe("model provider coding plan", () => {
         }),
       );
 
-      expect(html).toContain("4000万");
-      expect(html).toContain("每日额度 · GLM-5.2 3000万 · GLM-5-Turbo 1000万");
+      expect(html).toContain("40\u00a0Tr");
+      expect(html).toContain("Daily quota · GLM-5.2 30\u00a0Tr · GLM-5-Turbo 10\u00a0Tr");
       expect(html).not.toContain("40M");
       expect(html).not.toContain("30M");
       expect(html).not.toContain("10M");
@@ -2682,8 +2655,8 @@ describe("model provider coding plan", () => {
     }
   });
 
-  it("StartPlanCard 中文界面单模型每日额度使用本地化紧凑单位", () => {
-    intlMockState.locale = "zh-CN";
+  it("StartPlanCard 越南语界面单模型每日额度使用本地化紧凑单位", () => {
+    intlMockState.locale = "vi-VN";
     try {
       const html = renderToStaticMarkup(
         createElement(StartPlanCard, {
@@ -2703,9 +2676,9 @@ describe("model provider coding plan", () => {
         }),
       );
 
-      expect(html).toContain("500万");
-      expect(html).toContain("tokens/日");
-      expect(html).toContain("每日额度 · GLM-5.2 500万");
+      expect(html).toContain("5\u00a0Tr");
+      expect(html).toContain("tokens per day");
+      expect(html).toContain("Daily quota · GLM-5.2 5\u00a0Tr");
       expect(html).not.toContain("5 Million");
       expect(html).not.toContain("5M");
     } finally {
@@ -4661,12 +4634,12 @@ describe("model provider coding plan", () => {
         },
       ],
       {
-        locale: "zh-CN",
-        formatMessage: (id, fallback) => (zhCN as Record<string, string>)[id] ?? fallback,
+        locale: "en-US",
+        formatMessage: (id, fallback) => (enUS as Record<string, string>)[id] ?? fallback,
       },
     );
 
-    expect(groups.map((group) => group.title)).toEqual(["标准版", "高级版"]);
+    expect(groups.map((group) => group.title)).toEqual(["Pro", "Max"]);
     expect(groups.map(resolveEnterprisePurchaseChoiceBannerPrice)).toEqual([
       { kind: "price", price: 598, currency: "CNY" },
       { kind: "price", price: 1298, currency: "CNY" },
@@ -5867,17 +5840,18 @@ describe("model provider coding plan", () => {
     const tomorrowEffectiveTime = new Date(2026, 8, 2, 22, 0).toISOString();
     const laterEffectiveTime = new Date(2026, 8, 4, 22, 0).toISOString();
 
-    expect(zhCN["settings.modelProvider.startPlan.pendingUntil"]).toBe("待生效 {date}");
     expect(enUS["settings.modelProvider.startPlan.pendingUntil"]).toBe("Pending {date}");
-    expect(formatStartPlanEffectiveDate(todayEffectiveTime, "zh-CN", now)).toBe("今天 22:00");
+    expect(formatStartPlanEffectiveDate(todayEffectiveTime, "vi-VN", now)).toBe("Hôm nay 22:00");
     expect(formatStartPlanEffectiveDate(todayEffectiveTime, "en-US", now)).toBe("Today 22:00");
-    expect(formatStartPlanEffectiveDate(tomorrowEffectiveTime, "zh-CN", now)).toBe("明天 22:00");
+    expect(formatStartPlanEffectiveDate(tomorrowEffectiveTime, "vi-VN", now)).toBe(
+      "Ngày mai 22:00",
+    );
     expect(formatStartPlanEffectiveDate(tomorrowEffectiveTime, "en-US", now)).toBe(
       "Tomorrow 22:00",
     );
-    expect(formatStartPlanEffectiveDate(laterEffectiveTime, "zh-CN", now)).toBe("9月4日 22:00");
+    expect(formatStartPlanEffectiveDate(laterEffectiveTime, "vi-VN", now)).toBe("22:00 4 thg 9");
     expect(formatStartPlanEffectiveDate(laterEffectiveTime, "en-US", now)).toBe("Sep 4, 22:00");
-    expect(formatStartPlanExpireDate(laterEffectiveTime, "zh-CN", now)).toBe("9月4日 22:00");
+    expect(formatStartPlanExpireDate(laterEffectiveTime, "vi-VN", now)).toBe("22:00 4 thg 9");
     expect(formatStartPlanExpireDate(laterEffectiveTime, "en-US", now)).toBe("Sep 4, 22:00");
   });
 
@@ -6220,8 +6194,8 @@ describe("model provider coding plan", () => {
     expect(html).toContain("settings.modelProvider.codingPlan.connect");
   });
 
-  it("BigModel Start Plan 中文详情不显示推广额度", () => {
-    intlMockState.locale = "zh-CN";
+  it("BigModel Start Plan 越南语详情不显示推广额度", () => {
+    intlMockState.locale = "vi-VN";
     primeStartPlanPreviewCacheForTest({
       planId: "zcode-v3-start-plan",
       name: "ZCode V3 Start Plan",
@@ -6250,16 +6224,15 @@ describe("model provider coding plan", () => {
     });
 
     expect(html).not.toContain("ZCode V3 Start Plan");
-    expect(html).not.toContain("500万");
-    expect(html).not.toContain("tokens/日");
-    expect(html).not.toContain("每日额度 · GLM-5.2 500万");
+    expect(html).not.toContain("5\u00a0Tr");
+    expect(html).not.toContain("tokens per day");
+    expect(html).not.toContain("Daily quota · GLM-5.2 5\u00a0Tr");
     expect(html).not.toContain("¥49.00");
     expect(html).not.toContain("¥598.00");
-    expect(html).not.toContain("人民币 起");
   });
 
-  it("BigModel Start Plan 中文详情保留标题且不显示体验推广", () => {
-    intlMockState.locale = "zh-CN";
+  it("BigModel Start Plan 越南语详情保留标题且不显示体验推广", () => {
+    intlMockState.locale = "vi-VN";
     primeStartPlanPreviewCacheForTest({
       planId: "zcode-v3-start-plan",
       name: "Start Plan",
@@ -6287,7 +6260,7 @@ describe("model provider coding plan", () => {
       statusActive: false,
     });
 
-    expect(html).not.toContain(">体验套餐<");
+    expect(html).not.toContain("Daily quota · GLM-5.2 5\u00a0Tr");
     expect(html).toContain(">Start Plan<");
   });
 
@@ -6521,16 +6494,16 @@ describe("model provider coding plan", () => {
   it("Coding Plan 活动说明标题与 Markdown 正文来自远端配置", () => {
     const copy = resolveCodingPlanBillingDiscountCopy(
       {
-        "zh-CN": {
-          infoTitle: "远端权益规则",
-          infoBody: "- 远端规则一\n- 远端规则二",
+        "vi-VN": {
+          infoTitle: "Quy tắc quyền lợi từ máy chủ",
+          infoBody: "- Quy tắc một\n- Quy tắc hai",
         },
       },
-      "zh-CN",
+      "vi-VN",
     );
 
-    expect(copy.infoTitle).toBe("远端权益规则");
-    expect(copy.infoBody).toBe("- 远端规则一\n- 远端规则二");
+    expect(copy.infoTitle).toBe("Quy tắc quyền lợi từ máy chủ");
+    expect(copy.infoBody).toBe("- Quy tắc một\n- Quy tắc hai");
   });
 
   it("Coding Plan 活动说明弹窗使用紧凑宽度", () => {
@@ -6546,12 +6519,12 @@ describe("model provider coding plan", () => {
     expect(
       resolveCodingPlanBillingDiscountCopy(
         {
-          "zh-CN": {
-            cardTitle: "限时 150% 配额活动",
-            cardBody: "升级 Coding Plan，可在活动期内获得150% 配额",
-            badgeBody: "150% 配额",
-            infoTitle: "权益规则说明",
-            infoBody: "远端规则正文",
+          "vi-VN": {
+            cardTitle: "Chiến dịch ưu đãi 150% có thời hạn",
+            cardBody: "Nâng cấp Coding Plan để nhận 150% hạn mức trong thời gian chiến dịch",
+            badgeBody: "150% hạn mức",
+            infoTitle: "Giải thích quy tắc quyền lợi",
+            infoBody: "Nội dung quy tắc từ máy chủ",
           },
           "en-US": {
             cardTitle: "Limited-time 150% Quota Campaign",
@@ -6559,14 +6532,14 @@ describe("model provider coding plan", () => {
             badgeBody: "150% Quota",
           },
         },
-        "zh-CN",
+        "vi-VN",
       ),
     ).toEqual({
-      cardTitle: "限时 150% 配额活动",
-      cardBody: "升级 Coding Plan，可在活动期内获得150% 配额",
-      badgeBody: "150% 配额",
-      infoTitle: "权益规则说明",
-      infoBody: "远端规则正文",
+      cardTitle: "Chiến dịch ưu đãi 150% có thời hạn",
+      cardBody: "Nâng cấp Coding Plan để nhận 150% hạn mức trong thời gian chiến dịch",
+      badgeBody: "150% hạn mức",
+      infoTitle: "Giải thích quy tắc quyền lợi",
+      infoBody: "Nội dung quy tắc từ máy chủ",
     });
   });
 
@@ -6590,7 +6563,7 @@ describe("model provider coding plan", () => {
       infoTitle: undefined,
       infoBody: undefined,
     });
-    expect(resolveCodingPlanBillingDiscountCopy({}, "zh-CN")).toEqual({});
+    expect(resolveCodingPlanBillingDiscountCopy({}, "vi-VN")).toEqual({});
   });
 
   it("活动配置未透传到 UI 时不渲染 150% 活动入口", () => {

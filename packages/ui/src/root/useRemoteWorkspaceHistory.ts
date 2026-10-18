@@ -1143,7 +1143,7 @@ export function useRemoteWorkspaceHistory({
         ...new Set(matchedTabs.map((tab) => buildWorkspaceSessionKey(tab))),
       ];
       const reason = [
-        "远程连接已断开",
+        "Remote connection closed",
         event.exitCode != null ? `exitCode=${event.exitCode}` : null,
         event.signal ? `signal=${event.signal}` : null,
       ]

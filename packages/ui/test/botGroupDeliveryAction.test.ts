@@ -1,4 +1,5 @@
 import { createElement, type ContextType } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import {
@@ -14,7 +15,7 @@ const render = (results: BotGroupDelivery[]) =>
   renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(BotGroupDeliveryAction, {
         turnId: "product-turn-a",
         sourceCommandIds: ["command-a"],
@@ -68,7 +69,7 @@ describe("group reply delivery action", () => {
       const html = renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(
             DeliveryContext.Provider,
             { value },

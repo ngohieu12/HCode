@@ -39,7 +39,7 @@ function Fixture() {
     }
   }
   return (
-    <ZCodeIntlProvider initialLocale={params.get("locale") === "zh-CN" ? "zh-CN" : "en-US"}>
+    <ZCodeIntlProvider initialLocale="en-US">
       <main className="min-h-screen bg-background p-4 text-ui-base text-foreground">
         <CodingPlanStatusPanel
           providerId={providerId}

@@ -39,29 +39,31 @@ function readForceUpdatePromptIcon(): string | null {
 }
 
 function buildForceUpdatePromptMessages(locale: Locale) {
-  if (locale === "zh-CN") {
+  if (locale === "vi-VN") {
     return {
-      checkingTitle: "正在检查更新",
-      checkingMessage: "请保持此窗口打开，HCode 正在查找可用更新。",
-      downloadingTitle: "正在下载更新",
-      downloadingVersionTitle: "正在下载更新 v{version}",
-      downloadingMessage: "下载完成后会自动安装，请勿关闭应用。",
-      readyTitle: "更新已下载",
-      readyMessage: "HCode 正在准备重启并安装更新。",
-      installingTitle: "正在安装更新",
-      installingMessage: "HCode 即将重启完成安装。",
-      errorTitle: "自动升级失败",
-      errorMessage: "你可以重试自动升级，或改用手动升级。",
-      devSkippedTitle: "调试环境无法自动升级",
-      devSkippedMessage: "自动升级仅在打包后的应用中可用，请使用手动升级或打包应用验证。",
-      confirmCloseTitle: "自动升级正在进行",
-      confirmCloseMessage: "关闭窗口会中断当前自动升级流程，旧版本仍然无法进入主界面。你可以继续等待，或确认关闭并退出。",
-      confirmCloseButton: "确认关闭",
-      continueUpdateButton: "继续更新",
-      retryButton: "重试自动升级",
-      checkingButton: "检查中...",
-      downloadingButton: "下载中...",
-      installingButton: "安装中...",
+      checkingTitle: "Đang kiểm tra cập nhật",
+      checkingMessage: "Vui lòng giữ cửa sổ này mở trong khi HCode kiểm tra cập nhật.",
+      downloadingTitle: "Đang tải bản cập nhật",
+      downloadingVersionTitle: "Đang tải bản cập nhật v{version}",
+      downloadingMessage: "HCode sẽ tự động cài đặt bản cập nhật ngay sau khi tải xong.",
+      readyTitle: "Đã tải xong bản cập nhật",
+      readyMessage: "HCode đang chuẩn bị khởi động lại và cài đặt bản cập nhật.",
+      installingTitle: "Đang cài đặt bản cập nhật",
+      installingMessage: "HCode sẽ khởi động lại để hoàn tất cài đặt.",
+      errorTitle: "Cập nhật tự động thất bại",
+      errorMessage: "Bạn có thể thử lại cập nhật tự động hoặc dùng cập nhật thủ công.",
+      devSkippedTitle: "Môi trường gỡ lỗi không hỗ trợ cập nhật tự động",
+      devSkippedMessage:
+        "Cập nhật tự động chỉ khả dụng trong bản đóng gói. Hãy dùng cập nhật thủ công hoặc kiểm tra bản đóng gói.",
+      confirmCloseTitle: "Cập nhật tự động đang chạy",
+      confirmCloseMessage:
+        "Đóng cửa sổ này sẽ ngắt quá trình cập nhật tự động hiện tại, và phiên bản cũ vẫn không thể mở màn hình chính. Bạn có thể tiếp tục chờ hoặc xác nhận đóng và thoát.",
+      confirmCloseButton: "Vẫn đóng",
+      continueUpdateButton: "Tiếp tục cập nhật",
+      retryButton: "Thử lại cập nhật tự động",
+      checkingButton: "Đang kiểm tra...",
+      downloadingButton: "Đang tải...",
+      installingButton: "Đang cài đặt...",
     };
   }
 
@@ -78,9 +80,11 @@ function buildForceUpdatePromptMessages(locale: Locale) {
     errorTitle: "Auto update failed",
     errorMessage: "You can retry auto update or use manual update.",
     devSkippedTitle: "Auto update unavailable in development",
-    devSkippedMessage: "Auto update is only available in packaged apps. Use manual update or test a packaged build.",
+    devSkippedMessage:
+      "Auto update is only available in packaged apps. Use manual update or test a packaged build.",
     confirmCloseTitle: "Auto update in progress",
-    confirmCloseMessage: "Closing this window will stop the current auto update flow, and this old version still cannot open the main app. You can keep waiting or close and quit.",
+    confirmCloseMessage:
+      "Closing this window will stop the current auto update flow, and this old version still cannot open the main app. You can keep waiting or close and quit.",
     confirmCloseButton: "Close anyway",
     continueUpdateButton: "Continue update",
     retryButton: "Retry auto update",
@@ -489,7 +493,8 @@ export async function showForceUpdatePrompt(
   options: ShowForceUpdatePromptOptions = {},
 ): Promise<ForceUpdatePromptAction> {
   const { BrowserWindow, nativeTheme } = await import("electron");
-  const parentWindow = BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0] ?? undefined;
+  const parentWindow =
+    BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0] ?? undefined;
   return new Promise<ForceUpdatePromptAction>((resolvePrompt) => {
     let resolved = false;
     let shown = false;
@@ -566,7 +571,8 @@ export async function showForceUpdatePrompt(
       }
       logger.info("[force-update] 用户选择自动升级");
       updatePromptState({ kind: "checking" });
-      autoUpdateDispose = options.startAutoUpdate?.((state) => updatePromptState(state)) ?? undefined;
+      autoUpdateDispose =
+        options.startAutoUpdate?.((state) => updatePromptState(state)) ?? undefined;
     };
 
     const showPromptWindow = (source: string) => {
@@ -629,6 +635,8 @@ export async function showForceUpdatePrompt(
       showPromptWindow("did-fail-load");
     });
     fallbackTimer = setTimeout(() => showPromptWindow("timeout"), 1000);
-    win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(renderForceUpdatePromptHtml(text, locale))}`);
+    win.loadURL(
+      `data:text/html;charset=utf-8,${encodeURIComponent(renderForceUpdatePromptHtml(text, locale))}`,
+    );
   });
 }

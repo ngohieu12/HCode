@@ -65,7 +65,7 @@ describe("telemetryCore", () => {
       const dependencies = { homeDir: home, loadUserId: async () => userId, fetchImpl: fetchMock };
       const context = {
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "1280x800",
       };
       const detail = {
@@ -155,7 +155,7 @@ describe("telemetryCore", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
 
@@ -188,7 +188,7 @@ describe("telemetryCore", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
 
@@ -205,7 +205,7 @@ describe("telemetryCore", () => {
     expect(JSON.parse(String((requestInit as RequestInit).body))).toEqual({
       event_id: "452a978b-d926-4a65-9c07-b04344a307d0",
       client_timezone: "Asia/Shanghai",
-      client_language: "zh-CN",
+      client_language: "en-US",
       element_name: "app_launch",
       event_region: "app",
       event_type: "view",
@@ -240,7 +240,7 @@ describe("telemetryCore", () => {
     });
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
 
@@ -278,7 +278,7 @@ describe("telemetryCore", () => {
     });
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
 
@@ -327,7 +327,7 @@ describe("telemetryCore", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
 
@@ -362,7 +362,7 @@ describe("telemetryCore", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
 
@@ -403,7 +403,7 @@ describe("telemetryCore", () => {
     await service.reportEvent({
       context: {
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "3024x1964",
       },
       elementName: "send_btn",
@@ -424,7 +424,7 @@ describe("telemetryCore", () => {
     expect(JSON.parse(String((requestInit as RequestInit).body))).toEqual({
       event_id: "custom-event-id",
       client_timezone: "Asia/Shanghai",
-      client_language: "zh-CN",
+      client_language: "en-US",
       element_name: "send_btn",
       event_region: "app",
       event_type: "ck",
@@ -456,7 +456,7 @@ describe("telemetryCore", () => {
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 204 }));
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
 
@@ -500,7 +500,7 @@ describe("telemetryCore", () => {
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 204 }));
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
 
@@ -545,7 +545,7 @@ describe("telemetryCore", () => {
       .mockResolvedValueOnce(new Response(null, { status: 204 }));
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
 
@@ -583,7 +583,7 @@ describe("telemetryCore", () => {
     });
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
 
@@ -631,7 +631,7 @@ describe("telemetryCore", () => {
       .mockResolvedValueOnce(new Response(null, { status: 204 }));
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
 
@@ -693,7 +693,7 @@ describe("telemetryCore", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
 
@@ -731,7 +731,7 @@ describe("telemetryCore", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
 
@@ -771,7 +771,7 @@ describe("telemetryCore", () => {
     };
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
 
@@ -799,7 +799,7 @@ describe("telemetryCore", () => {
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 204 }));
     const context = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
 
@@ -874,7 +874,7 @@ describe("telemetryCore", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
 

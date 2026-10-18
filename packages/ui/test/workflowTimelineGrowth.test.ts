@@ -2,6 +2,7 @@
 // 补全的生长（docs/dynamic-workflow/presentation.md「Holes on the timeline」的「Growth」）：补全接进 run 的那一帧，
 // 插入列右侧的站带 `wf-slide`、从 −插入宽度滑到位；320ms 后类摘掉；冷开一条已补全的时间线不滑。
 import { act, cleanup, render } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { WorkflowRunState } from "@zcode/shared/zcode-protocol-v4";
@@ -151,7 +152,7 @@ describe("WorkflowTimeline · 生长的滑动", () => {
   function view(model: ReturnType<typeof buildWorkflowTimeline>) {
     return createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(WorkflowTimeline, { model }),
     );
   }

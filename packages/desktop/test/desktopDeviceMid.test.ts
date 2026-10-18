@@ -109,7 +109,7 @@ describe("ensureDesktopDeviceMidSync", () => {
 
     await service.reportAppLaunch({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
 

@@ -30,7 +30,7 @@ function createServices(params: {
     settingService: {
       get: vi.fn(async () => ({
         recentProjects: [],
-        locale: "zh-CN" as const,
+        locale: "vi-VN" as const,
         modelProviderFamilyModes: {},
         providerFamilyDomainMigrated: false,
         ...params.settings,

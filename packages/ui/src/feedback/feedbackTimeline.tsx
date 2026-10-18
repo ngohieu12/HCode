@@ -94,8 +94,8 @@ export function getFeedbackTimelineItems(
       attachments: c.attachments ?? [],
       isStaff: c.is_staff,
       actor: c.is_staff
-        ? formatOptionalMessage(formatMessage, "feedback.actor.productManager", "产品经理")
-        : formatOptionalMessage(formatMessage, "feedback.actor.user", "用户"),
+        ? formatOptionalMessage(formatMessage, "feedback.actor.productManager", "Product manager")
+        : formatOptionalMessage(formatMessage, "feedback.actor.user", "User"),
     });
   }
 
@@ -109,28 +109,28 @@ function getUserFacingEventActor(
   switch (event.type) {
     case "created":
     case "user_replied":
-      return formatOptionalMessage(formatMessage, "feedback.actor.user", "用户");
+      return formatOptionalMessage(formatMessage, "feedback.actor.user", "User");
     case "assignee_changed":
       return formatOptionalMessage(
         formatMessage,
         "feedback.actor.productManager",
-        "产品经理",
+        "Product manager",
       );
     case "staff_replied":
       return formatOptionalMessage(
         formatMessage,
         "feedback.actor.productManager",
-        "产品经理",
+        "Product manager",
       );
     case "status_changed": {
       const payload = event.payload as { to?: unknown } | null | undefined;
       const toStatus = typeof payload?.to === "string" ? payload.to : "";
       return ["开发中", "已解决", "已上线"].includes(toStatus)
-        ? formatOptionalMessage(formatMessage, "feedback.actor.dev", "研发")
+        ? formatOptionalMessage(formatMessage, "feedback.actor.dev", "Engineering")
         : formatOptionalMessage(
             formatMessage,
             "feedback.actor.productManager",
-            "产品经理",
+            "Product manager",
           );
     }
     default:
@@ -266,17 +266,17 @@ function isTimelineImageAttachment(attachment: FeedbackCommentAttachment) {
 function formatStepDuration(from: string, to: string, formatMessage?: MessageFormatter) {
   const diffMs = new Date(to).getTime() - new Date(from).getTime();
   if (!Number.isFinite(diffMs) || diffMs <= 0) {
-    return formatOptionalMessage(formatMessage, "feedback.duration.instant", "即时");
+    return formatOptionalMessage(formatMessage, "feedback.duration.instant", "Instant");
   }
   const minutes = Math.round(diffMs / 60_000);
   if (minutes < 1) {
-    return formatOptionalMessage(formatMessage, "feedback.duration.lessThanMinute", "不到 1 分钟");
+    return formatOptionalMessage(formatMessage, "feedback.duration.lessThanMinute", "Less than a minute");
   }
   if (minutes < 60) {
     return formatOptionalMessage(
       formatMessage,
       "feedback.duration.minutes",
-      `${minutes} 分钟`,
+      `${minutes} min`,
       { count: String(minutes) },
     );
   }
@@ -285,7 +285,7 @@ function formatStepDuration(from: string, to: string, formatMessage?: MessageFor
     return formatOptionalMessage(
       formatMessage,
       "feedback.duration.hours",
-      `${hours} 小时`,
+      `${hours} h`,
       { count: String(hours) },
     );
   }
@@ -293,7 +293,7 @@ function formatStepDuration(from: string, to: string, formatMessage?: MessageFor
   return formatOptionalMessage(
     formatMessage,
     "feedback.duration.days",
-    `${days} 天`,
+    `${days} d`,
     { count: String(days) },
   );
 }

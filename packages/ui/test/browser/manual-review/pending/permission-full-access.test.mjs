@@ -59,7 +59,7 @@ for (const width of [390, 1200])
       page.on("pageerror", (error) => errors.push(error.message));
       try {
         const mobile = width === 390;
-        await page.goto(`${origin}fixture?theme=${theme}&locale=${mobile ? "zh-CN" : "en-US"}`);
+        await page.goto(`${origin}fixture?theme=${theme}&locale=${mobile ? "en-US" : "en-US"}`);
         const options = page.getByRole("option");
         await options.first().waitFor();
         assert.equal(await options.count(), 4);

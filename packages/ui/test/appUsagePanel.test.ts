@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -120,7 +121,7 @@ describe("AppUsageLifetimeSummaryStrip", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(AppUsageLifetimeSummaryStrip, {
           snapshot: createSnapshot(),
         }),
@@ -159,7 +160,11 @@ describe("AppUsageLifetimeSummaryStrip", () => {
       createElement(
         ServiceProvider,
         { services: createServices() },
-        createElement(ZCodeIntlProvider, { initialLocale: "zh-CN" }, createElement(AppUsagePanel)),
+        createElement(
+          ZCodeIntlProvider,
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
+          createElement(AppUsagePanel),
+        ),
       ),
     );
 

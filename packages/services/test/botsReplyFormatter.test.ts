@@ -40,8 +40,8 @@ describe("bot reply formatter", () => {
     ]);
 
     expect(messages).toContain("已经完成。");
-    expect(messages).toContain("变更摘要：2 个文件，🟢 `+12` 🔴 `-4`\n- `packages/ui/src/App.tsx` (🟢 `+10` 🔴 `-2`)\n- `packages/services/src/bots/botsService.ts` (🟢 `+2` 🔴 `-2`)");
-    expect(messages.join("\n")).not.toContain("工具调用：");
+    expect(messages).toContain("Change summary: 2 files, 🟢 `+12` 🔴 `-4`\n- `packages/ui/src/App.tsx` (🟢 `+10` 🔴 `-2`)\n- `packages/services/src/bots/botsService.ts` (🟢 `+2` 🔴 `-2`)");
+    expect(messages.join("\n")).not.toContain("Tool calls:");
   });
 
   it("formats assistant response blocks with tool block and change summary", () => {
@@ -64,8 +64,8 @@ describe("bot reply formatter", () => {
     );
 
     expect(messages).toContain("已经完成。");
-    expect(messages).toContain("工具调用：\n- 完成 · Edit file · `packages/ui/src/App.tsx`");
-    expect(messages.join("\n")).toContain("变更摘要：2 个文件，🟢 `+12` 🔴 `-4`");
+    expect(messages).toContain("Tool calls:\n- Completed · Edit file · `packages/ui/src/App.tsx`");
+    expect(messages.join("\n")).toContain("Change summary: 2 files, 🟢 `+12` 🔴 `-4`");
   });
 
   it("keeps selected assistant response paragraphs in one message", () => {
@@ -75,7 +75,7 @@ describe("bot reply formatter", () => {
     ]);
 
     expect(messages[0]).toBe("第一句。第二句！\n\n第三段");
-    expect(messages.at(-1)).toContain("变更摘要：2 个文件，🟢 `+12` 🔴 `-4`");
+    expect(messages.at(-1)).toContain("Change summary: 2 files, 🟢 `+12` 🔴 `-4`");
   });
 
   it("buffers streaming assistant responses until terminal flush", () => {
@@ -161,7 +161,7 @@ describe("bot reply formatter", () => {
         input: { command: "pnpm test" },
         status: "completed",
       }),
-    ).toBe("工具调用：\n- 完成 · Run command · `pnpm test`");
+    ).toBe("Tool calls:\n- Completed · Run command · `pnpm test`");
   });
 
   it("shortens long run commands in tool call replies", () => {
@@ -176,7 +176,7 @@ describe("bot reply formatter", () => {
     });
 
     expect(text).toBe(
-      "工具调用：\n- 完成 · Run command · `pnpm vitest run packages/services/test/botsReplyFormatter.te ...  --reporter verbose --runInBand`",
+      "Tool calls:\n- Completed · Run command · `pnpm vitest run packages/services/test/botsReplyFormatter.te ...  --reporter verbose --runInBand`",
     );
     expect(text).not.toContain("botsService.test.ts");
   });
@@ -192,7 +192,7 @@ describe("bot reply formatter", () => {
     });
 
     expect(text).toBe(
-      "需要权限：\nPermission Required\n`npm exec very-long-script -- --workspace /Users/me/project - ... er.ts --include-generated false`",
+      "Permission required:\nPermission Required\n`npm exec very-long-script -- --workspace /Users/me/project - ... er.ts --include-generated false`",
     );
     expect(text).not.toContain("packages/services/src/bots");
   });
@@ -268,7 +268,7 @@ describe("bot reply formatter", () => {
         },
         { workspacePath: "/Users/me/project" },
       ),
-    ).toBe("工具调用：\n- 完成 · Edit file · `src/demo.md`");
+    ).toBe("Tool calls:\n- Completed · Edit file · `src/demo.md`");
   });
 
   it("escapes inline code markers in change summary paths", () => {

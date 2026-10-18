@@ -36,6 +36,9 @@ import {
 } from "@/lib/providerBusinessError.js";
 import type { ZCodeUiError } from "@/lib/zcodeUiError.js";
 
+// 旧会话里落盘的服务端错误文案，只用于识别「历史任务的模型已下架」这一类残留，
+// 命中后按 ZCODE_RUNTIME_MODEL_UNAVAILABLE 本地化展示；这里的中文串永远不会
+// 作为界面文案渲染，因此不受「只保留越南语/英语」的限制。
 const HISTORICAL_MODEL_UNAVAILABLE_MESSAGES = [
   "历史任务使用的模型已不可用",
   "The model used by this historical task is no longer available",

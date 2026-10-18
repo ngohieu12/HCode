@@ -104,34 +104,22 @@ vi.mock("@zcode/shared", () => ({
   },
   getDesktopMenuMessage: (_locale: string, id: string) => {
     const enLabels: Record<string, string> = {
+      "titleBar.menu.file": "File",
+      "titleBar.menu.edit": "Edit",
+      "titleBar.menu.view": "View",
+      "titleBar.menu.window": "Window",
+      "titleBar.menu.help": "Help",
+      "titleBar.menu.edit.undo": "Undo",
+      "titleBar.menu.edit.paste": "Paste",
+      "titleBar.menu.window.minimize": "Minimize",
+      "titleBar.menu.app.hide": "Hide {appName}",
       "titleBar.menu.help.zcodeEndpoint": "ZCode Endpoint",
       "titleBar.menu.help.zcodeEndpoint.production": "Production (default)",
       "titleBar.menu.help.zcodeEndpoint.test": "Test",
       "titleBar.menu.help.zcodeEndpoint.custom": "Custom...",
       "titleBar.menu.help.zcodeEndpoint.reset": "Reset to Default",
     };
-    const zhLabels: Record<string, string> = {
-      "titleBar.menu.file": "文件",
-      "titleBar.menu.edit": "编辑",
-      "titleBar.menu.view": "视图",
-      "titleBar.menu.window": "窗口",
-      "titleBar.menu.help": "帮助",
-      "titleBar.menu.edit.undo": "撤销",
-      "titleBar.menu.edit.redo": "重做",
-      "titleBar.menu.edit.cut": "剪切",
-      "titleBar.menu.edit.copy": "复制",
-      "titleBar.menu.edit.paste": "粘贴",
-      "titleBar.menu.edit.selectAll": "全选",
-      "titleBar.menu.window.minimize": "最小化",
-      "titleBar.menu.window.zoom": "缩放",
-      "titleBar.menu.window.bringAllToFront": "全部置于前台",
-      "titleBar.menu.app.services": "服务",
-      "titleBar.menu.app.hide": "隐藏 {appName}",
-      "titleBar.menu.app.hideOthers": "隐藏其他",
-      "titleBar.menu.app.showAll": "全部显示",
-      "titleBar.menu.app.quit": "退出 {appName}",
-    };
-    return _locale === "zh-CN" ? (zhLabels[id] ?? id) : (enLabels[id] ?? id);
+    return enLabels[id] ?? id;
   },
 }));
 
@@ -288,11 +276,11 @@ describe("desktopApplicationMenu endpoint submenu", () => {
     expect(executeDesktopCommand).toHaveBeenCalledWith("closeActiveContext");
   });
 
-  it("中文界面显式本地化 Edit 和 Window 系统菜单", async () => {
+  it("显式本地化 Edit 和 Window 系统菜单", async () => {
     const { rebuildApplicationMenu } = await import("../src/main/desktopApplicationMenu.js");
 
     rebuildApplicationMenu({
-      currentApplicationLocale: "zh-CN",
+      currentApplicationLocale: "en-US",
       zcodeEndpointSelection: "production",
       executeDesktopCommand: vi.fn(),
     });
@@ -301,14 +289,14 @@ describe("desktopApplicationMenu endpoint submenu", () => {
       .calls[0]?.[0] as Electron.MenuItemConstructorOptions[];
     const topLevelLabels = template.map((item) => item.label);
     expect(topLevelLabels).toEqual(
-      expect.arrayContaining(["文件", "编辑", "视图", "窗口", "帮助"]),
+      expect.arrayContaining(["File", "Edit", "View", "Window", "Help"]),
     );
-    expect(topLevelLabels).not.toEqual(expect.arrayContaining(["Edit", "Window"]));
-    expect(findMenuItem(template, "撤销")?.role).toBe("undo");
-    expect(findMenuItem(template, "粘贴")?.role).toBe("paste");
-    expect(findMenuItem(template, "最小化")?.role).toBe("minimize");
+    expect(topLevelLabels).not.toEqual(expect.arrayContaining(["文件", "编辑"]));
+    expect(findMenuItem(template, "Undo")?.role).toBe("undo");
+    expect(findMenuItem(template, "Paste")?.role).toBe("paste");
+    expect(findMenuItem(template, "Minimize")?.role).toBe("minimize");
     if (process.platform === "darwin") {
-      expect(findMenuItem(template, "隐藏 ZCode")?.role).toBe("hide");
+      expect(findMenuItem(template, "Hide ZCode")?.role).toBe("hide");
     }
   });
 

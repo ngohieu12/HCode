@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import type { ZCodePermissionRequest } from "@zcode/shared";
 import { createElement, type ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -117,13 +118,13 @@ function buildSaveRequest(overrides: Record<string, unknown> = {}): ZCodePermiss
 
 function renderDialog(
   request: ZCodePermissionRequest,
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
   onRespond: (requestId: string, option: unknown) => void = () => {},
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(PermissionDialog, { request, onRespond, workspacePath: "/workspace" }),
     ),
   );
@@ -196,7 +197,7 @@ describe("WorkflowPermissionBlock saved source badge", () => {
   });
 
   it("renders the badge in both locales", () => {
-    renderDialog(buildSavedRunRequest(), "zh-CN");
+    renderDialog(buildSavedRunRequest(), "vi-VN");
     expect(document.querySelector('[data-workflow-saved-source="true"]')?.textContent).toContain(
       "已保存的工作流 · project",
     );
@@ -326,7 +327,7 @@ describe("SaveWorkflowPermissionBlock", () => {
   });
 
   it("renders both locales", () => {
-    renderDialog(buildSaveRequest({ overwrite: true }), "zh-CN");
+    renderDialog(buildSaveRequest({ overwrite: true }), "vi-VN");
     expect(screen.getByText("覆盖已保存的同名工作流？")).toBeTruthy();
     expect(document.querySelector('[data-workflow-overwrite-badge="true"]')?.textContent).toBe(
       "覆盖",

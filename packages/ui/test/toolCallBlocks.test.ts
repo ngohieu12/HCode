@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -131,7 +132,7 @@ describe("ToolCallBlock agent routing", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           TooltipProvider,
           null,
@@ -173,7 +174,7 @@ describe("ToolCallBlock agent routing", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: toolCallRowToLegacyNode(row),
           workspacePath: "/workspace",
@@ -222,7 +223,7 @@ describe("ToolCallBlock agent routing", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: toolCallRowToLegacyNode(row),
           workspacePath: "/workspace",
@@ -270,7 +271,7 @@ describe("ToolCallBlock agent routing", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: toolCallRowToLegacyNode(row),
           workspacePath: "/workspace",
@@ -320,7 +321,7 @@ describe("ToolCallBlock agent routing", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: toolCallRowToLegacyNode(row),
           workspacePath: "/workspace",
@@ -364,7 +365,7 @@ describe("ToolCallBlock agent routing", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           TooltipProvider,
           null,
@@ -404,7 +405,7 @@ describe("ToolCallBlock agent routing", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBody, {
           childToolList: null,
           displayModel: buildToolDisplayModel(toolCall),
@@ -438,7 +439,7 @@ describe("ToolCallBlock agent routing", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBody, {
           childToolList: null,
           displayModel: buildToolDisplayModel(toolCall),
@@ -456,7 +457,7 @@ describe("ToolCallBlock agent routing", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -485,7 +486,7 @@ describe("ToolCallBlock agent routing", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -518,7 +519,7 @@ describe("ToolCallBlock agent routing", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -590,7 +591,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -946,7 +947,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -995,7 +996,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -1039,7 +1040,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -1072,7 +1073,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -1103,7 +1104,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -1134,7 +1135,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -1166,7 +1167,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -1200,7 +1201,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -1259,7 +1260,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -1305,7 +1306,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {
@@ -1344,7 +1345,7 @@ describe("readRawToolCallFileSummaries", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolCallBlock, {
           toolCallNode: {
             toolCall: {

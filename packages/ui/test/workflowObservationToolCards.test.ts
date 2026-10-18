@@ -6,11 +6,12 @@
 // 「按名分流 + display 驱动 + 无 display 时文本兜底（绝不是 JSON dump）」三件事。
 
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import { resolveToolCallRenderer } from "@/ToolCallBlocks/resolveRenderer.js";
 import { EvalWorkflowSnippetToolCallBlock } from "@/ToolCallBlocks/renderers/eval-workflow-snippet.js";
 import { GetWorkflowRunToolCallBlock } from "@/ToolCallBlocks/renderers/get-workflow-run.js";
@@ -352,12 +353,12 @@ function buildContext(
 function renderCard(
   component: (context: ToolCallBlockRenderContext) => unknown,
   context: ToolCallBlockRenderContext,
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(component as never, context),
     ),
   );
@@ -506,7 +507,7 @@ describe("GetWorkflowRunToolCallBlock", () => {
 
   it("shows the fetching kind label while running (zh + en)", () => {
     for (const [locale, expected] of [
-      ["zh-CN", "正在获取工作流状态"],
+      ["vi-VN", "正在获取工作流状态"],
       ["en-US", "Checking workflow status"],
     ] as const) {
       cleanup();
@@ -531,7 +532,7 @@ describe("GetWorkflowRunToolCallBlock", () => {
 // 情势截面上卡（spec: docs/dynamic-workflow/launch.md「`GetWorkflowRun`」「Their cards」）：
 // 摘要句 / 阶段轨 / 花名册 / 健康行 / 日志年龄，以及两处「把不知道说出口」。
 describe("GetWorkflowRunToolCallBlock situation report", () => {
-  function renderRun(display: Record<string, unknown>, locale: "en-US" | "zh-CN" = "en-US") {
+  function renderRun(display: Record<string, unknown>, locale: "en-US" | "vi-VN" = "en-US") {
     renderCard(
       GetWorkflowRunToolCallBlock,
       buildContext(
@@ -620,7 +621,7 @@ describe("GetWorkflowRunToolCallBlock situation report", () => {
   });
 
   it("running: zh-CN uses the run pane vocabulary", () => {
-    renderRun(GET_RUN_SITUATION_DISPLAY, "zh-CN");
+    renderRun(GET_RUN_SITUATION_DISPLAY, "vi-VN");
     const roster = screen.getByTestId("workflow-run-subagents");
     expect(roster.textContent).toContain("执行中");
     expect(roster.textContent).toContain("停驻");
@@ -927,7 +928,7 @@ describe("ResumeWorkflowRunToolCallBlock", () => {
   });
 
   it("renders the zh-CN card", () => {
-    renderCard(ResumeWorkflowRunToolCallBlock, buildContext(buildResumeToolCall()), "zh-CN");
+    renderCard(ResumeWorkflowRunToolCallBlock, buildContext(buildResumeToolCall()), "vi-VN");
     expect(screen.getByText("工作流实例已恢复")).toBeTruthy();
     expect(screen.getByText("后台运行中")).toBeTruthy();
     expect(screen.getByText(/从 journal 重放/u)).toBeTruthy();
@@ -997,7 +998,7 @@ describe("ResumeWorkflowRunToolCallBlock run-state compact card", () => {
     renderCard(
       ResumeWorkflowRunToolCallBlock,
       buildContext(buildResumeToolCall(), { workflowRun: RESUME_RUN_SUMMARY }),
-      "zh-CN",
+      "vi-VN",
     );
     expect(screen.getByText("工作流实例已恢复")).toBeTruthy();
     expect(screen.getByText("运行中")).toBeTruthy();

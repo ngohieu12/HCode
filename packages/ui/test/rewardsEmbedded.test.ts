@@ -23,7 +23,7 @@ describe("Rewards embedded contract", () => {
     expect(resolveRewardsOrigin({ env: "production", dev: true })).toBe("https://zcode.z.ai");
     expect(resolveRewardsOrigin({ env: "test" })).toBe("https://zcode.z.ai");
     expect(resolveRewardsOrigin({ env: "production" })).toBe("https://zcode.z.ai");
-    expect(buildRewardsUrl("https://zcode.z.ai", "zh-CN", "zai-light")).toBe(
+    expect(buildRewardsUrl("https://zcode.z.ai", "en-US", "zai-light")).toBe(
       "https://zcode.z.ai/cn/rewards?embedded=app&theme=zai-light",
     );
     expect(buildRewardsUrl("https://zcode.z.ai", "en-US", "zai-dark")).toContain(

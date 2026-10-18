@@ -42,7 +42,7 @@ vi.mock("@/hooks/usePlatform.js", () => ({
 
 vi.mock("@/i18n/IntlProvider.js", () => ({
   useZCodeIntl: () => ({
-    locale: "zh-CN",
+    locale: "vi-VN",
     intl: {
       formatMessage: ({ id }: { id: string }) => id,
     },
@@ -98,7 +98,7 @@ describe("WorkspaceSidebarFooter web remote control tooltip", () => {
     const html = renderToStaticMarkup(
       createElement(WorkspaceSidebarFooter, {
         theme: "dark",
-        localeMenuValue: "zh-CN",
+        localeMenuValue: "vi-VN",
         onLocaleChange: () => {},
         onThemeChange: () => {},
         onSettingsButtonClick: () => {},
@@ -249,7 +249,7 @@ describe("WorkspaceSidebarFooter web remote control tooltip", () => {
     const html = renderToStaticMarkup(
       createElement(WorkspaceSidebarFooter, {
         theme: "dark",
-        localeMenuValue: "zh-CN",
+        localeMenuValue: "vi-VN",
         onLocaleChange: () => {},
         onThemeChange: () => {},
         onSettingsButtonClick: () => {},
@@ -410,7 +410,7 @@ describe("WorkspaceSidebarFooter web remote control tooltip", () => {
     const html = renderToStaticMarkup(
       createElement(WorkspaceSidebarFooter, {
         theme: "dark",
-        localeMenuValue: "zh-CN",
+        localeMenuValue: "vi-VN",
         onLocaleChange: () => {},
         onThemeChange: () => {},
         onSettingsButtonClick: () => {},

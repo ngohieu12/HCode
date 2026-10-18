@@ -20,7 +20,7 @@ describe("desktopFinderOpenFolderWorkflow", () => {
 
     installFinderOpenFolderWorkflow({
       platform: "linux",
-      locale: "zh-CN",
+      locale: "en-US",
       homeDir,
       logger: { info: vi.fn(), warn: vi.fn() },
       refreshServicesIndex,

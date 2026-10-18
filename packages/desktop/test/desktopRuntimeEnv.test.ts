@@ -300,7 +300,7 @@ describe("desktopRuntimeEnv resolveRemoteAssetDirs", () => {
     await withTestMockCdnReleaseDir("present", async () => {
       const { resolveRemoteAssetDirs } = await import("../src/main/desktopRuntimeEnv.js");
       const dirs = resolveRemoteAssetDirs({
-        locale: "zh-CN",
+        locale: "en-US",
         timeZone: "Asia/Shanghai",
       });
 
@@ -319,7 +319,7 @@ describe("desktopRuntimeEnv resolveRemoteAssetDirs", () => {
     await withTestMockCdnReleaseDir("missing", async () => {
       const { resolveRemoteAssetDirs } = await import("../src/main/desktopRuntimeEnv.js");
       const dirs = resolveRemoteAssetDirs({
-        locale: "zh-CN",
+        locale: "en-US",
         timeZone: "Asia/Shanghai",
       });
 
@@ -357,7 +357,7 @@ describe("desktopRuntimeEnv resolveRemoteAssetDirs", () => {
     process.env["ZCODE_REMOTE_ASSET_CDN_BASE_URL"] = "https://cdn.example.com/releases///";
     const { resolveRemoteAssetDirs } = await import("../src/main/desktopRuntimeEnv.js");
     const dirs = resolveRemoteAssetDirs({
-      locale: "zh-CN",
+      locale: "en-US",
       timeZone: "Asia/Shanghai",
     });
 
@@ -372,7 +372,7 @@ describe("desktopRuntimeEnv resolveRemoteAssetDirs", () => {
     process.env["ZCODE_REMOTE_ASSET_CACHE_DIR"] = overrideCacheDir;
     const { resolveRemoteAssetDirs } = await import("../src/main/desktopRuntimeEnv.js");
     const dirs = resolveRemoteAssetDirs({
-      locale: "zh-CN",
+      locale: "en-US",
       timeZone: "Asia/Shanghai",
     });
 
@@ -384,7 +384,7 @@ describe("desktopRuntimeEnv resolveRemoteAssetDirs", () => {
     const { resolveRemoteAssetDirs } = await import("../src/main/desktopRuntimeEnv.js");
     const dirs = resolveRemoteAssetDirs(
       {
-        locale: "zh-CN",
+        locale: "en-US",
         timeZone: "Asia/Shanghai",
       },
       {
@@ -400,7 +400,7 @@ describe("desktopRuntimeEnv resolveRemoteAssetDirs", () => {
     const { resolveRemoteAssetDirs } = await import("../src/main/desktopRuntimeEnv.js");
     const dirs = resolveRemoteAssetDirs(
       {
-        locale: "zh-CN",
+        locale: "en-US",
         timeZone: "Asia/Shanghai",
       },
       {

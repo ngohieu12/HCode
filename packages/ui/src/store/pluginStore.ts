@@ -323,7 +323,7 @@ export const usePluginStore = create<PluginStoreState>((set, get) => ({
     if (!workspacePath) {
       // 设置页尚未绑定 workspace 时 store 里可能还留着上一份缓存列表；
       // 直接 return false 会让点击安装看起来毫无反应，这里先写入显式错误提示。
-      set({ error: "请先打开一个工作区后再安装插件" });
+      set({ error: "Open a workspace before installing plugins" });
       return false;
     }
     const workspaceIdentityFromState =
@@ -367,7 +367,7 @@ export const usePluginStore = create<PluginStoreState>((set, get) => ({
   ) {
     const workspacePath = get().workspacePath;
     if (!workspacePath) {
-      set({ error: "请先打开一个工作区后再卸载插件" });
+      set({ error: "Open a workspace before uninstalling plugins" });
       return false;
     }
     const workspaceIdentityFromState =
@@ -409,7 +409,7 @@ export const usePluginStore = create<PluginStoreState>((set, get) => ({
   ) {
     const workspacePath = get().workspacePath;
     if (!workspacePath) {
-      set({ error: "请先打开一个工作区后再修改插件状态" });
+      set({ error: "Open a workspace before changing plugin status" });
       return false;
     }
     const workspaceIdentityFromState =

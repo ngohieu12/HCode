@@ -129,7 +129,7 @@ import { runWithSessionResidencyFinalization } from "./session-residency.js";
 import { resolveDynamicWorkflowRuntimeGate } from "./dynamic-workflow-policy.js";
 import { abortMcpUiToolCallsForSession, clearMcpUiAppToolsForSession } from "./mcp-ui/index.js";
 
-const PLAN_MODE_GOAL_CONTINUATION_SKIPPED_MESSAGE = "Plan mode 下已记录 goal，但不会自动继续。";
+const PLAN_MODE_GOAL_CONTINUATION_SKIPPED_MESSAGE = "The goal was recorded in Plan mode, but it will not continue automatically.";
 const SLOW_SNAPSHOT_LOG_THRESHOLD_MS = 1000;
 const REMOTE_AUTOMATION_TOOL_NAMES = [
   "CronCreate",

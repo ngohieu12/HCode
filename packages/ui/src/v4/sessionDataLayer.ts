@@ -75,7 +75,7 @@ export class SessionDataLayer {
    */
   acquire(sessionId: string): SessionLease {
     if (this.disposed) {
-      throw new Error("SessionDataLayer 已释放，不能再 acquire");
+      throw new Error("SessionDataLayer has been disposed and cannot be acquired again");
     }
     const topic = conversationTopic(sessionId);
     const startedAt = monotonicNow();

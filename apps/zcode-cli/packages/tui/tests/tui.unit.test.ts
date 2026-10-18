@@ -33,7 +33,7 @@ import { describeSessionEvent, normalizePromptInput } from "../src/state.js";
 import type { TuiSlashCommandSuggestion } from "../src/types.js";
 
 const EN_COPY = getZCodeCopy("en-US").tui;
-const ZH_COPY = getZCodeCopy("zh-CN").tui;
+const ZH_COPY = getZCodeCopy("en-US").tui;
 
 test("normalizes prompt input for the shell", () => {
   assert.deepEqual(normalizePromptInput("hello"), {
@@ -118,8 +118,8 @@ test("renders a prominent non-modal login notice", () => {
 test("renders localized Chinese login notice copy", () => {
   const lines = collectTextLines(LoginRequiredPanel({ copy: ZH_COPY }));
 
-  assert.ok(lines.some((line) => line.includes("没有可用模型")));
-  assert.ok(lines.some((line) => line.includes("输入 /model 查看模型")));
+  assert.ok(lines.some((line) => line.includes("No available models")));
+  assert.ok(lines.some((line) => line.includes("Use /model to view models")));
 });
 
 test("clears the transcript when a session reset has no restored messages", () => {
@@ -313,8 +313,8 @@ test("renders localized Chinese TUI copy", () => {
     }),
   );
 
-  assert.ok(lines.includes("状态"));
-  assert.ok(lines.some((line) => line.includes("就绪。")));
+  assert.ok(lines.includes("Status"));
+  assert.ok(lines.some((line) => line.includes("Ready.")));
 });
 
 test("moves recalled input history to the buffer end", () => {

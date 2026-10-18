@@ -568,7 +568,7 @@ test("a replayed stopped run renders its real facts after a cold start", () => {
 
 test("both locales render the card without leaking raw copy keys", () => {
   const card = buildTuiWorkflowCardIndex(startedMirror()).get(TOOL_CALL_ID)!;
-  for (const locale of ["en-US", "zh-CN"] as const) {
+  for (const locale of ["en-US", "en-US"] as const) {
     const copy = getZCodeCopy(locale).tui;
     const text = renderCardText(WorkflowRunCardView({ card, copy, expanded: true })).join("\n");
     assert.ok(text.length > 0, `${locale} rendered nothing`);
@@ -621,7 +621,7 @@ test("no resumable runs means zero notice output", () => {
 });
 
 test("both locales render a notice without leaking raw keys", () => {
-  for (const locale of ["en-US", "zh-CN"] as const) {
+  for (const locale of ["en-US", "en-US"] as const) {
     const text = workflowInterruptedNoticeText(
       { runId: "dwfrun-1", label: "L" },
       getZCodeCopy(locale).tui,

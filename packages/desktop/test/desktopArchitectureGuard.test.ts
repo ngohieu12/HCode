@@ -48,21 +48,21 @@ describe("detectArchitectureMismatch", () => {
 });
 
 describe("resolveArchitectureDownloadUrl", () => {
-  it("按语言分流到官网下载页", () => {
-    expect(resolveArchitectureDownloadUrl("zh-CN")).toBe("https://zcode.z.ai/cn");
+  it("统一指向官网英文下载页", () => {
     expect(resolveArchitectureDownloadUrl("en-US")).toBe("https://zcode.z.ai/en");
+    expect(resolveArchitectureDownloadUrl("vi-VN")).toBe("https://zcode.z.ai/en");
   });
 });
 
 describe("formatArchitectureMismatchDialogText", () => {
   const mismatch = { binaryArch: "x64", nativeArch: "arm64" } as const;
 
-  it("中文文案包含运行架构与推荐架构", () => {
-    const text = formatArchitectureMismatchDialogText(mismatch, "zh-CN");
-    expect(text.title).toBe("架构不匹配");
+  it("越南语文案包含运行架构与推荐架构", () => {
+    const text = formatArchitectureMismatchDialogText(mismatch, "vi-VN");
+    expect(text.title).toBe("Architecture Mismatch");
     expect(text.detail).toContain("x64");
     expect(text.detail).toContain("arm64");
-    expect(text.downloadButton).toBe("前往下载");
+    expect(text.downloadButton).toBe("Download");
   });
 
   it("英文文案包含运行架构与推荐架构", () => {

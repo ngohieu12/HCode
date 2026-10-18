@@ -95,11 +95,11 @@ describe("MarketingTouchService boot request sequence", () => {
     );
   }
 
-  it("starts at zero, continues across accounts, locales and service instances", async () => {
+  it("starts at zero, continues across accounts and service instances", async () => {
     const f = fixture(createService);
     await f.service.query({ locale: "en-US" });
     f.setToken(null);
-    await f.service.query({ locale: "zh-CN" });
+    await f.service.query({ locale: "en-US" });
     f.setToken("second-token");
     await f.service.query({ locale: "en-US" });
     expect(sequences(f)).toEqual(["0", "1", "2"]);

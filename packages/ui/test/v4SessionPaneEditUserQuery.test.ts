@@ -1,4 +1,5 @@
 import { act, createElement, Fragment, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type {
@@ -425,7 +426,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "pane-2",
             sessionId: "session-1",
@@ -464,7 +465,7 @@ describe("SessionPane user query editing", () => {
     const renderPane = () =>
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(SessionPane, {
           paneId: "workspace-main",
           sessionId: "session-1",
@@ -550,7 +551,7 @@ describe("SessionPane user query editing", () => {
     const renderPane = () =>
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(SessionPane, {
           paneId: "workspace-main",
           sessionId: "session-1",
@@ -633,7 +634,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -687,7 +688,7 @@ describe("SessionPane user query editing", () => {
     const renderPane = () =>
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(SessionPane, {
           paneId: "workspace-main",
           sessionId: "session-1",
@@ -774,7 +775,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -828,7 +829,7 @@ describe("SessionPane user query editing", () => {
         root.render(
           createElement(
             ZCodeIntlProvider,
-            { initialLocale: "zh-CN" },
+            { initialLocale: "vi-VN", messages: zhCNLegacy },
             createElement(SessionPane, {
               paneId: "workspace-main",
               sessionId: "session-1",
@@ -875,7 +876,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -925,7 +926,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -970,7 +971,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -1055,7 +1056,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -1166,7 +1167,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -1215,7 +1216,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -1269,7 +1270,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -1323,7 +1324,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",
@@ -1364,7 +1365,7 @@ describe("SessionPane user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(SessionPane, {
             paneId: "workspace-main",
             sessionId: "session-1",

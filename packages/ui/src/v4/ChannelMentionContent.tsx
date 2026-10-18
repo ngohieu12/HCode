@@ -25,7 +25,7 @@ export function ChannelMentionContent({
           <span
             key={`${part.refId}:${index}`}
             data-channel-mention={part.channel}
-            title={`${part.name} · ${part.channel === "lark" ? "Lark" : "飞书 / Feishu"}`}
+            title={`${part.name} · ${part.channel === "lark" ? "Lark" : "Feishu"}`}
             className={`${PROMPT_MENTION_BASE_CLASS_NAME} mx-0.5 max-w-full rounded bg-surface-hover px-1 text-foreground`}
           >
             <AtSign className="size-3.5 shrink-0" aria-hidden="true" />

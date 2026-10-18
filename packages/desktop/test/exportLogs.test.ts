@@ -566,7 +566,7 @@ describe("export logs archive", () => {
                 "example-plugin@example": { license: "plugin-secret", region: "us-east" },
               },
             },
-            ui: { locale: "zh-CN", theme: "dark" },
+            ui: { locale: "en-US", theme: "dark" },
           }),
           "utf-8",
         );
@@ -613,7 +613,7 @@ describe("export logs archive", () => {
         expect(configEntry).not.toContain("config-secret");
         expect(configEntry).not.toContain("plugin-secret");
         expect(configEntry).not.toContain('"options"');
-        expect(configEntry).toContain('"locale":"zh-CN"');
+        expect(configEntry).toContain('"locale":"en-US"');
         expect(entries.get(".zcode/cli/rollout/trace.jsonl")).toBe("rollout-today");
         expect(entries.has(".zcode/cli/rollout/old-trace.jsonl")).toBe(false);
         expect(entries.has(".zcode/cli/debug/trace.jsonl")).toBe(false);

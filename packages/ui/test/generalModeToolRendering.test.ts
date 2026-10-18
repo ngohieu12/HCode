@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -45,7 +46,7 @@ function context(general: boolean, failed = false): ToolCallBlockRenderContext {
 
 function renderTool(component: typeof ExecuteToolCallBlock, props: ToolCallBlockRenderContext) {
   return renderToStaticMarkup(
-    createElement(ZCodeIntlProvider, { initialLocale: "zh-CN" }, createElement(component, props)),
+    createElement(ZCodeIntlProvider, { initialLocale: "vi-VN", messages: zhCNLegacy }, createElement(component, props)),
   );
 }
 

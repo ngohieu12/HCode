@@ -3,7 +3,6 @@ import type { ErrorInfo, ReactNode } from "react";
 import type { Locale } from "@zcode/shared";
 import { DEFAULT_LOCALE, resolveLocaleFromSystemLanguage } from "@zcode/shared";
 import { DesktopWindowFrame } from "@/DesktopWindowFrame.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
 import enUS from "@/i18n/locales/en-US.js";
 import viVN from "@/i18n/locales/vi-VN.js";
 import { logger } from "@/logger.js";
@@ -67,7 +66,7 @@ function resolveBoundaryLocale(): Locale {
   if (typeof localStorage !== "undefined" && typeof localStorage.getItem === "function") {
     try {
       const storedPreference = localStorage.getItem(LOCALE_PREFERENCE_KEY);
-      if (storedPreference === "zh-CN" || storedPreference === "en-US") {
+      if (storedPreference === "en-US" || storedPreference === "vi-VN") {
         return storedPreference;
       }
     } catch {
@@ -86,8 +85,8 @@ function resolveBoundaryLocale(): Locale {
 
 function formatBoundaryMessage(id: string): string {
   const locale = resolveBoundaryLocale();
-  // 越南语缺失的键回落到英文，保证边界错误页不会出现中文。
-  const messages = locale === "zh-CN" ? zhCN : locale === "en-US" ? enUS : { ...enUS, ...viVN };
+  // 越南语缺失的键回落到英文，保证边界错误页不出现 message id。
+  const messages = locale === "en-US" ? enUS : { ...enUS, ...viVN };
   return messages[id] ?? id;
 }
 

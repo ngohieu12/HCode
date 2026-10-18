@@ -221,13 +221,13 @@ describe("Todo104 个人规则原子落盘", () => {
 
   it("创建名称在同一文件锁内用当前语言去重，重读不会随模板改名", async () => {
     const templates = parseProviderTemplateMap([
-      { templateId: "t", templateNameMap: { "zh-CN": "模板", "en-US": "Template" }, config: {} },
+      { templateId: "t", templateNameMap: { "vi-VN": "Mẫu", "en-US": "Template" }, config: {} },
     ]);
     const a = service(repository(), templates),
       b = service(repository(), templates);
     await Promise.all([
-      a.createPersonalProvider({ templateId: "t", locale: "zh-CN" }),
-      b.createPersonalProvider({ templateId: "t", locale: "zh-CN" }),
+      a.createPersonalProvider({ templateId: "t", locale: "en-US" }),
+      b.createPersonalProvider({ templateId: "t", locale: "en-US" }),
     ]);
     const repo = repository();
     expect(
@@ -244,7 +244,7 @@ describe("Todo104 个人规则原子落盘", () => {
     const fresh = service(
       repo,
       parseProviderTemplateMap([
-        { templateId: "t", templateNameMap: { "zh-CN": "新名称" }, config: {} },
+        { templateId: "t", templateNameMap: { "en-US": "新名称" }, config: {} },
       ]),
     );
     expect((await repo.read()).providers.rules().map((rule) => rule.providerName)).toContain(

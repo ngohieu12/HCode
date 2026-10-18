@@ -11,6 +11,7 @@
 // 创建，所以提前点开 tab 会订阅一条还不存在的会话，投影 store 随即停在 error 只等手动
 // retry。门在 notStarted 时不挂订阅，改渲染占位。
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { WorkflowRunState } from "@zcode/shared/zcode-protocol-v4";
@@ -143,19 +144,19 @@ function snapshotWith(
   };
 }
 
-function renderTab(tab: WorkflowActorSessionSidePaneTab, locale: "en-US" | "zh-CN" = "en-US") {
+function renderTab(tab: WorkflowActorSessionSidePaneTab, locale: "en-US" | "vi-VN" = "en-US") {
   return createElement(
     ZCodeIntlProvider,
-    { initialLocale: locale },
+    { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
     createElement(WorkflowActorSessionSidePane, { tab, focused: true }),
   );
 }
 
-function renderPane(locale: "en-US" | "zh-CN" = "en-US") {
+function renderPane(locale: "en-US" | "vi-VN" = "en-US") {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowActorSessionSidePane, { tab: tabOf(), focused: true }),
     ),
   );
@@ -263,7 +264,7 @@ describe("WorkflowActorSessionSidePane 未启动门", () => {
     expect(en.getByTestId("workflow-actor-not-started").textContent).toContain("Not started yet");
     cleanup();
 
-    const zh = renderPane("zh-CN");
+    const zh = renderPane("vi-VN");
     expect(zh.getByTestId("workflow-actor-not-started").textContent).toContain("尚未启动");
   });
 

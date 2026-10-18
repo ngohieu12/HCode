@@ -55,7 +55,7 @@ after(async () => {
 });
 
 for (const width of [320, 390, 430, 650, 1200]) {
-  for (const locale of ["en-US", "zh-CN"]) {
+  for (const locale of ["en-US"]) {
     for (const theme of ["light", "dark"]) {
       test(`连接方式布局与交互 ${width}/${locale}/${theme}`, async () => {
         const page = await browser.newPage({ viewport: { width, height: 800 } });
@@ -83,10 +83,7 @@ for (const width of [320, 390, 430, 650, 1200]) {
                 await shortcut.hover();
                 const tooltip = page.getByRole("tooltip");
                 await tooltip.waitFor();
-                assert.equal(
-                  await tooltip.textContent(),
-                  locale === "zh-CN" ? "切换至体验套餐" : "Switch to Start Plan",
-                );
+                assert.equal(await tooltip.textContent(), "Switch to Start Plan");
                 await page.keyboard.press("Escape");
                 await tooltip.waitFor({ state: "hidden" });
                 await page.mouse.move(0, 0);
@@ -199,7 +196,7 @@ for (const width of [320, 390, 430, 650, 1200]) {
               );
               await page
                 .getByRole("option", {
-                  name: locale === "zh-CN" ? "体验套餐" : "Start Plan",
+                  name: "Start Plan",
                   exact: true,
                 })
                 .click();

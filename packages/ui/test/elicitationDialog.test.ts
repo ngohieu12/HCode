@@ -1,4 +1,5 @@
 import type { ZCodeElicitationRequest } from "@zcode/shared";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, type ComponentType } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
@@ -115,11 +116,11 @@ describe("ElicitationDialog", () => {
       visibleAt: 760_000,
       deadlineAt: 1_000_000,
     };
-    const render = (locale: "en-US" | "zh-CN") =>
+    const render = (locale: "en-US" | "vi-VN") =>
       renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: locale },
+          { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
           createElement(Dialog, {
             request: createMultiQuestionRequest(),
             autoResolution,
@@ -130,7 +131,7 @@ describe("ElicitationDialog", () => {
       );
 
     try {
-      const zhHtml = render("zh-CN");
+      const zhHtml = render("vi-VN");
       expect(zhHtml).toContain('data-elicitation-countdown-seconds="59"');
       expect(zhHtml).toContain('aria-label="停止计时"');
       expect(zhHtml).toContain(">59秒</button>");
@@ -150,7 +151,7 @@ describe("ElicitationDialog", () => {
     const mainHtml = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Dialog, {
           request,
           onRespond: () => {},
@@ -160,7 +161,7 @@ describe("ElicitationDialog", () => {
     const subagentHtml = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Dialog, {
           request: {
             ...request,
@@ -182,7 +183,7 @@ describe("ElicitationDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Dialog, {
           request: createMultiQuestionRequest(),
           onRespond: () => {},
@@ -241,7 +242,7 @@ describe("ElicitationDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Dialog, {
           request: createMultiQuestionRequest(),
           onRespond: () => {},
@@ -266,7 +267,7 @@ describe("ElicitationDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Dialog, {
           request,
           onRespond: () => {},
@@ -289,7 +290,7 @@ describe("ElicitationDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Dialog, {
           request,
           onRespond: () => {},
@@ -338,7 +339,7 @@ describe("ElicitationDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Dialog, {
           request,
           onRespond: () => {},
@@ -359,7 +360,7 @@ describe("ElicitationDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Dialog, {
           request: createMultiQuestionRequest(),
           onRespond: () => {},
@@ -385,7 +386,7 @@ describe("ElicitationDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(Dialog, {
           request,
           onRespond: () => {},
@@ -404,11 +405,11 @@ describe("ElicitationDialog", () => {
   it("plan approval title follows permission copy and approve option keeps approval copy in both locales", () => {
     const Dialog = ElicitationDialog as ComponentType<Record<string, unknown>>;
     const request = createPlanApprovalRequest();
-    const render = (locale: "en-US" | "zh-CN") =>
+    const render = (locale: "en-US" | "vi-VN") =>
       renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: locale },
+          { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
           createElement(Dialog, {
             request,
             onRespond: () => {},
@@ -426,7 +427,7 @@ describe("ElicitationDialog", () => {
     expect(enHtml).not.toContain(">Allow</span>");
     expect(enHtml).not.toContain("Allow only this time");
 
-    const zhHtml = render("zh-CN");
+    const zhHtml = render("vi-VN");
     expect(zhHtml).toContain("需要权限");
     expect(zhHtml).toContain("实施计划");
     expect(zhHtml).toContain(">批准</span>");

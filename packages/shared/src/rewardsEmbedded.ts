@@ -4,7 +4,7 @@ export const REWARDS_PARTITION = "persist:zcode-rewards";
 export const REWARDS_CONTEXT_EVENT = "zcode-rewards-context";
 export const rewardsContextSchema = z.object({
   theme: z.enum(["zai-light", "zai-dark"]),
-  locale: z.enum(["zh-CN", "en-US"]),
+  locale: z.literal("en-US"),
   auth: z.object({
     status: z.enum(["ready", "anonymous"]),
     provider: z.enum(["zai", "bigmodel"]).nullable(),
@@ -59,7 +59,7 @@ export function buildRewardsUrl(
   locale: string,
   theme: RewardsContext["theme"],
 ): string {
-  const url = new URL(`/${locale === "zh-CN" ? "cn" : "en"}/rewards`, origin);
+  const url = new URL("/en/rewards", origin);
   url.searchParams.set("embedded", "app");
   url.searchParams.set("theme", theme);
   return url.toString();

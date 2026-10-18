@@ -806,7 +806,7 @@ function zcodeBuiltinRelease(input: {
         })),
         templateRules: Object.entries(input.templates).map(([templateId, config]) => ({
           templateId,
-          templateNameMap: { "en-US": templateId, "zh-CN": templateId },
+          templateNameMap: { "en-US": templateId, "en-US": templateId },
           config,
         })),
       },

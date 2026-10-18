@@ -76,7 +76,7 @@ test("TUI output protection recognizes the same supported flags as command routi
   for (const args of [
     [],
     ["tui"],
-    ["--locale", "zh-CN", "--mode", "yolo"],
+    ["--locale", "en-US", "--mode", "yolo"],
     ["--cwd", "app-server", "--locale=en-US", "tui"],
     ["--browser-use=headless", "--browser-executable", "/test/browser"],
     ["--force-mcs", "--continue"],

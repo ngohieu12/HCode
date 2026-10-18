@@ -1,4 +1,3 @@
-import { requestSecurityMessagesZhCN } from "@/request-security-edition/messages.js";
 /** 中文翻译 */
 const zhCN: Record<string, string> = {
   "conversation.close": "关闭会话",
@@ -2199,32 +2198,13 @@ const zhCN: Record<string, string> = {
   "settings.shortcuts.keySearchClearAria": "清除按键搜索",
   "settings.shortcuts.keySearchEmpty": "没有命令绑定 {keys}",
   "settings.shortcuts.searchEmpty": "没有匹配的命令",
-  "settings.shortcuts.resetAll": "全部恢复默认",
-  "settings.shortcuts.resetAllConfirmTitle": "恢复全部默认快捷键？",
-  "settings.shortcuts.resetAllConfirmDescription":
-    "将清除所有自定义键位覆盖，全部命令回到默认绑定。",
   "settings.shortcuts.columnHeaderCommand": "命令",
   "settings.shortcuts.columnHeaderBinding": "按键绑定",
-  "settings.shortcuts.columnHeaderActions": "操作",
   "settings.shortcuts.columnHeaderScope": "作用域",
   "settings.shortcuts.notSet": "未分配",
-  "settings.shortcuts.desktopOnly": "仅桌面端生效",
   "settings.shortcuts.scopeComposer": "输入框",
   "settings.shortcuts.scopeGlobal": "全局",
-  "settings.shortcuts.recording": "按下新组合…",
-  "settings.shortcuts.recordingHint": "Esc 取消 · Backspace 恢复默认 · 冲突后直接重按新组合",
-  "settings.shortcuts.conflictReserved": "该组合为系统保留键位",
-  "settings.shortcuts.conflictOccupied": "已被「{command}」占用",
-  "settings.shortcuts.clearConflict":
-    "默认键已被「{command}」占用，恢复默认会造成同键冲突，请先调整该命令",
-  "settings.shortcuts.stealConfirm": "仍要绑定（原命令将失效）",
-  "settings.shortcuts.invalidNoModifier": "至少需要一个修饰键（Ctrl / Cmd / Alt）",
-  "settings.shortcuts.invalidKey": "不支持的按键",
-  "settings.shortcuts.rebindAria": "重新录制「{command}」快捷键",
-  "settings.shortcuts.addAria": "为「{command}」添加绑定",
-  "settings.shortcuts.removeBindingAria": "删除「{command}」的这条绑定",
-  "settings.shortcuts.duplicateBinding": "该组合已绑定到此命令",
-  "settings.shortcuts.clearAria": "清除「{command}」快捷键",
+  "settings.shortcuts.readOnlyHint": "以下是当前生效的快捷键。暂不支持修改快捷键。",
   "settings.shortcuts.command.newTask": "新建任务",
   "settings.shortcuts.command.composerSend": "发送消息",
   "settings.shortcuts.command.composerInsertNewline": "输入框换行",
@@ -6946,7 +6926,8 @@ const zhCN: Record<string, string> = {
     "我用 ZCode 高速卡节省了 {duration} 秒的时间，你也来试试吧。下载 ZCode https://zcode.z.ai",
   "globalNotice.highspeed.imageSummary": "{tokens} tokens · 节省 {duration} 秒",
   "globalNotice.highspeed.close": "关闭加速分享卡片",
-  ...requestSecurityMessagesZhCN,
+  "zcode.error.providerBusiness.3007":
+    "请求被网关安全校验拒绝，请稍后重试或联系支持。",
 };
 
 export default zhCN;

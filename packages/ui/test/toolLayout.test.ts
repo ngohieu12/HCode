@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -10,7 +11,7 @@ describe("ToolLayout", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolLayout, {
           toolId: "tool-layout-spacing",
           icon: createElement("span", { "aria-hidden": true }, "icon"),
@@ -40,7 +41,7 @@ describe("ToolLayout", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolLayout, {
           toolId: "tool-layout-force-open-spacing",
           icon: createElement("span", { "aria-hidden": true }, "icon"),
@@ -63,7 +64,7 @@ describe("ToolLayout", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolLayout, {
           toolId: "tool-layout-running-label",
           icon: createElement("span", { "aria-hidden": true }, "icon"),
@@ -86,7 +87,7 @@ describe("ToolLayout", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolLayout, {
           toolId: "tool-layout-empty-expanded-summary",
           icon: createElement("span", { "aria-hidden": true }, "icon"),
@@ -108,7 +109,7 @@ describe("ToolLayout", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolLayout, {
           toolId: "tool-layout-edit-file-priority",
           icon: createElement("span", { "aria-hidden": true }, "icon"),
@@ -130,7 +131,7 @@ describe("ToolLayout", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ToolLayout, {
           toolId: "tool-layout-summary-action",
           icon: createElement("span", { "aria-hidden": true }, "icon"),

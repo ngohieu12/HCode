@@ -687,7 +687,7 @@ function buildDetailEvents(createdAt: string, comments: FeedbackComment[]): Feed
     {
       id: 1,
       type: "created",
-      summary: "已提交",
+      summary: "Submitted",
       created_at: createdAt,
     },
   ];
@@ -695,7 +695,7 @@ function buildDetailEvents(createdAt: string, comments: FeedbackComment[]): Feed
     events.push({
       id: index + 2,
       type: comment.is_staff ? "staff_replied" : "user_replied",
-      summary: comment.is_staff ? "客服已回复" : "用户补充了反馈",
+      summary: comment.is_staff ? "Support replied" : "User added details",
       payload: { comment_id: comment.id },
       created_at: comment.created_at,
     });

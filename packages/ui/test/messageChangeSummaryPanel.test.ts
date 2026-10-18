@@ -1,4 +1,5 @@
 import type { IBroadcastService } from "@zcode/services";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import type { IPlatformService } from "@zcode/shared";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -135,7 +136,7 @@ function renderPanel(overrides: Partial<PanelProps> = {}) {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(
         PlatformProvider,
         { platform: mockPlatform },

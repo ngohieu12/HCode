@@ -52,9 +52,9 @@ describe("botsService status", () => {
       actor,
     });
 
-    expect(replies[0]?.text).toContain("工作区");
+    expect(replies[0]?.text).toContain("Workspace");
     expect(replies[0]?.text).not.toContain("Provider:");
-    expect(replies[0]?.text).toContain("模型: default");
+    expect(replies[0]?.text).toContain("Model: default");
     service.disposeAll();
   });
 
@@ -154,7 +154,7 @@ describe("botsService status", () => {
     });
 
     expect(replies[0]?.text).not.toContain("Provider:");
-    expect(replies[0]?.text).toContain("模型: gpt-5.4");
+    expect(replies[0]?.text).toContain("Model: gpt-5.4");
     service.disposeAll();
   });
 
@@ -224,7 +224,7 @@ describe("botsService status", () => {
       actor,
     });
 
-    expect(replies[0]?.text).toContain("模型: DeepSeek/deepseek-v4-flash");
+    expect(replies[0]?.text).toContain("Model: DeepSeek/deepseek-v4-flash");
     expect(replies[0]?.text).not.toContain(`${providerId}/deepseek-v4-flash`);
     service.disposeAll();
   });

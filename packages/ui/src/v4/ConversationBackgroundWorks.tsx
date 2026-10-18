@@ -29,7 +29,7 @@ function ConversationBackgroundWorksImpl({
       className="border-t border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
     >
       <div className="mb-1 text-ui-sm text-[var(--color-foreground-subtle)]">
-        后台工作 · {works.length}
+        Background work · {works.length}
       </div>
       <ul className="flex flex-col gap-1">
         {works.map((work) => (
@@ -93,7 +93,7 @@ const CancelButton = memo(function CancelButton({
       onClick={handleClick}
       className="shrink-0 rounded border border-[var(--color-border)] px-1.5 py-0.5 text-[var(--color-danger)] hover:bg-[var(--color-surface-hover)]"
     >
-      取消
+      Cancel
     </button>
   );
 });

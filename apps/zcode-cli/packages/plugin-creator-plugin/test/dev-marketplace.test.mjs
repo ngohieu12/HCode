@@ -32,15 +32,15 @@ test("dev listing is stable, localized, idempotent and preserves source and othe
     const first = await upsertDevMarketplace({
       pluginPath: plugin,
       displayName: "Demo",
-      nameZh: "演示",
-      descriptionZh: "演示工作流",
+      nameEn: "Demo Localized",
+      descriptionEn: "Demo workflow",
     });
     assert.match(first.marketplaceId, /^dev-creator-dev-.*-[a-f0-9]{8}$/);
     assert.equal(first.pluginId, `demo@${first.marketplaceId}`);
     assert.equal(first.marketplacePath, join(first.marketplaceRoot, "marketplace.json"));
     const market = JSON.parse(await readFile(first.marketplacePath, "utf8"));
     assert.equal(market.plugins[0].source, "./demo");
-    assert.equal(market.plugins[0].displayName_i18n["zh-CN"], "演示");
+    assert.equal(market.plugins[0].displayName_i18n["en-US"], "Demo Localized");
     market.owner = { name: "Test" };
     market.plugins.unshift({ name: "other", source: "./other", custom: true });
     market.plugins[1].custom = 42;
@@ -59,7 +59,7 @@ test("dev listing is stable, localized, idempotent and preserves source and othe
     assert.equal(updated.owner.name, "Test");
     assert.equal(updated.plugins[1].custom, 42);
     assert.equal(updated.plugins[1].version, "0.1.1");
-    assert.equal(updated.plugins[1].displayName_i18n["zh-CN"], "演示");
+    assert.equal(updated.plugins[1].displayName_i18n["en-US"], "演示");
     assert.equal(await readFile(join(plugin, "skills/demo/SKILL.md"), "utf8"), source);
     assert.equal((await upsertDevMarketplace({ pluginPath: plugin })).changed, false);
   } finally {

@@ -166,7 +166,7 @@ export function createBotRemoteWorkspaceService(params: {
       });
       setTimeout(() => {
         if (pendingConnectionStatus.delete(requestId)) {
-          resolve({ ok: false, error: "远端 workspace 连接状态查询超时。" });
+          resolve({ ok: false, error: "Remote workspace connection status query timed out." });
         }
       }, 5_000);
     });
@@ -210,7 +210,7 @@ export function createBotRemoteWorkspaceService(params: {
       if (!remoteTarget) {
         return {
           ok: false,
-          message: "未找到该远端 workspace 的连接信息。",
+          message: "No connection information found for the remote workspace.",
         };
       }
       const requestId = `bot-reconnect-${randomUUID()}`;
@@ -229,7 +229,7 @@ export function createBotRemoteWorkspaceService(params: {
         });
         setTimeout(() => {
           if (pending.delete(requestId)) {
-            resolve({ ok: false, error: "远端 workspace 重连超时。" });
+            resolve({ ok: false, error: "Remote workspace reconnect timed out." });
           }
         }, 60_000);
       });
@@ -299,12 +299,12 @@ export function createBotRemoteWorkspaceService(params: {
       });
       setTimeout(() => {
         if (pendingRuntimePorts.delete(requestId)) {
-          resolve({ ok: false, error: "远端 workspace runtime 初始化超时。" });
+          resolve({ ok: false, error: "Remote workspace runtime initialization timed out." });
         }
       }, 60_000);
     });
     if (!result.ok || !result.port) {
-      throw new Error(result.error ?? "远端 workspace runtime 初始化失败。");
+      throw new Error(result.error ?? "Remote workspace runtime initialization failed.");
     }
     // Bugfix: Bot 任务以前只知道远端 identity，却继续调用本地 task service。
     // 这里把 main 转发来的远端 RPC 端口包装成一组 runtime services；

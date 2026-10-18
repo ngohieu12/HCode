@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   TID_CHAT_ERROR_DETAILS_BUTTON,
@@ -23,7 +24,7 @@ describe("ChatErrorBanner Hook errors", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           PlatformProvider,
           { platform: mockPlatform },

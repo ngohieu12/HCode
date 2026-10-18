@@ -4,6 +4,7 @@
 // （「The run card」）、转写里的设置行（「The settings turn」）：真实 DOM 上钉字段、后果句、Apply 发出去的
 // 载荷、被拒的那一行，以及卡上按钮的位置与门控。纯规则在 workflowRunSettings.test.ts 里穷举。
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, createRef, type ReactNode } from "react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { TID_CHAT_THOUGHT_LEVEL_SELECT_TRIGGER } from "@zcode/shared";
@@ -102,7 +103,7 @@ function hostWith(apply: (change: unknown) => Promise<CommandAck>): WorkflowRunS
 function renderPopover(
   run: WorkflowRunState,
   options: {
-    locale?: "en-US" | "zh-CN";
+    locale?: "en-US" | "vi-VN";
     apply?: (change: unknown) => Promise<CommandAck>;
     onAccepted?: (accepted: unknown) => void;
     onOpenChange?: (open: boolean) => void;
@@ -118,7 +119,10 @@ function renderPopover(
     view: render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: options.locale ?? "en-US" },
+        {
+          initialLocale: options.locale ?? "en-US",
+          messages: options.locale === "vi-VN" ? zhCNLegacy : undefined,
+        },
         createElement(WorkflowRunSettingsPopover, {
           anchorRef,
           host: hostWith(apply),
@@ -176,7 +180,7 @@ describe("WorkflowRunSettingsPopover 字段", () => {
 
   it("zh-CN：跑在会话模型上、上限在默认——触发器带「会话模型」徽标，提示念「= 默认」，加号仍可按", () => {
     renderPopover(runState({ status: "stopped", stopReason: "user", resumable: true }), {
-      locale: "zh-CN",
+      locale: "vi-VN",
     });
     expect(screen.getByText("配置工作流")).toBeTruthy();
     expect(screen.getByTestId("workflow-run-settings-model-badge").textContent).toBe("会话模型");
@@ -317,7 +321,7 @@ describe("WorkflowRunSettingsPopover Apply", () => {
 
   it("zh-CN 的拒绝词：能力缺席", async () => {
     renderPopover(runState({ concurrency: { cap: 13, ceiling: 13, limit: 4 } }), {
-      locale: "zh-CN",
+      locale: "vi-VN",
       apply: vi.fn(
         async () =>
           ({
@@ -406,7 +410,7 @@ describe("run 卡上的 Configure", () => {
     const view = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationWorkflowDigests, {
           turnKey: "t",
           digests: [

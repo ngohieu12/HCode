@@ -89,7 +89,7 @@ const [unit] = buildConversationTurnRenderUnits(rows);
 // 真实组件、主题与点击行为；只读投影输入固定，不建立 runtime 或远控连接。
 createRoot(document.getElementById("root")!).render(
   <TooltipProvider>
-    <ZCodeIntlProvider initialLocale={mobile ? "en-US" : "zh-CN"}>
+    <ZCodeIntlProvider initialLocale="en-US">
       <main className="min-h-dvh bg-background text-foreground @container/conversation">
         <ConversationTurnGroup
           unit={{ ...unit!, showHighspeedOutputFooter: highspeed }}

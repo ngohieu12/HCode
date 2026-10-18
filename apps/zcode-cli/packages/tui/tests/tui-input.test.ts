@@ -78,15 +78,15 @@ test("uses a complete border for the prompt container", () => {
 });
 
 test("uses localized prompt title and placeholder copy", () => {
-  const copy = getZCodeCopy("zh-CN").tui;
+  const copy = getZCodeCopy("en-US").tui;
 
-  assert.equal(inputPaneTitle(copy), " 输入 ");
+  assert.equal(inputPaneTitle(copy), " Input ");
   assert.equal(inputPaneTitle(copy, "yolo"), " Yolo ");
-  assert.equal(inputPanePlaceholder(copy, false), "输入提示词");
-  assert.equal(inputPanePlaceholder(copy, true), "输入内容会排队");
-  assert.equal(copy.input.queuedTitle(2), " 队列（2） ");
-  assert.equal(copy.input.queuedSubmitHint, "下一次工具调用后提交。");
-  assert.equal(copy.input.queuedMore(3), "还有 3 条排队中");
+  assert.equal(inputPanePlaceholder(copy, false), "Type a prompt");
+  assert.equal(inputPanePlaceholder(copy, true), "Type to queue input");
+  assert.equal(copy.input.queuedTitle(2), " Queue (2) ");
+  assert.equal(copy.input.queuedSubmitHint, "Submitted after the next tool call.");
+  assert.equal(copy.input.queuedMore(3), "+ 3 more queued");
   assert.equal(copy.input.activeStatusHint, "esc to interrupt");
 });
 

@@ -24,12 +24,12 @@ describe("conversation share error presentation", () => {
         { type: "text", extensions: ["txt"], mimeTypes: ["text/plain"] },
       ],
     };
-    expect(formatConversationShareArtifactType(issue, "zh-CN")).toBe("MP4");
-    expect(formatConversationShareAllowedArtifacts(issue, "zh-CN")).toBe("PDF、纯文本");
+    expect(formatConversationShareArtifactType(issue, "vi-VN")).toBe("MP4");
+    expect(formatConversationShareAllowedArtifacts(issue, "vi-VN")).toBe("PDF, plain text");
     expect(formatConversationShareAllowedArtifacts(issue, "en-US")).toBe("PDF, plain text");
   });
 
-  it("为预览卡片媒体使用本地化的 warning 类别", () => {
+  it("为预览卡片媒体使用统一的英文 warning 类别", () => {
     expect(
       formatConversationShareArtifactType(
         {
@@ -38,9 +38,9 @@ describe("conversation share error presentation", () => {
           artifactType: "video",
           artifactDisplayName: "condensed.mp4",
         },
-        "zh-CN",
+        "vi-VN",
       ),
-    ).toBe("视频");
+    ).toBe("video");
     expect(
       formatConversationShareArtifactType(
         {

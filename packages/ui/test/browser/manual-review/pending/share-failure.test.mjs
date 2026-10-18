@@ -57,7 +57,7 @@ after(async () => {
 for (const kind of ["invalid_contract", "network"])
   for (const width of [390, 1200])
     for (const theme of ["light", "dark"])
-      for (const locale of ["zh-CN", "en-US"])
+      for (const locale of ["en-US"])
         test(`SHARE33 ${kind} ${width} ${theme} ${locale}`, async () => {
           const page = await browser.newPage({ viewport: { width, height: 900 } });
           const errors = [];
@@ -67,13 +67,7 @@ for (const kind of ["invalid_contract", "network"])
           await message.waitFor();
           assert.match(
             await message.innerText(),
-            locale === "zh-CN"
-              ? kind === "network"
-                ? /中断或超时/
-                : /接口异常（HTTP 405）/
-              : kind === "network"
-                ? /interrupted or timed out/
-                : /returned HTTP 405/,
+            kind === "network" ? /interrupted or timed out/ : /returned HTTP 405/,
           );
           assert.doesNotMatch(
             await page.locator("body").innerText(),

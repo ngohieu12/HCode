@@ -7,7 +7,7 @@ describe("app telemetry bridge", () => {
     );
     const createRendererContext = vi.fn(() => ({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     }));
     const syncTelemetryContext = vi.fn();
@@ -19,7 +19,7 @@ describe("app telemetry bridge", () => {
     expect(createRendererContext).toHaveBeenCalledTimes(1);
     expect(syncTelemetryContext).toHaveBeenCalledWith({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
   });

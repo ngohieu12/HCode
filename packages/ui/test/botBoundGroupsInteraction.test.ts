@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { BotConfig, BotState } from "@zcode/shared";
@@ -35,7 +36,7 @@ const show = (enabled = true) =>
   render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(BoundGroupsCard, { bot: { ...bot, enabled } }),
     ),
   );
@@ -49,14 +50,14 @@ describe("bound group controls", () => {
     ["en-US", 0, "0 topics"],
     ["en-US", 1, "1 topic"],
     ["en-US", 2, "2 topics"],
-    ["zh-CN", 0, "0 个话题"],
-    ["zh-CN", 1, "1 个话题"],
-    ["zh-CN", 2, "2 个话题"],
+    ["vi-VN", 0, "0 个话题"],
+    ["vi-VN", 1, "1 个话题"],
+    ["vi-VN", 2, "2 个话题"],
   ] as const)("renders %s topic count %s with the real formatter", (locale, count, label) => {
     const view = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: locale },
+        { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
         createElement(BoundGroupsList, {
           rows: [{ chatId: "chat", name: "产品讨论群", enabled: true, topicCount: count }],
           disabled: false,

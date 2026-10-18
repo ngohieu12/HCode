@@ -328,23 +328,23 @@ describe("localized managed plugin search", () => {
     info: plugin,
     listing: {
       displayName: "Lark CLI",
-      displayNameI18n: { "zh-CN": "飞书 CLI" },
-      descriptionI18n: { "zh-CN": "文档协作" },
+      displayNameI18n: { "vi-VN": "Công cụ Lark" },
+      descriptionI18n: { "vi-VN": "Cộng tác tài liệu" },
     },
   };
   it("matches the displayed localized name and description as well as stable identity", () => {
     const items = new Map([[plugin.id, item]]);
-    for (const query of ["飞书", "文档协作", "LARK-CLI", "lark-cli@official"]) {
-      expect(filterPluginsByQuery([plugin], query, items, "zh-CN")).toEqual([plugin]);
+    for (const query of ["Công cụ Lark", "Cộng tác tài liệu", "LARK-CLI", "lark-cli@official"]) {
+      expect(filterPluginsByQuery([plugin], query, items, "vi-VN")).toEqual([plugin]);
     }
-    expect(filterPluginsByQuery([plugin], "文档协作", items, "en-US")).toEqual([]);
+    expect(filterPluginsByQuery([plugin], "Cộng tác tài liệu", items, "en-US")).toEqual([]);
   });
   it("does not borrow listing from a same-name plugin in another marketplace", () => {
     const other = { ...plugin, id: "lark-cli@other", marketplace: "other" };
-    expect(filterPluginsByQuery([other], "飞书", new Map([[plugin.id, item]]), "zh-CN")).toEqual(
-      [],
-    );
-    expect(filterPluginsByQuery([other], "English description", new Map(), "zh-CN")).toEqual([
+    expect(
+      filterPluginsByQuery([other], "Cộng tác tài liệu", new Map([[plugin.id, item]]), "vi-VN"),
+    ).toEqual([]);
+    expect(filterPluginsByQuery([other], "English description", new Map(), "vi-VN")).toEqual([
       other,
     ]);
   });

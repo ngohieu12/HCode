@@ -1437,7 +1437,7 @@ describe("ConversationShareService", () => {
     ).resolves.toMatchObject({ share_url: "https://zcode.z.ai/share/share-1" });
 
     await expect(
-      service.publish({ ...publishInput(), locale: "zh-CN" }, "publish-op-locale-zh"),
+      service.publish({ ...publishInput(), locale: "en-US" }, "publish-op-locale-zh"),
     ).resolves.toEqual(shareRecord);
   });
 

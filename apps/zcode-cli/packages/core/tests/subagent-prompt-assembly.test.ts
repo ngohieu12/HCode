@@ -666,7 +666,7 @@ describe("subagent provider-visible prompt assembly", () => {
     );
 
     await runtime.executeTurn("first child request");
-    runtime.updateConfig({ language: "zh-CN" });
+    runtime.updateConfig({ language: "en-US" });
     await runtime.executeTurn("second child request after refresh");
 
     expect(requests).toHaveLength(2);

@@ -4,6 +4,7 @@
 // 外观与键盘见 docs/dynamic-workflow/presentation.md「The confirmation window」）：纯规则逐条穷举，
 // 真实 DOM 上钉两句话、改过的那一行、选项描述、Allow 应答带出去的 content、「不可用」的门与 Shift+Tab。
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { TID_CHAT_THOUGHT_LEVEL_SELECT_TRIGGER, type ZCodePermissionRequest } from "@zcode/shared";
 import type { ConversationSnapshot } from "@zcode/shared/zcode-protocol-v4";
 import { createElement, type ReactNode } from "react";
@@ -146,13 +147,16 @@ const ADJUSTABLE = { adjustable_settings: { subagent_model: true, concurrency_ce
 
 function renderDialog(
   request: ZCodePermissionRequest,
-  options: { locale?: "en-US" | "zh-CN"; responding?: boolean } = {},
+  options: { locale?: "en-US" | "vi-VN"; responding?: boolean } = {},
 ) {
   const onRespond = vi.fn();
   const element = (next: ZCodePermissionRequest) =>
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: options.locale ?? "en-US" },
+      {
+        initialLocale: options.locale ?? "en-US",
+        messages: options.locale === "vi-VN" ? zhCNLegacy : undefined,
+      },
       createElement(PermissionDialog, {
         request: next,
         onRespond,
@@ -418,7 +422,7 @@ describe("确认窗里的两句话", () => {
   });
 
   it("zh-CN：两句与「原为」", () => {
-    renderDialog(workflowRequest(ADJUSTABLE), { locale: "zh-CN" });
+    renderDialog(workflowRequest(ADJUSTABLE), { locale: "vi-VN" });
     expect(modelLine().textContent).toContain("子代理运行在");
     expect(boundLine().textContent).toContain("最多");
     expect(boundLine().textContent).toContain("个子代理同时运行");
@@ -491,7 +495,7 @@ describe("脚本点名了模型", () => {
   });
 
   it("zh-CN：「子代理默认运行在」", () => {
-    renderDialog(workflowRequest({ ...ADJUSTABLE, ...BINDINGS }), { locale: "zh-CN" });
+    renderDialog(workflowRequest({ ...ADJUSTABLE, ...BINDINGS }), { locale: "vi-VN" });
     expect(modelLine().textContent).toContain("子代理默认运行在");
   });
 

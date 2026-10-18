@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { FeedbackTicketDetail, FeedbackTicketSummary } from "@zcode/shared";
@@ -63,7 +64,7 @@ function renderIndicator(props?: Partial<FeedbackBackgroundUploadIndicatorViewPr
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(FeedbackBackgroundUploadIndicatorView, {
         status: "running",
         progress: {
@@ -146,7 +147,7 @@ describe("FeedbackBackgroundUploadIndicator", () => {
       renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(FeedbackBackgroundUploadIndicator, {
             feedbackDialogOpen: true,
           }),
@@ -185,7 +186,7 @@ describe("FeedbackBackgroundUploadIndicator", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(FeedbackBackgroundUploadIndicator, {
           feedbackDialogOpen: false,
         }),

@@ -9,6 +9,7 @@
 // 纯规则（Cancel 可用性、结果判定、事件摘要）在 workflowRunPanel.test.ts 里穷举；
 // 这里只钉「那些结果真的接到了 DOM 上」以及交互（点击 Cancel 发出哪条命令）。
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TID_WORKFLOW_ARTIFACTS_SECTION, TID_WORKFLOW_ARTIFACT_CARD } from "@zcode/shared";
@@ -251,7 +252,7 @@ const onOpenWorkflowWorkspace = vi.fn();
 const onOpenWorkflowRun = vi.fn();
 
 function renderPane(
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
   options: {
     withActorCallback?: boolean;
     withArtifactCallback?: boolean;
@@ -263,7 +264,7 @@ function renderPane(
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowRunSidePane, {
         tab,
         ...(options.withActorCallback === false ? {} : { onOpenWorkflowActorSession }),
@@ -283,11 +284,11 @@ type Pane = ReturnType<typeof renderPane>;
  * 真实应用里经由 context 订阅推进；这里的投影是 mock 出来的模块变量，所以给一个新的 tab
  * 对象让 memo 放行。
  */
-function rerenderPane(view: Pane, locale: "en-US" | "zh-CN" = "en-US"): Pane {
+function rerenderPane(view: Pane, locale: "en-US" | "vi-VN" = "en-US"): Pane {
   view.rerender(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowRunSidePane, { tab: { ...tab }, onOpenWorkflowActorSession }),
     ),
   );
@@ -577,7 +578,7 @@ describe("WorkflowRunSidePane 子代理模型", () => {
 
   it("zh-CN 下同一段说中文，模型名原样不译", () => {
     setSnapshot({ run: run({ subagentModel: TEAM_PLAN_MODEL }) });
-    const view = renderPane("zh-CN");
+    const view = renderPane("vi-VN");
 
     expect(view.getByTestId("workflow-run-subagent-model").textContent).toBe(
       "子代理 GLM-5.3-Flash",
@@ -688,7 +689,7 @@ describe("WorkflowRunSidePane 摘要行", () => {
         truncated: true,
       }),
     });
-    expect(renderPane("zh-CN").getByTestId("workflow-run-truncated").textContent).toBe(
+    expect(renderPane("vi-VN").getByTestId("workflow-run-truncated").textContent).toBe(
       "仅展示 1/2001 步的详情",
     );
   });
@@ -825,7 +826,7 @@ describe("WorkflowRunSidePane 被拒提示", () => {
       status: "failed",
       reasonCode: "fault.command.backgroundWorkCancelRejected.not_running",
     } as never);
-    const view = renderPane("zh-CN");
+    const view = renderPane("vi-VN");
     fireEvent.click(view.getByTestId("workflow-run-cancel"));
     expect((await view.findByTestId("workflow-run-rejection")).textContent).toContain("已经结束");
   });
@@ -893,7 +894,7 @@ describe("WorkflowRunSidePane 结果与失败面板", () => {
 
     cleanup();
     setSnapshot({ run: run({ status: "stopped", stopReason: "user", resumable: true }) });
-    const zh = renderPane("zh-CN");
+    const zh = renderPane("vi-VN");
     expect(zh.getByTestId("workflow-run-status-resumable").textContent).toContain("可恢复");
   });
 
@@ -1050,7 +1051,7 @@ describe("WorkflowRunSidePane 升级问题", () => {
           ],
         }),
       });
-      const view = renderPane("zh-CN");
+      const view = renderPane("vi-VN");
       const text = view.getByTestId("workflow-run-orphan-questions").textContent ?? "";
       expect(text).toContain("待答问题");
       expect(text).toContain("42 分钟前");
@@ -1083,7 +1084,7 @@ describe("WorkflowRunSidePane 国际化", () => {
         usage: { spentTokens: 1_000, nodesUsed: 3 },
       }),
     });
-    const view = renderPane("zh-CN");
+    const view = renderPane("vi-VN");
     const text = view.container.textContent ?? "";
 
     expect(view.getByTestId("workflow-run-status").textContent).toBe("已完成");
@@ -1330,7 +1331,7 @@ describe("WorkflowRunSidePane 子代理行", () => {
 
   it("zh-CN 下隐式阶段名、计数与状态标记都本地化", () => {
     setSnapshot({ run: run({ actors: [actor({ name: "planner" })], nodes: [executing()] }) });
-    const view = renderPane("zh-CN");
+    const view = renderPane("vi-VN");
     const list = view.getByTestId("workflow-run-phases");
     expect(list.textContent).toContain("工作流");
     expect(list.textContent).toContain("1 个任务");
@@ -1563,7 +1564,7 @@ describe("WorkflowRunSidePane 产物区", () => {
 
   it("zh-CN 下区名念「产物」——与顶部「结果」措辞不重叠", async () => {
     setSnapshot({ run: run({ artifacts: [summary()] } as never) });
-    const view = renderPane("zh-CN");
+    const view = renderPane("vi-VN");
     await waitFor(() => expect(view.getByTestId(TID_WORKFLOW_ARTIFACTS_SECTION)).toBeTruthy());
     expect(view.getByTestId(TID_WORKFLOW_ARTIFACTS_SECTION).textContent).toContain("产物");
   });
@@ -1846,7 +1847,7 @@ describe("WorkflowRunSidePane 阶段名册", () => {
 
   it("zh-CN：门的两种文案与组头", () => {
     fanoutSnapshot(9, mid);
-    const view = renderPane("zh-CN");
+    const view = renderPane("vi-VN");
     const door = view.getByTestId("workflow-roster-more-row");
     expect(door.textContent).toContain("还有 4 个");
     expect(door.getAttribute("title")).toBe("还有 4 个子代理 · 在这里列出");
@@ -1915,7 +1916,7 @@ describe("WorkflowRunSidePane 阶段名册", () => {
 describe("WorkflowRunSidePane lineage", () => {
   it.each([
     ["en-US", "Amends run"],
-    ["zh-CN", "调整自 run"],
+    ["vi-VN", "调整自 run"],
   ] as const)("修订出来的 run：状态头下一行「调整自 run X」：%s", (locale, label) => {
     setSnapshot({ run: run({ resumedFrom: "dwfrun-prev" }) });
     const view = renderPane(locale);
@@ -1969,7 +1970,7 @@ describe("WorkflowRunSidePane lineage", () => {
         supersededBy: "dwfrun-gone",
       } as never),
     });
-    const view = renderPane("zh-CN", { withOpenRunCallback: true });
+    const view = renderPane("vi-VN", { withOpenRunCallback: true });
     const line = view.getByTestId("workflow-run-superseded-by");
     expect(line.tagName).toBe("DIV");
     expect(line.textContent).toContain("已被替代，后继 run");
@@ -2056,7 +2057,7 @@ describe("WorkflowRunSidePane 配置", () => {
 
   it("zh-CN 念「配置」；能配置时模型段是按钮，点它与点 Configure 开的是同一个弹层", () => {
     setSnapshot({ run: run({ subagentModel: "zhipu/glm-5.3" }) });
-    const view = renderPane("zh-CN");
+    const view = renderPane("vi-VN");
     expect(view.getByTestId("workflow-run-configure").textContent).toBe("配置");
     const segment = view.getByTestId("workflow-run-subagent-model");
     expect(segment.tagName).toBe("BUTTON");
@@ -2182,7 +2183,7 @@ describe("WorkflowRunSidePane 配置", () => {
     const borrowed = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(WorkflowRunSidePane, { tab: settingsTab }),
       ),
     );
@@ -2222,7 +2223,7 @@ describe("WorkflowRunSidePane 配置", () => {
     const landed = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(WorkflowRunSidePane, { tab: settingsTab }),
       ),
     );
@@ -2268,7 +2269,7 @@ describe("WorkflowRunSidePane 配置", () => {
     const view = render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(WorkflowRunSidePane, { tab: retuneTab }),
       ),
     );

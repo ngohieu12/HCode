@@ -54,7 +54,7 @@ function createManagerHarness(options?: {
     warn: vi.fn(),
     error: vi.fn(),
   };
-  const settings: AppSettings = { recentProjects: [], locale: "zh-CN" };
+  const settings: AppSettings = { recentProjects: [], locale: "en-US" };
   let storedAuth = options?.storedAuth;
   let startupRestoreContext = options?.startupRestoreContext;
   let transportStartCount = 0;
@@ -1545,8 +1545,8 @@ describe("createWebRemoteControlManager external relay", () => {
         version: "1.7.0",
         name: "mobile-browser",
         userAgent: "Mozilla/5.0 Mobile Safari/604.1",
-        language: "zh-CN",
-        languages: ["zh-CN", "en-US"],
+        language: "en-US",
+        languages: ["en-US", "en-US"],
         browserPlatform: "iPhone",
         viewport: {
           width: 390,
@@ -1590,7 +1590,7 @@ describe("createWebRemoteControlManager external relay", () => {
       messageId: "mobile-first-command",
       context: {
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "390x844",
       },
       eventExtraDetail: {

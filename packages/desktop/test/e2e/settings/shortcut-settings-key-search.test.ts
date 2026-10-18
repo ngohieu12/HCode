@@ -33,7 +33,7 @@ describe("快捷键按组合键搜索 E2E", () => {
     this.timeout(90_000);
 
     // 默认绑定 CmdOrCtrl+k（openCommandCenter）：武装后按下平台主修饰+K 即命中。
-    // 录制器平台归一后捕获串与默认串同为 CmdOrCtrl+k —— 等价归一路径（win 显式
+    // 捕获器平台归一后捕获串与默认串同为 CmdOrCtrl+k —— 等价归一路径（win 显式
     // Ctrl 默认 vs CmdOrCtrl 产物的互检）在单测覆盖，这里验证端到端过滤行为。
     await clickTestIdByDom("settings-shortcut-key-search", {
       timeout: 15_000,

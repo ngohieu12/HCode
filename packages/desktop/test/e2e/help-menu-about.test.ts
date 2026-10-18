@@ -282,9 +282,9 @@ describe(`问号菜单应用入口（${expectedFlavor}）`, () => {
     }
   });
 
-  it("HM-04 中文设置页的导出日志、关于及更新入口", async function () {
+  it("HM-04 越南语设置页的导出日志、关于及更新入口", async function () {
     this.timeout(60_000);
-    await seedSettings({ locale: "zh-CN", localePreference: "zh-CN" });
+    await seedSettings({ locale: "vi-VN", localePreference: "vi-VN" });
     await browser.refresh();
     await enterWorkspace();
     await setTheme("zai-dark");
@@ -293,20 +293,20 @@ describe(`问号菜单应用入口（${expectedFlavor}）`, () => {
     await openMenu();
     const labels = await menuLabels();
     expect(labels).toEqual([
-      "产品文档",
-      "用户社群",
-      "问题上报",
-      "给产品提需求",
-      "导出日志",
-      "资源管理器",
-      ...(production ? ["检查更新"] : []),
-      "关于 ZCode",
+      "Tài liệu sản phẩm",
+      "Cộng đồng người dùng",
+      "Báo cáo sự cố",
+      "Đề xuất tính năng",
+      "Xuất nhật ký",
+      "Trình quản lý tài nguyên",
+      ...(production ? ["Kiểm tra cập nhật"] : []),
+      "Giới thiệu về HCode",
     ]);
     expect(await $$('[role="menu"] [role="separator"]')).toHaveLength(1);
-    await browser.saveScreenshot(join(tmpdir(), "zcode-help-export-zh-dark.png"));
-    await assertLogExport("导出日志", "正在导出日志中");
+    await browser.saveScreenshot(join(tmpdir(), "zcode-help-export-vi-dark.png"));
+    await assertLogExport("Xuất nhật ký", "Đang xuất nhật ký...");
     await openMenu();
-    await $('[role="menuitem"]*=关于 ZCode').click();
+    await $('[role="menuitem"]*=Giới thiệu về HCode').click();
     await assertAboutWindow();
   });
 });

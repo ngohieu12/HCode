@@ -3,10 +3,7 @@ import { mkdir } from "node:fs/promises";
 import { test } from "node:test";
 
 export function registerProgressiveModelEditorCases(getEnvironment) {
-  for (const [width, locale, theme] of [
-    [390, "zh-CN", "light"],
-    [1200, "en-US", "dark"],
-  ]) {
+  for (const [width, locale, theme] of [[1200, "en-US", "dark"]]) {
     test(`Todo141 hidden reasoning validation ${width}/${theme}`, async () => {
       const { browser, origin } = getEnvironment();
       const page = await browser.newPage({
@@ -26,7 +23,7 @@ export function registerProgressiveModelEditorCases(getEnvironment) {
         for (let attempt = 0; attempt < 2; attempt++) {
           await page
             .locator("[data-model-settings-footer]")
-            .getByRole("button", { name: locale === "zh-CN" ? "保存" : "Save", exact: true })
+            .getByRole("button", { name: "Save", exact: true })
             .click();
           await page.waitForFunction(() =>
             document.activeElement?.hasAttribute("data-model-reasoning-level-add"),
@@ -41,7 +38,7 @@ export function registerProgressiveModelEditorCases(getEnvironment) {
         await trigger.click();
         await page
           .locator("[data-model-settings-footer]")
-          .getByRole("button", { name: locale === "zh-CN" ? "保存" : "Save", exact: true })
+          .getByRole("button", { name: "Save", exact: true })
           .click();
         await page.locator("[data-model-settings-footer]").waitFor({ state: "hidden" });
         assert.equal(writes.length, 1);
@@ -79,7 +76,7 @@ export function registerProgressiveModelEditorCases(getEnvironment) {
           const map = advanced.locator("[data-model-json-slot] textarea");
           const footer = page.locator("[data-model-settings-footer]");
           const save = footer.getByRole("button", {
-            name: locale === "zh-CN" ? "保存" : "Save",
+            name: "Save",
             exact: true,
           });
           await summary.waitFor();
@@ -107,10 +104,7 @@ export function registerProgressiveModelEditorCases(getEnvironment) {
           const buttons = await footer
             .locator("button[data-variant]:not([data-model-help])")
             .allTextContents();
-          assert.deepEqual(
-            buttons,
-            locale === "zh-CN" ? ["重置表单", "取消", "保存"] : ["Reset form", "Cancel", "Save"],
-          );
+          assert.deepEqual(buttons, ["Reset form", "Cancel", "Save"]);
           assert.equal(await footer.getByRole("switch").count(), 0);
           assert.equal(
             await page.locator('[data-slot="dialog-header"]').getByRole("switch").count(),
@@ -237,9 +231,7 @@ export function registerProgressiveModelEditorCases(getEnvironment) {
           await page.getByRole("button", { name: "Reopen editor" }).click();
           await summary.click();
           await max.fill("34567");
-          await footer
-            .getByRole("button", { name: locale === "zh-CN" ? "取消" : "Cancel", exact: true })
-            .click();
+          await footer.getByRole("button", { name: "Cancel", exact: true }).click();
           await footer.waitFor({ state: "hidden" });
           assert.equal(writes.length, 2);
           await page.getByRole("button", { name: "Reopen editor" }).click();

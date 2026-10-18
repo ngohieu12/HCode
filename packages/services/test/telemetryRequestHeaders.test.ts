@@ -10,7 +10,7 @@ afterEach(async () => {
   await Promise.all(homes.splice(0).map((home) => rm(home, { recursive: true, force: true })));
 });
 const context = {
-  clientLanguage: "zh-CN",
+  clientLanguage: "en-US",
   clientTimezone: "Asia/Shanghai",
   screenResolution: "100x100",
 };
@@ -50,7 +50,7 @@ it("adds every public header and re-reads authorization on retry and logout", as
     "X-ZCode-App-Version": "1.2.3",
     "X-Platform": "darwin-arm64",
     "X-Release-Channel": "test",
-    "X-Client-Language": "zh-CN",
+    "X-Client-Language": "en-US",
     "X-Client-Timezone": "Asia/Shanghai",
     "X-Os-Category": "macos",
     "X-Os-Version": "24.0",

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from
 import { buildPresetLabels } from "@/app-shell/workflow-artifacts/artifactPresentation.js";
 import { cn } from "@/components/lib/utils.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
-import { workDurationParts, workDurationUnitSeparator } from "@/lib/workDuration.js";
+import { workDurationParts } from "@/lib/workDuration.js";
 import type { WorkflowCompletionArtifact } from "./WorkflowArtifactTile.js";
 import {
   WORKFLOW_RUN_KIND_ID,
@@ -170,7 +170,7 @@ export function WorkflowCompletionCard({
   renderPreview,
   testIdKey,
 }: WorkflowCompletionCardProps) {
-  const { intl, locale } = useZCodeIntl();
+  const { intl } = useZCodeIntl();
   const format = intl.formatMessage.bind(intl);
   const labels = useMemo(
     () => buildPresetLabels((descriptor, values) => intl.formatMessage(descriptor, values)),
@@ -187,13 +187,12 @@ export function WorkflowCompletionCard({
   const tokens = useCountUp(figures.tokens);
   const subagents = useCountUp(figures.subagents);
   const phases = useCountUp(figures.phases);
-  const separator = workDurationUnitSeparator(locale);
   const timeParts =
     durationMs === undefined
       ? undefined
       : workDurationParts(durationMs, format).map((part) => ({
           value: String(part.value),
-          unit: `${separator}${part.unit}`,
+          unit: part.unit,
         }));
   const tokenParts = tokens === undefined ? undefined : [formatCompactCount(tokens)];
   const plain = (value: number | undefined) =>

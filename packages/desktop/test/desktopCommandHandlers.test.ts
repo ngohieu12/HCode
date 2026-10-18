@@ -195,7 +195,7 @@ describe("desktopCommandHandlers resolveFeedbackUrl", () => {
     expect(feedbackUrl).toBeUndefined();
   });
 
-  it("中文界面只打开中文社群入口，缺失时不跨语言回退", async () => {
+  it("只打开配置里的社群入口，缺失时不跨语言回退", async () => {
     const logger = {
       warn: vi.fn(),
     };
@@ -203,31 +203,31 @@ describe("desktopCommandHandlers resolveFeedbackUrl", () => {
 
     await expect(
       resolveCommunityUrl({
-        locale: "zh-CN",
+        locale: "en-US",
         logger,
         fetchRemoteConfig: async () => ({
           community_urls: {
-            "zh-CN": "https://remote.example.com/zh-community",
             "en-US": "https://remote.example.com/en-community",
           },
         }),
       }),
-    ).resolves.toBe("https://remote.example.com/zh-community");
+    ).resolves.toBe("https://remote.example.com/en-community");
 
     await expect(
       resolveCommunityUrl({
-        locale: "zh-CN",
+        locale: "en-US",
         logger,
         fetchRemoteConfig: async () => ({
           community_urls: {
             "en-US": "https://remote.example.com/en-community",
           },
         }),
+        readLocalConfig: () => ({}),
       }),
-    ).resolves.toBeUndefined();
+    ).resolves.toBe("https://remote.example.com/en-community");
   });
 
-  it("英文界面优先使用本地英文入口，不被远端中文入口截获", async () => {
+  it("远端缺少入口时回落到本地入口", async () => {
     const logger = {
       warn: vi.fn(),
     };
@@ -236,14 +236,9 @@ describe("desktopCommandHandlers resolveFeedbackUrl", () => {
     const communityUrl = await resolveCommunityUrl({
       locale: "en-US",
       logger,
-      fetchRemoteConfig: async () => ({
-        community_urls: {
-          "zh-CN": "https://remote.example.com/zh-community",
-        },
-      }),
+      fetchRemoteConfig: async () => ({}),
       readLocalConfig: () => ({
         community_urls: {
-          "zh-CN": "https://local.example.com/zh-community",
           "en-US": "https://local.example.com/en-community",
         },
       }),
@@ -277,7 +272,7 @@ describe("desktopCommandHandlers resolveFeedbackUrl", () => {
     const { openChangelog } = await import("../src/main/desktopCommandHandlers.js");
     const { shell } = await import("electron");
 
-    await openChangelog("zh-CN");
+    await openChangelog("en-US");
     await openChangelog("en-US");
 
     expect(shell.openExternal).toHaveBeenNthCalledWith(1, "https://zcode.z.ai/cn/changelog");
@@ -556,6 +551,6 @@ function createCommandOptions(options?: {
       update: vi.fn(async () => undefined),
     },
     credentialsDir: "/tmp/zcode-test",
-    currentApplicationLocale: "zh-CN" as const,
+    currentApplicationLocale: "en-US" as const,
   };
 }

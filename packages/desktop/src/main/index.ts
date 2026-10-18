@@ -1452,12 +1452,12 @@ function confirmAppQuit(originWindow?: BrowserWindow | null) {
     return true;
   }
 
-  const isZh = currentApplicationLocale === "zh-CN";
+  const isVi = currentApplicationLocale === "vi-VN";
   const runningAgentSessionCount = getRunningAgentSessionCount();
   const detailLines = [
     runningAgentSessionCount > 0
-      ? isZh
-        ? `正在进行的会话：${runningAgentSessionCount} 个，退出后会被中断。`
+      ? isVi
+        ? `Phiên đang chạy: ${runningAgentSessionCount}. Chúng sẽ bị gián đoạn sau khi thoát.`
         : `In-progress sessions: ${runningAgentSessionCount}. They will be interrupted after quitting.`
       : null,
   ].filter((line): line is string => line !== null);
@@ -1469,11 +1469,11 @@ function confirmAppQuit(originWindow?: BrowserWindow | null) {
         null);
   const dialogOptions = {
     type: "question" as const,
-    buttons: isZh ? ["退出", "取消"] : ["Quit", "Cancel"],
+    buttons: ["Quit", "Cancel"],
     defaultId: 1,
     cancelId: 1,
-    title: isZh ? "退出确认" : "Confirm Quit",
-    message: isZh ? "确认退出 Z Code?" : "Quit Z Code?",
+    title: "Confirm Quit",
+    message: "Quit Z Code?",
     detail: detailLines.join("\n"),
     icon: nativeImage.createFromPath(iconPath),
   };
@@ -1532,9 +1532,9 @@ async function handleZCodeEndpointChanged() {
   }
 }
 
-/** 快捷键设置页录制态（renderer 经 SetShortcutRecordingActive 同步）；true 时菜单摘除可配置 accelerator。 */
+/** 快捷键设置页组合键捕获态（renderer 经 SetShortcutRecordingActive 同步）；true 时菜单摘除可配置 accelerator。 */
 let shortcutRecordingActive = false;
-/** 发起录制的 webContents id；窗口关闭/崩溃时 renderer 不会发复位 IPC，main 侧据此收口。 */
+/** 发起捕获的 webContents id；窗口关闭/崩溃时 renderer 不会发复位 IPC，main 侧据此收口。 */
 let shortcutRecordingOwnerWebContentsId: number | null = null;
 
 function setShortcutRecordingActive(active: boolean, ownerWebContentsId: number | null = null) {
@@ -1552,7 +1552,7 @@ function setShortcutRecordingActive(active: boolean, ownerWebContentsId: number 
 }
 
 /**
- * 录制态是跨进程的临时全局状态，收口不能依赖 renderer 合作——录制中关窗
+ * 捕获态是跨进程的临时全局状态，收口不能依赖 renderer 合作——捕获中关窗
  * 或渲染进程崩溃时 React cleanup 与复位 IPC 都不会执行，标志会永久为 true，之后所有
  * rebuildMenu（切语言/zoom/设置同步）都建出无 accelerator 的菜单且波及全部窗口。
  * 在既有窗口销毁清理里按发起 webContents 复位。

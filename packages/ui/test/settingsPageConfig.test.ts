@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { BarChart3, Blocks, Cable, Package, WandSparkles } from "lucide-react";
 import enUS from "../src/i18n/locales/en-US.js";
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 async function loadSettingsPageConfig(env: "test" | "production") {
   vi.resetModules();

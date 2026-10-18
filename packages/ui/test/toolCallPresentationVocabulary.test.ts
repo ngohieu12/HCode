@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 const stableKinds = {
   "chat.toolCall.kind.read": ["读取", "Read"],

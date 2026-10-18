@@ -18,7 +18,7 @@ export function createCliProviderRefreshReporter(
   return {
     onBuiltinRefreshError(error: unknown) {
       stderr.write(
-        `ZCode Built-in 刷新失败: ${error instanceof Error ? error.message : "unknown error"}\n`,
+        `ZCode Built-in refresh failed: ${error instanceof Error ? error.message : "unknown error"}\n`,
       );
     },
     onBuiltinRefreshResult(event: ZCodeBuiltinRefreshEvent) {
@@ -115,7 +115,7 @@ async function resolveBundledZCodeBuiltinProviderConfig(input: {
   }
 
   const entrypoint = input.entrypoint?.trim();
-  if (!entrypoint) throw new Error("无法定位 CLI ZCode Built-in Provider Config：缺少入口路径");
+  if (!entrypoint) throw new Error("Cannot locate the CLI ZCode Built-in Provider Config: entrypoint path is missing");
   // 全局 bin 可以是软链接，随包配置必须相对真实入口定位。
   const entryDirectory = dirname(realpathSync(resolve(entrypoint)));
   const candidates = [
@@ -124,7 +124,7 @@ async function resolveBundledZCodeBuiltinProviderConfig(input: {
   ];
   const candidate = candidates.find((filePath) => existsSync(filePath));
   if (candidate) return candidate;
-  throw new Error(`无法定位 CLI ZCode Built-in Provider Config：${candidates.join(", ")}`);
+  throw new Error(`Cannot locate the CLI ZCode Built-in Provider Config: ${candidates.join(", ")}`);
 }
 
 function getSeaProviderConfigAssets(): SeaProviderConfigAssets | undefined {

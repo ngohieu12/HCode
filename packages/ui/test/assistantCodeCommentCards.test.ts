@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AssistantCodeCommentCards } from "@/AssistantCodeCommentCards.js";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import type { AssistantCodeCommentCard } from "@/lib/assistantCodeComment.js";
 
 function card(index: number): AssistantCodeCommentCard {
@@ -52,7 +53,7 @@ describe("AssistantCodeCommentCards", () => {
     render(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(AssistantCodeCommentCards, {
           cards: Array.from({ length: 7 }, (_, index) => card(index + 1)),
           workspacePath: "/workspace",

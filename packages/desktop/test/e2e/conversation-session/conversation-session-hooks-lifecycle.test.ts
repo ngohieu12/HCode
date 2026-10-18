@@ -74,7 +74,7 @@ describe("Hooks full-chain E2E", () => {
     await installHooksLifecycleFixture();
     // Hooks 详情断言验证中文 aria-label/摘要文案；locale 属于 case fixture，不能
     // 依赖运行机系统语言，否则同一 Hook 证据会在英文环境下变成 "Hooks"。
-    await seedSettings({ locale: "zh-CN", localePreference: "zh-CN" });
+    await seedSettings({ locale: "en-US", localePreference: "en-US" });
     // 新隔离 profile 的三步引导会覆盖工作区；先完成真实 UI，再进入 Hook 验收。
     await skipOccupationOnboardingIfPresent();
     await prepareV4ConversationE2E();

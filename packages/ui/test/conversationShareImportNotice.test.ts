@@ -72,20 +72,20 @@ describe("conversation share import notice", () => {
   });
 
   it("渲染只读的分享对话与分割线", () => {
-    const html = render({ rows, locale: "zh-CN", onOpenShareUrl: () => {} });
+    const html = render({ rows, locale: "vi-VN", onOpenShareUrl: () => {} });
     expect(html).toContain('data-conversation-share-import-notice="true"');
     expect(html).toContain('data-conversation-share-import-divider="true"');
     // 复用分享页渲染器：用户气泡与助手正文都应出现。
     expect(html).toContain("帮我看下这个报错");
     expect(html).toContain("根因是 signer 被提前释放");
-    expect(html).toContain("已从分享导入");
+    expect(html).toContain("Imported from share");
   });
 
   it("可点击时分割线是 button，不可点击时退化为静态行", () => {
-    expect(render({ rows, locale: "zh-CN", onOpenShareUrl: () => {} })).toContain(
+    expect(render({ rows, locale: "vi-VN", onOpenShareUrl: () => {} })).toContain(
       '<button type="button" data-conversation-share-import-divider="true"',
     );
-    const staticHtml = render({ rows, locale: "zh-CN" });
+    const staticHtml = render({ rows, locale: "vi-VN" });
     expect(staticHtml).toContain('data-conversation-share-import-divider="true"');
     expect(staticHtml).not.toContain(
       '<button type="button" data-conversation-share-import-divider="true"',
@@ -120,7 +120,7 @@ describe("conversation share import notice", () => {
           state: "current" as const,
         },
       ],
-      locale: "zh-CN",
+      locale: "vi-VN",
     });
     expect(html).toContain("报告.pdf");
     expect(html).not.toContain("预览文件");
@@ -148,7 +148,7 @@ describe("conversation share import notice", () => {
           state: "current" as const,
         },
       ],
-      locale: "zh-CN",
+      locale: "vi-VN",
       workspacePath: "/workspace",
       artifactWorkspaceRelativePaths: new Map([
         ["artifact-1", ".zcode-share/share-1/shared-artifacts/报告.pdf"],

@@ -85,9 +85,9 @@ describe("plugins/referenceCatalog protocol", () => {
             icon: "https://cdn.example.com/demo.png",
             // display-only 本地化显示名投影（沿 icon 先例）：仅供 Picker 展示/搜索。
             displayName: "Demo Plugin",
-            displayNameI18n: { "zh-CN": "演示插件" },
+            displayNameI18n: { "en-US": "演示插件" },
             description: "Demo description",
-            descriptionI18n: { "zh-CN": "演示描述" },
+            descriptionI18n: { "en-US": "演示描述" },
             enabled: true,
             conflictingPluginIds: [],
             skillQualifiedNames: [],
@@ -179,9 +179,9 @@ describe("plugins/referenceCatalog protocol", () => {
       );
       expect(() => zcodePluginsReferenceCatalogResultSchema.parse(enriched)).not.toThrow();
       expect(zcodeGuide?.displayName).toBe("ZCode Guide");
-      expect(zcodeGuide?.displayNameI18n?.["zh-CN"]).toBe("ZCode 使用指南");
+      expect(zcodeGuide?.displayNameI18n?.["en-US"]).toBe("ZCode 使用指南");
       expect(zcodeGuide?.description).toEqual(expect.any(String));
-      expect(zcodeGuide?.descriptionI18n?.["zh-CN"]).toEqual(expect.any(String));
+      expect(zcodeGuide?.descriptionI18n?.["en-US"]).toEqual(expect.any(String));
       expect(
         enriched.plugins.find((x) => x.pluginId === zcodeGuide?.pluginId)?.descriptionI18n,
       ).toEqual(zcodeGuide?.descriptionI18n);

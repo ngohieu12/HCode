@@ -1,4 +1,5 @@
 import type { IHooksService } from "@zcode/services";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import type { Hook } from "@zcode/shared";
 import { readFileSync } from "node:fs";
 import { createElement } from "react";
@@ -352,7 +353,7 @@ describe("Hooks settings page", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           TooltipProvider,
           null,
