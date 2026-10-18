@@ -894,7 +894,7 @@ export async function createZCodeApp(options: ZCodeAppOptions): Promise<ZCodeApp
       customCommandPromptResolver: async (text, resolverOptions) => {
         const builtin = resolveZCodeBuiltinPromptCommandInvocation(text, {
           // 动态工作流灰度关闭时内置 `/workflow` 不得展开（DWG-03）。目录侧已经把它从 `/` 面板
-          // 剔除，但用户仍可手打命令名，两条路径必须给出同一个结论。独立 CLI 的 TUI 与 headless
+          // 剔除，但用户仍可手打命令名，两条路径必须给出同一个结论。独立 CLI 的 headless 路径
           // 按 --workflow-mode 显式取值；缺席（进程内嵌入方）不设门禁，见 runtimeConfig 字段注释。
           dynamicWorkflowEnabled: runtimeConfig.dynamicWorkflowEnabled,
           workingDirectory,

@@ -766,7 +766,7 @@ describe("resolveAppRuntimeConfig：dynamicWorkflowEnabled 透传", () => {
   it.each([
     { input: { dynamicWorkflowEnabled: false }, expected: false },
     { input: { dynamicWorkflowEnabled: true }, expected: true },
-    // 未参与灰度的调用方（TUI / headless）不写该字段，装配层也不能替它决定。
+    // 未参与灰度的调用方（headless）不写该字段，装配层也不能替它决定。
     { input: {}, expected: undefined },
   ])("%j", ({ input, expected }) => {
     const { runtimeConfig } = resolveAppRuntimeConfig({

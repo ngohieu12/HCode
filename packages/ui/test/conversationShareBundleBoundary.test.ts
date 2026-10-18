@@ -3,10 +3,10 @@ import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-// SG-01 静态守卫：公开匿名分享页（packages/web/src/share）直接引用的只读时间线必须物理
+// SG-01 静态守卫：匿名分享只读时间线必须物理
 // 排除 open-with 子树（OpenSplitButton → platform hooks、tab store、workspace-file-tree、
 // editorPreference 等 Desktop 专属依赖）。此前该边界只靠源码注释与 spec 约束：重新加回
-// 静态值 import 不会有任何测试失败，公开页 bundle 会被无声撑大并引入无 Desktop 宿主的
+// 静态值 import 不会有任何测试失败，只读 bundle 会被无声撑大并引入无 Desktop 宿主的
 // 运行时依赖。这里读取源码做机械断言（照搬 markdownTableStickyScrollbar.test.ts 的
 // readFileSync 先例），denylist 模块只允许 `import type`（构建期擦除）。
 //

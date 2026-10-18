@@ -22,7 +22,7 @@
 | 文件 | 改动 | 作用 |
 |---|---|---|
 | `apps/zcode-cli/packages/bootstrap/src/app/official-plugin-definitions.ts` | 新增 `OFFICIAL_PLUGIN_DEFINITIONS` 条目，`defaultEnabled: true` | 运行时 seed + 自动进入 `DEFAULT_ENABLED_OFFICIAL_PLUGIN_IDS`，两个 reader（CLI `resolveZCodePlugins`、应用启动 `resolveStartupPlugins`）都会默认启用 |
-| `apps/zcode-cli/packages/cli/scripts/sea-official-plugin-assets.mjs` | 新增 `officialSeaPlugins` 条目，`requiresRuntime: false` | 打进 SEA 单可执行文件；`requiresRuntime:false` 跳过 `dist/mcp/server.js` 校验 |
+| `apps/zcode-cli/packages/bootstrap/src/app/official-plugin-definitions.ts` | 新增官方插件定义与 seed 路径 | filesystem seed 随 Desktop 打包；SEA 打包路径已随 CLI 发行包移除 |
 
 其余 reader（`bundled-plugins.ts` seed、`writeOfficialMarketplace`、`getZCodePluginsOverview` 可恢复内置列表、skills/commands 的 plugin root 注入）都从 `OFFICIAL_PLUGIN_DEFINITIONS` 自动派生，无需改动。
 
@@ -33,7 +33,7 @@
 ```
 apps/zcode-cli/packages/zcode-guide-plugin/
 ├── .zcode-plugin/plugin.json      # 清单：name=zcode-guide, skills="skills"
-├── package.json                   # @zcode/zcode-guide-plugin（SEA 脚本按 packageName 读取）
+├── package.json                   # @zcode/zcode-guide-plugin
 ├── README.md
 └── skills/
     ├── zcode-configuration-guide/SKILL.md   # 总纲：五类资源位置/优先级 + 路由到诊断技能
@@ -63,7 +63,7 @@ apps/zcode-cli/packages/zcode-guide-plugin/
 
 - **用户主配置是 `~/.zcode/cli/config.json`**（不是 `~/.zcode/config.json`）。项目配置 `<repo>/.zcode/config.json` 或 `<repo>/zcode.json`。
 - **MCP `.agents/mcp.json` 差异（CLI vs 客户端）**：`apps/zcode-cli` CLI 运行时不读 `.agents/mcp.json`；但**桌面客户端会读**（`packages/desktop/src/main/mcpUserDirectory/index.ts` 的 `AGENTS_MCP_DESCRIPTOR`），作为同 scope 的 fallback（该 scope 的 `.zcode` 无 MCP server 时才读，key 用顶层 `mcpServers`），并喂给运行会话。技能面向客户端，故按客户端行为书写。项目级 MCP 默认 **untrusted**，不自动连接，需 `/mcp connect`。MCP 覆盖顺序 `cli > env > user > project > system`（user 盖 project）。
-- **MCP 无 headless 子命令**：`/mcp`、`/mcp connect` 是 TUI 交互命令；无 `--json`。最接近的结构化视图是 `zcode plugins list --json`（仅列插件 MCP 名，无连接状态）。
+- **MCP 无 headless 子命令**：`/mcp`、`/mcp connect` 是交互式命令；无 `--json`。最接近的结构化视图是 `zcode plugins list --json`（仅列插件 MCP 名，无连接状态）。
 - **skills/commands 发现顺序**：explicit → user `.zcode` → user `.agents` → project `.zcode`（cwd 上溯到 git 根）→ project `.agents` → 已启用插件。skills 按**路径**为身份、load 时**首个同名先赢**；commands 按**规范化命令名**去重、**先到先赢**并把 loser 记为 `custom_command_duplicate_name`。
 - **嵌套命令名用 `:` 连接**：`review/code.md` → `/review:code`（不是 `/review/code`）。命令名正则 `^[a-z0-9][a-z0-9_:-]{0,63}$`。
 - **诊断默认隐藏**：`zcode commands|skills|plugins list` 人类模式需加 `--verbose` 才打印 diagnostics；`--json` 恒包含。

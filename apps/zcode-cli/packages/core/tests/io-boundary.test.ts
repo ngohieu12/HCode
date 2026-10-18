@@ -64,7 +64,6 @@ describe("core I/O boundaries", () => {
       "packages/cli/src",
       "packages/contracts/src",
       "packages/core/src",
-      "packages/tui/src",
     ];
     const files = (
       await Promise.all(

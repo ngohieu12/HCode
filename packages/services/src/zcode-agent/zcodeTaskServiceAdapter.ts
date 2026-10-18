@@ -3949,7 +3949,7 @@ function mapMessage(
       }
     } else if (part.type === "compaction" && !syntheticTimeline) {
       // compact 的模型 summary/timelineText 属于 agent 内部上下文，不能作为正文透出。
-      // 持久化恢复只从结构化字段合成横线，展示文案由 UI/TUI 本地 i18n 决定。
+      // 持久化恢复只从结构化字段合成横线，展示文案由 UI 本地 i18n 决定。
       syntheticTimeline = synthesizeCompactionTimeline(part);
     }
   }

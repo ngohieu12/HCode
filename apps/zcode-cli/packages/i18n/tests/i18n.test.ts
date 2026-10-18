@@ -33,7 +33,7 @@ describe("i18n catalog", () => {
     expect(isUiLocale("auto")).toBe(true);
     expect(isUiLocale("en-US")).toBe(true);
     expect(isUiLocale("vi-VN")).toBe(true);
-    expect(isUiLocale("en-US")).toBe(false);
+    expect(isUiLocale("zh-CN")).toBe(false);
     expect(isUiLocale("fr-FR")).toBe(false);
   });
 
@@ -46,16 +46,13 @@ describe("i18n catalog", () => {
     }
   });
 
-  it("returns localized TUI and CLI copy", () => {
+  it("returns localized command-center and CLI copy", () => {
     const copy = getZCodeCopy("vi-VN");
 
-    expect(copy.tui.status.ready).toBe("Ready.");
-    expect(copy.tui.sidebar.sections.status).toBe("Status");
-    expect(copy.tui.sidebar.sections.modifiedFiles).toBe("Modified Files");
-    expect(copy.tui.loginRequired.message).toContain("No available models");
-    expect(copy.tui.loginSetup.pending.help).toContain("Esc");
-    expect(copy.tui.loginSetup.input.placeholder).toBe("Paste API key");
-    expect(copy.tui.input.placeholder).toBe("Type a prompt");
+    expect(copy.commandCenter.effort.enabled).toBe("enabled");
+    expect(copy.commandCenter.loginRequired.message).toContain("No available models");
+    expect(copy.commandCenter.loginSetup.pending.help).toContain("Esc");
+    expect(copy.commandCenter.loginSetup.input.placeholder).toBe("Paste API key");
     expect(copy.cli.help("1.0.0")).toContain("Usage:");
   });
 });

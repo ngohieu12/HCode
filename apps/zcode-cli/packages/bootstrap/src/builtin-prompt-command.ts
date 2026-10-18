@@ -10,7 +10,7 @@ const INIT_COMMAND_NAME = "init";
 export interface ResolveZCodeBuiltinPromptCommandOptions {
   /**
    * 动态工作流灰度门（docs/dynamic-workflow/launch.md「Gray release」）。**只有显式 false 才挡下**
-   * `/workflow`：TUI / headless 从不设置该字段，那里的功能始终开启。挡下时返回 undefined，
+   * `/workflow`：headless 从不设置该字段，那里的功能始终开启。挡下时返回 undefined，
    * 与「命令不存在」同形——`workflow` 是保留名，后续的自定义命令解析同样拒绝展开，于是原文作为
    * 普通 prompt 交给模型，与目录侧剔除它的结论一致（DWG-03）。
    */
