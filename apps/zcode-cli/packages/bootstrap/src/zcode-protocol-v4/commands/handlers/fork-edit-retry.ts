@@ -19,7 +19,11 @@ import {
 import { mapAttachmentRefsToTurnAttachments } from "../attachment-refs.js";
 import { V4PromptRejectedError } from "../prompt-turn.js";
 import { commandAdmissionOf } from "../executor.js";
-import { hasPromptInput, V4InputAdmissionRejectedError } from "../input-admission.js";
+import {
+  hasPromptInput,
+  resolveSubmittedExecutionState,
+  V4InputAdmissionRejectedError,
+} from "../input-admission.js";
 import { requireRecord } from "../record-access.js";
 import type { V4CommandCoreHost, V4SessionRecordView } from "../types.js";
 import { startCanonicalIntent, stableAttachmentRefs } from "./canonical-intent-replay.js";
@@ -137,6 +141,13 @@ async function editUserQuery(
   ) {
     throw new V4InputAdmissionRejectedError("proto.invalidPayload", "input must not be empty");
   }
+  // 编辑重发按新的一次主动发送处理：模型跟随本次提交的 Selection（payload 显式 Selection →
+  // 当前会话常驻 Selection），与 sendText admission 同一 resolver，不能沿用被 rewind 那轮
+  // pin 的旧模型——否则用户切换模型后再编辑，重发仍会跑回旧模型。resolve 必须放在 rewind
+  // 截断历史之前：解析失败只能拒绝命令，不能先截断历史再丢掉重发。
+  const replayModelSelection = resolveSubmittedExecutionState(record, {
+    modelSelection: payload.modelSelection,
+  }).modelSelection;
   // 附件映射在 rewind 前完成：引用失效要在截断历史之前暴露，避免半程失败。
   const attachments = await mapAttachmentRefsToTurnAttachments(record.app, attachmentRefs);
   const runtimeHasActiveTurn =
@@ -237,6 +248,7 @@ async function editUserQuery(
       attachmentRefs,
       attachments,
       highspeedEdit,
+      { modelSelection: replayModelSelection },
     );
   } catch (error) {
     if (
@@ -261,7 +273,7 @@ async function editUserQuery(
         attachmentRefs,
         attachments,
         highspeedEdit,
-        { requireQueue: true },
+        { requireQueue: true, modelSelection: replayModelSelection },
       );
     } else {
       throw error;

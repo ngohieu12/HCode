@@ -1,9 +1,11 @@
 // edit/retry 的 canonical intent 重发原语：rewind 截断之后，把 projection resolver 解析出的
 // canonical user intent（含附件引用、模型 Selection、goal 命令语义）重新发起为一轮。
+// 模型 Selection 语义分叉：retry 保留被 rewind 那轮 pin 的历史 Selection；edit 按新的主动
+// 发送处理，由调用方解析本次提交的 Selection（payload 显式 → 会话常驻）传入，不沿用旧模型。
 // 从 fork-edit-retry.ts 抽出：editUserQuery 与 retryTurn 共用，forkAssistant 不经过这里
 // （fork 只做 conversation-only copy，不 rewind、不重发）。
 import type { CommandEnvelope, CommandPayloadMap } from "@zcode/shared/zcode-protocol-v4";
-import { isHighspeedProviderId } from "@zcode/shared";
+import { isHighspeedProviderId, type ModelSelection } from "@zcode/shared";
 import type { mapAttachmentRefsToTurnAttachments } from "../attachment-refs.js";
 import { resolveSessionFallbackModelSelection } from "../input-admission.js";
 import { inputIntentMetadataFromCanonical } from "../input-intent.js";
@@ -34,7 +36,7 @@ export async function startCanonicalIntent(
     modelSelection: NonNullable<CommandPayloadMap["editUserQuery"]["modelSelection"]>;
     execution: V4QueuedTurnExecution;
   },
-  options?: { requireQueue?: boolean },
+  options?: { requireQueue?: boolean; modelSelection?: ModelSelection },
 ): Promise<void> {
   const intent = inputIntentMetadataFromCanonical(
     envelope,
@@ -52,7 +54,11 @@ export async function startCanonicalIntent(
       requestedDelivery: editTarget.intent.requestedDelivery,
       admittedDelivery: editTarget.intent.admittedDelivery,
       fallbackReasonCode: editTarget.intent.fallbackReasonCode,
-      modelSelection: editTarget.intent.modelSelection,
+      // retry（无 options.modelSelection）沿用被 rewind 那轮 pin 的历史 Selection；
+      // edit 是新的一次发送，调用方传入本次提交解析出的 Selection（payload 显式 Selection →
+      // 会话常驻 Selection），不能沿用被 rewind 那轮的旧模型，否则用户切换模型后再编辑，
+      // 重发仍会跑回旧模型（与 sendText admission 同源语义）。
+      modelSelection: options?.modelSelection ?? editTarget.intent.modelSelection,
       mode: editTarget.intent.mode,
       planEnabled: editTarget.intent.planEnabled,
       attachmentRefs,

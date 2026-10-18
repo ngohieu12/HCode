@@ -27,6 +27,9 @@ function makeApp(overrides: Record<string, unknown> = {}) {
     typeof overrides.runtime === "object" && overrides.runtime !== null ? overrides.runtime : {};
   return {
     sessionId: "s1",
+    // edit 重发按新发送解析 Selection（payload 显式 → 会话常驻）；缺省提供会话常驻模型，
+    // 覆盖用例可换 getModel 断言“跟随会话模型而不是被 rewind 那轮的旧模型”。
+    getModel: () => "builtin:session-default/SessionModel",
     sendInput: vi.fn().mockImplementation(async (_input, options) => {
       options?.onTurnStartedObserved?.({
         id: "event-started",
@@ -277,6 +280,95 @@ describe("v4 原生 editUserQuery", () => {
     )?.[1];
     expect(editLogFields).not.toHaveProperty("newText");
     expect(editLogFields).not.toHaveProperty("text");
+  });
+
+  it("编辑重发 pin 本次提交的 Selection（payload 显式），不沿用被 rewind 那轮的旧模型", async () => {
+    // Bug 回归：改完模型再编辑，旧实现从 canonical intent 复制被 rewind 那轮 pin 的
+    // Selection，重发一直跑旧模型。edit 是新的一次发送：payload 显式 Selection 必须生效。
+    const app = makeApp({ getModel: () => "builtin:session-default/SessionModel" });
+    const record = makeRecord({ app });
+    const host = makeHost(record, {
+      getTurnRewindAnchor: () => "msg-user",
+      resolveRowActionTarget: () => ({
+        ok: true,
+        action: "editUserQuery",
+        row: {} as never,
+        editTarget: {
+          entityId: "entity-7",
+          productTurnId: "turn-7",
+          transcriptMessageId: "msg-user",
+          coveredByStableCompact: false,
+          intent: {
+            kind: "sendText",
+            text: "原始问题",
+            modelSelection: { providerId: "old-provider", modelId: "Old-Model" },
+          },
+        },
+      }),
+    });
+
+    await new V4CommandExecutor(host).execute(
+      envelope("editUserQuery", {
+        target: { rowId: 7, entityId: "entity-7" },
+        newText: "改过的问题",
+        modelSelection: {
+          providerId: "ui-provider",
+          modelId: "UI-Model",
+          options: { reasoningLevel: "high" },
+        },
+      }),
+    );
+    await settle();
+
+    const options = app.sendInput.mock.calls[0]?.[1];
+    expect(options.intent.modelSelection).toEqual({
+      providerId: "ui-provider",
+      modelId: "UI-Model",
+      options: { reasoningLevel: "high" },
+    });
+  });
+
+  it("edit 缺省 Selection 时固定当前会话常驻 Selection，不复制旧模型", async () => {
+    // 旧发送端不显式提交 Selection 时，与 sendText admission 同源：CLI 接收边界固定
+    // 当前 Session 值，而不是被 rewind 那轮 pin 的历史 Selection（否则切换模型后编辑仍跑旧模型）。
+    const setModel = vi.fn();
+    const app = makeApp({ getModel: () => "builtin:new-provider/New-Model", setModel });
+    const record = makeRecord({ app });
+    const host = makeHost(record, {
+      getTurnRewindAnchor: () => "msg-user",
+      resolveRowActionTarget: () => ({
+        ok: true,
+        action: "editUserQuery",
+        row: {} as never,
+        editTarget: {
+          entityId: "entity-7",
+          productTurnId: "turn-7",
+          transcriptMessageId: "msg-user",
+          coveredByStableCompact: false,
+          intent: {
+            kind: "sendText",
+            text: "原始问题",
+            modelSelection: { providerId: "old-provider", modelId: "Old-Model" },
+          },
+        },
+      }),
+    });
+
+    await new V4CommandExecutor(host).execute(
+      envelope("editUserQuery", {
+        target: { rowId: 7, entityId: "entity-7" },
+        newText: "改过的问题",
+      }),
+    );
+    await settle();
+
+    const options = app.sendInput.mock.calls[0]?.[1];
+    expect(options.intent.modelSelection).toEqual({
+      providerId: "builtin:new-provider",
+      modelId: "New-Model",
+    });
+    // 只 pin 进本轮 intent，不改会话常驻模型。
+    expect(setModel).not.toHaveBeenCalled();
   });
 
   it("编辑重发会应用本次新准备的 Highspeed Selection 与执行材料", async () => {

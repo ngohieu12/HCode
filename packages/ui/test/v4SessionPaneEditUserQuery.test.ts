@@ -113,6 +113,51 @@ vi.mock("@/v4/BotGroupDeliveryAction.js", () => ({
   ConnectedBotGroupDeliveryAction: () => null,
 }));
 
+// settings 的 Coding Plan 升级弹窗链（model-provider-section/constants → @zcode/shared
+// provider id 表）不在编辑行为的被测面内；桩掉可避免无关的常量求值进入本组。
+vi.mock("@/settings/CodingPlanUpgradeDialogProvider.js", () => ({
+  CodingPlanUpgradeDialogProvider: ({ children }: { children: unknown }) => children,
+  useCodingPlanUpgradeDialog: () => null,
+  useOptionalCodingPlanUpgradeDialog: () => null,
+}));
+
+// 错误归因证据表按 provider id 展开常量集，同样不在编辑行为被测面内。
+vi.mock("@/lib/chatErrorAttributionEvidence.js", () => ({
+  isGenericProviderInvalidRequestCode: vi.fn(() => false),
+  isLocalModelValidationMessage: vi.fn(() => false),
+  isQuotaMessage: vi.fn(() => false),
+  resolveControlledUnknownMessageAttribution: vi.fn(),
+  resolveGenericProviderCodeAttribution: vi.fn(),
+  resolveKnownProviderCodeFailureReason: vi.fn(),
+  resolveLegacyProviderEnvelopeCode: vi.fn(),
+  resolveStableTransportCodeAttribution: vi.fn(),
+  resolveTrustedProviderCodeFailureReason: vi.fn(),
+}));
+
+// Start 套餐推荐读取 provider family 规格（@zcode/shared 侧能力），与编辑行为无关。
+vi.mock("@/hooks/useStartPlanRecommendation.js", () => ({
+  useStartPlanRecommendation: () => vi.fn(async () => null),
+}));
+
+// 套餐身份快照依赖 provider family domain 规范化，与编辑行为无关。
+vi.mock("@/hooks/usePlanIdentitySnapshot.js", () => ({
+  usePlanIdentitySnapshot: () => vi.fn(() => null),
+}));
+
+// 配额横幅读取 Start 套餐/家族规格，与编辑行为无关。
+vi.mock("@/v4/useV4SessionQuotaBanner.js", () => ({
+  useV4SessionQuotaBanner: () => ({
+    state: { visible: false, blocksSubmit: false, kind: "none" },
+    dismissKey: null,
+    dismissed: false,
+    dismiss: vi.fn(),
+    markShown: vi.fn(),
+    takesOverError: false,
+    upgradeProviderId: null,
+    upgradeActionLabelId: "chat.quota.action.upgrade",
+  }),
+}));
+
 vi.mock("@/hooks/useSettingService.js", () => ({
   useSettings: () => ({
     error: null,
@@ -149,12 +194,19 @@ vi.mock("@/store/StoreProvider.js", () => ({
   useZCodeStoreWithDefault: (_selector: unknown, fallback: unknown) => fallback,
 }));
 
+// 可变草稿配置：默认空（Submission 校验不通过 → edit 不携带 modelSelection）；
+// 用例可按需种入“当前 Composer 选择”，验证 editUserQuery 显式带上本次模型。
+const draftConfigControlState = vi.hoisted(() => ({
+  draftConfigRef: { current: {} as Record<string, unknown> },
+  modelSelectionState: { status: "loading", view: null } as Record<string, unknown>,
+}));
+
 vi.mock("@/v4/composer/useDraftConfigControl.js", () => ({
   buildDraftCreateConfigPayload: () => ({}),
   useDraftConfigControl: () => ({
-    modelSelectionRead: { state: { status: "loading" }, reload: vi.fn() },
+    modelSelectionRead: { state: draftConfigControlState.modelSelectionState, reload: vi.fn() },
     captureAcceptedModelSelection: () => vi.fn(),
-    draftConfigRef: { current: {} },
+    draftConfigRef: draftConfigControlState.draftConfigRef,
     draftConfigSeedSignal: 0,
     handleDraftSelectModel: vi.fn(),
     handleDraftSelectThought: vi.fn(),
@@ -405,6 +457,8 @@ afterEach(() => {
     nextDrawAt: null,
   });
   projectionState.current = null;
+  draftConfigControlState.draftConfigRef.current = {};
+  draftConfigControlState.modelSelectionState = { status: "loading", view: null };
   delete (globalThis as { document?: unknown }).document;
   delete (globalThis as { window?: unknown }).window;
   delete (globalThis as { IS_REACT_ACT_ENVIRONMENT?: unknown }).IS_REACT_ACT_ENVIRONMENT;
@@ -999,6 +1053,89 @@ describe("SessionPane user query editing", () => {
       },
       sessionId: "session-1",
       type: "editUserQuery",
+    });
+
+    await act(async () => {
+      root.unmount();
+    });
+  });
+
+  it("editUserQuery 显式携带当前 Composer 选择的模型，不再沿用旧轮模型", async () => {
+    // Bug 回归：改完模型再编辑，重发必须按本次 Composer 选择的 Selection 提交
+    // （与 sendText 同源），CLI 才能把它 pin 进新 canonical intent，而不是跑回旧模型。
+    draftConfigControlState.draftConfigRef.current = {
+      mode: "build",
+      planEnabled: false,
+      provider: "ui-provider",
+      model: "UI-Model",
+      thought: "high",
+      modelSelection: {
+        providerId: "ui-provider",
+        modelId: "UI-Model",
+        options: { reasoningLevel: "high" },
+      },
+    };
+    draftConfigControlState.modelSelectionState = {
+      status: "ready",
+      view: {
+        revision: 1,
+        providers: [
+          {
+            providerId: "ui-provider",
+            providerName: "UI Provider",
+            models: [
+              {
+                modelId: "UI-Model",
+                config: { optionSpecs: { reasoningLevel: { values: ["high"] } } },
+              },
+            ],
+          },
+        ],
+      },
+    };
+    projectionState.current = {
+      status: "live",
+      snapshot: makeSnapshot(),
+      subscriptionId: "sub-1",
+      lastError: null,
+      optimisticCommands: [],
+      loadingOlder: false,
+    };
+    const root: Root = createRoot(installMinimalDom());
+
+    await act(async () => {
+      root.render(
+        createElement(
+          ZCodeIntlProvider,
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
+          createElement(SessionPane, {
+            paneId: "workspace-main",
+            sessionId: "session-1",
+            workspacePath: "/workspace",
+          }),
+        ),
+      );
+      await flushMicrotasks();
+    });
+
+    await act(async () => {
+      await timelineProps
+        .at(-1)
+        ?.onEdit?.({ rowId: 42, entityId: "message-user-42" }, "改过的问题");
+    });
+
+    expect(sendCommandMock).toHaveBeenCalledTimes(1);
+    expect(sendCommandMock.mock.calls[0]?.[0]).toMatchObject({
+      type: "editUserQuery",
+      payload: {
+        newText: "改过的问题",
+        target: { rowId: 42, entityId: "message-user-42" },
+        modelSelection: {
+          providerId: "ui-provider",
+          modelId: "UI-Model",
+          options: { reasoningLevel: "high" },
+        },
+      },
     });
 
     await act(async () => {
