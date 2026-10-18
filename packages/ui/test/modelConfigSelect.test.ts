@@ -108,6 +108,31 @@ describe("ModelConfigSelect menu hierarchy", () => {
     expect(shouldRenderModelGroupSeparator(bigModelFamily, openRouter)).toBe(true);
     expect(shouldRenderModelGroupSeparator(openRouter, deepSeek)).toBe(false);
   });
+
+  it("provider 列表较长时限制一级菜单最大高度并声明 [app-region:no-drag]，避免草稿页首项被顶部拖拽区拦截", () => {
+    renderInteractive(
+      createElement(ModelConfigSelect, {
+        modelGroups: Array.from({ length: 12 }, (_, index) => createGroup(`Provider ${index + 1}`)),
+        normalizedValue: "Provider 1/model",
+        triggerLabel: "Model",
+        showManageModelsAction: false,
+        lockReasonMessage: "Locked",
+        isItemLocked: () => false,
+        onValueChange: () => {},
+        open: true,
+      }),
+      "vi-VN",
+    );
+
+    const menuContent = document.querySelector('[data-slot="dropdown-menu-content"]');
+    expect(menuContent).not.toBeNull();
+    const classTokens = (menuContent?.className ?? "").split(/\s+/);
+    expect(classTokens).toContain("[app-region:no-drag]");
+    expect(classTokens).toContain(
+      "max-h-[min(18rem,var(--radix-dropdown-menu-content-available-height))]",
+    );
+    expect(classTokens).toContain("overflow-y-auto");
+  });
 });
 
 describe("ModelConfigSelect badge style", () => {
