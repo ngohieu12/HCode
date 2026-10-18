@@ -28,7 +28,6 @@ import { isWorkflowModeEnabled, WORKFLOW_DISABLED_NOTICE } from "../workflow-mod
 import {
   buildLoginSelection,
   emitLoginAuthorizeMessage,
-  formatLoginResult,
   formatProviderSetupResult,
   loginSetupResponse,
   parseApiKeyLoginArgs,
@@ -92,32 +91,6 @@ export function createCommandCenter(deps: CommandCenterDeps): TuiSubmitPrompt {
             selection: buildLoginSelection(deps.getLocale?.()),
           };
         }
-        if (command.args === "zai-coding-plan") {
-          if (!deps.login) {
-            return {
-              mode: deps.getMode?.(),
-              response: "Z.AI Coding Plan login is not available in this client.",
-            };
-          }
-
-          return {
-            loginRequired: false,
-            mode: deps.getMode?.(),
-            response: formatLoginResult(
-              await deps.login({
-                abortSignal: options.abortSignal,
-                onAuthorizeUrl: async (data) => {
-                  await emitLoginAuthorizeMessage(
-                    options,
-                    data.authorize_url,
-                    "Z.AI",
-                    await deps.getApp(),
-                  );
-                },
-              }),
-            ),
-          };
-        }
         if (command.args === "bigmodel-coding-plan") {
           if (!deps.loginBigmodel) {
             return {
@@ -175,7 +148,7 @@ export function createCommandCenter(deps: CommandCenterDeps): TuiSubmitPrompt {
         return {
           mode: deps.getMode?.(),
           response:
-            "Usage: /login [zai-coding-plan|bigmodel-coding-plan|zai-coding-plan-api-key <api-key>|bigmodel-coding-plan-api-key <api-key>]",
+            "Usage: /login [bigmodel-coding-plan|zai-coding-plan-api-key <api-key>|bigmodel-coding-plan-api-key <api-key>]",
         };
       }
 

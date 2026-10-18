@@ -10,13 +10,13 @@ describe("shared runtime env", () => {
     vi.unstubAllGlobals();
   });
 
-  it("构建期可选能力未注入时关闭，事件上报端点取测试注入值", async () => {
+  it("遥测上报在 HCode 中始终关闭，即使构建注入遥测端点", async () => {
     const env = await importFreshEnvModule();
 
-    // 单测不注入 ARMS 与自动更新；事件上报端点由 vitest.config.ts 固定注入。
+    // 测试构建注入了事件上报端点，但 HCode 必须忽略遥测端点。
     expect(env.ZCODE_ARMS_RUM_ENDPOINT).toBe("");
     expect(env.ZCODE_AUTO_UPDATE_ENABLED).toBe(false);
-    expect(env.ZCODE_TELEMETRY_REPORT_ENDPOINT).toBe("https://zcode.z.ai/api/v1/event/report");
+    expect(env.ZCODE_TELEMETRY_REPORT_ENDPOINT).toBe("");
   });
 
   it("未注入 ZCODE_ENV 时默认 test 并映射为 local", async () => {

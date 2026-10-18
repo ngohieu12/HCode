@@ -974,15 +974,31 @@ test("zcode commands list prints custom commands", async () => {
   assert.match(ctx.stdout.output(), /\/review \[scope\]/);
 });
 
-test("zcode login runs OAuth flow without exposing tokens", async () => {
-  const ctx = createContext(["login", "--no-browser"]);
+test("zcode login rejects Z.ai account OAuth", async () => {
+  const ctx = createContext(["login", "zai", "--no-browser"]);
+  let loginCalled = false;
+  const exitCode = await run(ctx, {
+    ...createPromptDeps(),
+    loginZCodeCli: async () => {
+      loginCalled = true;
+      throw new Error("must not be called");
+    },
+  });
+
+  assert.equal(exitCode, 1);
+  assert.equal(loginCalled, false);
+  assert.match(ctx.stderr.output(), /Z.ai account login is disabled/);
+});
+
+test("zcode login runs remaining OAuth flow without exposing tokens", async () => {
+  const ctx = createContext(["login", "bigmodel", "--no-browser"]);
   let sawNoBrowser = false;
   const exitCode = await run(ctx, {
     ...createPromptDeps(),
     loginZCodeCli: async (options) => {
       sawNoBrowser = options?.noBrowser === true;
       await options?.onAuthorizeUrl?.({
-        authorize_url: "https://chat.z.ai/oauth/authorize?state=state",
+        authorize_url: "https://open.bigmodel.cn/oauth/authorize?state=state",
         expires_at: 1735000000,
         flow_id: "flow-1",
         poll_interval_sec: 2,
@@ -991,8 +1007,8 @@ test("zcode login runs OAuth flow without exposing tokens", async () => {
       return {
         configPath: "/home/test/.zcode/v2/model-selection.json",
         credentialsPath: "/home/test/.zcode/v2/credentials.json",
-        model: "zai/glm-5.1",
-        providerId: "zai",
+        model: "bigmodel/glm-5.1",
+        providerId: "bigmodel",
         user: {
           user_id: "u_1",
           email: "alice@example.com",
@@ -1078,7 +1094,7 @@ test("command center handles login and logout locally", async () => {
       loginCalled = true;
       loginAbortSignal = options?.abortSignal;
       await options?.onAuthorizeUrl?.({
-        authorize_url: "https://chat.z.ai/oauth/authorize?state=state",
+        authorize_url: "https://open.bigmodel.cn/oauth/authorize?state=state",
         expires_at: 1735000000,
         flow_id: "flow-1",
         poll_interval_sec: 2,

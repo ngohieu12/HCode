@@ -6,7 +6,6 @@ import {
   createUuid,
   type OAuthProviderId,
   ZCODE_ENV,
-  ZAI_PROVIDER_ID,
   type BuiltinModelProviderId,
   type UsageQuotaLimit,
   type UsageEntitlementSubscriptionDetail,
@@ -32,11 +31,6 @@ export interface PresetProviderSpec {
 }
 
 export const PRESET_PROVIDER_SPECS: PresetProviderSpec[] = [
-  {
-    id: BUILTIN_MODEL_PROVIDER_IDS.zaiStartPlan,
-    displayName: "Z.ai",
-    oauthProviderId: ZAI_PROVIDER_ID,
-  },
   {
     id: BUILTIN_MODEL_PROVIDER_IDS.bigmodelStartPlan,
     displayName: "BigModel",
@@ -75,20 +69,6 @@ interface CodingPlanProviderSpec {
 }
 
 export const CODING_PLAN_PROVIDER_SPECS: CodingPlanProviderSpec[] = [
-  {
-    id: BUILTIN_MODEL_PROVIDER_IDS.zaiStartPlan,
-    oauthProviderId: ZAI_PROVIDER_ID,
-    label: "Z.ai - Coding Plan",
-    providerName: "Z.ai",
-    purchaseUrl: "https://z.ai/manage-apikey/subscription",
-  },
-  {
-    id: BUILTIN_MODEL_PROVIDER_IDS.zaiIndividualCodingPlan,
-    oauthProviderId: ZAI_PROVIDER_ID,
-    label: "Z.ai - Coding Plan",
-    providerName: "Z.ai",
-    purchaseUrl: "https://z.ai/manage-apikey/subscription",
-  },
   {
     id: BUILTIN_MODEL_PROVIDER_IDS.bigmodelIndividualCodingPlan,
     oauthProviderId: BIGMODEL_PROVIDER_ID,

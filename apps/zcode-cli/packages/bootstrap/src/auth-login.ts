@@ -46,7 +46,7 @@ import { pollUntilReady } from "./auth-login-polling.js";
 const DEFAULT_LOGIN_TIMEOUT_MS = 5 * 60 * 1_000;
 
 /**
- * Z.ai 与 BigModel 共用服务端轮询登录：init 拿授权地址，浏览器授权后轮询到 ready，
+ * BigModel 服务端轮询登录：init 拿授权地址，浏览器授权后轮询到 ready，
  * 再解析项目访问材料并写入凭据与默认模型。OAuth 登录不落盘派生 API Key，
  * 运行时按 `authSource: "oauth"` 用访问令牌换取请求凭据。
  */
@@ -54,7 +54,7 @@ export async function loginZCodeCli(
   options: LoginZCodeCliOptions = {},
 ): Promise<LoginZCodeCliResult> {
   const env = options.env ?? process.env;
-  const providerId = options.providerId ?? "zai";
+  const providerId = options.providerId ?? "bigmodel";
   const now = options.now ?? Date.now;
   const timeoutMs = options.timeoutMs ?? DEFAULT_LOGIN_TIMEOUT_MS;
   const deadlineMs = now() + timeoutMs;
@@ -111,38 +111,26 @@ export async function loginZCodeCli(
     );
     // 已取消或已超时的登录不能把迟到的 ready 响应写入凭据。
     throwIfAborted(signal);
-    // Z.ai 以账号用户 ID 作为连接身份；BigModel 的项目令牌按组织与项目签发，
-    // 连接身份沿用组织与项目的稳定摘要，与运行时的令牌缓存范围一致。
-    const accountIdentity =
-      providerId === "zai"
-        ? readyData.user.user_id
-        : createStandaloneAccountIdentityFromSecret(
-            JSON.stringify([material.organizationId, material.projectId]),
-          );
+    // BigModel 项目令牌按组织与项目签发；连接身份沿用组织与项目的稳定摘要。
+    const accountIdentity = createStandaloneAccountIdentityFromSecret(
+      JSON.stringify([material.organizationId, material.projectId]),
+    );
     try {
-      if (providerId === "zai") {
-        await credentialStore.saveZaiLoginCredentials({
-          accessToken: readyData.accessToken,
-          jwtToken: readyData.token,
-          user: readyData.user,
-        });
-      } else {
-        const displayName = readyData.user.name || readyData.user.email || readyData.user.user_id;
-        await credentialStore.saveMany({
-          [SHARED_ZCODE_CREDENTIAL_KEYS.activeProvider]: providerId,
-          [SHARED_ZCODE_CREDENTIAL_KEYS.zcodeJwtToken]: readyData.token,
-          [SHARED_ZCODE_CREDENTIAL_KEYS.bigmodelAccessToken]: readyData.accessToken,
-          ...(readyData.refreshToken
-            ? { [SHARED_ZCODE_CREDENTIAL_KEYS.bigmodelRefreshToken]: readyData.refreshToken }
-            : {}),
-          [SHARED_ZCODE_CREDENTIAL_KEYS.bigmodelUserInfo]: JSON.stringify({
-            id: accountIdentity,
-            username: displayName,
-            displayName,
-            rawProfile: readyData.user,
-          }),
-        });
-      }
+      const displayName = readyData.user.name || readyData.user.email || readyData.user.user_id;
+      await credentialStore.saveMany({
+        [SHARED_ZCODE_CREDENTIAL_KEYS.activeProvider]: providerId,
+        [SHARED_ZCODE_CREDENTIAL_KEYS.zcodeJwtToken]: readyData.token,
+        [SHARED_ZCODE_CREDENTIAL_KEYS.bigmodelAccessToken]: readyData.accessToken,
+        ...(readyData.refreshToken
+          ? { [SHARED_ZCODE_CREDENTIAL_KEYS.bigmodelRefreshToken]: readyData.refreshToken }
+          : {}),
+        [SHARED_ZCODE_CREDENTIAL_KEYS.bigmodelUserInfo]: JSON.stringify({
+          id: accountIdentity,
+          username: displayName,
+          displayName,
+          rawProfile: readyData.user,
+        }),
+      });
     } catch (error) {
       throw new ZCodeCliLoginError(
         "credential_write_failed",
@@ -218,7 +206,7 @@ function createOAuthClient(options: LoginZCodeCliOptions, env: EnvRecord): CliOA
   return createCliOAuthClient({
     baseUrl:
       options.baseUrl ?? buildZCodeEndpointUrls(resolveCliZCodeEndpointOrigin(env)).apiBaseUrl,
-    providerId: options.providerId ?? "zai",
+    providerId: options.providerId ?? "bigmodel",
     httpClient: options.httpClient ?? createDefaultHttpClient(env),
   });
 }

@@ -12,7 +12,7 @@ import type { EnvRecord } from "@zcode/adapters/model";
 export type CodingPlanProviderId = "bigmodel" | "zai";
 
 export interface LoginZCodeCliOptions {
-  providerId?: CodingPlanProviderId;
+  providerId?: "bigmodel";
   abortSignal?: AbortSignal;
   apiKeyResolver?: ReturnType<typeof createCodingPlanApiKeyResolver>;
   baseUrl?: string;
@@ -36,7 +36,7 @@ export interface LoginZCodeCliResult {
   configPath: string;
   credentialsPath: string;
   model: string;
-  providerId: CodingPlanProviderId;
+  providerId: "bigmodel";
   user: CliOAuthUser;
 }
 
