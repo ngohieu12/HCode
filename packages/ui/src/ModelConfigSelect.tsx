@@ -546,9 +546,13 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
       {open ? (
         <DropdownMenuContent
           className={cn(
+            // 修复原因：New Task 草稿页输入框居中，provider 一级菜单原本未限制 18rem 最大高度，
+            // 列表过长时会一路向上顶到窗口顶部（进入透明 WorkspaceHeader 的 [app-region:drag] 区域）；
+            // 与二级模型菜单一致限制在 min(18rem, 可用高度) 内滚动，配合 DropdownMenuContent 的
+            // [app-region:no-drag]，确保列表首项始终可选。
             shouldShowProviderLevel
-              ? "w-max min-w-48 max-w-[calc(100vw-2rem)]"
-              : "w-48 max-h-72 overflow-y-auto",
+              ? "w-max min-w-48 max-w-[calc(100vw-2rem)] max-h-[min(18rem,var(--radix-dropdown-menu-content-available-height))] overflow-y-auto"
+              : "w-48 max-h-[min(18rem,var(--radix-dropdown-menu-content-available-height))] overflow-y-auto",
           )}
           align={contentAlign}
           side={contentSide}
