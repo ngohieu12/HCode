@@ -12,9 +12,9 @@ export async function runLoginCommand(
   args: readonly string[] = [],
 ): Promise<number> {
   try {
-    const providerId = args[0] ?? "zai";
-    if (args.length > 1 || (providerId !== "zai" && providerId !== "bigmodel")) {
-      throw new Error("Usage: zcode login [zai|bigmodel] [--no-browser]");
+    const providerId = args[0] ?? "bigmodel";
+    if (args.length > 1 || providerId !== "bigmodel") {
+      throw new Error("Z.ai account login is disabled. Usage: zcode login bigmodel [--no-browser]");
     }
     const env = deps.env ?? process.env;
     const workingDirectory = (deps.cwd ?? process.cwd)();

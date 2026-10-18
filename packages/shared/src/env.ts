@@ -50,13 +50,10 @@ export const RUNTIME_ZCODE_DEBUG =
 
 // ── 构建期可选能力（见 docs/desktop/build-time-optional-capabilities.md），未注入时一律关闭 ──
 /** ARMS RUM 上报地址；为空时 SDK 以 enable=false 初始化，不产生上报。 */
-export const ZCODE_ARMS_RUM_ENDPOINT: string =
-  typeof __ZCODE_ARMS_RUM_ENDPOINT__ !== "undefined" ? __ZCODE_ARMS_RUM_ENDPOINT__ : "";
-/** 事件上报（数仓）地址；为空时不上报。 */
-export const ZCODE_TELEMETRY_REPORT_ENDPOINT: string =
-  typeof __ZCODE_TELEMETRY_REPORT_ENDPOINT__ !== "undefined"
-    ? __ZCODE_TELEMETRY_REPORT_ENDPOINT__
-    : "";
+// HCode 不启用任何产品遥测上报。即使构建环境注入了 ZCode 的遥测地址，也不得向其发送用户数据。
+export const ZCODE_ARMS_RUM_ENDPOINT = "";
+/** 事件上报（数仓）在 HCode 中关闭。 */
+export const ZCODE_TELEMETRY_REPORT_ENDPOINT = "";
 /** 桌面自动更新是否启用。 */
 export const ZCODE_AUTO_UPDATE_ENABLED: boolean =
   typeof __ZCODE_AUTO_UPDATE_ENABLED__ !== "undefined" ? __ZCODE_AUTO_UPDATE_ENABLED__ : false;
