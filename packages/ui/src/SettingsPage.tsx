@@ -1852,6 +1852,9 @@ export function SettingsPage({
                         ) : activeSection === "pluginStore" ? (
                           <PluginStorePage
                             key={`pluginStore:${settingsSectionNavigationVersion}`}
+                            isDesktop={isDesktop}
+                            isMacDesktop={isMacDesktop}
+                            isWindowsDesktop={isWindowsDesktop}
                             workspacePath={activeWorkspacePath}
                             workspaceIdentity={activeWorkspaceIdentity}
                             onCreateTask={onCreateTask}

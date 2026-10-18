@@ -44,6 +44,8 @@ import type {
   SavedWorkflowsOpenRunParams,
 } from "@/settings/saved-workflows/SavedWorkflowsSection.js";
 import { AutomationsMainBreadcrumbFrame } from "@/settings/AutomationsMainBreadcrumbFrame.js";
+import { PluginStorePage } from "@/settings/PluginStorePage.js";
+import { PluginStoreMainBreadcrumbFrame } from "@/settings/PluginStoreMainBreadcrumbFrame.js";
 import { registerWorkspaceWorkflowActions } from "@/settings/saved-workflows/workspaceWorkflowActionsBridge.js";
 import { TaskFindDialog } from "@/quickpick/TaskFindDialog.js";
 import { WorkspaceHeader } from "@/WorkspaceHeader.js";
@@ -197,6 +199,7 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
   onWorkspaceMainViewChange,
   onOpenAutomationConsumed,
   handleOpenAutomations,
+  handleOpenMarketplace,
   onConnectRemote,
   onSelectRemoteProject,
   onCancelRemoteProject,
@@ -1470,7 +1473,7 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
   // Draft 之前维护一套独立轻量 header，导致 side pane、caption 安全区和拖拽入口
   // 与 Task Header 分叉。桌面端统一复用 WorkspaceHeader，只由 variant 裁剪 task 专属内容；
   // 手机远控无 active task 时仍不渲染桌面 chrome，继续遵守 replayable overlay 边界。
-  const shouldRenderMainViewHeader = workspaceMainView !== "automations";
+  const shouldRenderMainViewHeader = workspaceMainView !== "automations" && workspaceMainView !== "pluginStore";
   const shouldRenderWorkspaceHeader =
     shouldRenderMainViewHeader && (activeTaskId !== null || isDesktop);
   // ErrorBoundary resetKeys 的数组如果每次 render 都重新创建，
@@ -1569,6 +1572,8 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
                     onOpenCommandCenter={handleOpenCommandCenter}
                     onOpenAutomations={handleOpenAutomations}
                     automationsActive={workspaceMainView === "automations"}
+                    onOpenMarketplace={handleOpenMarketplace}
+                    marketplaceActive={workspaceMainView === "pluginStore"}
                   />
                 </WorkflowRunOpenProvider>
               </V4SplitPaneEntryProvider>
@@ -1720,6 +1725,8 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
                         >
                           <AutomationsMainBreadcrumbFrame
                             isDesktop={Boolean(isDesktop)}
+                            isMacDesktop={isMacDesktop}
+                            isWindowsDesktop={isWindowsDesktop}
                             sectionLabel={intl.formatMessage({
                               id: "settings.automations.title",
                             })}
@@ -1762,6 +1769,41 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
                               </ScopedErrorBoundary>
                             </div>
                           </AutomationsMainBreadcrumbFrame>
+                        </main>
+                      ) : workspaceMainView === "pluginStore" ? (
+                        <main className="flex h-full min-h-0 flex-1 flex-col bg-background">
+                          <PluginStoreMainBreadcrumbFrame
+                            isDesktop={Boolean(isDesktop)}
+                            isMacDesktop={isMacDesktop}
+                            isWindowsDesktop={isWindowsDesktop}
+                            sectionLabel={intl.formatMessage({
+                              id: "workspace.openPluginsSettings",
+                            })}
+                            ariaLabel={intl.formatMessage({
+                              id: "settings.breadcrumbLabel",
+                            })}
+                          >
+                            <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
+                              <ScopedErrorBoundary
+                                scope="plugin-marketplace-main"
+                                resetKeys={workspaceOnlyResetKeys}
+                                variant="panel"
+                                className="min-h-full"
+                              >
+                                <div className="mx-auto flex w-full max-w-5xl flex-col px-4 py-4 md:px-6 md:py-6">
+                                  <PluginStorePage
+                                    isDesktop={isDesktop}
+                                    isMacDesktop={isMacDesktop}
+                                    isWindowsDesktop={isWindowsDesktop}
+                                    workspacePath={workspaceAbsPath}
+                                    workspaceIdentity={workspaceIdentity}
+                                    onCreateTask={handleCreateTaskInChat}
+                                    onManageInstalled={() => {}}
+                                  />
+                                </div>
+                              </ScopedErrorBoundary>
+                            </div>
+                          </PluginStoreMainBreadcrumbFrame>
                         </main>
                       ) : (
                         <main className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
@@ -1845,7 +1887,7 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
                     </div>
                   </section>
                 </ResizablePanel>
-                {workspaceMainView !== "automations" ? (
+                {workspaceMainView !== "automations" && workspaceMainView !== "pluginStore" ? (
                   <AnimatedTerminalPanel
                     frameClassName={cn(
                       isSidePaneVisible

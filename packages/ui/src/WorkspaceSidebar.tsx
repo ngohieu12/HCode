@@ -13,6 +13,7 @@ import {
   Archive,
   CalendarClock,
   Cloud,
+  Store,
   Folder,
   FolderOpen,
   ListFilter,
@@ -46,6 +47,7 @@ import {
   TID_CONVERSATION_NEW_TASK,
   TID_CONVERSATION_SECTION,
   TID_AUTOMATIONS_OPEN,
+  TID_PLUGIN_MARKETPLACE_OPEN,
   TID_PROJECT_ADD,
   TID_PROJECT_SECTION,
   TID_SIDEBAR,
@@ -214,6 +216,8 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   onOpenCommandCenter,
   onOpenAutomations,
   automationsActive = false,
+  onOpenMarketplace,
+  marketplaceActive = false,
 }: {
   workspacePath: string;
   onSelectTask: (
@@ -256,6 +260,8 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   onOpenCommandCenter: () => void;
   onOpenAutomations?: () => void;
   automationsActive?: boolean;
+  onOpenMarketplace?: () => void;
+  marketplaceActive?: boolean;
 }) {
   const { intl } = useZCodeIntl();
   const handleTaskRowSelect = useCallback(
@@ -529,6 +535,9 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   const handleOpenAutomationsMain = useCallback(() => {
     onOpenAutomations?.();
   }, [onOpenAutomations]);
+  const handleOpenMarketplaceMain = useCallback(() => {
+    onOpenMarketplace?.();
+  }, [onOpenMarketplace]);
   const activeTaskId = useZCodeSessionStore(
     (state) =>
       // Web 远程控制从全局 task 入口进入远端 workspace 时，会先按
@@ -828,6 +837,21 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
             >
               <CalendarClock className="size-4" />
               {intl.formatMessage({ id: "workspace.openScheduledSettings" })}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={handleOpenMarketplaceMain}
+              data-icon="inline-start"
+              data-testid={TID_PLUGIN_MARKETPLACE_OPEN}
+              size="lg"
+              aria-pressed={marketplaceActive}
+              className={cn(
+                "w-full justify-start gap-2 text-foreground hover:bg-surface-hover hover:text-foreground",
+                marketplaceActive && "bg-selected text-foreground",
+              )}
+            >
+              <Store className="size-4" />
+              {intl.formatMessage({ id: "workspace.openPluginsSettings" })}
             </Button>
           </div>
 

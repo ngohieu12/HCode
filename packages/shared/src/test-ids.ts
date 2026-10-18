@@ -682,6 +682,7 @@ export const TID_PLUGIN_STORE_BROWSE = "plugin-store-browse";
 
 // Automations / 定时任务
 export const TID_AUTOMATIONS_OPEN = "automations-open";
+export const TID_PLUGIN_MARKETPLACE_OPEN = "plugin-marketplace-open";
 export const TID_AUTOMATIONS_LIST = "automations-list";
 /** 定时 / 闲时列表共用的状态筛选胶囊行（全部 / 进行中 / 已完成 / 失败） */
 export const TID_AUTOMATIONS_STATUS_FILTER = "automations-status-filter";
