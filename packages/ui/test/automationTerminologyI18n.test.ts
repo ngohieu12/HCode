@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import {
   appendLocalCustomizeTemplate,
   resolveOffPeakTemplateText,
@@ -55,10 +55,10 @@ describe("Automations terminology", () => {
       ({ id }: { id: string }) =>
         messages[id] ?? id;
 
-    expect(resolveOffPeakTemplateText(customize, "title", "zh-CN", format(zhCN))).toBe("自定义");
+    expect(resolveOffPeakTemplateText(customize, "title", "en-US", format(zhCN))).toBe("自定义");
     expect(resolveOffPeakTemplateText(customize, "title", "en-US", format(enUS))).toBe("Customize");
     expect(
-      resolveOffPeakTemplateText(customize, "description", "zh-CN", format(zhCN)),
+      resolveOffPeakTemplateText(customize, "description", "en-US", format(zhCN)),
     ).toBeTruthy();
     expect(
       resolveOffPeakTemplateText(customize, "description", "en-US", format(enUS)),

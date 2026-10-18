@@ -46,12 +46,6 @@ export type CodingPlanProductDisplay = CodingPlanProductPreviewPayment & {
   descriptionItems?: CodingPlanCardCopyItem[];
 };
 
-const CODING_PLAN_CURRENCY_LABELS_ZH: Record<CodingPlanPriceCurrency, string> =
-  {
-    CNY: "人民币",
-    USD: "美元",
-  };
-
 export const CODING_PLAN_PERIODS: CodingPlanBillingPeriod[] = [
   "monthly",
   "quarterly",
@@ -148,25 +142,14 @@ export function formatCodingPlanAmount(
   locale: string,
 ): string {
   const resolvedCurrency = normalizeCodingPlanCurrency(currency);
-  const isChineseLocale = locale.toLowerCase().startsWith("zh");
   const formattedAmount = new Intl.NumberFormat(locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
-  const currencyPrefix = isChineseLocale
-    ? resolvedCurrency === "USD"
-      ? "$"
-      : "¥"
-    : resolvedCurrency === "USD"
-      ? "US$"
-      : "CN¥";
-  const formatted = `${currencyPrefix}${formattedAmount}`;
-
-  // 套餐页需要同时展示中英文和跨币种价格；依赖 Intl currency 会在不同 locale 下输出
-  // 不一致的 ISO code/符号组合，因此这里按产品文案规范固定符号和中文币种名。
-  return isChineseLocale
-    ? `${formatted} ${CODING_PLAN_CURRENCY_LABELS_ZH[resolvedCurrency]}`
-    : formatted;
+  const currencyPrefix = resolvedCurrency === "USD" ? "US$" : "CN¥";
+  // 套餐页需要跨币种展示价格；依赖 Intl currency 会在不同 locale 下输出不一致的
+  // ISO code/符号组合，因此这里按产品文案规范固定符号。
+  return `${currencyPrefix}${formattedAmount}`;
 }
 
 export function inferBillingPeriod(

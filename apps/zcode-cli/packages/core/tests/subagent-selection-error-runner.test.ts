@@ -59,7 +59,7 @@ describe("Subagent 选择错误经过真实前后台 runner", () => {
         >[0],
         caught!,
       );
-      expect(modelContentForToolResult(result)).toContain("未选择思考档位");
+      expect(modelContentForToolResult(result)).toContain("No reasoning level selected");
       expect(result.error?.detail).toContain("reason=reasoning-level-missing");
       // 创建前失败不能伪造已启动子任务事件；错误沿本次 Agent 工具失败返回父模型。
       expect(JSON.stringify(events)).not.toContain('"subagent_spawned"');

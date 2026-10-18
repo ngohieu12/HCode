@@ -4,6 +4,7 @@
 // run, and running it again」）：弹层的两条路与三个字段、覆盖与拒绝、老 agent 的降级、⌘↩；表头两个槽位
 // 的门控、芯片是按钮还是文字、「再次运行」直接启动还是开实参窗。纯规则在 workflowRunSave.test.ts。
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, createRef, type ReactNode } from "react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -81,8 +82,12 @@ const ENTRY: ZCodeSavedWorkflowEntry = {
   path: "/repo/.zcode/workflows/pr-review.dwf.ts",
 };
 
-function withIntl(node: ReactNode, locale: "en-US" | "zh-CN" = "en-US") {
-  return createElement(ZCodeIntlProvider, { initialLocale: locale }, node);
+function withIntl(node: ReactNode, locale: "en-US" | "vi-VN" = "en-US") {
+  return createElement(
+    ZCodeIntlProvider,
+    { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
+    node,
+  );
 }
 
 // ── 弹层 ──
@@ -109,7 +114,7 @@ function popoverHost(overrides: Partial<WorkflowSavePopoverHost> = {}): Workflow
   };
 }
 
-function renderPopover(host: WorkflowSavePopoverHost, locale: "en-US" | "zh-CN" = "en-US") {
+function renderPopover(host: WorkflowSavePopoverHost, locale: "en-US" | "vi-VN" = "en-US") {
   const anchor = document.createElement("button");
   document.body.appendChild(anchor);
   const anchorRef = createRef<HTMLElement | null>() as { current: HTMLElement | null };
@@ -126,7 +131,7 @@ function renderPopover(host: WorkflowSavePopoverHost, locale: "en-US" | "zh-CN" 
 
 describe("WorkflowSavePopover", () => {
   it("zh：先是整条宽的 ZCode 主路，细线之下才是三个字段；名字按 run 名预填、名字框拿到焦点", () => {
-    renderPopover(popoverHost(), "zh-CN");
+    renderPopover(popoverHost(), "vi-VN");
     expect(screen.getByText("保存工作流")).toBeTruthy();
     expect(screen.getByTestId("workflow-save-lead").textContent).toBe("让 ZCode 帮我提炼保存");
     expect(screen.getByText("ZCode 会帮你提炼出可复用的工作流，再交你确认。")).toBeTruthy();

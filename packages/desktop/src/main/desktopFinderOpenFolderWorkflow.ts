@@ -41,7 +41,7 @@ function getWorkflowBundleId(productName: string): string {
 }
 
 function getServicesMenuLabel(locale: Locale, productName: string): string {
-  return locale === "zh-CN" ? `在${productName}中打开` : `Open in ${productName}`;
+  return `Open in ${productName}`;
 }
 
 function buildInfoPlist(locale: Locale, productName: string): string {

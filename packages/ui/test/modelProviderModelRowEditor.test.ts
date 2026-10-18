@@ -41,7 +41,7 @@ import {
 
 vi.mock("@/i18n/IntlProvider.js", () => ({
   useZCodeIntl: () => ({
-    locale: "zh-CN",
+    locale: "vi-VN",
     intl: {
       formatMessage: ({ id }: { id: string }, values?: Record<string, string>) => {
         const messages: Record<string, string> = {
@@ -1300,8 +1300,8 @@ describe("ProviderModelsSection compact model rows", () => {
     expect(formatModelContextWindowLabel(128000)).toBe("128K");
     expect(formatModelContextWindowLabel(1500000)).toBe("1.5M");
     expect(formatModelContextWindowLabel(1000000)).toBe("1M");
-    expect(formatModelContextWindowLabel(128000, "zh-CN")).toBe("128K");
-    expect(formatModelContextWindowLabel(1000000, "zh-CN")).toBe("1M");
+    expect(formatModelContextWindowLabel(128000, "vi-VN")).toBe("128K");
+    expect(formatModelContextWindowLabel(1000000, "vi-VN")).toBe("1M");
   });
 
   it("Provider 使用统一 API 格式枚举，不再从模型 kinds 反推", () => {

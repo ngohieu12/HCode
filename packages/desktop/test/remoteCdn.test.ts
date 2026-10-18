@@ -9,14 +9,14 @@ describe("remoteCdn", () => {
   it("中文且东八区时应优先国内 CDN", () => {
     expect(
       shouldPreferDomesticRemoteCdn({
-        locale: "zh-CN",
+        locale: "en-US",
         timeZone: "Asia/Shanghai",
       }),
     ).toBe(true);
     expect(
       resolveRemoteCdnBaseUrls({
         env: "production",
-        locale: "zh-CN",
+        locale: "en-US",
         timeZone: "Asia/Shanghai",
         version: "0.0.0-test",
       }),
@@ -35,14 +35,14 @@ describe("remoteCdn", () => {
     ).toBe(false);
     expect(
       shouldPreferDomesticRemoteCdn({
-        locale: "zh-CN",
+        locale: "en-US",
         timeZone: "America/Los_Angeles",
       }),
     ).toBe(false);
     expect(
       resolveRemoteCdnBaseUrls({
         env: "production",
-        locale: "zh-CN",
+        locale: "en-US",
         timeZone: "America/Los_Angeles",
         version: "0.0.0-test",
       }),
@@ -62,7 +62,7 @@ describe("remoteCdn", () => {
     expect(
       resolveRemoteCdnBaseUrls({
         env: "test",
-        locale: "zh-CN",
+        locale: "en-US",
         timeZone: "Asia/Shanghai",
         version: "0.0.0-test",
       }),

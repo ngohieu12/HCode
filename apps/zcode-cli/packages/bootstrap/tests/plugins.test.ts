@@ -284,7 +284,7 @@ describe("ZCode plugins", () => {
             {
               name: "computer-use",
               displayName: "Custom Computer Use",
-              displayName_i18n: { "zh-CN": "自定义电脑控制" },
+              displayName_i18n: { "en-US": "自定义电脑控制" },
             },
           ],
         }),

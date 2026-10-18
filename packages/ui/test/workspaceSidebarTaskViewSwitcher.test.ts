@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { resolveSidebarTaskGroupTogglePresentation } from "@/WorkspaceSidebar/taskGroupTogglePresentation.js";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 function readWorkspaceSidebarSource(): string {
   return readFileSync(resolve(process.cwd(), "packages/ui/src/WorkspaceSidebar.tsx"), "utf8");

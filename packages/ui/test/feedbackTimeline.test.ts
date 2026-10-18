@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -6,11 +7,11 @@ import { FeedbackTimeline } from "@/feedback/feedbackTimeline.js";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 import type { FeedbackTicketEvent } from "@zcode/shared";
 
-function renderTimeline(events: FeedbackTicketEvent[], locale: "zh-CN" | "en-US" = "en-US") {
+function renderTimeline(events: FeedbackTicketEvent[], locale: "vi-VN" | "en-US" = "en-US") {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(FeedbackTimeline, {
         events,
         comments: [],

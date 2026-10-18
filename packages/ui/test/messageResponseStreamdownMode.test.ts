@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { resolve } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -165,7 +166,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {
@@ -194,7 +195,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {
@@ -221,7 +222,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {
@@ -255,7 +256,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           { onOpenExternalUrl: vi.fn() },
@@ -275,7 +276,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {
@@ -294,7 +295,7 @@ describe("resolveMessageStreamdownMode", () => {
     const malformedHtml = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {
@@ -317,7 +318,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {
@@ -359,7 +360,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           TooltipProvider,
           null,
@@ -403,7 +404,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {
@@ -424,7 +425,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {
@@ -449,7 +450,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(MessageResponse, { workspacePath: "C:\\workspace" }, markdown),
       ),
     );
@@ -463,7 +464,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           { workspacePath: "\\\\server\\share\\repo" },
@@ -481,7 +482,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           TooltipProvider,
           null,
@@ -630,7 +631,7 @@ describe("resolveMessageStreamdownMode", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           MessageResponse,
           {
@@ -715,7 +716,7 @@ it("通用模式回答保留代码容器和复制入口，锁定换行入口且�
     renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(
           TooltipProvider,
           null,

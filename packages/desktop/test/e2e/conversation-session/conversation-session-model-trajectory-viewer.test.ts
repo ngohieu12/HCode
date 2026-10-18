@@ -33,7 +33,7 @@ describe("模型调用轨迹查看器 E2E", () => {
   it("TRJ01-TRJ09: 写入、投影、交互、虚拟搜索、窄布局与有界尾读", async function () {
     this.timeout(240_000);
     await prepareV4ConversationE2E();
-    await setRendererLocale("zh-CN");
+    await setRendererLocale("en-US");
     await sendV4Prompt("E2E_TRJ_TASK_SEED reply with E2E_TRJ_TASK_READY");
     await waitForV4TimelineContaining("E2E_TRJ_TASK_READY", 45_000);
     await waitForV4Pane(
@@ -721,7 +721,7 @@ async function trajectorySnapshot() {
   });
 }
 
-async function setRendererLocale(locale: "zh-CN") {
+async function setRendererLocale(locale: "en-US") {
   const changed = await browser.execute((nextLocale) => {
     const actions = (
       window as typeof window & {

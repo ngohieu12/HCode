@@ -188,7 +188,7 @@ createRoot(document.getElementById("root")!).render(
   <ServiceProvider services={services}>
     <PlatformProvider platform={platform}>
       <TabStoreProvider>
-        <ZCodeIntlProvider locale={params.get("locale") === "zh-CN" ? "zh-CN" : "en-US"}>
+        <ZCodeIntlProvider locale={params.get("locale") === "en-US" ? "en-US" : "en-US"}>
           <TooltipProvider>
             <Fixture />
           </TooltipProvider>

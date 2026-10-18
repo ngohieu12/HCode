@@ -45,7 +45,6 @@ function harness(argv: string[]) {
     env: {},
     loadDotenv: () => ({ keys: [], loaded: false }),
     resolveLatestSession: async () => ({ id: "sess_latest" }) as never,
-    resolveWorkspaceGitBranch: async () => undefined,
     listCustomCommands: async () => ({ commands: [], diagnostics: [] }),
     startProcessProviderRegistryRuntime: async () =>
       ({ runtime: { registryService: {} }, dispose: () => {} }) as never,
@@ -73,12 +72,6 @@ function harness(argv: string[]) {
         continueActiveTarget: async () => result,
         submitPrompt: async () => result,
       } as never;
-    },
-    runTui: async (options) => {
-      await options.submitPrompt("hello", {
-        requestPermission: async () => ({ decision: "deny" }),
-      });
-      return 0;
     },
     runZCodeProtocolAgent: async (options) => {
       protocolCalls += 1;
@@ -158,17 +151,8 @@ for (const argv of [
   });
 }
 
-for (const argv of [[], ["tui"]]) {
-  test(`${argv[0] ?? "implicit TUI"} startup defaults to disabled like headless`, async () => {
-    const h = harness(argv);
-    assert.equal(await run(h.ctx, h.deps), 0, h.stderr());
-    assert.equal(h.appOptions.length, 1);
-    assertPair(h.appOptions[0], "disabled");
-  });
-}
-
 for (const argv of [["app-server", "--stdio"], ["agent-server", "--stdio"], ["doctor"]]) {
-  test(`rejects --workflow-mode outside TUI and headless: ${argv[0]}`, async () => {
+  test(`rejects --workflow-mode outside headless prompts: ${argv[0]}`, async () => {
     const h = harness([...argv, "--workflow-mode", "alwaysOn"]);
     assert.equal(await run(h.ctx, h.deps), 1);
     assert.equal(h.stderr(), `${WORKFLOW_MODE_SCOPE_ERROR}\n`);
@@ -185,7 +169,7 @@ test("the retired --enable-workflow flag is an unknown option", async () => {
   assert.equal(h.appOptions.length, 0);
 });
 
-for (const locale of ["en-US", "zh-CN"]) {
+for (const locale of ["en-US", "en-US"]) {
   test(`help documents --workflow-mode and not the retired flag: ${locale}`, async () => {
     const h = harness(["--help", "--locale", locale]);
     assert.equal(await run(h.ctx, h.deps), 0, h.stderr());

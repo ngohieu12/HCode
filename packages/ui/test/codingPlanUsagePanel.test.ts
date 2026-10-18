@@ -15,7 +15,7 @@ import {
   shouldShowCodingPlanUsageDetailSummary,
 } from "@/settings/usage-stats/CodingPlanUsagePanel.js";
 import enMessages from "@/i18n/locales/en-US.js";
-import zhMessages from "@/i18n/locales/zh-CN.js";
+import zhMessages from "./fixtures/zhCNLegacy.js";
 import {
   findCodingPlanQuotaLimit,
   formatQuotaRemainingPercentage,
@@ -31,7 +31,7 @@ import { formatSummaryCompactTokenUsage } from "@/settings/usage-stats/usageStat
 
 describe("CodingPlanUsagePanel", () => {
   it("个人与团队套餐的中文 Token 摘要在数字和单位之间保留空格", () => {
-    expect(formatSummaryCompactTokenUsage("zh-CN", 370_000_000)).toBe("3.7 亿");
+    expect(formatSummaryCompactTokenUsage("vi-VN", 370_000_000)).toBe("3.7 亿");
     expect(formatSummaryCompactTokenUsage("en-US", 370_000_000)).toBe("370M");
   });
 
@@ -746,7 +746,6 @@ describe("CodingPlanUsagePanel", () => {
         "../src/settings/usage-stats/CodingPlanUsagePanel.tsx",
         "../src/WorkspaceSidebarFooterUsageSummary.tsx",
         "../src/i18n/locales/en-US.ts",
-        "../src/i18n/locales/zh-CN.ts",
       ].map((path) => readSourceTextAsync(new URL(path, import.meta.url), "utf8")),
     );
 
@@ -754,7 +753,6 @@ describe("CodingPlanUsagePanel", () => {
     expect(sources.join("\n")).not.toContain("sidebar.usage.plan.unlimited");
     expect(sources.join("\n")).not.toContain("settings.usage.entitlementNoReset");
     expect(sources.join("\n")).not.toContain("No reset time");
-    expect(sources.join("\n")).not.toContain("暂无重置时间");
   });
 
   it("个人套餐 quota 卡片把重置时间放在百分比同一信息行", async () => {
@@ -827,8 +825,8 @@ describe("CodingPlanUsagePanel", () => {
   it("只有 Usage stats 的额度卡统一显示月日和时分", () => {
     const resetAt = new Date(2026, 8, 16, 23, 0).getTime();
 
-    expect(formatUsageStatsQuotaResetTime("zh-CN", resetAt)).toBe("9月16日 23:00");
-    expect(formatUsageStatsQuotaResetTime("zh-CN", undefined)).toBeUndefined();
+    expect(formatUsageStatsQuotaResetTime("vi-VN", resetAt)).toBe("9月16日 23:00");
+    expect(formatUsageStatsQuotaResetTime("vi-VN", undefined)).toBeUndefined();
   });
 
   // 修复原因：zai 业务后端 Team Plan 的 quota/limit 用 CREDIT_LIMIT 作为 type，

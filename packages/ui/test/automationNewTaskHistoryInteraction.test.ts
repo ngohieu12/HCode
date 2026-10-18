@@ -25,7 +25,6 @@ const primitivesSource = await readSource(
 const segmentedTabsSource = await readSource(
   new URL("../src/settings/SettingsSegmentedTabs.tsx", import.meta.url),
 );
-const zhLocaleSource = await readSource(new URL("../src/i18n/locales/zh-CN.ts", import.meta.url));
 
 describe("automation new-task history interaction", () => {
   it("allows opening empty history without loading runs or showing create action", () => {
@@ -51,6 +50,5 @@ describe("automation new-task history interaction", () => {
     expect(segmentedTabsSource).toContain(
       "data-active:border-transparent data-active:bg-background",
     );
-    expect(zhLocaleSource).toContain('"automations.edit.tab.history": "历史"');
   });
 });

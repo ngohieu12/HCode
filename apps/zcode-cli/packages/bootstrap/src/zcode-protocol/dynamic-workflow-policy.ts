@@ -33,7 +33,7 @@ export interface DynamicWorkflowRuntimeGate {
  * 本次 create / resume 参数优先，缺席时读 Host 同步到进程的 workspace 级结论；两者都没有就是关闭
  * （fail-closed）。mode 同序取值，都缺席时按 alwaysOn——只发布尔的旧 Host 配对成今天的行为。
  * 两个字段**必须写出显式布尔**：core 把「缺席」定义为「不参与灰度、立刻注册全部工具」
- * （TUI / headless / workflow_child 的语义），受信 Host 创建的会话不能落进那条豁免。
+ * （headless / workflow_child 的语义），受信 Host 创建的会话不能落进那条豁免。
  */
 export function resolveDynamicWorkflowRuntimeGate(
   params: { dynamicWorkflowEnabled?: boolean; dynamicWorkflowMode?: DynamicWorkflowMode },

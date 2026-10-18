@@ -305,20 +305,20 @@ describe("telegram bot provider", () => {
       botId: bot.id,
       provider: "telegram",
       providerUserId: "chat-1",
-      text: "需要权限：Run command",
+      text: "Permission required: Run command",
       selection: {
         id: "permission-req-1",
-        title: "需要权限：Run command",
+        title: "Permission required: Run command",
         action: "permission.respond",
         showCancel: false,
         options: [
           {
             id: "/approve req-1 allow",
-            label: "允许",
+            label: "Allow",
           },
           {
             id: "/deny req-1",
-            label: "拒绝",
+            label: "Deny",
           },
         ],
       },
@@ -391,13 +391,13 @@ describe("telegram bot provider", () => {
       botId: bot.id,
       provider: "telegram",
       providerUserId: "chat-1",
-      text: "请选择",
+      text: "Choose one",
       selection: {
         id: "elicitation-long-request",
         token: "abc123def456",
-        title: "请选择",
+        title: "Choose one",
         action: "elicitation.respond",
-        options: [{ id: `answer-${"x".repeat(100)}`, label: "很长的选项" }],
+        options: [{ id: `answer-${"x".repeat(100)}`, label: "A very long option" }],
       },
     });
 
@@ -539,7 +539,7 @@ describe("telegram bot provider", () => {
           },
         },
       },
-      "已提交权限响应。",
+      "Permission response submitted.",
     );
 
     expect(fetchMock).toHaveBeenCalledWith(
@@ -548,7 +548,7 @@ describe("telegram bot provider", () => {
         method: "POST",
         body: JSON.stringify({
           callback_query_id: "callback-1",
-          text: "已提交权限响应。",
+          text: "Permission response submitted.",
         }),
       }),
     );

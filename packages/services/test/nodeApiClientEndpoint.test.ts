@@ -158,7 +158,7 @@ describe("NodeApiClient endpoint rewriting", () => {
       buildZCodeSourceHeaders({
         appVersion: "2.14.0",
         arch: "arm64",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         clientTimezone: "Asia/Shanghai",
         osVersion: "Darwin 25.0.0",
         platform: "darwin",
@@ -167,7 +167,7 @@ describe("NodeApiClient endpoint rewriting", () => {
     ).toMatchObject({
       "X-Platform": "darwin-arm64",
       "X-Release-Channel": "production",
-      "X-Client-Language": "zh-CN",
+      "X-Client-Language": "en-US",
       "X-Client-Timezone": "Asia/Shanghai",
       "X-Os-Category": "macos",
       "X-Os-Version": "Darwin 25.0.0",

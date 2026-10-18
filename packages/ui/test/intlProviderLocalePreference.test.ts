@@ -143,19 +143,19 @@ describe("IntlProvider locale preference sync", () => {
     expect(
       resolveLocalePreferenceFromSettings({
         storedPreference: "en-US",
-        settingsLocale: "zh-CN",
-        settingsLocalePreference: "zh-CN",
+        settingsLocale: "vi-VN",
+        settingsLocalePreference: "vi-VN",
         preferSettingServiceLocale: true,
       }),
-    ).toBe("zh-CN");
+    ).toBe("vi-VN");
   });
 
   it("非远控入口继续尊重本地语言偏好", () => {
     expect(
       resolveLocalePreferenceFromSettings({
         storedPreference: "en-US",
-        settingsLocale: "zh-CN",
-        settingsLocalePreference: "zh-CN",
+        settingsLocale: "vi-VN",
+        settingsLocalePreference: "vi-VN",
         preferSettingServiceLocale: false,
       }),
     ).toBe("en-US");
@@ -165,7 +165,7 @@ describe("IntlProvider locale preference sync", () => {
     expect(
       resolveLocalePreferenceFromSettings({
         storedPreference: null,
-        settingsLocale: "zh-CN",
+        settingsLocale: "vi-VN",
         settingsLocalePreference: "system",
         preferSettingServiceLocale: false,
       }),
@@ -176,24 +176,24 @@ describe("IntlProvider locale preference sync", () => {
     expect(
       resolveLocalePreferenceFromSettings({
         storedPreference: "en-US",
-        settingsLocale: "zh-CN",
+        settingsLocale: "vi-VN",
         settingsLocalePreference: "system",
         preferSettingServiceLocale: true,
       }),
-    ).toBe("zh-CN");
+    ).toBe("vi-VN");
   });
 
   it("只接收 state:locale 的合法语言广播", () => {
     expect(
       shouldApplyLocaleBroadcastMessage({
         channel: "state:locale",
-        payload: "zh-CN",
+        payload: "vi-VN",
       }),
     ).toBe(true);
     expect(
       shouldApplyLocaleBroadcastMessage({
         channel: "state:theme",
-        payload: "zh-CN",
+        payload: "vi-VN",
       }),
     ).toBe(false);
     expect(
@@ -207,7 +207,7 @@ describe("IntlProvider locale preference sync", () => {
         channel: "state:locale",
         payload: {
           preference: "system",
-          resolvedLocale: "zh-CN",
+          resolvedLocale: "vi-VN",
         },
       }),
     ).toBe(true);
@@ -220,13 +220,13 @@ describe("IntlProvider locale preference sync", () => {
           channel: "state:locale",
           payload: {
             preference: "system",
-            resolvedLocale: "zh-CN",
+            resolvedLocale: "vi-VN",
           },
         },
         {
           ignoredLocalPayload: {
             preference: "system",
-            resolvedLocale: "zh-CN",
+            resolvedLocale: "vi-VN",
           },
         },
       ),
@@ -237,14 +237,14 @@ describe("IntlProvider locale preference sync", () => {
           channel: "state:locale",
           payload: {
             preference: "system",
-            resolvedLocale: "zh-CN",
+            resolvedLocale: "vi-VN",
           },
           sourceWindowId: 1,
         },
         {
           ignoredLocalPayload: {
             preference: "system",
-            resolvedLocale: "zh-CN",
+            resolvedLocale: "vi-VN",
           },
         },
       ),
@@ -262,16 +262,16 @@ describe("IntlProvider locale preference sync", () => {
         locale: "en-US",
         localePreference: "system",
       },
-      resolveSystemLocale: () => Promise.resolve("zh-CN"),
+      resolveSystemLocale: () => Promise.resolve("vi-VN"),
       children: createElement(LocaleProbe),
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId("locale").textContent).toBe("zh-CN");
+      expect(screen.getByTestId("locale").textContent).toBe("vi-VN");
     });
     expect(screen.getByTestId("localePreference").textContent).toBe("system");
     expect(settingService.update).toHaveBeenCalledWith({
-      locale: "zh-CN",
+      locale: "vi-VN",
       localePreference: "system",
     });
   });
@@ -296,7 +296,7 @@ describe("IntlProvider locale preference sync", () => {
     fireEvent.click(screen.getByRole("button", { name: "system" }));
     fireEvent.click(screen.getByRole("button", { name: "en-US" }));
     await act(async () => {
-      deferredSystemLocale.resolve("zh-CN");
+      deferredSystemLocale.resolve("vi-VN");
       await deferredSystemLocale.promise;
     });
 
@@ -310,7 +310,7 @@ describe("IntlProvider locale preference sync", () => {
       localePreference: "en-US",
     });
     expect(settingService.update).not.toHaveBeenCalledWith({
-      locale: "zh-CN",
+      locale: "vi-VN",
       localePreference: "system",
     });
     expect(broadcastService.send).toHaveBeenCalledWith({
@@ -324,7 +324,7 @@ describe("IntlProvider locale preference sync", () => {
       channel: "state:locale",
       payload: {
         preference: "system",
-        resolvedLocale: "zh-CN",
+        resolvedLocale: "vi-VN",
       },
     });
   });
@@ -349,13 +349,13 @@ describe("IntlProvider locale preference sync", () => {
         channel: "state:locale",
         payload: {
           preference: "system",
-          resolvedLocale: "zh-CN",
+          resolvedLocale: "vi-VN",
         },
         sourceWindowId: 1,
       });
     });
 
-    expect(screen.getByTestId("locale").textContent).toBe("zh-CN");
+    expect(screen.getByTestId("locale").textContent).toBe("vi-VN");
     expect(screen.getByTestId("localePreference").textContent).toBe("system");
     expect(localStorage.getItem("zcode-locale-preference")).toBe("system");
   });
@@ -366,8 +366,8 @@ describe("IntlProvider locale preference sync", () => {
     const broadcastService = createBroadcastService();
     renderIntlProvider({
       settings: {
-        locale: "zh-CN",
-        localePreference: "zh-CN",
+        locale: "vi-VN",
+        localePreference: "vi-VN",
       },
       update,
       broadcastService,
@@ -375,7 +375,7 @@ describe("IntlProvider locale preference sync", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId("localePreference").textContent).toBe("zh-CN");
+      expect(screen.getByTestId("localePreference").textContent).toBe("vi-VN");
     });
 
     fireEvent.click(screen.getByRole("button", { name: "en-US" }));
@@ -416,7 +416,7 @@ describe("IntlProvider locale preference sync", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "en-US" }));
     await act(async () => {
-      deferredSystemLocale.resolve("zh-CN");
+      deferredSystemLocale.resolve("vi-VN");
       await deferredSystemLocale.promise;
     });
 
@@ -429,7 +429,7 @@ describe("IntlProvider locale preference sync", () => {
       localePreference: "en-US",
     });
     expect(update).not.toHaveBeenCalledWith({
-      locale: "zh-CN",
+      locale: "vi-VN",
       localePreference: "system",
     });
   });
@@ -442,16 +442,16 @@ describe("IntlProvider locale preference sync", () => {
       .mockResolvedValue(undefined);
     renderIntlProvider({
       settings: {
-        locale: "zh-CN",
-        localePreference: "zh-CN",
+        locale: "vi-VN",
+        localePreference: "vi-VN",
       },
-      resolveSystemLocale: () => "zh-CN",
+      resolveSystemLocale: () => "vi-VN",
       update,
       children: createElement(LocaleControls),
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId("localePreference").textContent).toBe("zh-CN");
+      expect(screen.getByTestId("localePreference").textContent).toBe("vi-VN");
     });
 
     fireEvent.click(screen.getByRole("button", { name: "en-US" }));
@@ -465,7 +465,7 @@ describe("IntlProvider locale preference sync", () => {
     fireEvent.click(screen.getByRole("button", { name: "system" }));
     await waitFor(() => {
       expect(update).toHaveBeenCalledWith({
-        locale: "zh-CN",
+        locale: "vi-VN",
         localePreference: "system",
       });
     });

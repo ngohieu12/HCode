@@ -1,36 +1,29 @@
 # zcode-cli
 
-TypeScript + Node.js 24.14.0 CLI starter. The default artifact is a normal Node CLI bundle, and SEA is kept as an optional packaging path.
+TypeScript + Node.js 24.14.0 Agent runtime and headless CLI used by the HCode desktop application. The only artifact is the Node CLI bundle at `dist/zcode.cjs`; there is no TUI, standalone distribution, or SEA packaging path.
 
 ## Why This Shape
 
-- Runtime code has zero production dependencies.
-- The CLI uses Node built-ins for argument parsing and terminal control.
-- `npm run build` produces `dist/zcode.cjs`, which works anywhere Node.js 24.14.0 is installed.
-- `npm run sea` attempts to turn that same bundle into a single executable.
-- If SEA breaks on a platform, the normal CLI artifact is still the fallback.
+- The CLI is a headless runtime: every user-facing surface is provided by the desktop application.
+- Runtime code has zero production dependencies outside the pinned workspace packages and `playwright-core`.
+- `npm run build` produces `dist/zcode.cjs`, which the desktop application bundles and launches.
+- `npm run build:desktop-agent` produces the same bundle with the desktop-specific build switches.
 
 ## Commands
 
 ```sh
 npm run bootstrap
 npm run dev -- --help
+npm run dev -- -p "summarize this repository"
 npm run build
-npm run start -- doctor --json
 npm test
-npm run sea
-npm run sea -- --target linux-x64 --target win-x64
-npm run sea -- --all
 ```
 
 ## Project Layout
 
 ```txt
-src/
-  cli/       command parsing and process wiring
-  core/      reusable runtime logic
-  ui/        terminal UI layer
-scripts/    build and optional SEA packaging scripts
+src/        command parsing, process wiring, and command center
+scripts/    build script
 tests/      subprocess-level CLI tests
 ```
 
@@ -315,12 +308,3 @@ Common stdout examples:
   }
 }
 ```
-
-## Packaging Strategy
-
-1. Start with the normal Node CLI bundle from `npm run build`.
-2. `npm run sea` builds the current host target by default.
-3. Use `npm run sea -- --target <platform-arch>` or `npm run sea -- --all` for cross-target SEA packaging.
-4. SEA target Node.js binaries are downloaded from the official Node.js release for the current `process.versions.node` and verified against `SHASUMS256.txt`.
-5. Keep native addons and runtime dynamic imports out of the core CLI until SEA compatibility is proven.
-6. Add richer TUI libraries later only behind a compatibility spike.

@@ -91,7 +91,7 @@ export function usePlugins(workspacePath: string | null, workspaceIdentity?: str
   const installPlugin = useCallback(
     async (pluginName: string, marketplace: string, scope: "workspace" | "user" = "user") => {
       if (!workspacePath) {
-        usePluginStore.setState({ error: "请先打开一个工作区后再安装插件" });
+        usePluginStore.setState({ error: "Open a workspace before installing plugins" });
         return false;
       }
       if (

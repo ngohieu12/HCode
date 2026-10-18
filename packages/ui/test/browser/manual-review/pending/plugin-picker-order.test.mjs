@@ -109,10 +109,7 @@ const config = {
     pluginOrder: { utilities: [`alpha@${official}`, `beta@${official}`] },
   },
 };
-for (const [width, locale, theme] of [
-  [1200, "en-US", "light"],
-  [390, "zh-CN", "dark"],
-]) {
+for (const [width, locale, theme] of [[1200, "en-US", "light"]]) {
   test(`PSO-10/11/14 @/+ ${width}/${locale}/${theme}`, async () => {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     page.setDefaultTimeout(10000);
@@ -222,7 +219,7 @@ for (const [width, locale, theme] of [
 }
 
 for (const width of [1200, 390]) {
-  for (const locale of ["en-US", "zh-CN"]) {
+  for (const locale of ["en-US"]) {
     for (const theme of ["light", "dark"]) {
       test(`PLUGIN-CREATOR-ICON @ token ${width}/${locale}/${theme}`, async () => {
         const page = await browser.newPage({ viewport: { width, height: 900 } });

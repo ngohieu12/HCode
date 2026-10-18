@@ -726,7 +726,7 @@ describe("设置页 UI polish E2E", () => {
     await setRendererViewport(390, 844);
     try {
       for (const presentation of [
-        { locale: "zh-CN", theme: "dark" },
+        { locale: "en-US", theme: "dark" },
         { locale: "en-US", theme: "light" },
       ]) {
         await setPresentation(presentation);
@@ -822,7 +822,7 @@ describe("设置页 UI polish E2E", () => {
       ).toBe(true);
     } finally {
       await clearRendererViewport();
-      await setPresentation({ locale: "zh-CN", theme: "dark" });
+      await setPresentation({ locale: "en-US", theme: "dark" });
     }
 
     await browser.waitUntil(
@@ -1053,7 +1053,7 @@ describe("设置页 UI polish E2E", () => {
     await clickVisibleButton(/保存|Save/);
     await $('[data-model-settings-scroll="true"]').waitForExist({ reverse: true });
     for (const presentation of [
-      { locale: "zh-CN", theme: "dark" },
+      { locale: "en-US", theme: "dark" },
       { locale: "en-US", theme: "light" },
     ]) {
       await setPresentation(presentation);

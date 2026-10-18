@@ -9,16 +9,15 @@ import { ConversationUserInputBubble } from "@/v4/ConversationUserInputBubble.js
 import "@/styles.css";
 
 const params = new URLSearchParams(location.search);
-const chinese = params.get("locale") === "zh-CN";
 document.documentElement.className =
   params.get("theme") === "light" ? "light theme-zai-light" : "dark theme-zai-dark";
-const text = chinese ? "北京今天天气如何？" : "What is the weather in Beijing today?";
+const text = "What is the weather in Beijing today?";
 const initial: BotTopicPreparation[] = [
   { messageId: "first", senderName: "莫汝舰", text, status: "preparing" },
   {
     messageId: "waiting",
     senderName: "Long sender name ".repeat(12),
-    text: (chinese ? "补充：请同时查看明天的天气。" : "Also check tomorrow's weather. ").repeat(32),
+    text: "Also check tomorrow's weather. ".repeat(32),
     status: "waitingStop",
   },
   { messageId: "empty", senderName: "Alice", text: "  ", status: "preparing" },
@@ -27,7 +26,7 @@ const initial: BotTopicPreparation[] = [
     senderName: "Bob",
     text: "file_" + "long".repeat(50),
     status: "failed",
-    error: chinese ? "附件下载失败，请重试。" : "Attachment download failed. Please retry.",
+    error: "Attachment download failed. Please retry.",
   },
 ];
 function Fixture() {
@@ -37,7 +36,7 @@ function Fixture() {
     ? ([{ kind: "userInput", botGroupSource: { messageId: "first" } }] as UserInputRow[])
     : [];
   return (
-    <ZCodeIntlProvider initialLocale={chinese ? "zh-CN" : "en-US"}>
+    <ZCodeIntlProvider initialLocale="en-US">
       <TooltipProvider>
         <main className="min-h-screen bg-background p-6 text-foreground @container/conversation">
           <div className="mx-auto flex max-w-3xl flex-col items-end" data-testid="formal">

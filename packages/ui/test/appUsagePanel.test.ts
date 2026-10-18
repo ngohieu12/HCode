@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -139,7 +140,7 @@ describe("AppUsageLifetimeSummaryStrip", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(AppUsageLifetimeSummaryStrip, {
           snapshot: createSnapshot(),
         }),
@@ -151,8 +152,8 @@ describe("AppUsageLifetimeSummaryStrip", () => {
     expect(html).toContain("最长聊天时长");
     expect(html).toContain("当前连续天数");
     expect(html).toContain("最长连续天数");
-    expect(html).toContain("206.5 亿");
-    expect(html).toContain("3.7 亿");
+    expect(html).toContain("20,7\u00a0T");
+    expect(html).toContain("370\u00a0Tr");
     expect(html).toContain("2 小时 15 分");
     expect(html).toContain("5 天");
     expect(html).toContain("34 天");
@@ -169,7 +170,11 @@ describe("AppUsageLifetimeSummaryStrip", () => {
       createElement(
         ServiceProvider,
         { services: createServices() },
-        createElement(ZCodeIntlProvider, { initialLocale: "zh-CN" }, createElement(AppUsagePanel)),
+        createElement(
+          ZCodeIntlProvider,
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
+          createElement(AppUsagePanel),
+        ),
       ),
     );
 
@@ -201,7 +206,11 @@ describe("AppUsageLifetimeSummaryStrip", () => {
       createElement(
         ServiceProvider,
         { services: createServices() },
-        createElement(ZCodeIntlProvider, { initialLocale: "zh-CN" }, createElement(AppUsagePanel)),
+        createElement(
+          ZCodeIntlProvider,
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
+          createElement(AppUsagePanel),
+        ),
       ),
     );
 

@@ -5,7 +5,7 @@ import {
   createWebRemoteControlRelayAuthStorageProvider,
 } from "../src/main/webRemoteControlRelayAuthStorageProvider.js";
 
-function createHarness(initialSettings: AppSettings = { recentProjects: [], locale: "zh-CN" }) {
+function createHarness(initialSettings: AppSettings = { recentProjects: [], locale: "en-US" }) {
   let settings = initialSettings;
   const credentials: Record<string, string | undefined> = {};
   const patches: Partial<AppSettings>[] = [];
@@ -59,7 +59,7 @@ describe("createWebRemoteControlRelayAuthStorageProvider", () => {
   it("clears partial persisted state and returns undefined", async () => {
     const { credentials, operations, patches, provider } = createHarness({
       recentProjects: [],
-      locale: "zh-CN",
+      locale: "en-US",
       webRemoteControlExternalRelayDevice: { deviceSid: "sid-1" },
     });
 
@@ -77,7 +77,7 @@ describe("createWebRemoteControlRelayAuthStorageProvider", () => {
   it("rotates by deleting old credential before saving new auth", async () => {
     const { credentials, operations, provider } = createHarness({
       recentProjects: [],
-      locale: "zh-CN",
+      locale: "en-US",
       webRemoteControlExternalRelayDevice: { deviceSid: "old-sid" },
     });
     credentials[WEB_REMOTE_CONTROL_EXTERNAL_RELAY_PASS_HASH_CREDENTIAL_KEY] = "old-hash";

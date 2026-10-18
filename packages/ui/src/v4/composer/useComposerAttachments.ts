@@ -168,7 +168,7 @@ export function isTransientAttachmentUploadError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   // video 超限错误必须在黑名单里，否则会触发一次无意义重试；按错误类型精确拦截，
   // 避免扩大 message 正则后改变 image 超限的既有判定。
-  return !/(?:payloadTooLarge|invalidBase64|invalidServerProgress|frameTooLarge|permission|EACCES|ENOENT|not found|unsupported|附件缺少|缺少可读取内容|远端附件未完成物化)/iu.test(
+  return !/(?:payloadTooLarge|invalidBase64|invalidServerProgress|frameTooLarge|permission|EACCES|ENOENT|not found|unsupported|attachment has no readable content|remote attachment was not materialized)/iu.test(
     message,
   );
 }
@@ -393,7 +393,7 @@ export function useComposerAttachments(
             },
           },
         );
-        if (!ref) throw new Error("附件缺少可读取内容");
+        if (!ref) throw new Error("Attachment has no readable content");
         if (controllersRef.current.get(controllerKey) !== controller) return;
         finishWithReady(targetScopeKey, attachmentId, ref, false);
       } catch (error) {
@@ -771,7 +771,8 @@ export function useComposerAttachments(
             text,
             filename: createClipboardTextAttachmentFilenameForDate(),
           });
-          if (!attachment) throw new Error("当前平台不支持临时文本附件");
+          if (!attachment)
+            throw new Error("Temporary text attachments are not supported on this platform");
           addPreparedAttachments([createClipboardTextPathComposerAttachment(text, attachment)]);
         } catch (error) {
           logger.warn("[v4-composer-attachments] 创建粘贴文本临时附件失败", error);

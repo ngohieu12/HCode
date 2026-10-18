@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import zh from "@/i18n/locales/zh-CN.js";
+import zh from "./fixtures/zhCNLegacy.js";
 import en from "@/i18n/locales/en-US.js";
 
 const expected = {

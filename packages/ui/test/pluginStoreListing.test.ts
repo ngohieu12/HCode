@@ -82,7 +82,7 @@ describe("pluginStoreListing", () => {
           name: "computer-use",
           listing: {
             displayName: "Computer Use",
-            displayNameI18n: { "zh-CN": "电脑控制" },
+            displayNameI18n: { "vi-VN": "Điều khiển máy tính" },
           },
         },
         "en-US",
@@ -94,12 +94,12 @@ describe("pluginStoreListing", () => {
           name: "computer-use",
           listing: {
             displayName: "Computer Use",
-            displayNameI18n: { "zh-CN": "电脑控制" },
+            displayNameI18n: { "vi-VN": "Điều khiển máy tính" },
           },
         },
-        "zh-CN",
+        "vi-VN",
       ),
-    ).toBe("电脑控制");
+    ).toBe("Điều khiển máy tính");
     expect(resolvePluginDisplayName({ name: "third-party-tool" }, "en-US")).toBe(
       "Third Party Tool",
     );
@@ -114,11 +114,11 @@ describe("pluginStoreListing", () => {
     );
   });
   it("resolves localized text with exact locale then language-prefix fallback", () => {
-    expect(resolveLocalizedText("zh-CN", "base", { "zh-CN": "精确" })).toBe("精确");
-    expect(resolveLocalizedText("zh-CN", "base", { zh: "前缀" })).toBe("前缀");
+    expect(resolveLocalizedText("vi-VN", "base", { "vi-VN": "chính xác" })).toBe("chính xác");
+    expect(resolveLocalizedText("vi-VN", "base", { vi: "tiền tố" })).toBe("tiền tố");
     expect(resolveLocalizedText("en-US", "base", { en: "english" })).toBe("english");
-    expect(resolveLocalizedText("en-US", "base", { "zh-CN": "中文" })).toBe("base");
-    expect(resolveLocalizedList("zh-CN", ["base"], { zh: ["列表"] })).toEqual(["列表"]);
+    expect(resolveLocalizedText("en-US", "base", { "vi-VN": "tiếng Việt" })).toBe("base");
+    expect(resolveLocalizedList("vi-VN", ["base"], { vi: ["danh sách"] })).toEqual(["danh sách"]);
     expect(resolveLocalizedList("en-US", undefined, undefined)).toBeUndefined();
   });
 
@@ -414,7 +414,7 @@ describe("pluginStoreListing", () => {
       "zebra-unknown",
       "other",
     ];
-    for (const locale of ["zh-CN", "en-US"]) {
+    for (const locale of ["vi-VN", "en-US"]) {
       expect(groupItemsByCategory(items, locale).map((group) => group.category)).toEqual(expected);
     }
   });
@@ -426,7 +426,7 @@ describe("pluginStoreListing", () => {
       availablePlugins: [
         makeSummary({
           id: "a@zcode-plugins-official",
-          listing: { displayName: "Alpha", displayNameI18n: { "zh-CN": "阿尔法" } },
+          listing: { displayName: "Alpha", displayNameI18n: { "vi-VN": "Alpha VN" } },
         }),
       ],
       installedPlugins: [],
@@ -434,7 +434,7 @@ describe("pluginStoreListing", () => {
       restorableBuiltins: [],
     });
     expect(item).toBeDefined();
-    expect(resolveItemDisplayName(item!, "zh-CN")).toBe("阿尔法");
+    expect(resolveItemDisplayName(item!, "vi-VN")).toBe("Alpha VN");
     expect(resolveItemDisplayName(item!, "en-US")).toBe("Alpha");
   });
 
@@ -594,7 +594,7 @@ describe("document plugin default order", () => {
       }),
     ),
   });
-  it.each(["en-US", "zh-CN"])(
+  it.each(["en-US", "vi-VN"])(
     "pins documents across installed and category views in %s",
     (locale) => {
       expect(

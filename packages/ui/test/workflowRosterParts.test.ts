@@ -3,6 +3,7 @@
 // 名册的两件小零件（docs/dynamic-workflow/presentation.md「Past six participants」、「一扇门与一卷名单」）：
 // 计数行只列非零项、每项 title 是整句；量条段序与段宽按计数、迷你版同一份 aria 文案。
 import { cleanup, render } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -14,9 +15,15 @@ afterEach(() => {
 
 function renderPart(
   element: ReturnType<typeof createElement>,
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
-  return render(createElement(ZCodeIntlProvider, { initialLocale: locale }, element));
+  return render(
+    createElement(
+      ZCodeIntlProvider,
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
+      element,
+    ),
+  );
 }
 
 describe("RosterTally", () => {
@@ -42,7 +49,7 @@ describe("RosterTally", () => {
   it("zh-CN：整句 title 本地化", () => {
     const view = renderPart(
       createElement(RosterTally, { counts: { done: 0, failed: 0, pending: 4, running: 0 } }),
-      "zh-CN",
+      "vi-VN",
     );
     const items = [
       ...view.getByTestId("workflow-roster-tally").querySelectorAll("[data-roster-count]"),
@@ -76,7 +83,7 @@ describe("RosterMeter", () => {
         counts: { done: 40, failed: 2, pending: 0, running: 6 },
         mini: true,
       }),
-      "zh-CN",
+      "vi-VN",
     );
     const meter = view.getByTestId("workflow-roster-meter-mini");
     expect(meter.className).toContain("w-11");

@@ -58,7 +58,7 @@ function Fixture() {
   );
 }
 createRoot(document.getElementById("root")!).render(
-  <ZCodeIntlProvider initialLocale={params.get("locale") === "en-US" ? "en-US" : "zh-CN"}>
+  <ZCodeIntlProvider initialLocale="en-US">
     <Fixture />
   </ZCodeIntlProvider>,
 );

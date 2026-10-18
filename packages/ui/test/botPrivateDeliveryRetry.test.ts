@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PrivateDeliveryRetry } from "@/BotsDialog/PrivateDeliveryRetry.js";
@@ -14,7 +15,7 @@ const show = () =>
   render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(PrivateDeliveryRetry, { botId: "bot", deliveryId: "failed-1" }),
     ),
   );

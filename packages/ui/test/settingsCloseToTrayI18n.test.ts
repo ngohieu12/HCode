@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 // Linux 关闭驻留托盘文案（spec：docs/desktop/linux-close-to-tray.md）。
 // 置灰描述必须说明"为什么不可用"，GNOME 追加扩展安装提示，避免用户把置灰当成 bug。

@@ -17,7 +17,7 @@ const surfaces = ["hello", "canvas"].map((id) => ({
   pluginName: id,
   title: {
     en: id === "hello" ? "Hello panel" : "Canvas",
-    "zh-CN": id === "hello" ? "Hello 面板" : "画布",
+    "en-US": id === "hello" ? "Hello 面板" : "画布",
   },
   server: `plugin:${id}:server`,
   resourceUri: `ui://${id}/panel.html`,
@@ -69,10 +69,7 @@ after(async () => {
   ]);
 });
 
-for (const [width, locale, theme] of [
-  [1200, "en-US", "light"],
-  [390, "zh-CN", "dark"],
-]) {
+for (const [width, locale, theme] of [[1200, "en-US", "light"]]) {
   test(`SPT-E2E-007 ${width}/${locale}/${theme}`, async () => {
     const page = await browser.newPage({ viewport: { width, height: 800 } });
     page.setDefaultTimeout(15000);
@@ -98,7 +95,7 @@ for (const [width, locale, theme] of [
         serverName: "plugin:hello:server",
         pluginId: "hello@example",
         resourceUri: "ui://hello/panel.html",
-        title: locale === "zh-CN" ? "Hello 面板" : "Hello panel",
+        title: "Hello panel",
         workspacePath: "/workspace/example",
         workspaceIdentity: "fixture-workspace",
         remoteSessionId: "fixture-remote-session",

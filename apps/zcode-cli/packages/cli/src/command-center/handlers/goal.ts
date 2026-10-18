@@ -1,22 +1,22 @@
-import type { TuiSubmitPromptResult } from "@zcode/tui";
+import type { CliSubmitPromptResult } from "../contracts.js";
 import { attachCurrentSessionMetadata } from "../metadata.js";
 import { buildTargetReplaceSelection } from "../selections.js";
 import type {
   CommandCenterApp,
   CommandCenterDeps,
   CommandCenterTarget,
-  TuiSubmitOptions,
+  CliSubmitOptions,
 } from "../types.js";
 import { splitArgs } from "../utils.js";
 
 const PLAN_MODE_GOAL_CONTINUATION_SKIPPED_MESSAGE =
-  "Plan mode 下已记录 goal，但不会自动继续。";
+  "The goal was recorded in Plan mode, but it will not continue automatically.";
 
 export async function handleTargetCommand(
   args: string,
   deps: CommandCenterDeps,
-  options: TuiSubmitOptions,
-): Promise<TuiSubmitPromptResult> {
+  options: CliSubmitOptions,
+): Promise<CliSubmitPromptResult> {
   const app = await deps.getApp();
   const trimmed = args.trim();
 
@@ -91,8 +91,8 @@ async function continueTargetAfterChange(
   target: CommandCenterTarget,
   app: CommandCenterApp,
   deps: CommandCenterDeps,
-  options: TuiSubmitOptions,
-): Promise<TuiSubmitPromptResult> {
+  options: CliSubmitOptions,
+): Promise<CliSubmitPromptResult> {
   if (!app.continueActiveTarget) {
     return {
       mode: deps.getMode?.(),

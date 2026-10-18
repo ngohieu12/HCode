@@ -287,7 +287,7 @@ describe("script workflow child runtime — actor transcript 直播通道", () =
    * 并因此漏过这个字段）时，这条用例会红。
    *
    * 三种取值都要断：父会话开着（run 只可能在开着的会话里启动）child 必须拿到全部工具；
-   * 父会话不参与灰度（TUI / headless）同理；父会话关着时 child 也关着，这在生产中不可达
+   * 父会话不参与灰度（headless）同理；父会话关着时 child 也关着，这在生产中不可达
    * （关着就没有 CreateWorkflow，起不了 run），断它只是为了证明继承没有方向性错误。
    */
   describe("script workflow child runtime — 灰度门整体继承父会话", () => {

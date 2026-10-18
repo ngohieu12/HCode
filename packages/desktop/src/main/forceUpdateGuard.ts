@@ -186,24 +186,13 @@ export function resolveForceUpdateDownloadUrl(
   endpointOrigin = DEFAULT_ZCODE_ENDPOINT_ORIGIN,
 ): string {
   const origin = buildZCodeEndpointUrls(endpointOrigin).origin;
-  return locale === "zh-CN" ? `${origin}/cn` : `${origin}/en`;
+  return `${origin}/en`;
 }
 
 export function formatForceUpdateDialogText(
   requirement: ForceUpdateRequirement,
-  locale: Locale,
+  _locale: Locale,
 ): ForceUpdateDialogText {
-  if (locale === "zh-CN") {
-    return {
-      title: "需要升级 HCode",
-      message: "当前版本无法继续使用",
-      detail: `当前版本：v${requirement.currentVersion}\n最低可用版本：v${requirement.minimalVersion}`,
-      autoUpdateButton: "自动升级",
-      manualUpdateButton: "手动升级",
-      quitButton: "退出",
-    };
-  }
-
   return {
     title: "Update HCode",
     message: "The current version can no longer be used",

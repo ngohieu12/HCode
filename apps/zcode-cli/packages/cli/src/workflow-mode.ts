@@ -1,5 +1,5 @@
 // 独立 CLI 的动态工作流 mode（docs/dynamic-workflow/launch.md「The standalone CLI: `--workflow-mode`」）。
-// TUI 与 headless 没有 Host 下发灰度 mode，由进程参数决定；缺省 disabled，即工作流在独立 CLI 里需显式开启。
+// headless CLI 没有 Host 下发灰度 mode，由进程参数决定；缺省 disabled，即工作流在独立 CLI 里需显式开启。
 // mode 只在这里折成 core 的两个显式字段，bootstrap / core 沿用协议服务端的同一套后果。
 import {
   DYNAMIC_WORKFLOW_MODES,
@@ -10,7 +10,7 @@ import {
 export const DEFAULT_CLI_WORKFLOW_MODE: DynamicWorkflowMode = "disabled";
 
 export const WORKFLOW_MODE_SCOPE_ERROR =
-  "--workflow-mode can only be used with --prompt, --target, or tui.";
+  "--workflow-mode can only be used with --prompt or --target.";
 
 export const WORKFLOW_DISABLED_NOTICE =
   "Dynamic workflows are disabled in this session. Restart with --workflow-mode onDemand or --workflow-mode alwaysOn to use them.";

@@ -4,7 +4,7 @@ import {
 } from "@zcode/adapters/browser";
 import type { GlobalOptions } from "@zcode/shared-types";
 import type { RunDependencies } from "./cli-types.js";
-import { loadCliPlaywrightChromium } from "./sea-playwright-runtime.js";
+import { loadCliPlaywrightChromium } from "./playwright-runtime.js";
 
 export function createCliHeadlessBrowserRuntime(
   options: Pick<GlobalOptions, "browserExecutable" | "browserUse">,

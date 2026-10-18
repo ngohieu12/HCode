@@ -142,7 +142,7 @@ function Fixture() {
 
 createRoot(document.getElementById("root")!).render(
   <ServiceProvider services={services}>
-    <ZCodeIntlProvider initialLocale={params.get("locale") === "zh-CN" ? "zh-CN" : "en-US"}>
+    <ZCodeIntlProvider initialLocale="en-US">
       <TooltipProvider>
         <Fixture />
       </TooltipProvider>

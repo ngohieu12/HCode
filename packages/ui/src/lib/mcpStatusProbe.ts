@@ -35,14 +35,11 @@ function isReachableHttpStatus(status: number): boolean {
   return status >= 200 && status < 500;
 }
 
-async function testUrlServer(
-  config: McpServerConfig,
-  startTime: number,
-): Promise<McpTestResult> {
+async function testUrlServer(config: McpServerConfig, startTime: number): Promise<McpTestResult> {
   if (!config.url) {
     return {
       success: false,
-      error: "URL 类型服务器缺少 url 配置",
+      error: "URL-type server is missing the url setting",
       response_time: Date.now() - startTime,
     };
   }
@@ -79,7 +76,7 @@ function testStdioServer(config: McpServerConfig, startTime: number): McpTestRes
   if (!config.command?.trim()) {
     return {
       success: false,
-      error: "stdio 类型服务器缺少 command 配置",
+      error: "stdio-type server is missing the command setting",
       response_time: Date.now() - startTime,
     };
   }

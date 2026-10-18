@@ -32,7 +32,7 @@ describe("desktop tray log export", () => {
     async (platform) => {
       const { createDesktopTray, updateWindowsDesktopTrayMenu } =
         await import("@desktop/main/desktopTray.js");
-      let locale: Locale = "zh-CN";
+      let locale: Locale = "en-US";
       const windowReady = Promise.withResolvers<void>();
       const showCurrentWindow = vi.fn(() => windowReady.promise);
       const executeDesktopCommand = vi.fn(async () => undefined);
@@ -46,8 +46,8 @@ describe("desktop tray log export", () => {
       });
 
       const labels = () => captured.template.map((item) => item.label).filter(Boolean);
-      expect(labels()).not.toContain("清除所有数据");
-      expect(labels().slice(-3)).toEqual(["关于 ZCode", "导出日志", "退出"]);
+      expect(labels()).not.toContain("Clear all data");
+      expect(labels().slice(-3)).toEqual(["About ZCode", "Export logs", "Quit"]);
       locale = "en-US";
       updateWindowsDesktopTrayMenu();
       expect(labels()).not.toContain("Clear all data");

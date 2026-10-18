@@ -33,22 +33,20 @@
 - 构建不更新清单，也不隐式运行许可校验；inventory 过期、待核验项或原生登记不匹配都不阻断开发和打包。
 - 声明文件和所需材料仍是打包输入；缺失、无法读取或无法解析时保留原始错误，不生成空声明。
 - 原生材料只在显式生成时 `{ verify: true }` 核验输入和原文。
-- `readVerifiedNotices(root, { requireComplete: true })` 目前只由显式检查使用；接入 SEA 发布与 SMB 上传前，必须先按本仓库依赖树重新生成声明并关闭已登记缺口，否则两条发布路径会立即失败。
+- `readVerifiedNotices(root, { requireComplete: true })` 目前只由显式检查使用；接入任何发布路径前，必须先按本仓库依赖树重新生成声明并关闭已登记缺口。
 
 ## 交付入口（本仓库已接入）
 
 | 产物 | 位置 | 接入点 |
 | --- | --- | --- |
 | Desktop | `Resources/THIRD-PARTY-NOTICES.md`、`Resources/licenses/electron/` | `electron-builder.config.js` 的 `extraResources` 与 `afterExtract` |
-| Web | 部署根目录 `THIRD-PARTY-NOTICES.md`，HTML `rel="license"` | `packages/web/vite.config.ts` 的 `thirdPartyNoticesVitePlugin` |
 | Server HTTP / remote bundle | `packages/server/dist/`、`dist/remote/` | `tsup.config.ts` 的 `onSuccess`、`build-remote.ts` |
 | CLI | `apps/zcode-cli/packages/cli/dist/THIRD-PARTY-NOTICES.md` | `scripts/build.mjs` |
-| 搜索工具 | 每个工具目录的 `THIRD-PARTY-NOTICES.txt`、`SOURCES.json`；SEA 内嵌同名资产 | `prepare-native-search-tools.mjs`、`sea-runtime-tool-assets.mjs` |
+| 搜索工具 | 每个工具目录的 `THIRD-PARTY-NOTICES.txt`、`SOURCES.json` | `prepare-native-search-tools.mjs`、`package-native-search-tools.mjs` |
 | 远端组件 | `server/`、`node-pty/<platform>/`、`glm/<platform>/` 的声明，`node/<platform>/LICENSE.node.txt` | `prepare-prebuilds.mjs`，在组件哈希计算前复制 |
 | 独立 Server 发行包 | `runtime/THIRD-PARTY-NOTICES.md`、`LICENSE.node.txt`、`NODE-SOURCES.json`、`licenses/{agent,official-plugins}/`、工具目录声明 | `stageCli.ts` 读取后显式传入 `stage.ts` |
-| 统一分发包 | `agent/THIRD-PARTY-NOTICES.md` | `scripts/build-zcode.mjs` |
 
-未接入：`zcode --licenses` 入口与 SEA 内嵌 Node 许可（SEA 基底 Node 版本随构建机浮动，`runtime/sources.json` 只登记固定版本）；producer 归档内嵌声明（会改变已固定 SHA-256 的归档字节）。
+未接入：`zcode --licenses` 入口；producer 归档内嵌声明（会改变已固定 SHA-256 的归档字节）。
 
 ## Electron 事件顺序
 

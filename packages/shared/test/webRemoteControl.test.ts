@@ -388,8 +388,8 @@ describe("parseWebRemoteControlAppPayload", () => {
           version: "1.7.0",
           name: "mobile-browser",
           userAgent: "Mozilla/5.0 Mobile Safari/604.1",
-          language: "zh-CN",
-          languages: ["zh-CN", "en-US"],
+          language: "en-US",
+          languages: ["en-US", "en-US"],
           browserPlatform: "iPhone",
           viewport: {
             width: 390,

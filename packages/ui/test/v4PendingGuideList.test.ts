@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { QueueItem } from "@zcode/shared/zcode-protocol-v4";
@@ -43,7 +44,7 @@ describe("ConversationPendingGuideList", () => {
     const markup = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(ConversationPendingGuideList, {
           context: {} as never,
           items: [guide],

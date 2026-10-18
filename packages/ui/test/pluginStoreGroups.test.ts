@@ -6,7 +6,7 @@ import { ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_ID } from "@zcode/shared";
 import type { PluginStoreActions } from "../src/settings/PluginStoreCard.js";
 import type { StorePluginItem } from "../src/settings/pluginStoreListing.js";
 
-const state = vi.hoisted(() => ({ locale: "zh-CN" }));
+const state = vi.hoisted(() => ({ locale: "vi-VN" }));
 vi.mock("@/hooks/useInterfaceMode.js", () => ({ useIsOfficeMode: () => false }));
 vi.mock("@/i18n/IntlProvider.js", () => ({
   useZCodeIntl: () => ({
@@ -27,7 +27,7 @@ afterEach(async () => {
   root = undefined;
 });
 
-describe.each(["zh-CN", "en-US"])("unified plugin groups in %s", (locale) => {
+describe.each(["vi-VN", "en-US"])("unified plugin groups in %s", (locale) => {
   it("shows official and personal plugins together and retains manual group toggles", async () => {
     state.locale = locale;
     const personalMarketplace = "my-market";

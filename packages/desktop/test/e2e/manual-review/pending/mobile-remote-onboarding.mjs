@@ -64,7 +64,7 @@ const collections = {
 // settings 故意没有 onboardingOccupation，确保通过来自真实记录 owner 的判定进入任务。
 for (const services of Object.values(collections)) {
   services.register(ISettingService, {
-    get: async () => ({ locale: "zh-CN" }),
+    get: async () => ({ locale: "en-US" }),
     update: async () => {},
   });
   services.register(IBroadcastService, broadcastService);
@@ -178,7 +178,7 @@ try {
         });
       const context = await browser.newContext({
         viewport: { width: 390, height: 844 },
-        locale: "zh-CN",
+        locale: "en-US",
       });
       const page = await context.newPage();
       const errors = [];

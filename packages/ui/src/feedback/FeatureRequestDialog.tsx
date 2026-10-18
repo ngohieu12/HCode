@@ -1,7 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { XIcon } from "lucide-react";
 import type { IFeedbackService } from "@zcode/services";
-import { toZhEnLocale } from "@zcode/shared";
 import { Button } from "@/components/ui/button.js";
 import {
   Dialog,
@@ -140,7 +139,7 @@ export const FeatureRequestDialog = memo(function FeatureRequestDialogComponent(
         ticketSeverity: "P3-低",
         ticketModule: "其它",
         modelContext: {},
-        locale: toZhEnLocale(locale),
+        locale: "en-US",
         copy,
         formatMessage: intl.formatMessage,
         onCompleted: (ticketId) => {

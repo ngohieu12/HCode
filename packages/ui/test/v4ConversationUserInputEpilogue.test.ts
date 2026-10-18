@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
@@ -39,11 +40,11 @@ function userInputRow(overrides: Partial<UserInputRow> = {}): UserInputRow {
   };
 }
 
-function element(row: UserInputRow, locale: "en-US" | "zh-CN" = "en-US") {
+function element(row: UserInputRow, locale: "en-US" | "vi-VN" = "en-US") {
   // 用户行的 MessageActions 挂着 Tooltip，需要 provider 在场（与真实宿主一致）。
   return createElement(
     ZCodeIntlProvider,
-    { initialLocale: locale },
+    { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
     createElement(TooltipProvider, null, createElement(ConversationRowView, { context, row })),
   );
 }
@@ -94,7 +95,7 @@ describe("ConversationRowView userInput epilogue fold", () => {
 
   it("localizes the fold label", () => {
     const html = renderToStaticMarkup(
-      element(userInputRow({ epilogueStart: ASK.length }), "zh-CN"),
+      element(userInputRow({ epilogueStart: ASK.length }), "vi-VN"),
     );
     expect(html).toContain("工作流引擎附加说明");
   });

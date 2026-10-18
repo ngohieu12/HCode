@@ -3,6 +3,7 @@
 // 完成卡（docs/dynamic-workflow/transcript-and-notifications.md）：表头 → 交付物行 + 产物索引 → 四格数字。纯展示层——
 // 预览由调用方交进来，这里只钉形态、布局随件数的变化、数字的诚实（`—` 不是 0）与门控。
 import { cleanup, fireEvent, render, within } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, type ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -25,7 +26,7 @@ import { formatWorkDuration, workDurationParts } from "@/lib/workDuration.js";
 // eslint-disable-next-line import/first -- 同上；词条只用于双语言存在性断言。
 import enUS from "../src/i18n/locales/en-US.js";
 // eslint-disable-next-line import/first -- 同上。
-import zhCN from "../src/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 afterEach(() => {
   cleanup();
@@ -47,7 +48,7 @@ const ARTIFACTS: WorkflowCompletionArtifact[] = [
 
 function renderCard(
   overrides: Partial<WorkflowCompletionCardProps> = {},
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ) {
   const props: WorkflowCompletionCardProps = {
     name: "deep-research",
@@ -59,7 +60,7 @@ function renderCard(
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowCompletionCard, props),
     ),
   );
@@ -122,7 +123,7 @@ describe("WorkflowCompletionCard · 形态", () => {
   });
 
   it("zh-CN：时长单位前留空格；四格标签与无障碍名双写", () => {
-    const view = renderCard({ figures: { durationMs: 708_000, tokens: 5 } }, "zh-CN");
+    const view = renderCard({ figures: { durationMs: 708_000, tokens: 5 } }, "vi-VN");
     expect(view.getByTestId("workflow-completion-figure-time").getAttribute("data-value")).toBe(
       "11 分 48 秒",
     );
@@ -344,7 +345,7 @@ describe("WorkflowCompletionCard · 交付物", () => {
     fireEvent.click(more);
     expect(onOpenRun).toHaveBeenCalledTimes(1);
     cleanup();
-    const zh = renderCard({ artifacts: [REPORT, ...others(7)], onOpenRun }, "zh-CN");
+    const zh = renderCard({ artifacts: [REPORT, ...others(7)], onOpenRun }, "vi-VN");
     expect(zh.getByTestId("workflow-completion-more").textContent).toBe("还有 2 个");
     cleanup();
     const truncated = renderCard({ artifacts: [REPORT, ...others(3)], artifactsTruncated: true });
@@ -388,8 +389,7 @@ describe("formatCompactCount / workDuration", () => {
       { value: 1, unit: "h" },
       { value: 2, unit: "m" },
     ]);
-    expect(formatWorkDuration(102_000, format, "en-US")).toBe("1m 42s");
-    expect(formatWorkDuration(102_000, format, "zh-CN")).toBe("1 m 42 s");
-    expect(formatWorkDuration(undefined, format, "en-US")).toBeNull();
+    expect(formatWorkDuration(102_000, format)).toBe("1m 42s");
+    expect(formatWorkDuration(undefined, format)).toBeNull();
   });
 });

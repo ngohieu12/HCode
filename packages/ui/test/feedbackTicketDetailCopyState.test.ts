@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import type { FeedbackTicketDetail } from "@zcode/shared";
 import type { IFeedbackService } from "@zcode/services";
 
@@ -50,7 +51,7 @@ describe("TicketDetailView issue copy state", () => {
     renderToStaticMarkup(
       React.createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         React.createElement(TicketDetailView, {
           ticket: createTicket("ticket-1"),
           feedbackService: {} as IFeedbackService,

@@ -1,4 +1,5 @@
 import { createElement, type ComponentType, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import {
@@ -137,7 +138,7 @@ function renderComposer(overrides: Record<string, unknown> = {}) {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(AnyConversationComposer, {
         draftMode: true,
         onSelectModel: vi.fn(),

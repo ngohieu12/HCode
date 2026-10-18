@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { act, cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createStore } from "zustand/vanilla";
@@ -85,7 +86,7 @@ function renderActivity(controller: MarketingTouchController, noticeStore: Globa
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(
         MarketingTouchContext.Provider,
         { value: controller },

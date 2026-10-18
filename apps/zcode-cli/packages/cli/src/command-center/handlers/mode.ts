@@ -1,4 +1,4 @@
-import type { TuiSubmitPromptResult } from "@zcode/tui";
+import type { CliSubmitPromptResult } from "../contracts.js";
 import {
   formatAvailableCommandCenterModes,
   isSwitchableCommandCenterMode,
@@ -8,7 +8,7 @@ import type { CommandCenterDeps } from "../types.js";
 export async function handleModeCommand(
   args: string,
   deps: CommandCenterDeps,
-): Promise<TuiSubmitPromptResult> {
+): Promise<CliSubmitPromptResult> {
   const current = deps.getMode?.() ?? "build";
   if (args.length === 0) {
     return {

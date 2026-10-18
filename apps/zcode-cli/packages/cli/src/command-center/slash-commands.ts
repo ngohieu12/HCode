@@ -1,5 +1,5 @@
 import type { DynamicWorkflowMode } from "@zcode/shared";
-import type { TuiSlashCommandSuggestion } from "@zcode/tui";
+import type { CliSlashCommandSuggestion } from "./contracts.js";
 import {
   findCustomCommandHelpEntry,
   formatAvailableCommandNames,
@@ -272,7 +272,7 @@ export function manualSkillCommandUsage(): string {
 export function listSlashCommandSuggestions(
   customCommands?: CommandCenterCustomCommandListOutcome,
   options?: SlashCommandSurfaceOptions,
-): TuiSlashCommandSuggestion[] {
+): CliSlashCommandSuggestion[] {
   return [
     ...visibleHelpEntries(options).map((entry) => ({
       ...(entry.aliases ? { aliases: entry.aliases } : {}),

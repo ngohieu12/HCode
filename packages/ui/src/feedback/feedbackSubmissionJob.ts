@@ -87,28 +87,29 @@ export interface StartFeedbackSubmissionJobOptions {
 type LogUploadAction = "continue";
 
 const DEFAULT_SUBMISSION_COPY: FeedbackSubmissionCopy = {
-  connectingLabel: "正在连接反馈服务",
-  connectingDetail: "创建成功后会继续上传截图和日志",
-  cancelingCreateLabel: "正在取消提交",
-  cancelingCreateDetail: "已收到取消请求，正在停止创建反馈。",
-  canceledLabel: "反馈提交已取消",
-  canceledDetail: "反馈提交已取消",
-  uploadingScreenshotLabel: "正在上传截图",
-  submittedLabel: "反馈已提交",
-  submittedDetail: "我们会尽快处理。",
-  failedLabel: "反馈提交失败",
-  networkErrorDetail: "无法连接反馈服务，请检查网络、VPN 或代理设置后重试。",
+  connectingLabel: "Connecting to the feedback service",
+  connectingDetail: "Screenshots and logs keep uploading once the ticket is created",
+  cancelingCreateLabel: "Cancelling the submission",
+  cancelingCreateDetail: "Cancel received; stopping the feedback creation.",
+  canceledLabel: "Feedback submission cancelled",
+  canceledDetail: "Feedback submission cancelled",
+  uploadingScreenshotLabel: "Uploading screenshots",
+  submittedLabel: "Feedback submitted",
+  submittedDetail: "We will get to it as soon as possible.",
+  failedLabel: "Feedback submission failed",
+  networkErrorDetail:
+    "Could not reach the feedback service. Check your network, VPN, or proxy settings and try again.",
   postCreateNetworkErrorDetail:
-    "反馈已创建，但后续材料上传失败。请打开已创建的反馈补充材料，不要重复提交。",
-  pausingLogLabel: "正在暂停日志上传",
-  pausingLogDetail: "已收到取消请求，稍等一下。",
-  exportingLogLabel: "正在导出完整日志",
-  exportingLogDetail: "会根据本机日志大小耗时数秒",
-  uploadingLogLabel: "正在上传完整日志",
-  logUploadSuccessLabel: "日志上传成功",
-  logUploadPausedLabel: "已暂停日志上传",
-  logUploadPausedDetail: "日志是定位问题的必需材料，请继续上传。",
-  preparingUploadDetail: "准备上传",
+    "The feedback was created, but the follow-up uploads failed. Open the created feedback to add the material instead of submitting again.",
+  pausingLogLabel: "Pausing the log upload",
+  pausingLogDetail: "Cancel received, one moment.",
+  exportingLogLabel: "Exporting the full log",
+  exportingLogDetail: "This takes a few seconds, depending on the local log size",
+  uploadingLogLabel: "Uploading the full log",
+  logUploadSuccessLabel: "Log uploaded",
+  logUploadPausedLabel: "Log upload paused",
+  logUploadPausedDetail: "The log is required to diagnose the issue; keep uploading it.",
+  preparingUploadDetail: "Preparing the upload",
 };
 
 let nextJobSeq = 0;
@@ -277,7 +278,10 @@ export function startFeedbackSubmissionJob(
 
       if (failedScreenshots.length > 0) {
         await options.feedbackService
-          .comment(ticket.id, `系统提示：部分截图上传失败：${failedScreenshots.join("；")}`)
+          .comment(
+            ticket.id,
+            `System notice: some screenshots failed to upload: ${failedScreenshots.join("; ")}`,
+          )
           .catch(() => undefined);
       }
 
@@ -533,7 +537,7 @@ async function uploadLogsUntilComplete(
     await feedbackService
       .comment(
         ticketId,
-        `系统提示：完整日志自动上传失败，请必要时让用户手动导出日志。错误：${message}`,
+        `System notice: the full log could not be uploaded automatically; export it manually if needed. Error: ${message}`,
       )
       .catch(() => undefined);
     // 日志上传是提交链路的一部分，非用户主动跳过时不能吞掉异常继续显示“提交成功”。

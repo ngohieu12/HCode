@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { createElement, type ReactElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { cleanup, render, screen } from "@testing-library/react";
 import type { Locale } from "@zcode/shared";
@@ -32,11 +33,11 @@ function createGroup(key: string): ModelSelectGroup {
   };
 }
 
-function renderWithTooltipProvider(element: ReactElement, locale: Locale = "zh-CN") {
+function renderWithTooltipProvider(element: ReactElement, locale: Locale = "vi-VN") {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(TooltipProvider, null, element),
     ),
   );
@@ -46,7 +47,7 @@ function renderInteractive(element: ReactElement, locale: Locale) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(TooltipProvider, null, element),
     ),
   );
@@ -152,7 +153,7 @@ describe("ModelConfigSelect badge style", () => {
   });
 
   it.each([
-    ["zh-CN", "视觉"],
+    ["vi-VN", "视觉"],
     ["en-US", "Vision"],
   ] as const)("模型项在模型名后展示 %s 视觉标签并保留行尾选中区", (locale, label) => {
     renderInteractive(

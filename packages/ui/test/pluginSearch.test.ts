@@ -12,12 +12,12 @@ describe("plugin name pinyin search", () => {
     orphaned: false,
     listing: {
       displayName: "Lark CLI",
-      displayNameI18n: { "zh-CN": "飞书 CLI" },
-      descriptionI18n: { "zh-CN": "文档协作" },
+      displayNameI18n: { "vi-VN": "飞书 CLI" },
+      descriptionI18n: { "vi-VN": "文档协作" },
     },
   };
   const items = new Map([[item.id, item]]);
-  for (const locale of ["zh-CN", "en-US"]) {
+  for (const locale of ["vi-VN", "en-US"]) {
     it(`matches Chinese names by full pinyin and initials in ${locale}`, () => {
       for (const query of ["feishu", " FEI SHU ", "fs", "飞书", "LARK", "official"]) {
         expect(storeItemMatches(item, query, locale), query).toBe(true);
@@ -27,15 +27,15 @@ describe("plugin name pinyin search", () => {
   }
   it("does not add fuzzy typos, description initials, or cross-market aliases", () => {
     for (const query of ["feisuh", "wdxz", "nonesuch"])
-      expect(storeItemMatches(item, query, "zh-CN")).toBe(false);
+      expect(storeItemMatches(item, query, "vi-VN")).toBe(false);
     const other = { ...plugin, id: "lark@other", marketplace: "other" };
-    expect(filterPluginsByQuery([other], "fs", items, "zh-CN")).toEqual([]);
+    expect(filterPluginsByQuery([other], "fs", items, "vi-VN")).toEqual([]);
     expect(
       filterPluginsByQuery(
         [plugin],
         "fs",
         new Map([[plugin.id, { ...item, id: other.id }]]),
-        "zh-CN",
+        "vi-VN",
       ),
     ).toEqual([]);
   });

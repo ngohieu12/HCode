@@ -56,7 +56,7 @@ after(async () => {
 
 for (const width of [390, 1200]) {
   for (const theme of ["light", "dark"]) {
-    for (const locale of ["zh-CN", "en-US"]) {
+    for (const locale of ["en-US"]) {
       test(`TL-01/02 ${width}/${theme}/${locale}`, async () => {
         const page = await browser.newPage({
           viewport: { width, height: 850 },
@@ -74,34 +74,19 @@ for (const width of [390, 1200]) {
           );
           assert.equal(await page.getByTestId("value").textContent(), value);
         };
-        const label =
-          locale === "zh-CN"
-            ? [
-                "关闭",
-                "极低",
-                "低",
-                "中",
-                "高",
-                "极高",
-                "最高",
-                "极致",
-                "极高",
-                "极高",
-                "Provider default",
-              ]
-            : [
-                "Off",
-                "Minimal",
-                "Low",
-                "Medium",
-                "High",
-                "Extra high",
-                "Max",
-                "Ultra",
-                "Extra high",
-                "Extra high",
-                "Provider default",
-              ];
+        const label = [
+          "Off",
+          "Minimal",
+          "Low",
+          "Medium",
+          "High",
+          "Extra high",
+          "Max",
+          "Ultra",
+          "Extra high",
+          "Extra high",
+          "Provider default",
+        ];
         try {
           await page.goto(`${origin}fixture?${new URLSearchParams({ theme, locale })}`);
           const trigger = page.getByTestId("select").getByRole("combobox");

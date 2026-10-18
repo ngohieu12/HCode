@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type {
@@ -37,7 +38,7 @@ describe("InstalledPluginDetailPanel", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(InstalledPluginDetailPanel, {
           getPluginOptionValue: (
             _plugin: ZCodePluginInfo,
@@ -89,7 +90,7 @@ describe("InstalledPluginDetailPanel", () => {
       const html = renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(InstalledPluginDetailPanel, {
             getPluginOptionValue: (
               _plugin: ZCodePluginInfo,
@@ -137,7 +138,7 @@ describe("InstalledPluginDetailPanel", () => {
       renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(InstalledPluginDetailPanel, {
             diagnostics,
             getPluginOptionValue: (
@@ -206,7 +207,7 @@ describe("InstalledPluginDetailPanel", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(InstalledPluginDetailPanel, {
           getPluginOptionValue: (
             _plugin: ZCodePluginInfo,

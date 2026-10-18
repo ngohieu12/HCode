@@ -239,8 +239,8 @@ describe("Client Scenes automation template catalog", () => {
     };
     const formatMessage = ({ id }: { id: string }) => messages[id as keyof typeof messages] ?? id;
 
-    expect(resolveOffPeakTemplateText(customize, "title", "zh-CN", formatMessage)).toBe("自定义");
-    expect(resolveOffPeakTemplateText(customize, "description", "zh-CN", formatMessage)).toBe(
+    expect(resolveOffPeakTemplateText(customize, "title", "en-US", formatMessage)).toBe("自定义");
+    expect(resolveOffPeakTemplateText(customize, "description", "en-US", formatMessage)).toBe(
       "跳过模板，直接告诉它你想做什么。",
     );
     expect(customize.title).toEqual({});
@@ -249,8 +249,8 @@ describe("Client Scenes automation template catalog", () => {
 
   it("materializes current-locale primitives that are independent from later catalog refreshes", () => {
     const first = mapClientScenesToAutomationTemplates(createScenes(), () => true);
-    const scheduledDraft = materializeScheduledTemplateDraft(first.scheduled[0]!, "zh-CN");
-    const offPeakDraft = materializeOffPeakTemplateDraft(first.offPeak[0]!, "zh-CN");
+    const scheduledDraft = materializeScheduledTemplateDraft(first.scheduled[0]!, "en-US");
+    const offPeakDraft = materializeOffPeakTemplateDraft(first.offPeak[0]!, "en-US");
 
     const refreshedScenes = createScenes();
     refreshedScenes[0]!.options.prompts!.items![0]!.labels.cn = "后台刷新标题";
@@ -271,8 +271,8 @@ describe("Client Scenes automation template catalog", () => {
   });
 
   it("resolves the active locale with a deterministic opposite-language fallback", () => {
-    expect(resolveAutomationTemplateText({ cn: "中文", en: "English" }, "zh-CN")).toBe("中文");
-    expect(resolveAutomationTemplateText({ en: "English" }, "zh-CN")).toBe("English");
-    expect(resolveAutomationTemplateText({ cn: "中文" }, "en-US")).toBe("中文");
+    expect(resolveAutomationTemplateText({ cn: "中文", en: "English" }, "en-US")).toBe("English");
+    expect(resolveAutomationTemplateText({ en: "English" }, "en-US")).toBe("English");
+    expect(resolveAutomationTemplateText({ cn: "中文" }, "en-US")).toBe("");
   });
 });

@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ConversationRow, UserInputRow } from "@zcode/shared/zcode-protocol-v4";
@@ -111,7 +112,7 @@ describe("authoritative conversation row actions", () => {
       renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationTurnGroup, {
             unit,
             context,
@@ -145,7 +146,7 @@ describe("authoritative conversation row actions", () => {
       renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationTurnGroup, {
             unit,
             context,

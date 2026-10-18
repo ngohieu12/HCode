@@ -376,8 +376,8 @@ function notifyForceAutoUpdate(state: ForceAutoUpdateState) {
 }
 
 function getForceAutoUpdateNoUpdateMessage(): string {
-  return menuLocale === "zh-CN"
-    ? "未找到可安装更新，请使用手动升级。"
+  return menuLocale === "vi-VN"
+    ? "Không tìm thấy bản cập nhật có thể cài đặt. Hãy cập nhật thủ công."
     : "No installable update was found. Use manual update instead.";
 }
 
@@ -661,7 +661,7 @@ function normalizeLocalizedReleaseNotes(
     return undefined;
   }
 
-  for (const locale of ["zh-CN", "en-US"] as const) {
+  for (const locale of ["en-US", "vi-VN"] as const) {
     const entry = releaseNotesByLocale[locale];
     if (!entry) {
       continue;
@@ -806,12 +806,7 @@ function applyManifestUpdateProvider(options: InitAutoUpdaterOptions): void {
 function pickFallbackReleaseNotesMarkdown(
   localized: PostUpdateReleaseNotesPayload["releaseNotesByLocale"] | undefined,
 ): string | null {
-  return (
-    localized?.[menuLocale]?.markdown ??
-    localized?.["zh-CN"]?.markdown ??
-    localized?.["en-US"]?.markdown ??
-    null
-  );
+  return localized?.[menuLocale]?.markdown ?? localized?.["en-US"]?.markdown ?? null;
 }
 
 function normalizeReleaseDate(

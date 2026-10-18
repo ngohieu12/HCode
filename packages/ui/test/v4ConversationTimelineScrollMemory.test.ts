@@ -1,4 +1,5 @@
 import { act, createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TID_V4_TIMELINE, TID_V4_TIMELINE_BOTTOM } from "@zcode/shared";
@@ -313,7 +314,7 @@ function renderTimeline(
   root.render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(ConversationTimeline, {
         canLoadOlder: options.canLoadOlder,
         onLoadOlder: options.onLoadOlder,

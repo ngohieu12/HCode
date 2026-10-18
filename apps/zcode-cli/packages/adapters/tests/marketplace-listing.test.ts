@@ -38,9 +38,9 @@ describe("marketplace store listing", () => {
           {
             name: "example-plugin",
             description: "A minimal template plugin",
-            description_i18n: { "zh-CN": "一个最小模板插件" },
+            description_i18n: { "en-US": "一个最小模板插件" },
             displayName: "Example Plugin",
-            displayName_i18n: { "zh-CN": "示例插件" },
+            displayName_i18n: { "en-US": "示例插件" },
             version: "0.1.1",
             author: { name: "Z.ai", url: "https://z.ai" },
             category: "template",
@@ -50,7 +50,7 @@ describe("marketplace store listing", () => {
             termsOfService: "https://z.ai/terms",
             heroImage: "https://cdn-zcode.z.ai/hero/example.png",
             examplePrompts: ["Try the example"],
-            examplePrompts_i18n: { "zh-CN": ["试试这个示例"] },
+            examplePrompts_i18n: { "en-US": ["试试这个示例"] },
             requiresPaidPlan: true,
             source: {
               source: "url",
@@ -82,8 +82,8 @@ describe("marketplace store listing", () => {
     const example = manifest?.plugins.find((entry) => entry.name === "example-plugin");
     expect(example?.listing).toEqual({
       displayName: "Example Plugin",
-      displayNameI18n: { "zh-CN": "示例插件" },
-      descriptionI18n: { "zh-CN": "一个最小模板插件" },
+      displayNameI18n: { "en-US": "示例插件" },
+      descriptionI18n: { "en-US": "一个最小模板插件" },
       icon: "https://cdn-zcode.z.ai/icons/example.png",
       category: "template",
       author: "Z.ai",
@@ -93,7 +93,7 @@ describe("marketplace store listing", () => {
       termsOfService: "https://z.ai/terms",
       heroImage: "https://cdn-zcode.z.ai/hero/example.png",
       examplePrompts: ["Try the example"],
-      examplePromptsI18n: { "zh-CN": ["试试这个示例"] },
+      examplePromptsI18n: { "en-US": ["试试这个示例"] },
       requiresPaidPlan: true,
     });
 

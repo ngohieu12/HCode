@@ -32,7 +32,7 @@ function Fixture() {
   const [updated, setUpdated] = useState("");
   const [opened, setOpened] = useState("");
   return (
-    <ZCodeIntlProvider initialLocale={params.get("locale") === "zh-CN" ? "zh-CN" : "en-US"}>
+    <ZCodeIntlProvider initialLocale="en-US">
       <TooltipProvider>
         <main className="min-h-screen bg-background p-4 text-foreground">
           <PluginStoreListView

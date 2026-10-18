@@ -93,7 +93,7 @@ describe("EmbeddedBrowserJavaScriptDialogController", () => {
     );
     const controller = new EmbeddedBrowserJavaScriptDialogController({
       iconPath: "/app/icon.png",
-      getLocale: () => "zh-CN",
+      getLocale: () => "en-US",
       logger: { warn: vi.fn() },
     });
     controller.bindGuest("browser:user-tab", 42, 17);

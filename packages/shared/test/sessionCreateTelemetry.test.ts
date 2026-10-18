@@ -16,7 +16,7 @@ describe("session_create 手机合同", () => {
     messageId: "first-command",
     context: {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "390x844",
     },
     eventExtraDetail: {

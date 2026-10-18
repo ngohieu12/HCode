@@ -1,45 +1,32 @@
 import { z } from "zod";
 
-import type { Locale } from "./protocol.js";
 import {
   conversationArtifactTypeSchema,
   conversationRowSchema,
   type ConversationRow,
 } from "./zcode-protocol-v4/rows.js";
 
-/**
- * 分享站按语言分路径：中文站带 /cn 前缀，英文站是裸 /share。
- * web 路由、发布回链改写、导入回链共用这一份定义，避免三处各写一遍前缀。
- */
-const CONVERSATION_SHARE_LOCALE_PATH_PREFIX: Readonly<Record<Locale, string>> = {
-  "zh-CN": "/cn",
-  "en-US": "",
-  // 越南语界面使用英文分享站，不单独建站。
-  "vi-VN": "",
-};
-
 const CONVERSATION_SHARE_PATHNAME_RE = /^\/(cn\/)?share\/([^/]+)\/?$/u;
 
 /**
- * 解析分享页 pathname，返回未解码的 code 段与该路径对应的语言。
- * 只认 `/share/<code>` 与 `/cn/share/<code>` 两种形状；调用方负责 code 的解码与安全校验。
+ * 解析分享页 pathname，返回未解码的 code 段。
+ * 只认 `/share/<code>` 与旧版 `/cn/share/<code>` 两种形状；中文站已下线，
+ * `/cn` 前缀仅用于继续打开存量链接。调用方负责 code 的解码与安全校验。
  */
-export function parseConversationSharePathname(
-  pathname: string,
-): { rawCode: string; locale: Locale } | null {
+export function parseConversationSharePathname(pathname: string): { rawCode: string } | null {
   const match = CONVERSATION_SHARE_PATHNAME_RE.exec(pathname);
   if (!match) return null;
-  return { rawCode: match[2]!, locale: match[1] ? "zh-CN" : "en-US" };
+  return { rawCode: match[2]! };
 }
 
 /**
- * 把分享链接改写到目标语言站点。
+ * 把分享链接改写为当前分享站路径。
  *
  * 只在 pathname 精确匹配已知分享形状时改写，且只替换语言前缀、不碰 code 段
  * （避免 decode/encode 往返改变 code）。其它任何形状原样返回 —— 服务端将来若改用
  * 别的 URL 形状或独立域名，这里会安静地不作为，而不是改错。
  */
-export function localizeConversationShareUrl(shareUrl: string, locale: Locale): string {
+export function localizeConversationShareUrl(shareUrl: string): string {
   let url: URL;
   try {
     url = new URL(shareUrl);
@@ -48,7 +35,7 @@ export function localizeConversationShareUrl(shareUrl: string, locale: Locale): 
   }
   const parsed = parseConversationSharePathname(url.pathname);
   if (!parsed) return shareUrl;
-  url.pathname = `${CONVERSATION_SHARE_LOCALE_PATH_PREFIX[locale]}/share/${parsed.rawCode}`;
+  url.pathname = `/share/${parsed.rawCode}`;
   return url.toString();
 }
 

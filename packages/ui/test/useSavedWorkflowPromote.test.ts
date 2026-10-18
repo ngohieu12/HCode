@@ -31,7 +31,7 @@ const agentService = {} as never;
 const REQUEST = {
   name: "release-check",
   path: "/beta/.zcode/workflows/release-check.dwf.ts",
-  locale: "zh-CN",
+  locale: "vi-VN",
 };
 
 afterEach(() => {

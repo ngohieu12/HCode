@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { TID_V4_USER_INPUT_DIALOG } from "@zcode/shared";
@@ -105,7 +106,7 @@ describe("V4InteractionDialogs", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(V4InteractionDialogs, {
           sessionId: "sess-1",
           workspacePath: "/workspace",
@@ -176,7 +177,7 @@ describe("V4InteractionDialogs", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(V4InteractionDialogs, {
           sessionId: "sess-1",
           workspacePath: "/workspace",
@@ -224,7 +225,7 @@ describe("V4InteractionDialogs", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(V4InteractionDialogs, {
           sessionId: "sess-1",
           workspacePath: "/workspace",

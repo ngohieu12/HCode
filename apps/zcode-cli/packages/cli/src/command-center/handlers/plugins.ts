@@ -1,4 +1,4 @@
-import type { TuiSelection, TuiSubmitPromptResult } from "@zcode/tui";
+import type { CliSelection, CliSubmitPromptResult } from "../contracts.js";
 import { resolvePluginDisplayName } from "@zcode/shared";
 import type {
   CommandCenterDeps,
@@ -15,7 +15,7 @@ const DISABLED_MARK = "○";
 export async function handlePluginsCommand(
   args: string,
   deps: CommandCenterDeps,
-): Promise<TuiSubmitPromptResult> {
+): Promise<CliSubmitPromptResult> {
   const app = await deps.getApp();
   const tokens = splitArgs(args);
   const action = tokens[0] ?? "list";
@@ -78,7 +78,7 @@ async function handlePluginsUninstall(
   tokens: string[],
   deps: CommandCenterDeps,
   app: Awaited<ReturnType<CommandCenterDeps["getApp"]>>,
-): Promise<TuiSubmitPromptResult> {
+): Promise<CliSubmitPromptResult> {
   const rest = tokens.slice(1);
   const force = rest.includes("--force") || rest.includes("-f");
   const plugin = rest.find((token) => token !== "--force" && token !== "-f");
@@ -128,7 +128,7 @@ async function handlePluginsUninstall(
   }
 }
 
-function unavailable(deps: CommandCenterDeps): TuiSubmitPromptResult {
+function unavailable(deps: CommandCenterDeps): CliSubmitPromptResult {
   return {
     mode: deps.getMode?.(),
     response: "Plugin management is not available in this client.",
@@ -139,7 +139,7 @@ function buildPluginsSelection(
   outcome: CommandCenterPluginListOutcome,
   selectedPluginId?: string,
   locale = "en-US",
-): TuiSelection {
+): CliSelection {
   const plugins = [...outcome.plugins].sort((left, right) => left.id.localeCompare(right.id));
   return {
     emptyMessage: "No plugins found.",

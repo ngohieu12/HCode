@@ -52,18 +52,11 @@ describe("conversation selection guard", () => {
       resolve(process.cwd(), "packages/ui/src/v4/SelectionActionMenu.tsx"),
       "utf8",
     );
-    const zh = readFileSync(
-      resolve(process.cwd(), "packages/ui/src/i18n/locales/zh-CN.ts"),
-      "utf8",
-    );
-
     expect(source).toContain("rounded-lg");
     expect(source).toContain("text-ui-sm");
     expect(source).toContain("shadow-md");
     expect(source).toContain("px-2.5 py-1.5");
     expect(source).not.toContain("range.cloneContents().querySelector");
     expect(source).not.toContain("rounded-xl");
-    expect(zh).toContain('"sidePane.selectionChat": "辅助对话"');
-    expect(zh).toContain('"chat.selections.askInSideChat": "在辅助对话中提问"');
   });
 });

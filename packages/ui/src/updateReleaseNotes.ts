@@ -18,12 +18,7 @@ export function getLocalizedUpdateReleaseNotes(
     markdown: payload.markdown,
   };
 
-  return (
-    payload.releaseNotesByLocale?.[locale] ??
-    (locale === "zh-CN"
-      ? defaultReleaseNotes
-      : (payload.releaseNotesByLocale?.["zh-CN"] ?? defaultReleaseNotes))
-  );
+  return payload.releaseNotesByLocale?.[locale] ?? defaultReleaseNotes;
 }
 
 export function formatUpdateReleaseDate(

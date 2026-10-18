@@ -53,11 +53,11 @@ export function createCommandEnvelope<T extends CommandType>(
 ): CommandEnvelope {
   if (COMMANDS_REQUIRING_BASE_REVISION.has(input.type) && input.baseRevision === undefined) {
     throw new Error(
-      `command ${input.type} 是 CAS 命令，必须携带 baseRevision（10-protocol-spec §6.4）`,
+      `command ${input.type} is a CAS command and requires baseRevision (10-protocol-spec §6.4)`,
     );
   }
   if (ROW_TARGETING_COMMANDS.has(input.type) && !input.baseLogEpoch) {
-    throw new Error(`command ${input.type} 是 row target 命令，必须携带 baseLogEpoch`);
+    throw new Error(`command ${input.type} is a row-target command and requires baseLogEpoch`);
   }
   return {
     commandId: uuidv7(),

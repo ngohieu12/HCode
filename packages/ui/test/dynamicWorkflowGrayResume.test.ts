@@ -5,6 +5,7 @@
 // 「回调在不在场」作为按钮门控，所以这里按真实的门（resolveWorkflowResumeHandler）算出回调，
 // 再把两处真的渲染出来看按钮在不在——而不是各自复述一遍规则。
 import { readFileSync } from "node:fs";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { resolve } from "node:path";
 import { cleanup, render } from "@testing-library/react";
 import { createElement, type ReactNode } from "react";
@@ -87,7 +88,7 @@ function renderCard(
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(CreateWorkflowToolCallBlock, {
         toolCallNode: {
           toolCall: {
@@ -131,7 +132,7 @@ function renderDigest(onResume: (() => void) | undefined) {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(WorkflowRunDigest, {
         graph: GRAPH as unknown as WorkflowRunDigestProps["graph"],
         name: "implement-verify",

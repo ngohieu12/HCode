@@ -5,8 +5,8 @@
 ## 设计与平台
 
 - 修改界面前读 [DESIGN.md](../../DESIGN.md)，遵守颜色、层级、尺寸、字体、圆角、组件复用、响应式、主题与国际化规则。插件商店另读 [CONTEXT.md](../../CONTEXT.md)。
-- 同时检查桌面和手机 Web；视觉验证使用 DESIGN 定义的当前深浅主题，并考虑不同语言长度。
-- 平台操作通过 `usePlatform()` / `IPlatformService`，不直接调用 `window.zcode`。平台实现通过注入隔离：Desktop 入口见 [desktopPlatform.ts](../desktop/src/renderer/src/desktopPlatform.ts)，Web 入口见 [main.tsx](../web/src/main.tsx)。
+- 同时检查桌面窗口与手机远程控制页面；视觉验证使用 DESIGN 定义的当前深浅主题，并考虑不同语言长度。
+- 平台操作通过 `usePlatform()` / `IPlatformService`，不直接调用 `window.zcode`。平台实现通过注入隔离，Desktop 入口见 [desktopPlatform.ts](../desktop/src/renderer/src/desktopPlatform.ts)。
 
 ## 服务与状态
 

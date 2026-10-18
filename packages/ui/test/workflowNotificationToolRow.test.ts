@@ -4,6 +4,7 @@
 // 照 workflowEscalationToolCards 用 createElement + renderToStaticMarkup；展开态经 forceOpen
 // 透传给 ToolLayout（ToolLayout 自管开合，静态渲染默认折叠，forceOpen 才把展开体渲进 DOM）。
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -25,12 +26,12 @@ import {
 function render(
   props: Partial<WorkflowNotificationToolRowProps> &
     Pick<WorkflowNotificationToolRowProps, "notification">,
-  locale: "en-US" | "zh-CN" = "en-US",
+  locale: "en-US" | "vi-VN" = "en-US",
 ): string {
   return renderToStaticMarkup(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowNotificationToolRow, {
         runName: "flaky-test-triage",
         testIdKey: "turn-1:1",

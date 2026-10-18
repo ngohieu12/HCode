@@ -23,19 +23,19 @@ function formatExpected(
 
 describe("formatMessageTimeLabel", () => {
   const now = new Date(2026, 6, 13, 12, 0).getTime();
-  const zhIntl = createIntl("昨天");
+  const viIntl = createIntl("Hôm qua");
   const enIntl = createIntl("Yesterday");
 
   it("当天只显示本地时分", () => {
     const timestamp = new Date(2026, 6, 13, 7, 15).getTime();
 
-    expect(formatMessageTimeLabel(timestamp, "zh-CN", zhIntl, now)).toBe(
-      formatExpected("zh-CN", timestamp, { hour: "2-digit", minute: "2-digit" }),
+    expect(formatMessageTimeLabel(timestamp, "vi-VN", viIntl, now)).toBe(
+      formatExpected("vi-VN", timestamp, { hour: "2-digit", minute: "2-digit" }),
     );
   });
 
   it.each([
-    ["zh-CN", zhIntl, "昨天"],
+    ["vi-VN", viIntl, "Hôm qua"],
     ["en-US", enIntl, "Yesterday"],
   ] as const)("%s 为昨天的消息加本地化前缀", (locale, intl, prefix) => {
     const timestamp = new Date(2026, 6, 12, 7, 15).getTime();
@@ -47,8 +47,8 @@ describe("formatMessageTimeLabel", () => {
   it("当年更早的消息显示月日和时分", () => {
     const timestamp = new Date(2026, 3, 10, 7, 15).getTime();
 
-    expect(formatMessageTimeLabel(timestamp, "zh-CN", zhIntl, now)).toBe(
-      formatExpected("zh-CN", timestamp, {
+    expect(formatMessageTimeLabel(timestamp, "vi-VN", viIntl, now)).toBe(
+      formatExpected("vi-VN", timestamp, {
         month: "numeric",
         day: "numeric",
         hour: "2-digit",
@@ -72,6 +72,6 @@ describe("formatMessageTimeLabel", () => {
   });
 
   it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY])("无效时间戳 %s 不展示", (timestamp) => {
-    expect(formatMessageTimeLabel(timestamp, "zh-CN", zhIntl, now)).toBeNull();
+    expect(formatMessageTimeLabel(timestamp, "vi-VN", viIntl, now)).toBeNull();
   });
 });

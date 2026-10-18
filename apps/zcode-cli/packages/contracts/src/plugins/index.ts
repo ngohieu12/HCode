@@ -165,7 +165,7 @@ export interface PluginManifest {
 
 /** 面板生命周期：第一版只接受会话级；`draft` 留待需要时放开。 */
 export type PluginUiSurfaceAvailability = "session";
-/** 标题：单一字符串或按 locale 键的映射（`{ "zh-CN": "...", "en-US": "..." }`）。 */
+/** 标题：单一字符串或按 locale 键的映射（`{ "vi-VN": "...", "en-US": "..." }`）。 */
 export type PluginUiSurfaceTitle = string | Record<string, string>;
 export interface PluginUiSurfaceDefinition {
   id: string;

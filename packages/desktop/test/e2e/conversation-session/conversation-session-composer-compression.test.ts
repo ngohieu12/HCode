@@ -193,8 +193,8 @@ describe("Composer 七档压缩", () => {
           JSON.stringify({
             ...settings,
             computerUseComposerEntryHidden: false,
-            locale: "zh-CN",
-            localePreference: "zh-CN",
+            locale: "en-US",
+            localePreference: "en-US",
           }),
         );
         const configFile = join(paths.homeDir, ".zcode", "cli", "config.json");

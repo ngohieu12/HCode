@@ -12,25 +12,28 @@ import {
 describe("i18n catalog", () => {
   it("resolves supported, auto, and unknown locale values deterministically", () => {
     expect(DEFAULT_LOCALE).toBe("en-US");
-    expect(resolveLocale("zh-CN")).toBe("zh-CN");
-    expect(resolveLocale("auto", "zh_Hans_CN")).toBe("zh-CN");
+    expect(resolveLocale("vi-VN")).toBe("vi-VN");
+    expect(resolveLocale("auto", "vi_VN")).toBe("vi-VN");
     expect(resolveLocale("auto", "en-GB")).toBe("en-US");
     expect(resolveLocale("fr-FR")).toBe("en-US");
-    expect(getZCodeCopy("auto", "zh_CN.UTF-8").locale).toBe("zh-CN");
+    expect(resolveLocale("en-US")).toBe("en-US");
+    expect(getZCodeCopy("auto", "vi_VN.UTF-8").locale).toBe("vi-VN");
   });
 
   it("detects supported locales from adapter-provided OS hints", () => {
-    expect(detectLocale({ env: { LC_ALL: "zh_CN.UTF-8" } })).toBe("zh-CN");
+    expect(detectLocale({ env: { LC_ALL: "vi_VN.UTF-8" } })).toBe("vi-VN");
     expect(detectLocale({ env: { LC_ALL: "C.UTF-8", LC_MESSAGES: "en_GB.UTF-8" } })).toBe("en-US");
-    expect(detectLocale({ env: { LANG: "fr_FR.UTF-8" }, intlLocale: "zh-Hans-CN" })).toBe("zh-CN");
-    expect(detectLocale({ env: { LANGUAGE: "fr:zh_CN:en_US" } })).toBe("zh-CN");
+    expect(detectLocale({ env: { LANG: "fr_FR.UTF-8" }, intlLocale: "vi-VN" })).toBe("vi-VN");
+    expect(detectLocale({ env: { LANGUAGE: "fr:vi_VN:en_US" } })).toBe("vi-VN");
     expect(detectLocale({ env: { LANG: "POSIX" }, intlLocale: "fr-FR" })).toBeUndefined();
+    expect(detectLocale({ env: { LC_ALL: "zh_CN.UTF-8" } })).toBeUndefined();
   });
 
   it("validates UI locale config strings", () => {
     expect(isUiLocale("auto")).toBe(true);
     expect(isUiLocale("en-US")).toBe(true);
-    expect(isUiLocale("zh-CN")).toBe(true);
+    expect(isUiLocale("vi-VN")).toBe(true);
+    expect(isUiLocale("zh-CN")).toBe(false);
     expect(isUiLocale("fr-FR")).toBe(false);
   });
 
@@ -43,18 +46,14 @@ describe("i18n catalog", () => {
     }
   });
 
-  it("returns localized TUI and CLI copy", () => {
-    const copy = getZCodeCopy("zh-CN");
+  it("returns localized command-center and CLI copy", () => {
+    const copy = getZCodeCopy("vi-VN");
 
-    expect(copy.tui.status.ready).toBe("就绪。");
-    expect(copy.tui.sidebar.sections.status).toBe("状态");
-    expect(copy.tui.sidebar.sections.modifiedFiles).toBe("变更文件");
-    expect(copy.tui.loginRequired.message).toContain("没有可用模型");
-    expect(copy.tui.loginSetup.title).toBe("配置 Coding Plan");
-    expect(copy.tui.loginSetup.pending.help).toContain("Esc");
-    expect(copy.tui.loginSetup.input.placeholder).toBe("粘贴 API key");
-    expect(copy.tui.input.placeholder).toBe("输入提示词");
-    expect(copy.cli.help("1.0.0")).toContain("用法:");
+    expect(copy.commandCenter.effort.enabled).toBe("enabled");
+    expect(copy.commandCenter.loginRequired.message).toContain("No available models");
+    expect(copy.commandCenter.loginSetup.pending.help).toContain("Esc");
+    expect(copy.commandCenter.loginSetup.input.placeholder).toBe("Paste API key");
+    expect(copy.cli.help("1.0.0")).toContain("Usage:");
   });
 });
 

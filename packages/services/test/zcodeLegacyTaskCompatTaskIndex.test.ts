@@ -430,7 +430,7 @@ function createService(options?: {
           async () =>
             ({
               recentProjects: [],
-              locale: "zh-CN",
+              locale: "en-US",
               ...options.settings,
             }) as AppSettings,
         ),

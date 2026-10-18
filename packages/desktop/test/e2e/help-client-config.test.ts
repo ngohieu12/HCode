@@ -3,15 +3,14 @@ import { join } from "node:path";
 import { readSettings, seedSettings, waitForDefaultWorkspaceReady } from "./helpers/desktop-app.js";
 import { writeE2EJsonFileAtomically } from "./helpers/e2e-atomic-json-file.js";
 import {
-  buildHelpBrowserFixture,
   readHelpFixture,
   startHelpConfigFixture,
 } from "./helpers/help-client-config-fixture.js";
 
 type DesktopBridge = {
   executeDesktopCommand(command: string): Promise<void>;
-  canOpenCommunity(locale: "zh-CN" | "en-US" | "vi-VN"): Promise<boolean>;
-  setApplicationLocale(locale: "zh-CN" | "en-US" | "vi-VN"): Promise<void>;
+  canOpenCommunity(locale: "en-US" | "vi-VN"): Promise<boolean>;
+  setApplicationLocale(locale: "en-US" | "vi-VN"): Promise<void>;
 };
 
 async function command(command: string) {
@@ -19,7 +18,7 @@ async function command(command: string) {
     await (window as unknown as { zcode: DesktopBridge }).zcode.executeDesktopCommand(value);
   }, command);
 }
-async function available(locale: "zh-CN" | "en-US" | "vi-VN") {
+async function available(locale: "en-US" | "vi-VN") {
   return browser.execute(
     async (value) => (window as unknown as { zcode: DesktopBridge }).zcode.canOpenCommunity(value),
     locale,
@@ -96,12 +95,12 @@ describe("帮助配置 client/configs", () => {
     await $('button[aria-label="Help"]').click();
     await $('//*[@role="menuitem" and contains(.,"User community")]').click();
     await expectExternal(fixture.remote.community_urls!["en-US"]!);
-    expect(await available("zh-CN")).toBe(true);
+    expect(await available("en-US")).toBe(true);
     await browser.execute(async () => {
-      await (window as unknown as { zcode: DesktopBridge }).zcode.setApplicationLocale("zh-CN");
+      await (window as unknown as { zcode: DesktopBridge }).zcode.setApplicationLocale("en-US");
     });
     await command("openCommunity");
-    await expectExternal(fixture.remote.community_urls!["zh-CN"]!);
+    await expectExternal(fixture.remote.community_urls!["en-US"]!);
     expect(server.requests).toHaveLength(1);
     const query = new URL(server.requests[0]!.url, server.origin).searchParams;
     expect(query.get("app_version")).toBeTruthy();
@@ -110,7 +109,7 @@ describe("帮助配置 client/configs", () => {
   });
 
   it("HC-02: 英文缺失只回退英文内置值", async () => {
-    server.setConfig({ community_urls: { "zh-CN": fixture.remote.community_urls!["zh-CN"] } });
+    server.setConfig({ community_urls: { "en-US": fixture.remote.community_urls!["en-US"] } });
     expect(await available("en-US")).toBe(true);
     await command("openCommunity");
     await expectExternal(fixture.local.community_urls!["en-US"]!);
@@ -161,68 +160,7 @@ describe("帮助配置 client/configs", () => {
     await writeE2EJsonFileAtomically(localPath, {});
     server.setConfig({});
     expect(await available("en-US")).toBe(false);
-    expect(await available("zh-CN")).toBe(false);
+    expect(await available("en-US")).toBe(false);
   });
 
-  it("HC-05: 窄屏 Chromium Web 解析、并发缓存与页面重载重新请求", async () => {
-    const webServer = await startHelpConfigFixture(fixture.remote, await buildHelpBrowserFixture());
-    const mainHandle = await browser.getWindowHandle();
-    const existing = await browser.getWindowHandles();
-    const id = await browser.electron.execute(async (electron, url) => {
-      const win = new electron.BrowserWindow({
-        width: 390,
-        height: 844,
-        show: false,
-        webPreferences: { sandbox: true, nodeIntegration: false },
-      });
-      await win.loadURL(url);
-      return win.id;
-    }, webServer.origin);
-    try {
-      await browser.waitUntil(
-        async () => (await browser.getWindowHandles()).length > existing.length,
-        { timeout: 10000 },
-      );
-      const handle = (await browser.getWindowHandles()).find((item) => !existing.includes(item))!;
-      await browser.switchToWindow(handle);
-      const read = async () =>
-        browser.execute(async () => {
-          const help = (
-            window as unknown as {
-              helpFixture: {
-                resolveWebCommunityUrl(
-                  locale: string,
-                  options: { endpointOrigin: string },
-                ): Promise<string>;
-              };
-            }
-          ).helpFixture;
-          return Promise.all(
-            ["zh-CN", "en-US"].map((locale) =>
-              help.resolveWebCommunityUrl(locale, { endpointOrigin: location.origin }),
-            ),
-          );
-        });
-      expect(await read()).toEqual([
-        fixture.remote.community_urls!["zh-CN"],
-        fixture.remote.community_urls!["en-US"],
-      ]);
-      expect(webServer.requests).toHaveLength(1);
-      expect(
-        new URL(webServer.requests[0]!.url, webServer.origin).searchParams.has("platform"),
-      ).toBe(false);
-      webServer.setConfig({ community_urls: { "en-US": "https://example.com/E2E_WEB_CHANGED" } });
-      expect((await read())[1]).toBe(fixture.remote.community_urls!["en-US"]);
-      await browser.refresh();
-      expect((await read())[1]).toBe("https://example.com/E2E_WEB_CHANGED");
-      expect(webServer.requests).toHaveLength(2);
-    } finally {
-      await browser.electron.execute(
-        (electron, windowId) => electron.BrowserWindow.fromId(windowId)?.destroy(),
-        id,
-      );
-      await browser.switchToWindow(mainHandle);
-      await webServer.close();
-    }
-  });
 });

@@ -15,7 +15,7 @@ function pluginItem(overrides: Partial<StorePluginItem> = {}): StorePluginItem {
     orphaned: false,
     listing: {
       displayName: "Demo [Plugin]",
-      displayNameI18n: { "zh-CN": "演示插件" },
+      displayNameI18n: { "vi-VN": "Plugin minh họa" },
       icon: "https://cdn.example.com/demo-plugin.png",
     },
     ...overrides,
@@ -49,26 +49,24 @@ describe("Plugin Store try prompt", () => {
     expect(
       buildPluginStoreTryPrompt({
         item: pluginItem(),
-        locale: "zh-CN",
-        prompt: "帮我检查配置",
+        locale: "vi-VN",
+        prompt: "Kiểm tra cấu hình",
       }),
-    ).toBe(
-      "[@演示插件](plugin://demo-plugin@demo-market) 帮我检查配置",
-    );
+    ).toBe("[@Plugin minh họa](plugin://demo-plugin@demo-market) Kiểm tra cấu hình");
   });
 
   it("builds the same structured Plugin mention used by the @ picker", () => {
     expect(
       buildPluginStoreTryMention({
         item: pluginItem(),
-        locale: "zh-CN",
+        locale: "vi-VN",
       }),
     ).toEqual({
       id: "plugin:demo-plugin@demo-market",
       category: "plugins",
-      label: "演示插件",
+      label: "Plugin minh họa",
       value: "demo-plugin@demo-market",
-      markdown: "[@演示插件](plugin://demo-plugin@demo-market)",
+      markdown: "[@Plugin minh họa](plugin://demo-plugin@demo-market)",
       data: {
         pluginId: "demo-plugin@demo-market",
         icon: "https://cdn.example.com/demo-plugin.png",

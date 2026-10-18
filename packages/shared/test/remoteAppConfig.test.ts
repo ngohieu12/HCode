@@ -15,37 +15,11 @@ describe("remoteAppConfig", () => {
     ).toBe("https://example.com/feedback");
   });
 
-  it("中文界面只读取中文社群地址", () => {
-    expect(
-      getCommunityUrlFromConfig(
-        {
-          community_urls: {
-            "zh-CN": "https://example.com/zh-community",
-            "en-US": "https://example.com/en-community",
-          },
-        },
-        "zh-CN",
-      ),
-    ).toBe("https://example.com/zh-community");
-
-    expect(
-      getCommunityUrlFromConfig(
-        {
-          community_urls: {
-            "en-US": "https://example.com/en-community",
-          },
-        },
-        "zh-CN",
-      ),
-    ).toBeUndefined();
-  });
-
   it("英文界面只读取英文社群地址", () => {
     expect(
       getCommunityUrlFromConfig(
         {
           community_urls: {
-            "zh-CN": "https://example.com/zh-community",
             "en-US": "https://example.com/en-community",
           },
         },
@@ -57,16 +31,16 @@ describe("remoteAppConfig", () => {
       getCommunityUrlFromConfig(
         {
           community_urls: {
-            "zh-CN": "https://example.com/zh-community",
+            "en-US": "https://example.com/en-community",
           },
         },
-        "en-US",
+        "vi-VN",
       ),
     ).toBeUndefined();
   });
 
-  it("两个语言渠道都缺失时返回 undefined", () => {
-    expect(getCommunityUrlFromConfig({}, "zh-CN")).toBeUndefined();
+  it("社群入口缺失时返回 undefined", () => {
+    expect(getCommunityUrlFromConfig({}, "en-US")).toBeUndefined();
   });
 
   it("远端缺少当前语言时优先使用内置同语言入口", () => {
@@ -74,16 +48,27 @@ describe("remoteAppConfig", () => {
       getCommunityUrlFromConfigs(
         {
           community_urls: {
-            "zh-CN": "https://remote.example.com/feishu",
+            "en-US": "https://remote.example.com/feishu",
           },
         },
         {
           community_urls: {
-            "zh-CN": "https://local.example.com/feishu",
             "en-US": "https://local.example.com/discord",
           },
         },
         "en-US",
+      ),
+    ).toBe("https://remote.example.com/feishu");
+
+    expect(
+      getCommunityUrlFromConfigs(
+        {},
+        {
+          community_urls: {
+            "en-US": "https://local.example.com/discord",
+          },
+        },
+        "vi-VN",
       ),
     ).toBe("https://local.example.com/discord");
   });

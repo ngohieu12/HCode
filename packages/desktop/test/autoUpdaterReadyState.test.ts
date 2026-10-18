@@ -762,8 +762,7 @@ describe("autoUpdater ready state sync", () => {
     expect(autoUpdaterMock.setFeedURL).toHaveBeenCalledWith(
       expect.objectContaining({
         provider: "custom",
-        manifestUrl:
-          "https://zcode.z.ai/api/v1/releases/electron/manifest?platform=old&channel=1",
+        manifestUrl: "https://zcode.z.ai/api/v1/releases/electron/manifest?platform=old&channel=1",
         releasePlatform: "darwin-aarch64",
       }),
     );
@@ -1533,9 +1532,9 @@ describe("autoUpdater ready state sync", () => {
       releaseNotes: "# Release v0.1.25\n\n- add popup",
       releaseDate: new Date("2026-06-23T13:48:54.438Z"),
       releaseNotesByLocale: {
-        "zh-CN": {
+        "vi-VN": {
           title: "ZCode v0.1.25",
-          markdown: "# ZCode v0.1.25\n\n- 中文说明",
+          markdown: "# ZCode v0.1.25\n\n- Ghi chú tiếng Việt",
         },
         "en-US": {
           title: "ZCode v0.1.25",
@@ -1552,9 +1551,9 @@ describe("autoUpdater ready state sync", () => {
         markdown: "# Release v0.1.25\n\n- add popup",
         releaseDate: "2026-06-23T13:48:54.438Z",
         releaseNotesByLocale: {
-          "zh-CN": {
+          "vi-VN": {
             title: "ZCode v0.1.25",
-            markdown: "# ZCode v0.1.25\n\n- 中文说明",
+            markdown: "# ZCode v0.1.25\n\n- Ghi chú tiếng Việt",
           },
           "en-US": {
             title: "ZCode v0.1.25",
@@ -1575,9 +1574,9 @@ describe("autoUpdater ready state sync", () => {
         markdown: "# Release v0.1.25\n\n- add popup",
         releaseDate: "2026-06-23T13:48:54.438Z",
         releaseNotesByLocale: {
-          "zh-CN": {
+          "vi-VN": {
             title: "ZCode v0.1.25",
-            markdown: "# ZCode v0.1.25\n\n- 中文说明",
+            markdown: "# ZCode v0.1.25\n\n- Ghi chú tiếng Việt",
           },
           "en-US": {
             title: "ZCode v0.1.25",
@@ -1601,9 +1600,9 @@ describe("autoUpdater ready state sync", () => {
         markdown: "# Release v0.1.25\n\n- add popup",
         releaseDate: "2026-06-23T13:48:54.438Z",
         releaseNotesByLocale: {
-          "zh-CN": {
+          "vi-VN": {
             title: "ZCode v0.1.25",
-            markdown: "# ZCode v0.1.25\n\n- 中文说明",
+            markdown: "# ZCode v0.1.25\n\n- Ghi chú tiếng Việt",
           },
           "en-US": {
             title: "ZCode v0.1.25",

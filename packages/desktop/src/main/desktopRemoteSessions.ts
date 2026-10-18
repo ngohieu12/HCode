@@ -401,7 +401,7 @@ export function createRemoteWorkspaceSessionManager(options: {
           requestId,
           sessionId: descriptor.remoteSessionId,
           level: "info",
-          message: `远程 ${descriptor.target.kind} workspace 已连接`,
+          message: `Remote ${descriptor.target.kind} workspace connected`,
         });
         pending.resolve(descriptor.remoteSessionId);
       })
@@ -515,7 +515,7 @@ export function createRemoteWorkspaceSessionManager(options: {
       "window-host:connection-closed",
       {
         reason: "workspace-closed",
-        message: "远程工作区连接已结束，请在桌面端重新连接。",
+        message: "Remote workspace connection ended. Reconnect from the desktop app.",
       },
     );
     if (win && !win.isDestroyed() && !win.webContents.isDestroyed()) {
@@ -528,7 +528,7 @@ export function createRemoteWorkspaceSessionManager(options: {
       emitConnectionLog(win, {
         sessionId: event.remoteSessionId,
         level: "warn",
-        message: event.error || "远程 workspace 连接已断开",
+        message: event.error || "Remote workspace connection lost",
       });
     }
   }

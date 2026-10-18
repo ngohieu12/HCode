@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import enUS from "@/i18n/locales/en-US.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 
 describe("settings HTTP proxy i18n", () => {
   it("中文显示不使用代理的地址标签且英文保持不变", () => {

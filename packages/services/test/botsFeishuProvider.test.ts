@@ -882,13 +882,13 @@ describe("feishu bot provider", () => {
         botId: "compact-queue",
         provider: "feishu",
         providerUserId: "ou_owner",
-        text: "等待执行",
+        text: "Waiting to run",
         selection: {
           id: "queue-one",
-          title: "已排队",
+          title: "Queued",
           action: "queue.cancel",
           showCancel: false,
-          options: [{ id: "/queue-cancel one", label: "取消" }],
+          options: [{ id: "/queue-cancel one", label: "Cancel" }],
         },
       },
     );
@@ -898,7 +898,7 @@ describe("feishu bot provider", () => {
     const card = JSON.parse(body.content);
     expect(card.body.elements).toHaveLength(1);
     expect(card.body.elements[0].tag).toBe("column_set");
-    expect(card.body.elements[0].columns[0].elements[0].content).toBe("等待执行");
+    expect(card.body.elements[0].columns[0].elements[0].content).toBe("Waiting to run");
     expect(card.body.elements[0].columns[1].elements[0].behaviors[0].value.command).toBe(
       "/queue-cancel one",
     );
@@ -957,7 +957,7 @@ describe("feishu bot provider", () => {
   it("splits streaming cards before Card JSON 2.0 reaches the 200-element limit", () => {
     const segments = splitFeishuStreamingCardStates({
       providerUserId: "ou_user",
-      locale: "zh-CN",
+      locale: "en-US",
       blocks: Array.from({ length: 181 }, (_, index) => ({
         type: "message" as const,
         text: `message-${index}`,
@@ -2199,8 +2199,8 @@ describe("feishu bot provider", () => {
         { type: "message", text: "正在检查项目" },
         {
           type: "tools",
-          title: "工具摘要",
-          summaries: ["- 完成 · Read `README.md`"],
+          title: "Tool summaries",
+          summaries: ["- Completed · Read `README.md`"],
           expanded: true,
         },
       ],
@@ -2212,15 +2212,15 @@ describe("feishu bot provider", () => {
         { type: "message", text: "正在检查项目" },
         {
           type: "tools",
-          title: "工具摘要",
-          summaries: ["- 完成 · Read `README.md`"],
+          title: "Tool summaries",
+          summaries: ["- Completed · Read `README.md`"],
           expanded: false,
         },
         { type: "message", text: "检查完成" },
         {
           type: "tools",
-          title: "工具摘要",
-          summaries: ["- 完成 · Bash `pnpm test`"],
+          title: "Tool summaries",
+          summaries: ["- Completed · Bash `pnpm test`"],
           expanded: false,
         },
       ],
@@ -2256,7 +2256,7 @@ describe("feishu bot provider", () => {
               icon_expanded_angle: -180,
             },
           },
-          { tag: "markdown", content: "⏳ 运行中" },
+          { tag: "markdown", content: "⏳ Running" },
         ],
       },
     });
@@ -2280,9 +2280,9 @@ describe("feishu bot provider", () => {
       },
     });
     const updateCardJson = JSON.stringify(updateCard);
-    expect(updateCardJson.match(/🛠️ 工具摘要 \(1\)/gu) ?? []).toHaveLength(2);
+    expect(updateCardJson.match(/🛠️ Tool summaries \(1\)/gu) ?? []).toHaveLength(2);
     expect(updateCardJson).toContain("检查完成");
-    expect(updateCardJson).toContain("✅ 已完成");
+    expect(updateCardJson).toContain("✅ Completed");
   });
 
   it("resolves the Feishu bot name from application info API", async () => {
@@ -2683,7 +2683,7 @@ describe("feishu bot provider", () => {
       provider: "feishu",
       providerUserId: "ou_user",
       text: "Review this implementation plan.",
-      locale: "zh-CN",
+      locale: "en-US",
       elicitation: {
         requestId: "plan-1",
         taskId: "task-1",
@@ -2717,8 +2717,8 @@ describe("feishu bot provider", () => {
         options: [
           {
             id: "approve",
-            label: "批准",
-            description: "退出计划模式并开始实施。",
+            label: "Approve",
+            description: "Exit plan mode and start implementation.",
           },
         ],
       },
@@ -2729,17 +2729,17 @@ describe("feishu bot provider", () => {
     );
     const body = JSON.parse(String(sendCall?.[1]?.body)) as { content?: string };
     const cardJson = JSON.stringify(parseFeishuCardContent(body.content));
-    expect(cardJson).toContain("**请审阅此实施计划。**");
+    expect(cardJson).toContain("**Review this implementation plan.**");
     expect(cardJson).not.toContain("**Review this implementation plan.**");
     expect(cardJson).toContain("# Snake game");
     expect(cardJson).toContain("Implement gameplay");
-    expect(cardJson).toContain("批准");
-    expect(cardJson).toContain("自定义回答");
-    expect(cardJson).not.toContain("#### 提问");
-    expect(cardJson).not.toContain("退出计划模式并开始实施。");
+    expect(cardJson).toContain("Approve");
+    expect(cardJson).toContain("Custom answer");
+    expect(cardJson).not.toContain("#### Question");
+    expect(cardJson).not.toContain("Exit plan mode and start implementation.");
     const planIndex = cardJson.indexOf("# Snake game");
     const dividerIndex = cardJson.indexOf('"tag":"hr"');
-    const reviewIndex = cardJson.indexOf("**请审阅此实施计划。**");
+    const reviewIndex = cardJson.indexOf("**Review this implementation plan.**");
     expect(planIndex).toBeGreaterThan(-1);
     expect(dividerIndex).toBeGreaterThan(planIndex);
     expect(reviewIndex).toBeGreaterThan(dividerIndex);
@@ -2792,7 +2792,7 @@ describe("feishu bot provider", () => {
     const body = JSON.parse(String(sendCall?.[1]?.body)) as { content?: string };
     const cardJson = JSON.stringify(parseFeishuCardContent(body.content));
     expect(cardJson).toContain("**Review this implementation plan.**");
-    expect(cardJson).not.toContain("请审阅此实施计划。");
+    expect(cardJson).not.toContain("Review this implementation plan.");
   });
 
   it("renders AskUserQuestion answers and multi-select actions in one Feishu card", async () => {
@@ -2858,12 +2858,12 @@ describe("feishu bot provider", () => {
     expect(cardJson).toContain("网页版 (HTML/CSS/JS)");
     expect(cardJson).toContain('"tag":"hr"');
     expect(cardJson).not.toContain('"content":"---\\n"');
-    expect(cardJson).toContain("#### 提问");
+    expect(cardJson).toContain("#### Question");
     expect(cardJson).toContain("你希望游戏有什么功能？");
     expect(cardJson).toContain('"tag":"form"');
     expect(cardJson).toContain("☑ 基础玩法");
     expect(cardJson).toContain("☐ 分数系统");
-    expect(cardJson).toContain("☐ 自定义回答");
+    expect(cardJson).toContain("☐ Custom answer");
     // 当前题的“基础玩法”只应存在于待回答区的选中按钮，不能提前进入已回答历史。
     expect(cardJson.match(/基础玩法/gu)).toHaveLength(1);
     expect(cardJson.indexOf("你想在哪里运行贪吃蛇游戏？")).toBeLessThan(
@@ -2922,9 +2922,9 @@ describe("feishu bot provider", () => {
     );
     const body = JSON.parse(String(sendCall?.[1]?.body)) as { content?: string };
     const cardJson = JSON.stringify(parseFeishuCardContent(body.content));
-    expect(cardJson).toContain("#### 提问");
+    expect(cardJson).toContain("#### Question");
     expect(cardJson).toContain("请补充需求说明");
-    expect(cardJson).toContain("自定义回答");
+    expect(cardJson).toContain("Custom answer");
     expect(cardJson).toContain('"tag":"input"');
     expect(cardJson).toContain('"input_type":"multiline_text"');
     expect(cardJson).toContain("/elicitation abc123def456 __form__:");
@@ -2976,7 +2976,7 @@ describe("feishu bot provider", () => {
     const body = JSON.parse(String(sendCall?.[1]?.body)) as { content?: string };
     const cardJson = JSON.stringify(parseFeishuCardContent(body.content));
     expect(cardJson).toContain("○ 网页版 (HTML/CSS/JS)");
-    expect(cardJson).toContain("○ 自定义回答");
+    expect(cardJson).toContain("○ Custom answer");
     expect(cardJson).not.toContain('"tag":"input"');
     expect(cardJson).not.toContain('"tag":"form"');
     expect(cardJson).not.toContain('"tag":"select_static"');
@@ -3029,9 +3029,9 @@ describe("feishu bot provider", () => {
     );
     const body = JSON.parse(String(sendCall?.[1]?.body)) as { content?: string };
     const cardJson = JSON.stringify(parseFeishuCardContent(body.content));
-    expect(cardJson).toContain("● 自定义回答");
+    expect(cardJson).toContain("● Custom answer");
     expect(cardJson).toContain('"tag":"input"');
-    expect(cardJson).toContain("请输入自定义回答");
+    expect(cardJson).toContain("Enter a custom answer");
     expect(cardJson).toContain("/elicitation abc123def456 __custom__");
     expect(cardJson).toContain("/elicitation abc123def456 __form__:");
   });
@@ -3147,7 +3147,7 @@ describe("feishu bot provider", () => {
           action: { token: "card-token", value: { command: "/workspace 1" } },
         },
       },
-      "已进入 /tmp/workspace 的新任务草稿。",
+      "Entered a new task draft in /tmp/workspace.",
     );
 
     const updateCall = fetchMock.mock.calls.find(([url]) =>
@@ -3166,7 +3166,7 @@ describe("feishu bot provider", () => {
     expect(body.token).toBe("card-token");
     expect(body).toMatchObject({ open_ids: ["ou_user"] });
     expect(body.card).toMatchObject({ schema: "2.0" });
-    expect(JSON.stringify(body.card)).toContain("已进入 /tmp/workspace 的新任务草稿。");
+    expect(JSON.stringify(body.card)).toContain("Entered a new task draft in /tmp/workspace.");
     expect(JSON.stringify(body.card)).not.toContain('"command"');
   });
 
@@ -3192,12 +3192,12 @@ describe("feishu bot provider", () => {
             token: "card-token",
             value: {
               command: "/workspace /tmp/workspace",
-              zcodeCardText: "请选择工作区",
+              zcodeCardText: "Select workspace",
             },
           },
         },
       },
-      "已进入 /tmp/workspace 的新任务草稿。",
+      "Entered a new task draft in /tmp/workspace.",
     );
 
     const updateCall = fetchMock.mock.calls.find(([url]) =>
@@ -3206,8 +3206,8 @@ describe("feishu bot provider", () => {
     expect(updateCall).toBeTruthy();
     const body = JSON.parse(String(updateCall?.[1]?.body)) as { card?: unknown };
     expect(body.card).toMatchObject({ schema: "2.0" });
-    expect(JSON.stringify(body.card)).toContain("请选择工作区");
-    expect(JSON.stringify(body.card)).not.toContain("已进入 /tmp/workspace 的新任务草稿。");
+    expect(JSON.stringify(body.card)).toContain("Select workspace");
+    expect(JSON.stringify(body.card)).not.toContain("Entered a new task draft in /tmp/workspace.");
     expect(JSON.stringify(body.card)).not.toContain('"command"');
   });
 
@@ -3235,7 +3235,7 @@ describe("feishu bot provider", () => {
                 type: "callback",
                 value: {
                   command: "/workspace /tmp/workspace",
-                  zcodeCardText: "请选择工作区",
+                  zcodeCardText: "Select workspace",
                 },
               },
             ],
@@ -3243,7 +3243,7 @@ describe("feishu bot provider", () => {
           context: { card_update_token: "schema-2-card-token" },
         },
       },
-      "已进入 /tmp/workspace 的新任务草稿。",
+      "Entered a new task draft in /tmp/workspace.",
     );
 
     const updateCall = fetchMock.mock.calls.find(([url]) =>
@@ -3254,7 +3254,7 @@ describe("feishu bot provider", () => {
     expect(body.token).toBe("schema-2-card-token");
     expect(body).toMatchObject({ open_ids: ["ou_user"] });
     expect(body.card).toMatchObject({ schema: "2.0" });
-    expect(JSON.stringify(body.card)).toContain("请选择工作区");
+    expect(JSON.stringify(body.card)).toContain("Select workspace");
     expect(JSON.stringify(body.card)).not.toContain('"command"');
   });
 
@@ -3360,12 +3360,12 @@ describe("feishu bot provider", () => {
           context: { card_update_token: "ask-card-token" },
         },
       },
-      "已提交问答响应。",
+      "Question response submitted.",
       {
         botId: "feishu-1",
         provider: "feishu",
         providerUserId: "ou_user",
-        text: "已提交问答响应。",
+        text: "Question response submitted.",
         elicitation: {
           requestId: "ask-1",
           taskId: "task-1",

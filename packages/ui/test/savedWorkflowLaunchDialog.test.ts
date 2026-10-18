@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // 实参窗（docs/dynamic-workflow/launch.md「The launch dialog」）：按类型出控件、默认值回填、一次收齐错误。
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import {
@@ -74,7 +75,7 @@ function mount(
   render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(SavedWorkflowLaunchDialog, {
         entry,
         scope: scope ?? entry?.scope ?? "project",

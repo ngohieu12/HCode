@@ -371,7 +371,7 @@ describe("hostResponseMessageSchema", () => {
   it("accepts combined workspace session snapshots in settings", () => {
     const parsed = appSettingsSchema.safeParse({
       recentProjects: [],
-      locale: "zh-CN",
+      locale: "vi-VN",
       lastWorkspaceSession: [
         {
           kind: "local",
@@ -664,7 +664,7 @@ describe("hostResponseMessageSchema", () => {
   it("preserves SSH remote asset install mode and drops historical resource packages", () => {
     const parsed = appSettingsSchema.safeParse({
       recentProjects: [],
-      locale: "zh-CN",
+      locale: "vi-VN",
       lastWorkspaceSession: [
         {
           kind: "remote",
@@ -708,7 +708,7 @@ describe("hostResponseMessageSchema", () => {
   it("migrates legacy lastOpenTabs and remoteWorkspaceHistory into lastWorkspaceSession", () => {
     const parsed = appSettingsSchema.safeParse({
       recentProjects: [],
-      locale: "zh-CN",
+      locale: "vi-VN",
       lastOpenTabs: ["/tmp/local-demo"],
       lastWorkspaceSession: [{ kind: "remote", historyId: "remote-history-1" }],
       remoteWorkspaceHistory: [
@@ -748,7 +748,7 @@ describe("hostResponseMessageSchema", () => {
   it("migrates legacy remoteWorkspaceHistory after dropping historical resource packages", () => {
     const parsed = appSettingsSchema.safeParse({
       recentProjects: [],
-      locale: "zh-CN",
+      locale: "vi-VN",
       lastWorkspaceSession: [{ kind: "remote", historyId: "remote-history-ssh" }],
       remoteWorkspaceHistory: [
         {
@@ -794,7 +794,7 @@ describe("hostResponseMessageSchema", () => {
   it("drops retired ZCode Agent proxy settings from legacy settings files", () => {
     const parsed = appSettingsSchema.safeParse({
       recentProjects: [],
-      locale: "zh-CN",
+      locale: "vi-VN",
       retiredProxyUrl: "127.0.0.1:7890",
       retiredProxyUseSystemCa: true,
       retiredProxyCaCertPath: "C:\\Users\\test\\proxy-ca.pem",

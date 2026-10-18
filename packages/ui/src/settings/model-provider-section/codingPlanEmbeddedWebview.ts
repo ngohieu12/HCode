@@ -42,13 +42,13 @@ export interface CodingPlanEmbeddedReportContext {
 export type CodingPlanEmbeddedTheme = "zai-light" | "zai-dark";
 
 /**
- * App locale（zh-CN / en-US）→ 官网 URL lang 段（cn / en）。
- * 用于 webview URL 的 ?lang= hint，让官网首屏就有正确语言，避免注入前的英文闪烁。
+ * App locale → 官网 URL lang 段。官网只保留英文站，统一返回 en。
+ * 用于 webview URL 的 ?lang= hint，避免注入前的语言闪烁。
  */
 export function codingPlanLocaleToWebsiteLang(
-  locale: CodingPlanWebviewLocale | null | undefined,
-): "cn" | "en" {
-  return locale === "zh-CN" ? "cn" : "en";
+  _locale: CodingPlanWebviewLocale | null | undefined,
+): "en" {
+  return "en";
 }
 
 export interface ResolveCodingPlanEmbeddedOriginOptions {
@@ -174,15 +174,11 @@ export function createCodingPlanAuthInjectionScript({
   provider,
   credentials,
   theme,
-  locale,
   reportContext,
 }: {
   provider: CodingPlanWebsiteProvider;
   credentials: CodingPlanEmbeddedCredentials;
   theme: CodingPlanEmbeddedTheme;
-  // App 当前 locale，写入 window.__zcodeLang__ 供 zcodeBridge.getLang() 读取，
-  // 并附带在 auth-ready 事件 detail 里让官网一次性同步初始语言。
-  locale: CodingPlanWebviewLocale | null;
   reportContext?: CodingPlanEmbeddedReportContext | null;
 }): string {
   const values: Record<string, string | null> =
@@ -208,7 +204,7 @@ export function createCodingPlanAuthInjectionScript({
         : `localStorage.removeItem(${JSON.stringify(key)});`,
     )
     .join("\n  ");
-  const resolvedLocale: CodingPlanWebviewLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+  const resolvedLocale: CodingPlanWebviewLocale = "en-US";
   const normalizedReportContext = normalizeCodingPlanEmbeddedReportContext(reportContext);
 
   return `(() => {
@@ -316,8 +312,8 @@ body::-webkit-scrollbar,
  * 重写 window.__zcodeLang__ 并派发 zcode-coding-plan-lang-change 事件，
  * 官网侧（zcodeBridge.onLangChange 或 window 监听）据此无感切换语言。
  */
-export function createCodingPlanLangInjectionScript(locale: CodingPlanWebviewLocale): string {
-  const resolvedLocale: CodingPlanWebviewLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+export function createCodingPlanLangInjectionScript(): string {
+  const resolvedLocale: CodingPlanWebviewLocale = "en-US";
   return `(() => {
   // 注意：注入 webview 执行的原始 JS，不能用 TS 语法（如 as any）。
   window.__zcodeLang__ = ${JSON.stringify(resolvedLocale)};

@@ -1,4 +1,5 @@
 import { createElement, type ComponentProps } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type {
@@ -112,7 +113,7 @@ describe("V4 mobile plan interaction acknowledgement", () => {
     renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(V4InteractionDialogs, {
           sessionId: "session-plan",
           workspacePath: "/workspace",
@@ -147,7 +148,7 @@ describe("V4 mobile plan interaction acknowledgement", () => {
       renderToStaticMarkup(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(V4InteractionDialogs, {
             sessionId: "session-plan",
             workspacePath: "/workspace",
@@ -179,7 +180,7 @@ describe("V4 mobile plan interaction acknowledgement", () => {
     renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(V4InteractionDialogs, {
           sessionId: "session-plan",
           workspacePath: "/workspace",
@@ -209,7 +210,7 @@ describe("V4 mobile plan interaction acknowledgement", () => {
     renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(V4InteractionDialogs, {
           sessionId: "session-plan",
           workspacePath: "/workspace",

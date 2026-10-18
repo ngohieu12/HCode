@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ZCodeTaskMeta } from "@zcode/shared";
-import {
-  DEFAULT_TASK_RUNTIME_STATE,
-  getDefaultWorkspaceState,
-} from "@/store/zcodeSessionStore.js";
+import { DEFAULT_TASK_RUNTIME_STATE, getDefaultWorkspaceState } from "@/store/zcodeSessionStore.js";
 import { markRemoteWorkspaceRunningTasksFailed } from "@/lib/remoteWorkspaceSessionRuntime.js";
 
 function createTask(taskId: string, status: ZCodeTaskMeta["status"]): ZCodeTaskMeta {
@@ -59,7 +56,7 @@ describe("markRemoteWorkspaceRunningTasksFailed", () => {
       ],
       getWorkspaceState: () => workspaceState,
       setTaskRuntimeState,
-      reason: "远程连接已断开",
+      reason: "Remote connection closed",
     });
 
     expect(count).toBe(4);
@@ -68,28 +65,28 @@ describe("markRemoteWorkspaceRunningTasksFailed", () => {
         "/workspace/demo",
         "active-task",
         "failed",
-        "远程连接已断开",
+        "Remote connection closed",
         "ssh://root@example.com/workspace/demo",
       ],
       [
         "/workspace/demo",
         "restoring-task",
         "failed",
-        "远程连接已断开",
+        "Remote connection closed",
         "ssh://root@example.com/workspace/demo",
       ],
       [
         "/workspace/demo",
         "persisted-running-task",
         "failed",
-        "远程连接已断开",
+        "Remote connection closed",
         "ssh://root@example.com/workspace/demo",
       ],
       [
         "/workspace/demo",
         "optimistic-running-task",
         "failed",
-        "远程连接已断开",
+        "Remote connection closed",
         "ssh://root@example.com/workspace/demo",
       ],
     ]);
@@ -121,7 +118,7 @@ describe("markRemoteWorkspaceRunningTasksFailed", () => {
       ],
       getWorkspaceState: () => workspaceState,
       setTaskRuntimeState,
-      reason: "远程连接已断开",
+      reason: "Remote connection closed",
     });
 
     expect(count).toBe(0);
@@ -158,7 +155,7 @@ describe("markRemoteWorkspaceRunningTasksFailed", () => {
       ],
       getWorkspaceState: () => workspaceState,
       setTaskRuntimeState,
-      reason: "远程连接已断开",
+      reason: "Remote connection closed",
     });
 
     expect(count).toBe(0);

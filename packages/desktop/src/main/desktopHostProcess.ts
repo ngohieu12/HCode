@@ -586,7 +586,7 @@ export function spawnHostProcess(
           requestId: request.requestId,
           ok: false,
           // Bugfix: /reconnect 需要 main 侧 bridge，缺 handler 时返回明确原因，避免继续显示笼统的不可访问。
-          error: "未注入 Bot 远端 workspace 重连处理器。",
+          error: "Bot remote workspace reconnect handler was not injected.",
         });
         return;
       }
@@ -626,7 +626,7 @@ export function spawnHostProcess(
           type: HostMessageTypes.BotRemoteWorkspaceConnectionStatusResult,
           requestId: request.requestId,
           ok: false,
-          error: "未注入 Bot 远端 workspace 连接状态处理器。",
+          error: "Bot remote workspace connection state handler was not injected.",
         });
         return;
       }
@@ -668,7 +668,7 @@ export function spawnHostProcess(
           ok: false,
           // Bugfix: 远端 Bot 不能在缺少 runtime bridge 时回落到本地 ZCode Agent，
           // 否则会把 remote workspace 的任务写到本地并触发错误模型。
-          error: "未注入 Bot 远端 workspace runtime 处理器。",
+          error: "Bot remote workspace runtime handler was not injected.",
         });
         return;
       }

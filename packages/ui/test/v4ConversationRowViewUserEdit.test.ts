@@ -1,4 +1,5 @@
 import { act, createElement, type ReactElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createRoot, type Root } from "react-dom/client";
 import { FileClockIcon } from "lucide-react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -437,7 +438,7 @@ describe("ConversationRowView reasoning summary", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, { context: { ...rowContext, readAttachment }, row }),
         ),
       );
@@ -461,7 +462,7 @@ describe("ConversationRowView reasoning summary", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, { context: rowContext, row }),
         ),
       );
@@ -513,7 +514,7 @@ describe("ConversationRowView user query editing", () => {
         root.render(
           createElement(
             ZCodeIntlProvider,
-            { initialLocale: "zh-CN" },
+            { initialLocale: "vi-VN", messages: zhCNLegacy },
             createElement(ConversationRowView, {
               context: { ...rowContext, compactForRemoteControl },
               row,
@@ -562,7 +563,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, { context: rowContext, row }),
         ),
       );
@@ -599,7 +600,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             row: userInputRow({ sourceCommandId }),
@@ -644,7 +645,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             row: userInputRow({ text, attachments }),
@@ -693,7 +694,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             row: userInputRow({ text: "" }),
@@ -796,7 +797,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, readAttachment },
             row,
@@ -931,7 +932,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, readAttachment },
             row,
@@ -1012,7 +1013,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, readAttachment },
             row,
@@ -1118,7 +1119,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, readAttachment },
             row,
@@ -1192,7 +1193,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, readAttachment },
             row,
@@ -1270,7 +1271,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, readAttachment },
             row,
@@ -1339,7 +1340,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, readAttachment },
             row,
@@ -1373,7 +1374,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, readAttachment },
             row,
@@ -1395,7 +1396,7 @@ describe("ConversationRowView user query editing", () => {
   // 回归：v4 迁移后用户行复制/编辑按钮硬编码中文，未走 i18n；
   // en-US 下会显示「复制」「编辑」。文案必须跟随当前 locale。
   it.each([
-    ["zh-CN", "复制", "编辑"],
+    ["vi-VN", "复制", "编辑"],
     ["en-US", "Copy", "Edit"],
   ] as const)(
     "renders user row copy/edit action labels from locale %s",
@@ -1408,7 +1409,7 @@ describe("ConversationRowView user query editing", () => {
         root.render(
           createElement(
             ZCodeIntlProvider,
-            { initialLocale: locale },
+            { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
             createElement(ConversationRowView, {
               context: rowContext,
               onEdit: vi.fn(),
@@ -1441,7 +1442,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, compactForRemoteControl: true },
             row,
@@ -1473,7 +1474,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: { ...rowContext, compactForRemoteControl: true },
             row,
@@ -1527,7 +1528,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             row,
@@ -1556,7 +1557,7 @@ describe("ConversationRowView user query editing", () => {
         root.render(
           createElement(
             ZCodeIntlProvider,
-            { initialLocale: "zh-CN" },
+            { initialLocale: "vi-VN", messages: zhCNLegacy },
             createElement(ConversationRowView, {
               context: rowContext,
               row,
@@ -1591,7 +1592,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: {
               ...rowContext,
@@ -1643,7 +1644,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             onEdit: vi.fn(),
@@ -1729,7 +1730,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             onEdit: vi.fn(),
@@ -1765,7 +1766,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             row: userInputRow({
@@ -1796,7 +1797,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             row,
@@ -1824,7 +1825,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             onEdit,
@@ -1895,7 +1896,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             onEdit,
@@ -1981,7 +1982,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             onEdit,
@@ -2029,7 +2030,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             onEdit,
@@ -2083,7 +2084,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             onEdit,
@@ -2146,7 +2147,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             onEdit,
@@ -2196,7 +2197,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             editWorkspaceRewindAvailability: {
@@ -2278,7 +2279,7 @@ describe("ConversationRowView user query editing", () => {
       root.render(
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(ConversationRowView, {
             context: rowContext,
             editWorkspaceRewindAvailability: {

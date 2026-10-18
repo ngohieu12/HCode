@@ -11,20 +11,11 @@ it("内嵌网页导航保留顶部和左右间距，移除底部内边距", asyn
 });
 
 it("菜单保留邀请好友及奖励徽标，页面标题独立为奖励中心", async () => {
-  expect(await readFile("packages/ui/src/i18n/locales/zh-CN.ts", "utf8")).toContain(
-    '"rewards.menuTitle": "邀请好友"',
-  );
-  expect(await readFile("packages/ui/src/i18n/locales/zh-CN.ts", "utf8")).toContain(
-    '"rewards.menuBadge": "奖励"',
-  );
   expect(await readFile("packages/ui/src/i18n/locales/en-US.ts", "utf8")).toContain(
     '"rewards.menuTitle": "Refer a friend"',
   );
   expect(await readFile("packages/ui/src/i18n/locales/en-US.ts", "utf8")).toContain(
     '"rewards.menuBadge": "Rewards"',
-  );
-  expect(await readFile("packages/ui/src/i18n/locales/zh-CN.ts", "utf8")).toContain(
-    '"rewards.title": "奖励中心"',
   );
   expect(await readFile("packages/ui/src/i18n/locales/en-US.ts", "utf8")).toContain(
     '"rewards.title": "Rewards"',

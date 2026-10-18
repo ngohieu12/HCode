@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // 工作流详情页（docs/dynamic-workflow/launch.md「The detail page」「元数据编辑」「运行历史」）。
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -116,7 +117,7 @@ function mount(overrides: Partial<Parameters<typeof SavedWorkflowDetailView>[0]>
   render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(SavedWorkflowDetailView, props),
     ),
   );

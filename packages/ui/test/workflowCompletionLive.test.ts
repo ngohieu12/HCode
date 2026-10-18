@@ -7,6 +7,7 @@
 // **载荷**被砍的事实，卡却拿它决定「还有 N 个」的写法，而清单早已从 journal 补齐、数字明明可知。省略号
 // 只在载荷是唯一来源时才诚实：冷渲染、老 CLI、journal 还没答上来的那几帧。
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { createElement, type ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { WorkflowRunArtifact } from "@zcode/shared/zcode-protocol-v4";
@@ -116,7 +117,7 @@ function renderCompletion(
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: "zh-CN" },
+      { initialLocale: "vi-VN", messages: zhCNLegacy },
       createElement(ConversationWorkflowCompletion, { completion, context, turnKey: "t1" }),
     ),
   );

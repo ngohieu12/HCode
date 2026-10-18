@@ -404,7 +404,7 @@ describe("forceUpdateGuard", () => {
     );
 
     const resultPromise = maybeBlockStartupForForceUpdate({
-      locale: "zh-CN",
+      locale: "en-US",
       logger: createLogger(),
       fetchRemoteConfig: async () => ({
         forceUpdate: { minimalVersion: "999.0.0" },
@@ -469,7 +469,7 @@ describe("forceUpdateGuard", () => {
     );
 
     const resultPromise = maybeBlockStartupForForceUpdate({
-      locale: "zh-CN",
+      locale: "en-US",
       logger: createLogger(),
       fetchRemoteConfig: async () => ({
         forceUpdate: { minimalVersion: "999.0.0" },
@@ -510,7 +510,7 @@ describe("forceUpdateGuard", () => {
 
     const text = formatForceUpdateDialogText(
       { currentVersion: "3.1.7", minimalVersion: "4.0.0" },
-      "zh-CN",
+      "en-US",
     );
 
     expect(text.detail).toBe("当前版本：v3.1.7\n最低可用版本：v4.0.0");

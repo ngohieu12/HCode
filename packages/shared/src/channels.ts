@@ -498,7 +498,17 @@ export interface EmbeddedBrowserWheelBoundaryPayload {
   deltaY: number;
 }
 
+/**
+ * 插件 UI 沙箱 guest（partition=plugin-sandbox:<id>）的 main → guest preload 频道。
+ * preload 只把 MessagePort 组经 window.postMessage 转交给受信 shell，不暴露任何 contextBridge API。
+ */
+export const PluginSandboxChannels = {
+  /** main → guest：{ sandboxId, initId, names } + port1[]，shell 据此建立宿主端口 */
+  Init: "zcode:plugin-sandbox-init",
+} as const;
 
+// ============================================================================
+// 内部传输频道 —— 框架级别的通信
 // ============================================================================
 /** 内部传输频道。用于 MessagePort 转发等框架级通信。 */
 export const InternalChannels = {

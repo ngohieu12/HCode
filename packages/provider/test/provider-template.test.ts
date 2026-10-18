@@ -22,7 +22,7 @@ describe("Provider Template", () => {
       parseProviderTemplateMap([
         {
           templateId: "deepseek",
-          templateNameMap: { "zh-CN": "深度求索", "en-US": "DeepSeek" },
+          templateNameMap: { "vi-VN": "DeepSeek VN", "en-US": "DeepSeek" },
           config: {
             logo: { type: "builtin", key: "deepseek" },
             access: { type: "api-key", apiKeyManagementUrl: "https://example.com/keys" },
@@ -35,7 +35,7 @@ describe("Provider Template", () => {
         ?.toJSON(),
     ).toEqual({
       templateId: "deepseek",
-      templateNameMap: { "zh-CN": "深度求索", "en-US": "DeepSeek" },
+      templateNameMap: { "vi-VN": "DeepSeek VN", "en-US": "DeepSeek" },
       config: {
         logo: { type: "builtin", key: "deepseek" },
         access: { type: "api-key", apiKeyManagementUrl: "https://example.com/keys" },
@@ -63,7 +63,7 @@ describe("Provider Template", () => {
   it("按当前语言、英文和 Template ID 依次解析名称", () => {
     const localized = new ProviderTemplate({
       templateId: "deepseek",
-      templateNameMap: { "zh-CN": "深度求索", "en-US": "DeepSeek" },
+      templateNameMap: { "vi-VN": "DeepSeek VN", "en-US": "DeepSeek" },
       config: new ProviderConfig(),
     });
     const englishOnly = new ProviderTemplate({
@@ -77,9 +77,9 @@ describe("Provider Template", () => {
       config: new ProviderConfig(),
     });
 
-    expect(resolveProviderTemplateName("deepseek", localized, "zh-CN")).toBe("深度求索");
-    expect(resolveProviderTemplateName("deepseek", englishOnly, "zh-CN")).toBe("DeepSeek");
-    expect(resolveProviderTemplateName("deepseek", unnamed, "zh-CN")).toBe("deepseek");
+    expect(resolveProviderTemplateName("deepseek", localized, "vi-VN")).toBe("DeepSeek VN");
+    expect(resolveProviderTemplateName("deepseek", englishOnly, "vi-VN")).toBe("DeepSeek");
+    expect(resolveProviderTemplateName("deepseek", unnamed, "vi-VN")).toBe("deepseek");
   });
 
   it("同一 Template 可实例化为多个独立 Provider，Template 不进入 Registry", () => {

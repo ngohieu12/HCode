@@ -353,7 +353,7 @@ export function createBotsService(
   return createBotsServiceImpl({
     // Bots 不再持久化 workspace 候选项；测试默认从 settings.lastWorkspaceSession 提供当前工作区。
     settingService: createSettingService({
-      locale: "zh-CN",
+      locale: "en-US",
       lastWorkspaceSession: [
         {
           kind: "remote",

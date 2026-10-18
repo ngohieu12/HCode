@@ -25,7 +25,7 @@ import {
 
 vi.mock("@/i18n/IntlProvider.js", () => ({
   useZCodeIntl: () => ({
-    locale: "zh-CN",
+    locale: "vi-VN",
     intl: {
       formatMessage: (
         { id }: { id: string },

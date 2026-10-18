@@ -21,7 +21,7 @@ afterEach(cleanup);
 
 vi.mock("@/i18n/IntlProvider.js", () => ({
   useZCodeIntl: () => ({
-    locale: "zh-CN",
+    locale: "vi-VN",
     intl: {
       formatMessage: ({ id }: { id: string }, values?: Record<string, string>) => {
         const message =
@@ -48,7 +48,7 @@ describe("ProviderTemplatePicker", () => {
           templates: [
             {
               templateId: "deepseek",
-              templateNameMap: { "zh-CN": "深度求索", "en-US": "DeepSeek" },
+              templateNameMap: { "vi-VN": "深度求索", "en-US": "DeepSeek" },
               config: { logo: { type: "builtin", key: "deepseek" } },
             },
             {
@@ -100,7 +100,7 @@ describe("ProviderTemplatePicker", () => {
             templates: [
               {
                 templateId: "deepseek",
-                templateNameMap: { "zh-CN": "DeepSeek" },
+                templateNameMap: { "vi-VN": "DeepSeek" },
                 config: { logo: { type: "builtin", key: "deepseek" } },
               },
             ],

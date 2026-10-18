@@ -66,12 +66,12 @@ describe("desktopOAuthDeepLink workspace open routing", () => {
     const { resolveExternalWorkspaceOpenDialogCopy } =
       await import("../src/main/desktopOAuthDeepLink.js");
 
-    const zhCopy = resolveExternalWorkspaceOpenDialogCopy("zh-CN");
+    const viCopy = resolveExternalWorkspaceOpenDialogCopy("vi-VN");
     const enCopy = resolveExternalWorkspaceOpenDialogCopy("en-US");
 
-    expect(zhCopy.buttons).toEqual(["打开文件夹", "取消"]);
-    expect(zhCopy.title).toBe("打开外部 HCode 链接？");
-    expect(zhCopy.detail("/tmp/project")).toContain("只打开你信任来源的文件夹");
+    expect(viCopy.buttons).toEqual(["Open folder", "Cancel"]);
+    expect(viCopy.title).toBe("Open external HCode link?");
+    expect(viCopy.detail("/tmp/project")).toContain("Only open folders from sources you trust");
     expect(enCopy.buttons).toEqual(["Open folder", "Cancel"]);
   });
 
@@ -164,7 +164,7 @@ describe("desktopOAuthDeepLink workspace open routing", () => {
     targetWindow.webContents.send.mockClear();
 
     const handled = handleDeepLink(buildWorkspaceOpenUrl(workspacePath), logger, {
-      confirmationCopy: resolveExternalWorkspaceOpenDialogCopy("zh-CN"),
+      confirmationCopy: resolveExternalWorkspaceOpenDialogCopy("en-US"),
     });
 
     expect(handled).toBe(true);

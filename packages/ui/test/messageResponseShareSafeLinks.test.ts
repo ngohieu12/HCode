@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { MessageResponse } from "@/components/ai-elements/message.js";
@@ -13,7 +14,7 @@ describe("MessageResponse share-safe links", () => {
         null,
         createElement(
           ZCodeIntlProvider,
-          { initialLocale: "zh-CN" },
+          { initialLocale: "vi-VN", messages: zhCNLegacy },
           createElement(
             MessageResponse,
             { onOpenExternalUrl: vi.fn() },

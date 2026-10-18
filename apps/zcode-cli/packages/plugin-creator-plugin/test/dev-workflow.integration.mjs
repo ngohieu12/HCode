@@ -35,8 +35,8 @@ try {
   const dev = await upsertDevMarketplace({
     pluginPath: source,
     displayName: "Development Demo",
-    nameZh: "开发演示",
-    descriptionZh: "开发闭环测试",
+    nameEn: "Development Demo Localized",
+    descriptionEn: "Development loop test",
   });
   await command("validate", source);
   await command("validate", dev.marketplacePath);

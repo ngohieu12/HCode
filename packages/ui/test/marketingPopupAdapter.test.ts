@@ -6,8 +6,9 @@ import {
 } from "@/components/marketing-touch/marketingPopupAdapter.js";
 
 describe("marketing popup adapter", () => {
-  it.each(["zh-CN", "en-US"] as const)("%s Start 设置入口明确叫查看套餐", (locale) => {
-    const text = { format: "plaintext" as const, content: "立即使用" };
+  it("Start settings entry is labeled View plan", () => {
+    const locale = "en-US";
+    const text = { format: "plaintext" as const, content: "Use now" };
     const popup = adaptMarketingPopup(
       "start",
       locale,
@@ -29,9 +30,9 @@ describe("marketing popup adapter", () => {
         ],
       },
       null,
-      locale === "zh-CN" ? "查看套餐" : "View plan",
+      "View plan",
     );
-    expect(popup.dialog.buttons[0]?.label).toBe(locale === "zh-CN" ? "查看套餐" : "View plan");
+    expect(popup.dialog.buttons[0]?.label).toBe("View plan");
     expect(popup.dialog.buttons[0]?.formattedLabel?.text).toBe(popup.dialog.buttons[0]?.label);
   });
   it("preserves popup themes and uses default when omitted", () => {

@@ -38,7 +38,7 @@ import {
 import { getContextQuotaMeterGridClass } from "../src/chat-input-toolbar/contextQuotaMeterGrid.js";
 import { resolveMcpQuotaLimit } from "../src/lib/codingPlanQuotaPresentation.js";
 import enMessages from "../src/i18n/locales/en-US.js";
-import zhMessages from "../src/i18n/locales/zh-CN.js";
+import zhMessages from "./fixtures/zhCNLegacy.js";
 import { TooltipProvider } from "../src/components/ui/tooltip.js";
 
 const activeSubscription = {
@@ -790,9 +790,9 @@ describe("formatContextUsageTokenCount", () => {
   });
 
   it("uses localized compact units for Chinese context usage", () => {
-    expect(formatContextUsageTokenCount(399_900, "zh-CN")).toBe("40万");
-    expect(formatContextUsageTokenCount(200_000, "zh-CN")).toBe("20万");
-    expect(formatContextUsageTokenCount(120_000_000, "zh-CN")).toBe("1.2亿");
+    expect(formatContextUsageTokenCount(399_900, "vi-VN")).toBe("40万");
+    expect(formatContextUsageTokenCount(200_000, "vi-VN")).toBe("20万");
+    expect(formatContextUsageTokenCount(120_000_000, "vi-VN")).toBe("1.2亿");
   });
 });
 

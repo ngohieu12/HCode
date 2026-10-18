@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // 已保存工作流卡片（docs/dynamic-workflow/launch.md「Cards」）：名字 / 说明 / 上次运行四态 / 实参芯片。
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
@@ -47,7 +48,9 @@ function run(overrides: Partial<ZCodeSavedWorkflowRun> = {}): ZCodeSavedWorkflow
 }
 
 function mount(node: ReactNode) {
-  return render(createElement(ZCodeIntlProvider, { initialLocale: "zh-CN" }, node));
+  return render(
+    createElement(ZCodeIntlProvider, { initialLocale: "vi-VN", messages: zhCNLegacy }, node),
+  );
 }
 
 describe("SavedWorkflowLastRunBadge", () => {

@@ -5,7 +5,7 @@ import {
   getThoughtLevelLabel,
   isNoThoughtLevel,
 } from "@/chat-input-toolbar/thoughtLevelOptions.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import zhCN from "./fixtures/zhCNLegacy.js";
 import enUS from "@/i18n/locales/en-US.js";
 
 const option: ZCodeConfigOption = {
@@ -27,7 +27,7 @@ const expectedLabels = [
 ] as const;
 
 describe.each([
-  ["zh-CN", zhCN, 1],
+  ["vi-VN", zhCN, 1],
   ["en-US", enUS, 2],
 ] as const)("思考档位 %s", (_locale, messages, column) => {
   const intl = { formatMessage: ({ id }: { id: string }) => messages[id] ?? id };

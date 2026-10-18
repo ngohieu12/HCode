@@ -15,7 +15,7 @@ describe("app telemetry runtime", () => {
     });
     const firstContext = {
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     };
     const secondContext = {
@@ -59,7 +59,7 @@ describe("app telemetry runtime", () => {
       rendererId: 1,
       context: {
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "3024x1964",
       },
     });
@@ -68,12 +68,12 @@ describe("app telemetry runtime", () => {
 
     expect(reportAppLaunch).toHaveBeenCalledWith({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
     expect(reportAppDailyActive).toHaveBeenCalledWith({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
   });
@@ -97,7 +97,7 @@ describe("app telemetry runtime", () => {
       rendererId: 1,
       context: {
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "3024x1964",
       },
     });
@@ -153,7 +153,7 @@ describe("app telemetry runtime", () => {
       rendererId: 1,
       context: {
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "3024x1964",
       },
     });
@@ -162,12 +162,12 @@ describe("app telemetry runtime", () => {
 
     expect(reportAppLaunch).toHaveBeenCalledWith({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
     expect(reportAppDailyActive).toHaveBeenCalledWith({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
   });
@@ -191,7 +191,7 @@ describe("app telemetry runtime", () => {
       rendererId: 1,
       context: {
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "3024x1964",
       },
     });
@@ -206,7 +206,7 @@ describe("app telemetry runtime", () => {
     expect(reportAppDailyActive).toHaveBeenCalledTimes(1);
     expect(reportAppDailyActive).toHaveBeenCalledWith({
       clientTimezone: "Asia/Shanghai",
-      clientLanguage: "zh-CN",
+      clientLanguage: "en-US",
       screenResolution: "3024x1964",
     });
   });
@@ -236,7 +236,7 @@ describe("app telemetry runtime", () => {
       rendererId: 1,
       context: {
         clientTimezone: "Asia/Shanghai",
-        clientLanguage: "zh-CN",
+        clientLanguage: "en-US",
         screenResolution: "3024x1964",
       },
     });

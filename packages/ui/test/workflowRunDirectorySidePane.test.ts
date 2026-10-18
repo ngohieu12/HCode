@@ -7,6 +7,7 @@
 // useWorkflowRunJournalSummaries.test.ts 里；这里只钉「那些结果真的接到了 DOM 上」、
 // 行点击发出什么，以及三种空态在屏幕上可分辨。
 import { createElement, useEffect, useState, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { V4ConversationWorkflowRunSummary } from "@zcode/shared/zcode-protocol-v4";
@@ -116,11 +117,11 @@ function projectionRun(runId: string, status: "running" | "pending" | "completed
   };
 }
 
-function renderPane(locale: "en-US" | "zh-CN" = "en-US") {
+function renderPane(locale: "en-US" | "vi-VN" = "en-US") {
   return render(
     createElement(
       ZCodeIntlProvider,
-      { initialLocale: locale },
+      { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
       createElement(WorkflowRunDirectorySidePane, { tab, onOpenWorkflowRun }),
     ),
   );
@@ -334,7 +335,7 @@ describe("WorkflowRunDirectorySidePane", () => {
       summary({ runId: "r-run", status: "running" }),
       summary({ runId: "r-fail", status: "errored" }),
     ];
-    const pane = renderPane("zh-CN");
+    const pane = renderPane("vi-VN");
 
     // 分区标题是「标题 · 计数」的组合节点，所以按子串匹配（计数本身另有 testid）。
     expect(pane.getByText(/正在运行/)).toBeTruthy();

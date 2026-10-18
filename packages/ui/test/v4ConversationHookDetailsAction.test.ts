@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { HookInvocationRow } from "@zcode/shared/zcode-protocol-v4";
@@ -74,14 +75,14 @@ function hookRow(
   };
 }
 
-function renderAction(rows: readonly HookInvocationRow[], locale: "zh-CN" | "en-US" = "zh-CN") {
+function renderAction(rows: readonly HookInvocationRow[], locale: "vi-VN" | "en-US" = "vi-VN") {
   return render(actionElement(rows, locale));
 }
 
-function actionElement(rows: readonly HookInvocationRow[], locale: "zh-CN" | "en-US" = "zh-CN") {
+function actionElement(rows: readonly HookInvocationRow[], locale: "vi-VN" | "en-US" = "vi-VN") {
   return createElement(
     ZCodeIntlProvider,
-    { initialLocale: locale },
+    { initialLocale: locale, messages: locale === "vi-VN" ? zhCNLegacy : undefined },
     createElement(ConversationHookDetailsAction, {
       rows,
       turnId: "turn-1",

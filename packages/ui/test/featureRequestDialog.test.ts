@@ -1,4 +1,5 @@
 import { createElement, type ReactNode } from "react";
+import zhCNLegacy from "./fixtures/zhCNLegacy.js";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { IFeedbackService } from "@zcode/services";
@@ -67,7 +68,7 @@ describe("FeatureRequestDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(FeatureRequestDialog, {
           feedbackService: createFeedbackService(),
         }),
@@ -87,7 +88,7 @@ describe("FeatureRequestDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(FeatureRequestDialog, {
           feedbackService: createFeedbackService(),
         }),
@@ -107,7 +108,7 @@ describe("FeatureRequestDialog", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
-        { initialLocale: "zh-CN" },
+        { initialLocale: "vi-VN", messages: zhCNLegacy },
         createElement(FeatureRequestDialog, {
           feedbackService: createFeedbackService(),
         }),

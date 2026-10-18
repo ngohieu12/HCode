@@ -213,7 +213,7 @@ async function configureSubagentReasoningOverrides() {
     "Select a reasoning effort supported by this model",
     "英文",
   );
-  await setRendererLocale("zh-CN");
+  await setRendererLocale("en-US");
   await waitForExploreInvalidEffortError("请选择当前模型支持的推理档位", "中文");
   await setRendererLocale("en-US");
   await waitForExploreInvalidEffortError(
@@ -265,7 +265,7 @@ async function configureSubagentReasoningOverrides() {
   await waitForWorkspaceApp(DEFAULT_WORKSPACE, 30000);
 }
 
-async function setRendererLocale(locale: "en-US" | "zh-CN") {
+async function setRendererLocale(locale: "en-US" | "vi-VN") {
   const changed = await browser.execute((nextLocale) => {
     const actions = (
       window as typeof window & {
