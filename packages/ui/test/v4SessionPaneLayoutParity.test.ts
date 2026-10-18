@@ -177,11 +177,8 @@ vi.mock("@/request-security-edition/V4ProviderRuntimeHeadersController.js", asyn
 vi.mock("@/v4/ConversationDraftEmptyState.js", async () => {
   const React = await import("react");
   return {
-    ConversationDraftEmptyState: (props: { compactForRemoteControl?: boolean }) =>
-      React.createElement("div", {
-        "data-testid": "mock-draft-empty",
-        "data-compact-remote": props.compactForRemoteControl ? "true" : "false",
-      }),
+    ConversationDraftEmptyState: () =>
+      React.createElement("div", { "data-testid": "mock-draft-empty" }),
   };
 });
 
@@ -386,11 +383,11 @@ describe("SessionPane v4 chat layout parity", () => {
       resolve(process.cwd(), "packages/ui/src/v4/ConversationDraftEmptyState.tsx"),
       "utf8",
     );
-    expect(emptyStateSource).not.toContain("100vw");
-    expect(emptyStateSource).toContain("resolveGreetingFontSizePx");
-    expect(emptyStateSource).toContain("new ResizeObserver");
+    expect(emptyStateSource).toContain("text-ui-xl");
     expect(emptyStateSource).toContain("data-v4-draft-greeting");
-    expect(html).toContain('data-compact-remote="false"');
+    expect(emptyStateSource).not.toContain("ResizeObserver");
+    expect(emptyStateSource).not.toContain("resolveGreetingFontSizePx");
+    expect(emptyStateSource).not.toContain("compactForRemoteControl");
     expect(timelineSource).not.toContain("setDesktopWindowContentMinimumHeight");
     expect(timelineSource).not.toContain("draftWindowMinimumHeight");
     expect(timelineSource).not.toContain("useOptionalPlatform");
@@ -403,7 +400,6 @@ describe("SessionPane v4 chat layout parity", () => {
   it("keeps the mobile remote draft on the original compact centered layout", () => {
     const html = renderPane({ sessionId: null, compactForRemoteControl: true });
 
-    expect(html).toContain('data-compact-remote="true"');
     expect(html).toMatch(/class="[^"]*justify-center[^"]*gap-4/u);
     expect(html).not.toContain("before:min-h-[52px]");
   });
