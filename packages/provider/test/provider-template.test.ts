@@ -13,7 +13,6 @@ import {
   ProviderTemplateMap,
   parseProviderTemplateMap,
   parseZCodeBuiltinModelConfigRules,
-  resolveProviderTemplateName,
 } from "../src/index.js";
 
 describe("Provider Template", () => {

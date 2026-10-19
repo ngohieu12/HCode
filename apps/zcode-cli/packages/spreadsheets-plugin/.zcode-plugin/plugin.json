@@ -1,15 +1,43 @@
 {
   "name": "spreadsheets",
-  "version": "0.1.8",
-  "description": "XLSX spreadsheet production skills, published as an official ZCode plugin.",
+  "version": "0.2.0",
+  "description": "XLSX spreadsheet production skills and an Excel viewer panel, published as an official ZCode plugin.",
   "description_i18n": {
-    "en": "Spreadsheet skills for XLSX: create, edit, analyze, chart, and convert workbooks.",
-    "vi-VN": "Kỹ năng bảng tính XLSX: tạo, chỉnh sửa, phân tích, biểu đồ và chuyển đổi định dạng."
+    "en": "Spreadsheet skills for XLSX: create, edit, analyze, chart, and convert workbooks. View workbooks in a side panel: reference cells in chat, and the agent can read, search, point at and capture them.",
+    "vi-VN": "Kỹ năng bảng tính cho XLSX: tạo, chỉnh sửa, phân tích, vẽ biểu đồ và chuyển đổi sổ làm việc. Xem sổ làm việc trong bảng bên: trích dẫn ô vào cuộc trò chuyện, và Agent có thể đọc, tìm kiếm, chỉ định vị trí và chụp nội dung."
   },
   "author": {
     "name": "Z.ai"
   },
   "license": "Apache-2.0",
   "skills": "skills",
-  "agents": "agents"
+  "agents": "agents",
+  "mcpServers": {
+    "spreadsheets": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${ZCODE_PLUGIN_ROOT}/dist/server.mjs"
+      ],
+      "cwd": "${ZCODE_PROJECT_DIR}",
+      "env": {
+        "ZCODE_WORKSPACE_ROOT": "${ZCODE_PROJECT_DIR}"
+      }
+    }
+  },
+  "ui": {
+    "surfaces": [
+      {
+        "id": "spreadsheets",
+        "title": {
+          "zh-CN": "电子表格",
+          "en-US": "Spreadsheets"
+        },
+        "icon": "table",
+        "server": "spreadsheets",
+        "resourceUri": "ui://spreadsheets/panel.html",
+        "availability": "session"
+      }
+    ]
+  }
 }

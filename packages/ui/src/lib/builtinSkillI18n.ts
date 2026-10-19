@@ -61,6 +61,10 @@ const BUILTIN_SKILL_DESCRIPTIONS: Record<string, Partial<Record<Locale, string>>
   "docx": {
     "en-US": "Create, edit, and analyze DOCX documents with revisions, comments, formatting preservation, and text extraction. Use for new documents, edits, revision handling, comments, and professional Word document work.",
   },
+  "docx-viewer": {
+    "zh-CN": "在 Word 文档侧栏与用户一起查看和讨论 .docx 文件。适用于打开、阅读、审阅或询问工作区中的 Word 文档，用户提到在查看器中选中或引用的内容，或需要检查刚生成的文档。",
+    "en-US": "View and discuss Word (.docx) files with the user in the Documents side panel. Use to open, read, review, or ask about a workspace Word document, when the user refers to a selection or reference in the viewer, or to check a document you just produced.",
+  },
   "executing-plans": {
     "en-US": "Use when you have a written implementation plan to execute in a separate session with review checkpoints.",
   },
@@ -73,8 +77,16 @@ const BUILTIN_SKILL_DESCRIPTIONS: Record<string, Partial<Record<Locale, string>>
   "pdf": {
     "en-US": "Professional PDF toolkit for reports, creative visuals, academic LaTeX, and existing-PDF workflows. Supports reports, posters, papers, resumes, extraction, merge, split, forms, and conversion.",
   },
+  "pdf-viewer": {
+    "zh-CN": "在 PDF 侧栏与用户一起查看和讨论 PDF 文件。适用于打开、阅读、审阅或询问工作区中的 PDF，用户提到在查看器中选中或引用的内容，或需要检查刚生成的 PDF。",
+    "en-US": "View and discuss PDF files with the user in the PDF side panel. Use to open, read, review, or ask about a workspace PDF, when the user refers to a selection or reference in the viewer, or to check a PDF you just produced.",
+  },
   "pptx": {
     "en-US": "Inspect and narrowly update elements selected in PPTX Preview Pane. Verifies the whole-file fingerprint and OOXML locator for shape or table-cell text, and stops on conflicts instead of guessing.",
+  },
+  "pptx-viewer": {
+    "zh-CN": "在演示文稿侧栏与用户一起查看和讨论 .pptx 演示文稿。适用于一起打开、审阅或询问工作区中的演示文稿，用户提到在查看器中选中或引用的幻灯片或元素，或需要检查刚生成的演示文稿。",
+    "en-US": "View and discuss PowerPoint (.pptx) decks with the user in the Presentations side panel. Use to open, review, or ask about a workspace deck together, when the user refers to a slide or shape selected or referenced in the viewer, or to check a deck you just produced.",
   },
   "receiving-code-review": {
     "en-US": "Use when receiving code review feedback before implementing suggestions, especially when feedback is unclear or technically questionable.",
@@ -118,6 +130,10 @@ const BUILTIN_SKILL_DESCRIPTIONS: Record<string, Partial<Record<Locale, string>>
   },
   "writing-skills": {
     "en-US": "Use when creating new skills, editing existing skills, or verifying skills work before deployment.",
+  },
+  "xlsx-viewer": {
+    "zh-CN": "在电子表格侧栏与用户一起查看和讨论 .xlsx 工作簿。适用于一起打开、浏览或询问工作区中的工作簿，用户提到在查看器中选中或引用的单元格，或需要检查刚生成的工作簿。",
+    "en-US": "View and discuss Excel (.xlsx) workbooks with the user in the Spreadsheets side panel. Use to open, browse, or ask about a workspace workbook together, when the user refers to cells selected or referenced in the viewer, or to check a workbook you just produced.",
   },
 };
 

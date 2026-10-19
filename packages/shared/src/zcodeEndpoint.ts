@@ -3,6 +3,7 @@ import type { ZCodeEnv } from "./env.js";
 // HCode 尚无托管服务；保留不可解析的占位域，禁止默认回连上游或复用其 OAuth client。
 export const DEFAULT_ZCODE_ENDPOINT_ORIGIN = "https://services.hcode.invalid";
 export const TEST_ZCODE_ENDPOINT_ORIGIN = "https://services.hcode.invalid";
+export const CODING_PLAN_LOCAL_WEBVIEW_ORIGIN = "http://localhost:3000";
 export const DEFAULT_BIGMODEL_API_ORIGIN = "https://accounts.hcode.invalid";
 export const TEST_BIGMODEL_API_ORIGIN = "https://accounts.hcode.invalid";
 export const DEFAULT_ZAI_OAUTH_ORIGIN = "https://auth.hcode.invalid";
@@ -152,6 +153,29 @@ function isLoopbackHostname(hostname: string): boolean {
   return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
 }
 
+export function isTrustedCodingPlanWebviewOrigin(
+  value: string | null | undefined,
+  options?: {
+    e2eStoreBridgeEnabled?: boolean;
+  },
+): boolean {
+  if (!value) return false;
+  try {
+    const origin = normalizeZCodeEndpointOrigin(value);
+    if (
+      origin === DEFAULT_ZCODE_ENDPOINT_ORIGIN ||
+      origin === TEST_ZCODE_ENDPOINT_ORIGIN ||
+      origin === CODING_PLAN_LOCAL_WEBVIEW_ORIGIN
+    ) {
+      return true;
+    }
+    const parsed = new URL(origin);
+    return options?.e2eStoreBridgeEnabled === true && isLoopbackHostname(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
 export function resolveZCodeEndpointOrigin(options?: {
   env?: ZCodeEnv;
   envBaseOrigin?: string | null;
@@ -218,8 +242,12 @@ export function resolveWebRemoteControlRelayWsUrl(options?: {
     return overrideUrl;
   }
 
-  // 未显式配置 relay 时只返回 HCode 保留占位地址，不回连上游 relay。
-  return DEFAULT_WEB_REMOTE_CONTROL_RELAY_WS_URL;
+  const origin = new URL(
+    normalizeZCodeEndpointOrigin(options?.endpointOrigin?.trim() || DEFAULT_ZCODE_ENDPOINT_ORIGIN),
+  );
+  origin.protocol = origin.protocol === "https:" ? "wss:" : "ws:";
+  origin.pathname = "/api/v1/remote/ws2";
+  return origin.toString();
 }
 
 export function resolveBigModelApiOrigin(env: RuntimeBigModelApiEnv = {}): string {
@@ -341,9 +369,9 @@ export function buildZCodeEndpointUrls(
     origin: normalizedOrigin,
     apiBaseUrl: `${normalizedOrigin}/api/v1`,
     remoteUrl: `${normalizedOrigin}/remote/${remoteVersion}`,
-    webRemoteCallbackUrl: `${normalizedOrigin}/web-remote/callback`,
+    webRemoteCallbackUrl: `${normalizedOrigin}/remote/v4`,
     webShareCallbackUrl: `${normalizedOrigin}/cn/share/callback`,
-    relayWsUrl: `${wsOrigin}/ws`,
+    relayWsUrl: `${wsOrigin}/api/v1/remote/ws2`,
     zcodePlanOpenAiBaseUrl: `${normalizedOrigin}/api/v1/zcode-plan`,
     zcodePlanAnthropicBaseUrl: `${normalizedOrigin}/api/v1/zcode-plan/anthropic`,
     zcodePlanBillingCurrentUrl: `${normalizedOrigin}/api/v1/zcode-plan/billing/current`,

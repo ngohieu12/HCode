@@ -142,6 +142,13 @@ describe("resolveTelemetryProviderScope", () => {
       });
     }
   });
+
+  it("未知的 builtin: 前缀不能借前缀混入内置", () => {
+    expect(resolveTelemetryProviderScope("builtin:my-proxy")).toEqual({
+      providerId: "custom",
+      providerScope: "custom",
+    });
+  });
 });
 
 describe("resolveTelemetryModelId", () => {

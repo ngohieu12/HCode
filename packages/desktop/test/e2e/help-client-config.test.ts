@@ -105,7 +105,7 @@ describe("帮助配置 client/configs", () => {
     const query = new URL(server.requests[0]!.url, server.origin).searchParams;
     expect(query.get("app_version")).toBeTruthy();
     expect(query.get("platform")).toBe(`${process.platform}-${process.arch}`);
-    expect(server.requests[0]!.headers.authorization).toBeUndefined();
+    expect(helpRequests[0]!.headers.authorization).toBeUndefined();
   });
 
   it("HC-02: 英文缺失只回退英文内置值", async () => {

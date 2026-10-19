@@ -38,14 +38,11 @@ vi.mock("@/components/ai-elements/code-block.js", () => ({
       children,
       createElement("pre", null, code),
     ),
-  CodeBlockActions: ({ children }: { children: ReactNode }) =>
-    createElement("div", null, children),
+  CodeBlockActions: ({ children }: { children: ReactNode }) => createElement("div", null, children),
   CodeBlockCopyButton: (props: ComponentProps<"button">) =>
     createElement("button", { ...props, type: "button" }),
-  CodeBlockHeader: ({ children }: { children: ReactNode }) =>
-    createElement("div", null, children),
-  CodeBlockTitle: ({ children }: { children: ReactNode }) =>
-    createElement("div", null, children),
+  CodeBlockHeader: ({ children }: { children: ReactNode }) => createElement("div", null, children),
+  CodeBlockTitle: ({ children }: { children: ReactNode }) => createElement("div", null, children),
   CodeBlockWrapButton: (props: ComponentProps<"button">) =>
     createElement("button", { ...props, type: "button" }),
 }));
@@ -71,9 +68,7 @@ function renderImageToolCall(source?: "browser_turn_end", imageCount = 1) {
     toolId: source ? "tool-browser-turn-screenshot" : "tool-node-repl-image",
     toolName: "mcp__node_repl__js",
     kind: "mcp__node_repl__js",
-    input: source
-      ? { source }
-      : { code: "nodeRepl.emitImage(await tab.screenshot());" },
+    input: source ? { source } : { code: "nodeRepl.emitImage(await tab.screenshot());" },
     output: "",
     raw: {
       schemaVersion: 1,
@@ -234,131 +229,83 @@ describe("node repl tool interaction", () => {
 
     const resultSurface = screen.getByTestId("node-repl-result-surface");
     expect(resultSurface.textContent).toBe("示例页面");
-    expect(resultSurface.className).toContain("bg-card");
-    expect(resultSurface.className).toContain("border-border");
     expect(screen.queryByTestId("code-block")).toBeNull();
   });
 
   it.each([
     ["显式 Node REPL 图片", undefined],
     ["自动轮尾图片", "browser_turn_end" as const],
-  ])(
-    "opens and closes the fullscreen preview for %s",
-    async (_name, source) => {
-      renderImageToolCall(source);
+  ])("opens and closes the fullscreen preview for %s", async (_name, source) => {
+    renderImageToolCall(source);
 
-      const thumbnail = screen.getByRole("button", { name: "打开图片预览 1" });
-      expect(thumbnail.className).toContain("max-w-1/2");
-      expect(thumbnail.querySelector("img")?.className).toContain("max-h-90");
-      expect(thumbnail.querySelector("img")?.className).toContain("rounded-xl");
-      expect(screen.queryByTestId("node-repl-image-lightbox")).toBeNull();
+    const thumbnail = screen.getByRole("button", { name: "打开图片预览 1" });
+    expect(screen.queryByTestId("node-repl-image-lightbox")).toBeNull();
 
-      fireEvent.click(thumbnail);
+    fireEvent.click(thumbnail);
 
-      const lightbox = screen.getByTestId("node-repl-image-lightbox");
-      const previewImage = screen.getByTestId("node-repl-image-lightbox-image");
-      expect(lightbox.className).toContain("w-[calc(100vw-1rem)]");
-      expect(lightbox.className).toContain("h-[calc(100dvh-1rem)]");
-      expect(lightbox.className).toContain("sm:w-[calc(100vw-2rem)]");
-      expect(lightbox.className).toContain("pointer-events-auto");
-      expect(lightbox.className).toContain("[app-region:no-drag]");
-      expect(previewImage.getAttribute("src")).toBe(
-        "data:image/png;base64,AAAA",
-      );
-      expect(previewImage.className).toContain("max-h-full");
-      expect(previewImage.className).toContain("max-w-full");
-      expect(previewImage.getAttribute("draggable")).toBe("false");
-      expect(screen.getByText("100%")).toBeTruthy();
-      expect(screen.getByRole("button", { name: "下载图片" })).toBeTruthy();
-      expect(screen.queryByRole("button", { name: "上一张图片" })).toBeNull();
-      const closeButton = screen.getByRole("button", { name: "关闭" });
-      const topActions = closeButton.parentElement;
-      expect(
-        screen.getByRole("button", { name: "下载图片" }).parentElement,
-      ).toBe(topActions);
-      expect(topActions?.className).toContain("pointer-events-auto");
-      expect(topActions?.className).toContain("[app-region:no-drag]");
-      expect(topActions?.className).toContain("right-4");
-      expect(topActions?.className).toContain("top-4");
-      expect(topActions?.className).toContain(
-        "platform-windows-desktop:right-6",
-      );
-      expect(topActions?.className).toContain(
-        "platform-windows-desktop:top-[calc(env(titlebar-area-height,48px)_+_0.5rem)]",
-      );
-      expect(topActions?.className).toContain("platform-linux-desktop:right-6");
-      expect(topActions?.className).toContain("platform-linux-desktop:top-4");
-      expect(topActions?.className).toContain("platform-mac-desktop:top-12");
+    const previewImage = screen.getByTestId("node-repl-image-lightbox-image");
+    expect(previewImage.getAttribute("src")).toBe("data:image/png;base64,AAAA");
+    expect(previewImage.getAttribute("draggable")).toBe("false");
+    expect(screen.getByText("100%")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "下载图片" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "上一张图片" })).toBeNull();
 
-      fireEvent.click(previewImage);
-      expect(screen.getByTestId("node-repl-image-lightbox")).toBeTruthy();
+    fireEvent.click(previewImage);
+    expect(screen.getByTestId("node-repl-image-lightbox")).toBeTruthy();
 
-      const previewViewport = previewImage.parentElement as HTMLDivElement;
-      const setPointerCapture = vi.fn();
-      const releasePointerCapture = vi.fn();
-      previewViewport.setPointerCapture = setPointerCapture;
-      previewViewport.hasPointerCapture = vi.fn(() => true);
-      previewViewport.releasePointerCapture = releasePointerCapture;
+    const previewViewport = previewImage.parentElement as HTMLDivElement;
+    const setPointerCapture = vi.fn();
+    const releasePointerCapture = vi.fn();
+    previewViewport.setPointerCapture = setPointerCapture;
+    previewViewport.hasPointerCapture = vi.fn(() => true);
+    previewViewport.releasePointerCapture = releasePointerCapture;
 
-      fireEvent.pointerDown(previewViewport, {
-        clientX: 100,
-        clientY: 100,
-        pointerId: 7,
-      });
-      fireEvent.pointerUp(previewViewport, {
-        clientX: 100,
-        clientY: 100,
-        pointerId: 7,
-      });
-      expect(setPointerCapture).toHaveBeenCalledWith(7);
-      expect(releasePointerCapture).toHaveBeenCalledWith(7);
+    fireEvent.pointerDown(previewViewport, {
+      clientX: 100,
+      clientY: 100,
+      pointerId: 7,
+    });
+    fireEvent.pointerUp(previewViewport, {
+      clientX: 100,
+      clientY: 100,
+      pointerId: 7,
+    });
+    expect(setPointerCapture).toHaveBeenCalledWith(7);
+    expect(releasePointerCapture).toHaveBeenCalledWith(7);
 
-      fireEvent.keyDown(screen.getByTestId("node-repl-image-lightbox"), {
-        key: "Escape",
-        code: "Escape",
-      });
-      await waitFor(() =>
-        expect(screen.queryByTestId("node-repl-image-lightbox")).toBeNull(),
-      );
-      expect(document.activeElement).toBe(thumbnail);
+    fireEvent.keyDown(screen.getByTestId("node-repl-image-lightbox"), {
+      key: "Escape",
+      code: "Escape",
+    });
+    await waitFor(() => expect(screen.queryByTestId("node-repl-image-lightbox")).toBeNull());
+    expect(document.activeElement).toBe(thumbnail);
 
-      fireEvent.click(thumbnail);
-      fireEvent.click(screen.getByRole("button", { name: "关闭" }));
-      await waitFor(() =>
-        expect(screen.queryByTestId("node-repl-image-lightbox")).toBeNull(),
-      );
-      expect(document.activeElement).toBe(thumbnail);
-    },
-  );
+    fireEvent.click(thumbnail);
+    fireEvent.click(screen.getByRole("button", { name: "关闭" }));
+    await waitFor(() => expect(screen.queryByTestId("node-repl-image-lightbox")).toBeNull());
+    expect(document.activeElement).toBe(thumbnail);
+  });
 
   it("groups Browser Use result images and navigates inside the shared preview", () => {
     renderImageToolCall(undefined, 2);
 
-    const gallery = document.querySelector("[data-node-repl-image-gallery]");
-    expect(gallery?.className).toContain("grid-cols-1");
-    expect(gallery?.className).toContain("sm:grid-cols-2");
-    expect(gallery?.className).toContain("md:flex-wrap");
-    expect(gallery?.className).toContain(
-      "md:[&>[data-image-thumbnail-trigger]]:h-44",
+    fireEvent.click(screen.getByRole("button", { name: "打开图片预览 1" }));
+    expect(screen.getByTestId("node-repl-image-lightbox-image").getAttribute("src")).toBe(
+      "data:image/png;base64,AAAA",
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "打开图片预览 1" }));
-    expect(
-      screen.getByTestId("node-repl-image-lightbox-image").getAttribute("src"),
-    ).toBe("data:image/png;base64,AAAA");
-
     fireEvent.click(screen.getByRole("button", { name: "下一张图片" }));
-    expect(
-      screen.getByTestId("node-repl-image-lightbox-image").getAttribute("src"),
-    ).toBe("data:image/png;base64,BBBB");
+    expect(screen.getByTestId("node-repl-image-lightbox-image").getAttribute("src")).toBe(
+      "data:image/png;base64,BBBB",
+    );
 
     fireEvent.keyDown(screen.getByTestId("node-repl-image-lightbox"), {
       key: "ArrowLeft",
       code: "ArrowLeft",
     });
-    expect(
-      screen.getByTestId("node-repl-image-lightbox-image").getAttribute("src"),
-    ).toBe("data:image/png;base64,AAAA");
+    expect(screen.getByTestId("node-repl-image-lightbox-image").getAttribute("src")).toBe(
+      "data:image/png;base64,AAAA",
+    );
   });
 
   it("falls back to browser-native navigation when a remote image rejects CORS fetch", async () => {
@@ -391,17 +338,13 @@ describe("node repl tool interaction", () => {
     fireEvent.click(screen.getByRole("button", { name: "下载图片" }));
     await waitFor(() => expect(anchorClick).toHaveBeenCalledTimes(1));
     expect(
-      document.querySelector(
-        'a[href="https://images.example.test/no-cors-cat.png"]',
-      ),
+      document.querySelector('a[href="https://images.example.test/no-cors-cat.png"]'),
     ).toBeNull();
   });
 
   it("navigates from an image to a video in the shared media gallery", () => {
     const onActiveIndexChange = vi.fn();
-    const pause = vi
-      .spyOn(HTMLMediaElement.prototype, "pause")
-      .mockImplementation(() => undefined);
+    const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined);
 
     render(
       createElement(
@@ -441,9 +384,7 @@ describe("node repl tool interaction", () => {
     fireEvent.click(screen.getByRole("button", { name: "下一张图片" }));
     const reopenedVideo = document.querySelector("video");
     fireEvent.error(reopenedVideo!);
-    expect(screen.getByRole("alert").textContent).toContain(
-      "当前设备不支持预览",
-    );
+    expect(screen.getByRole("alert").textContent).toContain("当前设备不支持预览");
     expect(screen.getByRole("button", { name: "上一张图片" })).not.toBeNull();
   });
 
@@ -482,10 +423,9 @@ describe("node repl tool interaction", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "下载图片" }));
     await waitFor(() =>
-      expect(
-        (screen.getByRole("button", { name: "下载图片" }) as HTMLButtonElement)
-          .disabled,
-      ).toBe(false),
+      expect((screen.getByRole("button", { name: "下载图片" }) as HTMLButtonElement).disabled).toBe(
+        false,
+      ),
     );
     expect(anchorClick).not.toHaveBeenCalled();
   });

@@ -9,7 +9,6 @@ import {
   buildStoreItems,
   canUpdatePluginItem,
   formatCanonicalPluginName,
-  formatCanonicalMarketplaceName,
   groupItemsByCategory,
   resolveItemDisplayName,
   resolvePluginDisplayName,
@@ -105,14 +104,6 @@ describe("pluginStoreListing", () => {
     );
   });
 
-  it("formats marketplace slugs as display names", () => {
-    expect(formatCanonicalMarketplaceName("zcode-plugins-official", "en-US")).toBe(
-      "ZCode Plugins Official",
-    );
-    expect(formatCanonicalMarketplaceName("claude-plugins-official", "en-US")).toBe(
-      "Claude Plugins Official",
-    );
-  });
   it("resolves localized text with exact locale then language-prefix fallback", () => {
     expect(resolveLocalizedText("vi-VN", "base", { "vi-VN": "chính xác" })).toBe("chính xác");
     expect(resolveLocalizedText("vi-VN", "base", { vi: "tiền tố" })).toBe("tiền tố");

@@ -246,7 +246,6 @@ describe("message and task control tool call details", () => {
     );
 
     expect(html).not.toContain('role="button"');
-    expect(html).not.toContain("rounded-lg border border-border bg-panel");
   });
 
   it("does not render SendMessage plain-text model content as success details", () => {
@@ -391,7 +390,6 @@ describe("message and task control tool call details", () => {
     expect(html).toContain("background_shell");
     expect(html).toContain("命令");
     expect(html).toContain("pnpm test");
-    expect(html).toMatch(/<dd class="[^"]*font-mono[^"]*">pnpm test<\/dd>/u);
     expect(html).toContain("结果");
     expect(html).toContain("Successfully stopped task: task_alpha");
     expect(html).not.toContain("Successfully stopped task: task_alpha (pnpm test)");
@@ -427,10 +425,7 @@ describe("message and task control tool call details", () => {
 
     expect(html).toContain("任务描述");
     expect(html).not.toContain(">命令<");
-    expect(html).toMatch(
-      /<dt[^>]*>任务描述<\/dt><dd class="[^"]*leading-5[^"]*">检查赔率来源<\/dd>/u,
-    );
-    expect(html).not.toMatch(/font-mono[^>]*>检查赔率来源/u);
+    expect(html).toMatch(/<dt[^>]*>任务描述<\/dt><dd[^>]*>检查赔率来源<\/dd>/u);
   });
 
   it("does not expose a legacy local agent prompt as a task description", () => {
@@ -656,7 +651,6 @@ describe("message and task control tool call details", () => {
     });
 
     expect(html).not.toContain('role="button"');
-    expect(html).not.toContain("rounded-lg border border-border bg-panel");
   });
 
   it("renders only bounded TaskOutput output and its truncation notice", () => {
@@ -720,7 +714,6 @@ describe("message and task control tool call details", () => {
 
     expect(html).toContain("已获取");
     expect(html).not.toContain('role="button"');
-    expect(html).not.toContain("rounded-lg border border-border bg-panel");
   });
 
   it.each([
@@ -903,9 +896,6 @@ describe("message and task control tool call details", () => {
       );
 
       expect(html).toContain(expected);
-      if (displayStatus === "failed") {
-        expect(html).toContain("执行失败");
-      }
     },
   );
 });

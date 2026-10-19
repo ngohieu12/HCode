@@ -5,11 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { IFeedbackService } from "@zcode/services";
 import type { FeedbackTicketSummary } from "@zcode/shared";
-import {
-  FeedbackTicketList,
-  TicketsInitialLoadingState,
-  TicketsView,
-} from "@/feedback/TicketsView.js";
+import { FeedbackTicketList, TicketsView } from "@/feedback/TicketsView.js";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 
 function createFeedbackService(): IFeedbackService {

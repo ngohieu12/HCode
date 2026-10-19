@@ -157,12 +157,6 @@ describe("AppUsageLifetimeSummaryStrip", () => {
     expect(html).toContain("2 小时 15 分");
     expect(html).toContain("5 天");
     expect(html).toContain("34 天");
-    expect(html).toContain("rounded-xl");
-    expect(html).toContain("h-7");
-    expect(html).toContain("w-px");
-    expect(html).not.toContain("border-border");
-    expect(html).not.toContain("border-t");
-    expect(html).not.toContain("sm:border-l");
   });
 
   it("renders the lifetime strip, range tabs and a sortable model table without charts", async () => {

@@ -237,7 +237,7 @@ describe("@zcode/provider-node", () => {
     expect(reasons).toEqual([]);
 
     await writeZCodeBuiltin(filePath, "model-b");
-    await vi.waitFor(() => expect(reasons).toContain("file-changed"));
+    await vi.waitFor(() => expect(reasons).toContain("file-changed"), { timeout: 10_000 });
     await settleFileWatcher();
 
     expect(reasons).toEqual(["file-changed"]);
@@ -312,7 +312,7 @@ describe("@zcode/provider-node", () => {
       providers: new ProviderConfigMap([["external", personalProviderConfig(false)]]),
       models: ModelConfigRules.empty(),
     }));
-    await vi.waitFor(() => expect(reasons).toContain("poll-changed"));
+    await vi.waitFor(() => expect(reasons).toContain("poll-changed"), { timeout: 10_000 });
     await new Promise((resolve) => setTimeout(resolve, 30));
 
     expect(reasons).toEqual(["poll-changed"]);
@@ -337,7 +337,7 @@ describe("@zcode/provider-node", () => {
     repository.onDidChange((reason) => reasons.push(reason));
     await repository.read();
 
-    await vi.waitFor(() => expect(pollingErrors).toHaveLength(1));
+    await vi.waitFor(() => expect(pollingErrors).toHaveLength(1), { timeout: 10_000 });
     await new Promise((resolve) => setTimeout(resolve, 30));
     expect(pollingErrors).toHaveLength(1);
 
@@ -352,7 +352,7 @@ describe("@zcode/provider-node", () => {
       ),
       "utf8",
     );
-    await vi.waitFor(() => expect(reasons).toContain("poll-changed"));
+    await vi.waitFor(() => expect(reasons).toContain("poll-changed"), { timeout: 10_000 });
     expect((await repository.read()).providers.keys()).toEqual(["recovered"]);
     repository.dispose();
   });

@@ -6,7 +6,6 @@ import {
   formatAboutDetail,
   formatAboutOptimizationLine,
 } from "../src/main/about.js";
-import { createCustomAboutDialogHtml } from "../src/main/aboutWindow.js";
 
 describe("about", () => {
   const appleSiliconSnapshot = createAboutSnapshot({

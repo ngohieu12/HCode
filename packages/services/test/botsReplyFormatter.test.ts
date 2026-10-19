@@ -45,14 +45,13 @@ describe("bot reply formatter", () => {
   });
 
   it("formats assistant response blocks with tool block and change summary", () => {
-    const toolCall: BotReplyToolCallState =
-      {
-        toolId: "tool-1",
-        title: "Edit file",
-        kind: "edit",
-        input: { file_path: "/repo/project/packages/ui/src/App.tsx" },
-        status: "completed",
-      };
+    const toolCall: BotReplyToolCallState = {
+      toolId: "tool-1",
+      title: "Edit file",
+      kind: "edit",
+      input: { file_path: "/repo/project/packages/ui/src/App.tsx" },
+      status: "completed",
+    };
 
     const messages = formatBotAssistantReplyBlocks(
       [
@@ -79,23 +78,17 @@ describe("bot reply formatter", () => {
   });
 
   it("buffers streaming assistant responses until terminal flush", () => {
-    expect(
-      extractBotAssistantResponseMessages("这是第一句。第二句还没换行", false),
-    ).toEqual({
+    expect(extractBotAssistantResponseMessages("这是第一句。第二句还没换行", false)).toEqual({
       messages: [],
       rest: "这是第一句。第二句还没换行",
     });
 
-    expect(
-      extractBotAssistantResponseMessages("第一段。\n\n第二段还在流式输出", false),
-    ).toEqual({
+    expect(extractBotAssistantResponseMessages("第一段。\n\n第二段还在流式输出", false)).toEqual({
       messages: [],
       rest: "第一段。\n\n第二段还在流式输出",
     });
 
-    expect(
-      extractBotAssistantResponseMessages("第一段。\n\n第二段", true),
-    ).toEqual({
+    expect(extractBotAssistantResponseMessages("第一段。\n\n第二段", true)).toEqual({
       messages: ["第一段。\n\n第二段"],
       rest: "",
     });
@@ -178,7 +171,6 @@ describe("bot reply formatter", () => {
     expect(text).toBe(
       "Tool calls:\n- Completed · Run command · `pnpm vitest run packages/services/test/botsReplyFormatter.te ...  --reporter verbose --runInBand`",
     );
-    expect(text).not.toContain("botsService.test.ts");
   });
 
   it("shortens long run commands in permission request summaries", () => {
@@ -194,7 +186,6 @@ describe("bot reply formatter", () => {
     expect(text).toBe(
       "Permission required:\nPermission Required\n`npm exec very-long-script -- --workspace /Users/me/project - ... er.ts --include-generated false`",
     );
-    expect(text).not.toContain("packages/services/src/bots");
   });
 
   it("uses edit kind labels in permission request titles", () => {

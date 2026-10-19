@@ -1,6 +1,6 @@
 {
   "name": "zcode",
-  "version": "3.15.1",
+  "version": "3.16.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "dev:desktop:remote-prod": "node scripts/dev-desktop-remote-prod.mjs",
     "dev:server": "pnpm --filter @zcode/server dev",
     "dev:official-mcp": "node scripts/dev-official-mcp-server.mjs",
-    "prepare": "husky",
+    "prepare": "husky && pnpm build:cua",
     "prepare:desktop-runtime": "pnpm --filter @zcode/desktop prepare:runtime-assets",
     "dep:graph": "node scripts/dependency-graph.mjs",
     "dep:refs": "node scripts/dep-refs.mjs",
@@ -29,7 +29,7 @@
     "test:coverage": "vitest run --coverage --exclude \"packages/desktop/test/e2e/**/*.test.ts\"",
     "test:unit": "vitest run --exclude \"packages/desktop/test/e2e/**/*.test.ts\"",
     "test:unit:affected": "node scripts/run-affected-unit-tests.mjs",
-    "verify:pre-push": "pnpm run lint && pnpm run architecture:check -- --changed && pnpm run test:unit:affected",
+    "verify:pre-push": "pnpm run lint && pnpm run db:schema:check && pnpm run test:architecture && pnpm run architecture:check -- --changed && pnpm run test:unit:affected --scope push",
     "build": "pnpm -r build",
     "build:desktop-agent:bytecode": "node scripts/build-desktop-agent-bytecode.mjs",
     "build:bootstrap": "pnpm -r --filter \"./packages/*\" --filter \"!@zcode/desktop\" build && pnpm --filter @zcode/desktop build:no-runtime-assets",
@@ -38,14 +38,16 @@
     "ci:ensure-native-search-deps": "node scripts/ensure-native-search-deps.mjs",
     "test:native-search:e2e": "node scripts/test-native-search-tools-e2e.mjs",
     "clean": "node scripts/clean.mjs",
-    "typecheck": "tsc -b packages/rpc packages/provider packages/provider-node packages/shared packages/services packages/client packages/server packages/ui packages/desktop/tsconfig.host.json packages/desktop/tsconfig.e2e.json packages/e2e-report",
+    "typecheck": "tsc -b packages/shared/tsconfig.testing.json packages/rpc packages/provider packages/provider-node packages/shared packages/services packages/client packages/server packages/ui packages/e2e-report packages/desktop/tsconfig.main.json packages/desktop/tsconfig.host.json packages/desktop/tsconfig.e2e.json && tsc -p packages/desktop/tsconfig.remote-main.json --noEmit && tsc -p packages/zcode-cua --noEmit",
     "bundle:desktop": "pnpm --filter @zcode/desktop run bundle --",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "knip": "knip",
     "count-lines": "bash scripts/count-lines.sh",
-    "prepare:remote-assets": "pnpm --filter @zcode/desktop prepare:remote-assets",
+    "prepare:remote-assets": "pnpm --filter @zcode/server-cli stage:remote-assets",
+    "prepare:remote-assets:linux": "pnpm --filter @zcode/server-cli stage:remote-assets --linux",
     "ci:assert-node": "node scripts/assert-node-version.mjs",
+    "build:cua": "pnpm --filter @zcode/zcode-cua build",
     "doctor:macos-release": "bash scripts/doctor-macos-release-app.sh",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix --fix-suggestions",
@@ -56,7 +58,10 @@
     "architecture:report": "node scripts/architecture/architecture-check.mjs report",
     "architecture:baseline:update": "node scripts/architecture/architecture-check.mjs baseline:update",
     "architecture:context": "node scripts/architecture/architecture-check.mjs context",
-    "test:architecture": "node --test scripts/test/architecture-governance.test.mjs"
+    "test:architecture": "node --test scripts/test/architecture-governance.test.mjs scripts/test/architecture-governance-review.test.mjs scripts/test/architecture-upstream-admission.test.mjs scripts/test/source-size-policy.test.mjs",
+    "architecture:adopt": "node scripts/architecture/architecture-check.mjs adopt",
+    "db:schema:check": "node --test scripts/test/sqlite-schema-contract.test.mjs && pnpm --dir apps/zcode-cli exec tsx ../../scripts/check-sqlite-schema.ts",
+    "db:schema:update": "pnpm --dir apps/zcode-cli exec tsx ../../scripts/check-sqlite-schema.ts --update"
   },
   "dependencies": {
     "border-beam": "^1.0.1",
@@ -69,6 +74,7 @@
     "@tanstack/react-virtual": "^3.13.23",
     "@types/node": "^25.5.0",
     "@vitest/coverage-v8": "^4.1.1",
+    "@zcode/zcode-cua": "workspace:*",
     "concurrently": "^9.1.2",
     "conventional-changelog-conventionalcommits": "^9.3.1",
     "conventional-changelog-writer": "^8.4.0",
@@ -100,6 +106,7 @@
       "react-dom": "19.2.7"
     },
     "patchedDependencies": {
+      "@radix-ui/react-collapsible@1.1.12": "patches/@radix-ui__react-collapsible@1.1.12.patch",
       "vitest@4.1.7": "patches/vitest@4.1.7.patch",
       "wdio-electron-service@9.2.1": "patches/wdio-electron-service@9.2.1.patch",
       "@arms/rum-electron@0.0.3": "patches/@arms__rum-electron@0.0.3.patch",
