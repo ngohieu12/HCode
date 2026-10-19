@@ -115,7 +115,7 @@ export function formatPluginSandboxPermissionDialogText(
     title: "App permission request",
     message: `The "${input.serverName}" app wants to use your ${list}`,
     detail:
-      "This page runs in the ZCode sandbox. If you allow it, apps from this MCP server can keep using these permissions until ZCode restarts.",
+      "This page runs in the HCode sandbox. If you allow it, apps from this MCP server can keep using these permissions until HCode restarts.",
     allowButton: "Allow",
     denyButton: "Deny",
   };

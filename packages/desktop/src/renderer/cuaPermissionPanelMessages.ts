@@ -14,7 +14,7 @@ const MESSAGES: Record<
   Omit<CuaPermissionPanelMessages, "permissionLabel"> & Record<CuaPermissionKind, string>
 > = {
   "en-US": {
-    documentTitle: "ZCode Computer Use Permissions",
+    documentTitle: "HCode Computer Use Permissions",
     dragTitle: "Drag me to the permission list above",
     hintPrefix: "Drag the icon on the left into the ",
     hintSuffix: " list above",
@@ -24,7 +24,7 @@ const MESSAGES: Record<
   },
   // 越南语暂无独立文案，先复用英文，保证面板不会出现中文。
   "vi-VN": {
-    documentTitle: "ZCode Computer Use Permissions",
+    documentTitle: "HCode Computer Use Permissions",
     dragTitle: "Drag me to the permission list above",
     hintPrefix: "Drag the icon on the left into the ",
     hintSuffix: " list above",

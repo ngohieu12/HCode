@@ -1,16 +1,17 @@
 import type { ZCodeEnv } from "./env.js";
 
-export const DEFAULT_ZCODE_ENDPOINT_ORIGIN = "https://zcode.z.ai";
-export const TEST_ZCODE_ENDPOINT_ORIGIN = "https://zcode.z.ai";
-export const DEFAULT_BIGMODEL_API_ORIGIN = "https://bigmodel.cn";
-export const TEST_BIGMODEL_API_ORIGIN = "https://bigmodel.cn";
-export const DEFAULT_ZAI_OAUTH_ORIGIN = "https://chat.z.ai";
-export const TEST_ZAI_OAUTH_ORIGIN = "https://chat.z.ai";
-export const DEFAULT_ZAI_BUSINESS_BASE_URL = "https://api.z.ai";
-export const TEST_ZAI_BUSINESS_BASE_URL = "https://api.z.ai";
-export const DEFAULT_ZAI_OAUTH_CLIENT_ID = "client_P8X5CMWmlaRO9gyO-KSqtg";
-export const TEST_ZAI_OAUTH_CLIENT_ID = "client_P8X5CMWmlaRO9gyO-KSqtg";
-export const DEFAULT_WEB_REMOTE_CONTROL_RELAY_WS_URL = "wss://zcode.z.ai/ws";
+// HCode 尚无托管服务；保留不可解析的占位域，禁止默认回连上游或复用其 OAuth client。
+export const DEFAULT_ZCODE_ENDPOINT_ORIGIN = "https://services.hcode.invalid";
+export const TEST_ZCODE_ENDPOINT_ORIGIN = "https://services.hcode.invalid";
+export const DEFAULT_BIGMODEL_API_ORIGIN = "https://accounts.hcode.invalid";
+export const TEST_BIGMODEL_API_ORIGIN = "https://accounts.hcode.invalid";
+export const DEFAULT_ZAI_OAUTH_ORIGIN = "https://auth.hcode.invalid";
+export const TEST_ZAI_OAUTH_ORIGIN = "https://auth.hcode.invalid";
+export const DEFAULT_ZAI_BUSINESS_BASE_URL = "https://business.hcode.invalid";
+export const TEST_ZAI_BUSINESS_BASE_URL = "https://business.hcode.invalid";
+export const DEFAULT_ZAI_OAUTH_CLIENT_ID = "";
+export const TEST_ZAI_OAUTH_CLIENT_ID = "";
+export const DEFAULT_WEB_REMOTE_CONTROL_RELAY_WS_URL = "wss://services.hcode.invalid/ws";
 export const WEB_REMOTE_CONTROL_V4_MIN_APP_VERSION = "3.4.0";
 
 export interface BuildZCodeEndpointUrlsOptions {
@@ -217,12 +218,7 @@ export function resolveWebRemoteControlRelayWsUrl(options?: {
     return overrideUrl;
   }
 
-  // Bugfix：标准 test endpoint 已部署独立 relay；继续固定到生产 relay 会让测试环境跨环境配对。
-  // 仅识别规范 test origin，避免改变 production、localhost 和其他自定义 endpoint 的既有行为。
-  if (options?.endpointOrigin?.trim() === TEST_ZCODE_ENDPOINT_ORIGIN) {
-    return "wss://zcode.z.ai/ws";
-  }
-
+  // 未显式配置 relay 时只返回 HCode 保留占位地址，不回连上游 relay。
   return DEFAULT_WEB_REMOTE_CONTROL_RELAY_WS_URL;
 }
 

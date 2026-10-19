@@ -2,13 +2,6 @@ import { ZCODE_VERSION, type ZCodeEnv } from "@zcode/shared";
 
 declare const __ZCODE_REMOTE_CDN_RELEASE_ROOTS__: readonly string[] | undefined;
 
-const REMOTE_CDN_RELEASE_ROOTS = {
-  domestic: "https://cdn.codegeex.cn/zcode/electron/releases",
-  // 开发构建未注入 CDN_DOMAIN 时也须使用当前发布域名，避免仍请求旧域名。
-  overseas: "https://cdn-zcode.z.ai/zcode/electron/releases",
-} as const;
-const TEST_REMOTE_CDN_RELEASE_ROOT = "http://intranet.example.invalid:12345/ssh-remote-assets";
-
 export interface ResolveRemoteCdnOptions {
   env?: ZCodeEnv;
   locale?: string;
@@ -49,14 +42,7 @@ export function resolveRemoteCdnBaseUrls(options: ResolveRemoteCdnOptions = {}):
     return [normalizeBaseUrl(overrideBaseUrl)];
   }
 
-  const orderedReleaseRoots = shouldPreferDomesticRemoteCdn(options)
-    ? [REMOTE_CDN_RELEASE_ROOTS.domestic, REMOTE_CDN_RELEASE_ROOTS.overseas]
-    : [REMOTE_CDN_RELEASE_ROOTS.overseas, REMOTE_CDN_RELEASE_ROOTS.domestic];
   const version = options.version ?? ZCODE_VERSION;
-
-  if (options.env === "test") {
-    return [`${TEST_REMOTE_CDN_RELEASE_ROOT}/${version}`];
-  }
 
   const configuredReleaseRoots =
     typeof __ZCODE_REMOTE_CDN_RELEASE_ROOTS__ === "undefined"
@@ -70,7 +56,8 @@ export function resolveRemoteCdnBaseUrls(options: ResolveRemoteCdnOptions = {}):
     );
   }
 
-  return orderedReleaseRoots.map((releaseRoot) => `${releaseRoot}/${version}`);
+  // HCode 未发布独立 remote runtime CDN；缺少配置时不可下载上游二进制。
+  return [];
 }
 
 export function resolvePrimaryRemoteCdnBaseUrl(

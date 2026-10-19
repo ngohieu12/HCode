@@ -9,6 +9,7 @@ import {
   ProjectAccessTokenClient,
   ProjectAccessTokenTransientError,
   resolveBigModelApiOrigin,
+  resolveZaiBusinessBaseUrl,
   type ProjectAccessTokenMaterial,
 } from "@zcode/shared";
 import { ZaiBusinessTokenCache, type ZaiBusinessToken } from "./zai-business-token-cache.js";
@@ -16,7 +17,6 @@ import { ZaiBusinessTokenCache, type ZaiBusinessToken } from "./zai-business-tok
 const BUSINESS_AUTH_MAX_ATTEMPTS = 2;
 const SINGLE_ATTEMPT = 1;
 const PROJECT_TOKEN_REQUEST_TIMEOUT_MS = 15_000;
-const ZAI_API_HOST = "https://api.z.ai";
 export type CodingPlanFamily = "bigmodel" | "zai";
 export interface CodingPlanApiKeyResolverOptions {
   httpClient: HttpClientPort;
@@ -123,7 +123,7 @@ export function createCodingPlanApiKeyResolver(
         input.family === "zai"
           ? await businessTokens
               .resolve(oauth, () =>
-                request(`${ZAI_API_HOST}/api/auth/z/login`, {
+                request(`${resolveZaiBusinessBaseUrl(process.env)}/api/auth/z/login`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ token: oauth }),
@@ -145,7 +145,10 @@ export function createCodingPlanApiKeyResolver(
       if (run) run.business = business;
       try {
         const result = await client.resolve({
-          origin: input.family === "zai" ? ZAI_API_HOST : resolveBigModelApiOrigin(process.env),
+          origin:
+            input.family === "zai"
+              ? resolveZaiBusinessBaseUrl(process.env)
+              : resolveBigModelApiOrigin(process.env),
           family: input.family,
           loginToken,
           accountId: input.accountIdentity ?? input.family,
