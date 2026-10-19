@@ -42,6 +42,7 @@ import {
   isPluginUpdatePending,
   resolveItemDisplayName,
   resolvePluginDisplayName,
+  type PluginStoreSegment,
   type StorePluginItem,
 } from "@/settings/pluginStoreListing.js";
 import { ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_ID } from "@zcode/shared";
@@ -139,6 +140,9 @@ export function PluginStorePage({
 
   const [detailPluginId, setDetailPluginId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  // 商店来源分段（公开/社区/个人）：列表与搜索都限定在当前分段内，卸载后的条目仍按
+  // 其市场归属留在原分段的浏览列表中，不能因分段状态缺失而只能靠搜索命中。
+  const [segment, setSegment] = useState<PluginStoreSegment>("public");
   const [refreshing, setRefreshing] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [addSourceOpen, setAddSourceOpen] = useState(false);
