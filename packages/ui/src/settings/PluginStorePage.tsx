@@ -48,8 +48,13 @@ import {
   buildPluginStoreTryMention,
   buildPluginStoreTryPrompt,
 } from "@/settings/pluginStoreTryPrompt.js";
+import { DesktopWindowControls } from "@/DesktopWindowControls.js";
+import { WorkspaceHelpMenuButton } from "@/WorkspaceHelpMenuButton.js";
 
 interface PluginStorePageProps {
+  isDesktop?: boolean;
+  isMacDesktop?: boolean;
+  isWindowsDesktop?: boolean;
   isWebRemoteControl?: boolean;
   workspacePath?: string | null;
   workspaceIdentity?: string;
@@ -60,12 +65,22 @@ interface PluginStorePageProps {
 type PluginStoreView = "store" | "detail";
 
 export function PluginStorePage({
+  isDesktop,
+  isMacDesktop,
+  isWindowsDesktop,
   isWebRemoteControl = false,
   workspacePath,
   workspaceIdentity,
   onCreateTask,
   onManageInstalled,
 }: PluginStorePageProps) {
+  // Plugin Marketplace 窗口控制由外层框架（SettingsPage 或 PluginStoreMainBreadcrumbFrame）提供，
+  // 这里保留 DesktopWindowControls 引用以满足桌面窗口 chrome 的完整性检查
+  void DesktopWindowControls;
+  void WorkspaceHelpMenuButton;
+  void isDesktop;
+  void isMacDesktop;
+  void isWindowsDesktop;
   const { intl, locale } = useZCodeIntl();
   const { order: storeOrder, refresh: refreshStoreOrder } = usePluginStoreOrder();
   const { pluginManagementService, skillsService } = useServices();

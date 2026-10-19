@@ -889,6 +889,12 @@ export function App({
     },
     [handleOpenSettingsSection],
   );
+  const handleNavigateToMarketplaceMain = useCallback(() => {
+    setWorkspaceMainView("pluginStore");
+  }, []);
+  const handleOpenMarketplace = useCallback(() => {
+    handleNavigateToMarketplaceMain();
+  }, [handleNavigateToMarketplaceMain]);
   const handleOpenAutomationConsumed = useCallback(() => {
     setOpenAutomationId(null);
     setOpenAutomationTab(null);
@@ -1175,6 +1181,7 @@ export function App({
           onWorkspaceMainViewChange={setWorkspaceMainView}
           onOpenAutomationConsumed={handleOpenAutomationConsumed}
           handleOpenAutomations={handleOpenAutomations}
+          handleOpenMarketplace={handleOpenMarketplace}
           onConnectRemote={onConnectRemote}
           onSelectRemoteProject={onSelectRemoteProject}
           onCancelRemoteProject={onCancelRemoteProject}
