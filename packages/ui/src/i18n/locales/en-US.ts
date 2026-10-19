@@ -272,7 +272,7 @@ const enUS: Record<string, string> = {
   "manualClaimPlan.claim.share.copyImageSucceeded": "Image copied",
   "manualClaimPlan.claim.share.actionFailed": "Share action failed. Please try again.",
   "manualClaimPlan.claim.share.twitterText":
-    "I claimed {subtitle} on ZCode. Download and install ZCode to claim yours. https://zcode.z.ai",
+    "Shared from HCode: {subtitle}. https://github.com/ngohieu12/HCode",
   "manualClaimPlan.claim.share.twitterTextLabel": "Twitter/X post text",
   // Common
   "common.loading": "Loading...",
@@ -978,8 +978,6 @@ const enUS: Record<string, string> = {
   "login.oauth.noProviders":
     "No account providers are available right now. Please try again later.",
   "login.oauth.button": "Continue with {provider}",
-  "login.oauth.button.zai": "Connect to Z.ai",
-  "login.oauth.button.bigmodel": "Connect to BigModel",
   "login.oauth.regionTag.zai": "Global",
   "login.oauth.regionTag.bigmodel": "CN",
   "login.oauth.waiting": "Waiting for {provider} authentication...",
@@ -994,8 +992,6 @@ const enUS: Record<string, string> = {
   "login.apiKey.title": "API Key",
   "login.apiKey.placeholder": "Enter API key",
   "login.apiKey.providerLabel": "API key provider",
-  "login.apiKey.provider.zai": "Z.ai",
-  "login.apiKey.provider.bigmodel": "BigModel",
   "login.apiKey.getApiKey": "Get API Key",
   "login.apiKey.cancel": "Cancel",
   "login.apiKey.continue": "Continue",
@@ -2007,7 +2003,7 @@ const enUS: Record<string, string> = {
   "webRemoteControl.taskStatus.running": "Running",
   "webRemoteControl.taskStatus.completed": "Done",
   "webRemoteControl.taskStatus.error": "Error",
-  "webRemoteControl.mobileHome.title": "ZCode remote control",
+  "webRemoteControl.mobileHome.title": "HCode remote control",
   "webRemoteControl.mobileHome.connected": "Connected to this desktop window",
   "webRemoteControl.mobileHome.notice":
     "This connection can view the projects, tasks, and sessions currently open on this device. If the QR code expires, return to desktop and connect again.",
@@ -2052,7 +2048,7 @@ const enUS: Record<string, string> = {
   "remote.kind.wsl": "WSL",
   "remote.kind.docker": "Docker",
   "remote.kind.ssh.wizardDescription": "Remote host",
-  "remote.kind.server.wizardDescription": "Running ZCode service",
+  "remote.kind.server.wizardDescription": "Running HCode service",
   "remote.kind.wsl.wizardDescription": "Windows Subsystem for Linux",
   "remote.kind.docker.wizardDescription": "Local container",
   "remote.connect": "Connect",
@@ -2080,7 +2076,7 @@ const enUS: Record<string, string> = {
   "remote.log.requestingSession": "Requesting the host process to create a remote session...",
   "remote.log.sessionReady":
     "Remote session created successfully. You can choose a directory next.",
-  "server.description": "Connect to an already running ZCode server.",
+  "server.description": "Connect to an already running HCode server.",
   "server.url": "Server URL",
   "server.urlPlaceholder": "e.g. https://studio.example.com:3030",
   "server.name": "Display name",
@@ -3029,7 +3025,7 @@ const enUS: Record<string, string> = {
   "settings.modelProvider.modelSaveFailure": "Failed to save {provider} / {model}: {error}",
   "settings.modelProvider.cancel": "Cancel",
   "settings.modelProvider.name": "Name",
-  "settings.modelProvider.namePlaceholder": "e.g. Z.ai GLM",
+  "settings.modelProvider.namePlaceholder": "e.g. My model provider",
   "settings.modelProvider.addProviderTitle": "Add model provider",
   "settings.modelProvider.addProviderDescription":
     "Configure a custom API endpoint and initial model.",
@@ -4042,7 +4038,7 @@ const enUS: Record<string, string> = {
   "settings.skills.delete.title": "Delete skill",
   "settings.skills.delete.description":
     'Delete "{name}"? This removes the skill folder from disk and cannot be undone.',
-  "settings.skills.agent.glm": "ZCode Agent",
+  "settings.skills.agent.glm": "HCode Agent",
   "settings.skills.agent.unknown": "Unknown source",
   "settings.skills.create.open": "New skill",
   "settings.skills.create.taskCreateFailed":
@@ -4677,7 +4673,7 @@ const enUS: Record<string, string> = {
   "settings.hooks.customJson": "Custom fields JSON",
   "settings.hooks.customJsonObjectError": "Custom fields must be a JSON object.",
   "settings.hooks.customJsonParseError": "Custom fields JSON parsing failed.",
-  "settings.plugins.zcodeOnly": "ZCode Agent only",
+  "settings.plugins.zcodeOnly": "HCode Agent only",
   "settingsSync.dialog.title": "Import Settings",
   "settingsSync.dialog.description":
     "Only missing items will be imported. Existing settings will be skipped automatically.",
@@ -5745,7 +5741,7 @@ const enUS: Record<string, string> = {
   // 「配置」弹层（docs/dynamic-workflow/presentation.md「The settings popover」）：改子代理模型与最大并发数，
   // 应用即一次 GUI 修订（新 run 接着跑，旧 run 停下，已完成的步骤作缓存带过去）。
   // 完成卡与 run 侧板上的「保存 / 再次运行」（docs/dynamic-workflow/transcript-and-notifications.md
-  // 「Saving the run, and running it again」）。两条路：交给 ZCode 提炼，或按原样直接写下去。
+  // 「Saving the run, and running it again」）。两条路：交给 HCode 提炼，或按原样直接写下去。
   "chat.toolCall.workflow.saveRun.action": "Save",
   "chat.toolCall.workflow.saveRun.runAgain": "Run again",
   "chat.toolCall.workflow.saveRun.starting": "Starting…",
@@ -5754,10 +5750,10 @@ const enUS: Record<string, string> = {
   "chat.toolCall.workflow.saveRun.announce.project": "Saved to the project",
   "chat.toolCall.workflow.saveRun.announce.global": "Saved as a global workflow",
   "chat.toolCall.workflow.saveRun.title": "Save workflow",
-  "chat.toolCall.workflow.saveRun.lead": "Let ZCode refine and save it",
+  "chat.toolCall.workflow.saveRun.lead": "Let HCode refine and save it",
   "chat.toolCall.workflow.saveRun.lead.hint":
-    "ZCode distills a reusable workflow for you, then asks you to confirm.",
-  "chat.toolCall.workflow.saveRun.lead.sending": "Handed to ZCode…",
+    "HCode distills a reusable workflow for you, then asks you to confirm.",
+  "chat.toolCall.workflow.saveRun.lead.sending": "Handed to HCode…",
   "chat.toolCall.workflow.saveRun.lead.unsupported": "This agent cannot save directly.",
   "chat.toolCall.workflow.saveRun.or": "or save it as is",
   "chat.toolCall.workflow.saveRun.name": "Name",
@@ -7268,13 +7264,13 @@ const enUS: Record<string, string> = {
   "globalNotice.highspeed.textCopied": "Share text copied",
   "globalNotice.highspeed.textCopyFailed": "Could not copy share text. Try again.",
   "globalNotice.highspeed.copyImage": "Copy image",
-  "globalNotice.highspeed.badge": "ZCode & Coding Plan Exclusive Benefits",
+  "globalNotice.highspeed.badge": "HCode & Coding Plan Exclusive Benefits",
   "globalNotice.highspeed.standardTaskSpeed": "Standard generation speed",
   "globalNotice.highspeed.relativeTaskDuration": "Relative generation time",
   "globalNotice.highspeed.speedSummary": "HighSpeed · {duration}",
   "globalNotice.highspeed.lessWaiting": "{percent}% less waiting",
   "globalNotice.highspeed.copySummary":
-    "I used the ZCode Highspeed card and saved {duration}s. Give it a try. Download ZCode https://zcode.z.ai",
+    "Working with HCode. https://github.com/ngohieu12/HCode",
   "globalNotice.highspeed.imageSummary": "{tokens} tokens · {duration}s saved",
   "globalNotice.highspeed.close": "Close Highspeed share card",
   ...requestSecurityMessagesEnUS,

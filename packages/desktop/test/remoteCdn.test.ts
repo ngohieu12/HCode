@@ -1,74 +1,31 @@
-import { describe, expect, it } from "vitest";
-import {
-  isUtcPlusEightTimeZone,
-  resolveRemoteCdnBaseUrls,
-  shouldPreferDomesticRemoteCdn,
-} from "../src/main/remoteCdn.js";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { isUtcPlusEightTimeZone, resolveRemoteCdnBaseUrls } from "../src/main/remoteCdn.js";
+
+afterEach(() => vi.unstubAllGlobals());
 
 describe("remoteCdn", () => {
-  it("中文且东八区时应优先国内 CDN", () => {
-    expect(
-      shouldPreferDomesticRemoteCdn({
-        locale: "en-US",
-        timeZone: "Asia/Shanghai",
-      }),
-    ).toBe(true);
-    expect(
-      resolveRemoteCdnBaseUrls({
-        env: "production",
-        locale: "en-US",
-        timeZone: "Asia/Shanghai",
-        version: "0.0.0-test",
-      }),
-    ).toEqual([
-      "https://cdn.codegeex.cn/zcode/electron/releases/0.0.0-test",
-      "https://cdn-zcode.z.ai/zcode/electron/releases/0.0.0-test",
+  it("uses explicitly configured build roots and never appends upstream mirrors", () => {
+    vi.stubGlobal("__ZCODE_REMOTE_CDN_RELEASE_ROOTS__", ["https://assets.example.test/releases/"]);
+    expect(resolveRemoteCdnBaseUrls({ version: "1.2.3" })).toEqual([
+      "https://assets.example.test/releases/1.2.3",
     ]);
+    expect(
+      resolveRemoteCdnBaseUrls({ overrideBaseUrl: "https://override.example.test/v2" }),
+    ).toEqual(["https://override.example.test/v2"]);
   });
 
-  it("非中文或非东八区时应优先海外 CDN", () => {
-    expect(
-      shouldPreferDomesticRemoteCdn({
-        locale: "en-US",
-        timeZone: "Asia/Shanghai",
-      }),
-    ).toBe(false);
-    expect(
-      shouldPreferDomesticRemoteCdn({
-        locale: "en-US",
-        timeZone: "America/Los_Angeles",
-      }),
-    ).toBe(false);
-    expect(
-      resolveRemoteCdnBaseUrls({
-        env: "production",
-        locale: "en-US",
-        timeZone: "America/Los_Angeles",
-        version: "0.0.0-test",
-      }),
-    ).toEqual([
-      "https://cdn-zcode.z.ai/zcode/electron/releases/0.0.0-test",
-      "https://cdn.codegeex.cn/zcode/electron/releases/0.0.0-test",
-    ]);
+  it.each([
+    { env: "production" as const, locale: "zh-CN", timeZone: "Asia/Shanghai" },
+    { env: "production" as const, locale: "en-US", timeZone: "America/Los_Angeles" },
+    { env: "test" as const, locale: "vi-VN", timeZone: "Asia/Ho_Chi_Minh" },
+  ])("has no upstream CDN fallback for %j", (options) => {
+    expect(resolveRemoteCdnBaseUrls({ ...options, version: "0.0.0-test" })).toEqual([]);
   });
 
   it("东八区判断应按 UTC 偏移而不是固定城市名单", () => {
     expect(isUtcPlusEightTimeZone("Asia/Shanghai")).toBe(true);
     expect(isUtcPlusEightTimeZone("Asia/Singapore")).toBe(true);
     expect(isUtcPlusEightTimeZone("Asia/Tokyo")).toBe(false);
-  });
-
-  it("测试产品环境应固定使用内网 SSH remote assets 根目录", () => {
-    expect(
-      resolveRemoteCdnBaseUrls({
-        env: "test",
-        locale: "en-US",
-        timeZone: "Asia/Shanghai",
-        version: "0.0.0-test",
-      }),
-    ).toEqual([
-      "http://intranet.example.invalid:12345/ssh-remote-assets/0.0.0-test",
-    ]);
   });
 
   it("显式覆盖 CDN 基址时不再按产品环境选择默认值", () => {

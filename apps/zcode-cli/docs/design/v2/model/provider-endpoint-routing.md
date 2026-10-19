@@ -1,5 +1,9 @@
 # Provider Endpoint Routing
 
+> HCode 当前行为：默认实现是 identity routing，所有用户模型 URL 原样透传，
+> 不读取路由配置、不进入上游网关。下文动态实现与旧匹配规则仅为历史架构说明，
+> 不能作为启用转发的依据。产品规则见根目录 `docs/specs/hcode-independent-services.md`。
+
 ## 状态
 
 - 本文是 ZCode CLI 模型 provider 端点转发的事实规范；动态路由与静态网关共用同一契约和调用链。
@@ -29,16 +33,11 @@ bootstrap process registry（endpoint origin + network policy）
 导出只替换该目录，不改公共源码。动态实现的专属测试显式排除，公共 fetch 与静态实现测试两版都保留。
 公共工厂不向上暴露 snapshot、刷新预算或实现 class。网络客户端和来源标识以依赖传入，静态实现不调用它们。
 
-静态实现保持既有开源网关行为：
-
-| 精确匹配的 HTTPS 端点 | 当前 runtime ZCode origin 下的目标路径 |
-| --- | --- |
-| `open.bigmodel.cn/api/anthropic/v1/messages` | `/api/v1/ultra/anthropic/v1/messages` |
-| `api.z.ai/api/anthropic/v1/messages` | `/api/v1/ultra-zai/anthropic/v1/messages` |
-
-默认端口、主机大小写、末尾 `/` 与 query 的处理遵循下文匹配规则；其它协议、端口、路径、子域和
-第三方 Provider 不改写。origin 复用 `resolveRuntimeZCodeEndpointOrigin`，不增加用户配置或环境变量。
-静态实现无路由快照或刷新 timer。进程 registry 的复用与网络隔离仍由 bootstrap 负责。
+HCode 静态实现对所有 URL 返回 `{ routed: false, url: requestUrl }`。
+不按厂商主机、路径、端口或 query 匹配，不调用配置接口，也不向产品 gateway 发送认证信息。
+工厂参数暂时保留以兼容 bootstrap 装配；endpoint origin 不参与 BYOK 请求转发。
+公共 transport 的非路由分支原样保留输入、headers、body、signal 和流式 response。
+回归测试：`packages/adapters/tests/official-coding-plan-gateway.test.ts`。
 
 本次不改变公共请求处理的顺序：SDK/最终 body 转换、官方版本的请求安全校验、路由、网络代理。
 请求期 apiKeyId 仍只来自账号 owner，普通请求不因版本装配产生额外等待。
@@ -236,7 +235,7 @@ provider fetch 组合顺序和所有默认 model adapter 创建路径；WebFetch
 | PER-020 | 不同 scheme/host/port/path 和第三方 URL | 静态实现原样返回，不扩大匹配范围 |
 | PER-021 | 静态 port 经公共 wrapper 发送 Request/URL/string | method/body/auth/signal/response 不变，旧 Host 删除 |
 | PER-022 | 同 endpoint/network 重复创建，或改变 network | 工厂共享或隔离符合现有进程 registry 契约 |
-| PER-023 | 替换 edition 后构建并实际发送模型请求 | 默认装配走静态网关，动态源码缺席，公共调用链与测试保留 |
+| PER-023 | 替换 edition 后构建并实际发送模型请求 | 默认装配原样透传模型 URL，不进入产品网关，公共调用链与测试保留 |
 
 PER-019—023 与以下动态用例先于实现更新。动态测试继续覆盖缓存、失败、取消和 ID 隔离；
 本次没有 UI 交互变更，以真实 HTTP/模型执行集成与导出树运行验证入口，不新增 conversation 产品状态。
