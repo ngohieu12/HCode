@@ -1,5 +1,4 @@
 import { useUiPluginRecommendations } from "@/plugin-ui/index.js";
-import { useIsOfficeMode } from "@/hooks/useInterfaceMode.js";
 /* eslint-disable max-lines -- 商店列表页把搜索/公开-社区-个人分段/Featured/分类折叠聚合成一个连贯浏览面，拆散反而难以维持 1:1 布局。 */
 import { useMemo, useState } from "react";
 import type { PluginStoreOrder, ZCodePluginMarketplaceSummary } from "@zcode/shared";
@@ -414,6 +413,112 @@ function CollapsibleCardGroup({
   );
 }
 
+/** 目录区块（Featured + 分类分组）：公开/社区分段与官方目录共用同一浏览投影。 */
+function CatalogSections({
+  actions,
+  categoryGroups,
+  expandedGroups,
+  featuredItems,
+  locale,
+  resolveCategoryLabel,
+  onToggleGroup,
+}: {
+  actions: PluginStoreActions;
+  categoryGroups: ReturnType<typeof groupItemsByCategory>;
+  expandedGroups: Record<string, boolean>;
+  featuredItems: StorePluginItem[];
+  locale: string;
+  resolveCategoryLabel: (category: string) => string;
+  onToggleGroup: (key: string) => void;
+}) {
+  const { intl } = useZCodeIntl();
+  return (
+    <>
+      {featuredItems.length > 0 ? (
+        <StoreSection
+          title={intl.formatMessage({ id: "settings.plugins.store.featured" })}
+          className="py-4 first:pt-0 last:pb-0"
+        >
+          <CardGrid items={featuredItems} actions={actions} locale={locale} />
+        </StoreSection>
+      ) : null}
+      {categoryGroups.map((group) => (
+        <StoreSection
+          key={group.category}
+          className="py-4 first:pt-0 last:pb-0"
+          title={
+            group.category === FALLBACK_CATEGORY
+              ? intl.formatMessage({
+                  id: "settings.plugins.store.category.other",
+                })
+              : resolveCategoryLabel(group.category)
+          }
+        >
+          <CollapsibleCardGroup
+            groupKey={`category:${group.category}`}
+            items={group.items}
+            expanded={expandedGroups[`category:${group.category}`] ?? true}
+            onToggle={onToggleGroup}
+            actions={actions}
+            locale={locale}
+          />
+        </StoreSection>
+      ))}
+    </>
+  );
+}
+
+/**
+ * 公开/社区分段的浏览区：与搜索共用 segmentItems 投影，条目无论安装与否都必须
+ * 出现在分类分组中。此前该组件缺失，浏览渲染直接抛错，未安装条目只能靠搜索命中。
+ */
+function PublicSegment({
+  actions,
+  categoryGroups,
+  expandedGroups,
+  featuredItems,
+  loading,
+  locale,
+  resolveCategoryLabel,
+  onToggleGroup,
+}: {
+  actions: PluginStoreActions;
+  categoryGroups: ReturnType<typeof groupItemsByCategory>;
+  expandedGroups: Record<string, boolean>;
+  featuredItems: StorePluginItem[];
+  loading: boolean;
+  locale: string;
+  resolveCategoryLabel: (category: string) => string;
+  onToggleGroup: (key: string) => void;
+}) {
+  const { intl } = useZCodeIntl();
+  const isEmpty = featuredItems.length === 0 && categoryGroups.length === 0;
+  if (isEmpty) {
+    return loading ? (
+      <div data-testid="plugin-store-public-catalog">
+        <p className="rounded-xl border border-dashed border-border px-4 py-3 text-ui-base text-foreground-subtle">
+          {intl.formatMessage({
+            id: "settings.plugins.marketplace.catalogLoading",
+          })}
+        </p>
+      </div>
+    ) : null;
+  }
+  return (
+    <div data-testid="plugin-store-public-catalog">
+      <CatalogSections
+        actions={actions}
+        categoryGroups={categoryGroups}
+        expandedGroups={expandedGroups}
+        featuredItems={featuredItems}
+        locale={locale}
+        resolveCategoryLabel={resolveCategoryLabel}
+        onToggleGroup={onToggleGroup}
+      />
+    </div>
+  );
+}
+
 function OfficialCatalog({
   actions,
   categoryGroups,
@@ -452,36 +557,15 @@ function OfficialCatalog({
   }
   return (
     <div data-testid="plugin-store-official-catalog">
-      {featuredItems.length > 0 ? (
-        <StoreSection
-          title={intl.formatMessage({ id: "settings.plugins.store.featured" })}
-          className="py-4 first:pt-0 last:pb-0"
-        >
-          <CardGrid items={featuredItems} actions={actions} locale={locale} />
-        </StoreSection>
-      ) : null}
-      {categoryGroups.map((group) => (
-        <StoreSection
-          key={group.category}
-          className="py-4 first:pt-0 last:pb-0"
-          title={
-            group.category === FALLBACK_CATEGORY
-              ? intl.formatMessage({
-                  id: "settings.plugins.store.category.other",
-                })
-              : resolveCategoryLabel(group.category)
-          }
-        >
-          <CollapsibleCardGroup
-            groupKey={`category:${group.category}`}
-            items={group.items}
-            expanded={expandedGroups[`category:${group.category}`] ?? true}
-            onToggle={onToggleGroup}
-            actions={actions}
-            locale={locale}
-          />
-        </StoreSection>
-      ))}
+      <CatalogSections
+        actions={actions}
+        categoryGroups={categoryGroups}
+        expandedGroups={expandedGroups}
+        featuredItems={featuredItems}
+        locale={locale}
+        resolveCategoryLabel={resolveCategoryLabel}
+        onToggleGroup={onToggleGroup}
+      />
     </div>
   );
 }
