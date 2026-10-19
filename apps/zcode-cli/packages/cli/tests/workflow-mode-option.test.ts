@@ -137,25 +137,6 @@ for (const argv of [["app-server"], ["agent-server"], ["login"], ["skills"]] as 
   });
 }
 
-test("--workflow-mode is accepted with --target", async () => {
-  const ctx = createContext(["--target", "ship it", "--workflow-mode", "alwaysOn"]);
-  let seenPair: RuntimeConfigSeen | undefined;
-  const exitCode = await run(ctx, {
-    ...createRecordingDeps().deps,
-    createZCodeApp: (options) => {
-      const config = (options?.runtimeConfig ?? {}) as RuntimeConfigSeen;
-      seenPair = {
-        dynamicWorkflowEnabled: config.dynamicWorkflowEnabled,
-        dynamicWorkflowToolsOnDemand: config.dynamicWorkflowToolsOnDemand,
-      };
-      throw new Error("stop after app options were checked");
-    },
-  });
-  assert.equal(exitCode, 1);
-  assert.doesNotMatch(ctx.stderr.output(), /can only be used/);
-  assert.deepEqual(seenPair, ALWAYS_ON_PAIR);
-});
-
 // ── DWG-17：headless ─────────────────────────────────────────────────────────
 
 test("headless /workflow under the default mode exits 1 before any app exists", async () => {

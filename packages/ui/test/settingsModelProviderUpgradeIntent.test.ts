@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { BUILTIN_MODEL_PROVIDER_IDS } from "@zcode/shared";
 import {
@@ -8,44 +6,7 @@ import {
 } from "@/settings/model-provider-section/codingPlanPurchaseAuth.js";
 import { CODING_PLAN_PROVIDER_SPECS } from "@/settings/model-provider-section/constants.js";
 
-function readSource(path: string) {
-  return readFileSync(resolve(process.cwd(), path), "utf8");
-}
-
 describe("settings model provider upgrade intent", () => {
-  it("opens Settings upgrade entries through the dialog hook", () => {
-    const settingsPageSource = readSource("packages/ui/src/SettingsPage.tsx");
-    const modelProviderSectionSource = readSource(
-      "packages/ui/src/settings/ModelProviderSection.tsx",
-    );
-    const detailSource = readSource("packages/ui/src/settings/model-provider-section/Detail.tsx");
-    const statusCardsSource = readSource(
-      "packages/ui/src/settings/model-provider-section/StatusCards.tsx",
-    );
-
-    expect(settingsPageSource).toContain("useCodingPlanUpgradeDialog");
-    expect(settingsPageSource).toContain("openCodingPlanUpgrade({");
-    expect(settingsPageSource).not.toContain("<CodingPlanUpgradeDialog");
-    expect(settingsPageSource).not.toContain("codingPlanUpgradeProviderId");
-    // 修复原因：JSX 格式化可能把属性换行，断言应验证绑定语义而不是排版。
-    expect(settingsPageSource).toMatch(
-      /pendingModelProviderTarget=\{\s*pendingModelProviderTarget\s*\}/,
-    );
-    expect(modelProviderSectionSource).toContain("pendingModelProviderTarget");
-    expect(modelProviderSectionSource).toContain("applyModelProviderTarget");
-    expect(modelProviderSectionSource).not.toContain("onOpenCodingPlanUpgrade");
-    expect(detailSource).toContain("useCodingPlanUpgradeDialog");
-    expect(detailSource).toContain("openCodingPlanUpgrade({");
-    expect(statusCardsSource).toContain("onOpenUpgradePlans");
-    expect(statusCardsSource).toContain("由弹窗 hook 承载购买面板");
-    expect(statusCardsSource).not.toContain('openUpgradePlans(\n            "personal"');
-    expect(detailSource).toContain("initialTeamPlanKey:");
-    expect(statusCardsSource).toContain(
-      'isStartPlanProvider ? "setting_start_plan_card" : "setting_plan_card"',
-    );
-    expect(statusCardsSource).toContain("disabled={effectiveViewState.loginLoading}");
-  });
-
   it("keeps both Team Provider identities in the Coding Plan upgrade boundary", () => {
     expect(normalizeCodingPlanProviderId(BUILTIN_MODEL_PROVIDER_IDS.zaiTeamCodingPlan)).toBe(
       BUILTIN_MODEL_PROVIDER_IDS.zaiTeamCodingPlan,

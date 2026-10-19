@@ -6,12 +6,37 @@ import {
   formatConversationShareArtifactType,
   getConversationShareErrorDetails,
   resolveConversationShareFallbackIssueCode,
+  resolveConversationShareIssueMessageId,
   resolveConversationSharePublishErrorMessageId,
   resolveConversationShareWarningMessageId,
   sanitizeConversationShareWarnings,
 } from "@/lib/conversationShareError.js";
 
 describe("conversation share error presentation", () => {
+  it("keeps safe server rejection details through RPC and discards unsafe fields", () => {
+    expect(
+      getConversationShareErrorDetails({
+        kind: "invalid_conversation",
+        details: {
+          rejection: {
+            rule: "field_type",
+            row_index: 0,
+            field: "state",
+            path: "/Users/secret",
+            text: "secret",
+          },
+        },
+      }),
+    ).toMatchObject({ rejection: { rule: "field_type", row_index: 0, field: "state" } });
+    expect(
+      JSON.stringify(
+        getConversationShareErrorDetails({
+          details: { rejection: { rule: "field_type", path: "/Users/secret" } },
+        }),
+      ),
+    ).not.toContain("/Users/secret");
+  });
+
   it("用友好文件类别和支持类型替代内部 MIME 白名单文案", () => {
     const issue = {
       code: "artifact_type_not_allowed" as const,
@@ -227,7 +252,22 @@ describe("conversation share error presentation", () => {
     expect(resolveConversationShareFallbackIssueCode({ kind: "invalid_conversation" })).toBe(
       "invalid_conversation",
     );
-    expect(resolveConversationShareFallbackIssueCode({ kind: "network" })).toBe("unknown");
+    expect(resolveConversationShareFallbackIssueCode({ kind: "network" })).toBe("network");
+  });
+
+  it.each([
+    ["authentication_required", "conversationShare.error.authenticationRequired"],
+    ["network", "conversationShare.error.network"],
+    ["service_unavailable", "conversationShare.error.serviceUnavailable"],
+    ["rate_limited", "conversationShare.error.rateLimited"],
+    ["feature_disabled", "conversationShare.error.featureDisabled"],
+    ["connection_unavailable", "conversationShare.error.connectionUnavailable"],
+    ["invalid_contract", "conversationShare.issue.invalidServiceResponse"],
+    ["disclosure_required", "conversationShare.error.disclosureRequired"],
+  ])("预检保留 %s 的明确原因，不退化为 unknown", (kind, messageId) => {
+    const code = resolveConversationShareFallbackIssueCode({ kind });
+    expect(code).toBe(kind);
+    expect(resolveConversationShareIssueMessageId({ code, scope: "transport" })).toBe(messageId);
   });
 
   it("limits rendered issues and reports the omitted count", () => {

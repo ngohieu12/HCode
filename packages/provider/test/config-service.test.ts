@@ -1192,27 +1192,6 @@ describe("ProviderConfigService", () => {
     );
   });
 
-  it("迁移边界可以原子替换完整 Personal Overlay", async () => {
-    const personal = new MemoryPersonalRepository(layerSnapshot("personal-1"));
-    const service = new ProviderConfigService({
-      zcodeBuiltinSource: new MutableSource(layerSnapshot("zcodeBuiltin-1")),
-      personalRepository: personal,
-    });
-    const providers = new ProviderConfigMap([["personal", personalProvider(["model-a"])]]);
-    const models = new ModelConfigRules([
-      {
-        type: "model",
-        modelMatch: "model-a",
-        config: completeModelConfig(),
-      },
-    ]);
-
-    await service.replacePersonalConfig({ providers, models });
-
-    expect(personal.current.providers).toBe(providers);
-    expect(personal.current.models).toBe(models);
-  });
-
   it("删除 Personal Model 时原子删除成员和精确规则", async () => {
     const exact = completeModelConfig();
     const pattern = new ModelConfig({

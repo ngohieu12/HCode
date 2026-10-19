@@ -9,7 +9,6 @@ import {
   DEV_ELECTRON_BUNDLE_FORMAT,
   patchDevElectronInfoPlist,
   prepareDevElectronAppBundle,
-  resolveDevElectronAppBundlePath,
 } from "../scripts/devElectronAppBundle.mjs";
 
 const tempRoots: string[] = [];

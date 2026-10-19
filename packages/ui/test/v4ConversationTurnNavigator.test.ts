@@ -10,16 +10,12 @@ import type {
   TurnHeaderRow,
   UserInputRow,
 } from "@zcode/shared/zcode-protocol-v4";
-import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
-import { ConversationTurnNavigator } from "@/v4/ConversationTurnNavigator.js";
 import { buildConversationTurnRenderUnits } from "@/v4/conversationTurnRenderUnits.js";
 import {
   buildConversationTurnNavigatorItems,
   resolveConversationTurnNavigatorActiveQueryRowId,
   resolveConversationTurnNavigatorActiveUnitIndex,
-  resolveConversationTurnNavigatorBarVisualState,
   resolveConversationTurnNavigatorHydrationRetryDelayMs,
-  resolveConversationTurnNavigatorVisualFocusItemIndex,
   shouldHydrateConversationTurnNavigatorDirectory,
 } from "@/v4/conversationTurnNavigatorHelpers.js";
 
@@ -129,11 +125,6 @@ describe("conversation turn navigator helpers", () => {
         ...base,
       }),
     ).toBe(true);
-    expect(
-      shouldHydrateConversationTurnNavigatorDirectory({
-        ...base,
-      }),
-    ).toBe(true);
   });
 
   it("TN07：暂时失败只安排两次有界退避重试", () => {
@@ -197,9 +188,7 @@ describe("conversation turn navigator helpers", () => {
     expect(items[0]?.assistantPreview).toContain("Assistant paragraph two");
     expect(items[0]?.assistantPreview).not.toContain("private reasoning");
     expect(items[1]?.assistantPreview).toBe(items[0]?.assistantPreview);
-    expect(items.map((item) => item.userPreview).join(" ")).not.toContain(
-      "Assistant paragraph",
-    );
+    expect(items.map((item) => item.userPreview).join(" ")).not.toContain("Assistant paragraph");
     expect(new Set(items.map((item) => item.key)).size).toBe(3);
   });
 

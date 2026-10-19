@@ -100,9 +100,9 @@ describe("zcodeEndpoint", () => {
       origin: "http://localhost:3030",
       apiBaseUrl: "http://localhost:3030/api/v1",
       remoteUrl: "http://localhost:3030/remote/v3",
-      webRemoteCallbackUrl: "http://localhost:3030/web-remote/callback",
+      webRemoteCallbackUrl: "http://localhost:3030/remote/v4",
       webShareCallbackUrl: "http://localhost:3030/cn/share/callback",
-      relayWsUrl: "ws://localhost:3030/ws",
+      relayWsUrl: "ws://localhost:3030/api/v1/remote/ws2",
       zcodePlanOpenAiBaseUrl: "http://localhost:3030/api/v1/zcode-plan",
       zcodePlanAnthropicBaseUrl: "http://localhost:3030/api/v1/zcode-plan/anthropic",
       zcodePlanBillingCurrentUrl: "http://localhost:3030/api/v1/zcode-plan/billing/current",
@@ -168,7 +168,7 @@ describe("zcodeEndpoint", () => {
     ).toBe("https://services.hcode.invalid/api/v1/zcode-plan/anthropic");
   });
 
-  it("uses the test relay only for the standard test endpoint", () => {
+  it("derives V2 relay from each endpoint origin", () => {
     expect(
       resolveWebRemoteControlRelayWsUrl({
         endpointOrigin: TEST_ZCODE_ENDPOINT_ORIGIN,
@@ -183,16 +183,16 @@ describe("zcodeEndpoint", () => {
       resolveWebRemoteControlRelayWsUrl({
         endpointOrigin: "http://localhost:3030",
       }),
-    ).toBe(DEFAULT_WEB_REMOTE_CONTROL_RELAY_WS_URL);
+    ).toBe("ws://localhost:3030/api/v1/remote/ws2");
   });
 
   it("allows an explicit web remote control relay url override", () => {
     expect(
       resolveWebRemoteControlRelayWsUrl({
         endpointOrigin: TEST_ZCODE_ENDPOINT_ORIGIN,
-        overrideUrl: " ws://localhost:8787/ws ",
+        overrideUrl: " ws://localhost:8787/api/v1/remote/ws2 ",
       }),
-    ).toBe("ws://localhost:8787/ws");
+    ).toBe("ws://localhost:8787/api/v1/remote/ws2");
   });
 
   it("derives BigModel API origin from ZCODE_ENV", () => {

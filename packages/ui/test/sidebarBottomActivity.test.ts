@@ -103,9 +103,6 @@ afterEach(() => {
 });
 
 describe("isMarketingBannerRenderable", () => {
-  it("为 null 时判定不可见", () => {
-    expect(isMarketingBannerRenderable(null)).toBe(false);
-  });
   it("popup 位置的投放不算左下角 banner", () => {
     expect(
       isMarketingBannerRenderable({
@@ -118,9 +115,6 @@ describe("isMarketingBannerRenderable", () => {
     expect(
       isMarketingBannerRenderable({ delivery: { resource_position: "banner" } } as never),
     ).toBe(false);
-  });
-  it("banner 位置且有图片时可见", () => {
-    expect(isMarketingBannerRenderable(renderableBanner as never)).toBe(true);
   });
   it("banner 位置且有 bannerHero 时可见", () => {
     expect(

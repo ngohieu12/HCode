@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  CORE_USER_ACTION_FEATURES,
-  SETTINGS_USER_ACTION_FEATURES,
-  USER_ACTION_CATALOG,
-} from "../src/lib/userActionTraceCatalog.js";
+import { USER_ACTION_CATALOG } from "../src/lib/userActionTraceCatalog.js";
 
 describe("user action trace catalog", () => {
 

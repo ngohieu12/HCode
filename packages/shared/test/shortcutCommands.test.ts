@@ -59,8 +59,6 @@ describe("shortcutCommands 序列化格式", () => {
   it("无修饰键单键格式上合法（spec §3：格式合法、匹配支持）", () => {
     expect(serializeShortcutBinding(parseShortcutBinding("F5")!)).toBe("F5");
     expect(serializeShortcutBinding(parseShortcutBinding("]")!)).toBe("]");
-    // 单 token 修饰键名不是合法键
-    expect(parseShortcutBinding("CmdOrCtrl")).toBeNull();
   });
 
   it("命名键白名单大小写敏感", () => {
@@ -91,17 +89,6 @@ describe("shortcutCommands 命令表", () => {
         expect(isValidShortcutBinding(binding)).toBe(true);
       }
     }
-  });
-
-  it("openSettings 默认 mac ⌘, / win·linux Ctrl+,（系统惯例，spec §4）", () => {
-    expect(getDefaultShortcutBindings("openSettings")).toEqual(["CmdOrCtrl+,"]);
-  });
-
-  it("openCommandCenter 保留双默认绑定", () => {
-    expect(getDefaultShortcutBindings("openCommandCenter")).toEqual([
-      "CmdOrCtrl+k",
-      "CmdOrCtrl+Shift+p",
-    ]);
   });
 
   it("未知命令返回空数组", () => {

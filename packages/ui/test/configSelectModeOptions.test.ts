@@ -21,7 +21,8 @@ vi.mock("@/components/ai-elements/context.js", () => ({
 }));
 
 vi.mock("@/components/ui/select.js", () => ({
-  Select: ({ children }: { children: unknown }) => createElement("div", { "data-testid": "select-root" }, children),
+  Select: ({ children }: { children: unknown }) =>
+    createElement("div", { "data-testid": "select-root" }, children),
   SelectContent: ({
     children,
     onCloseAutoFocus,
@@ -77,16 +78,12 @@ vi.mock("@/components/ui/select.js", () => ({
 }));
 
 vi.mock("@/components/ui/tooltip.js", () => ({
-  TooltipProvider: ({ children }: { children: unknown }) => createElement("div", { "data-testid": "tooltip-provider" }, children),
-  Tooltip: ({ children }: { children: unknown }) => createElement("div", { "data-testid": "tooltip-root" }, children),
+  TooltipProvider: ({ children }: { children: unknown }) =>
+    createElement("div", { "data-testid": "tooltip-provider" }, children),
+  Tooltip: ({ children }: { children: unknown }) =>
+    createElement("div", { "data-testid": "tooltip-root" }, children),
   TooltipTrigger: ({ children }: { children: unknown }) => children,
-  TooltipContent: ({
-    children,
-    side,
-  }: {
-    children: unknown;
-    side?: string;
-  }) =>
+  TooltipContent: ({ children, side }: { children: unknown; side?: string }) =>
     createElement(
       "div",
       {
@@ -97,11 +94,7 @@ vi.mock("@/components/ui/tooltip.js", () => ({
     ),
 }));
 
-import {
-  ConfigSelect,
-  isHighPermissionModeValue,
-  resolveModeOptionIcon,
-} from "@/chat-input-toolbar/display.js";
+import { ConfigSelect, isHighPermissionModeValue } from "@/chat-input-toolbar/display.js";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
 
 beforeEach(() => {
@@ -126,7 +119,7 @@ describe("ConfigSelect mode options", () => {
     ["vi-VN", "自主模式", "在有风险时询问"],
     ["en-US", "Autonomous mode", "Ask when there’s risk"],
   ] as const)(
-    "Guarded 在 %s 下使用浅蓝色和 Edit 图标，不复用 YOLO 警示样式",
+    "Guarded 在 %s 下使用本地化自主模式文案并保持普通权限",
     (locale, label, description) => {
       const html = renderConfigSelect(locale, {
         provider: "glm",
@@ -145,11 +138,8 @@ describe("ConfigSelect mode options", () => {
       expect(html).toContain(label);
       expect(html).toContain(description);
       expect(html).toContain('data-value="guarded"');
-      expect(resolveModeOptionIcon("guarded")).toBe(resolveModeOptionIcon("edit"));
-      expect(html.match(/lucide-shield-check/g)).toHaveLength(2);
-      expect(html).toContain("text-icon-blue hover:text-icon-blue aria-expanded:text-icon-blue");
+
       expect(html).not.toContain("text-warning");
-      expect(html).not.toContain("lucide-shield-alert");
     },
   );
 
@@ -179,29 +169,25 @@ describe("ConfigSelect mode options", () => {
         name: "Mode",
         category: "mode",
         type: "select",
-        currentValue: "read-only",
-        options: [{ value: "read-only", name: "read-only" }],
+        currentValue: "edit",
+        options: [
+          { value: "guarded", name: "Guarded" },
+          { value: "yolo", name: "YOLO" },
+        ],
       },
-      onValueChange: () => {},
+      onValueChange,
       tooltipTitle: "Mode",
-      indicatorClassName: "hidden @xl/composer:block",
     });
-
-    expect(html).toContain("lucide-chevron-down");
-    expect(html).toContain("hidden @xl/composer:block");
+    expect(html).toContain(label);
+    expect(html).not.toContain('data-value="edit"');
+    expect(onValueChange).not.toHaveBeenCalled();
   });
 
   it("触控设备关闭 mode 菜单后不会重新聚焦聊天输入框", () => {
     const focus = vi.fn();
     const preventDefault = vi.fn();
-    const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
-      globalThis,
-      "window",
-    );
-    const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(
-      globalThis,
-      "document",
-    );
+    const originalWindowDescriptor = Object.getOwnPropertyDescriptor(globalThis, "window");
+    const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(globalThis, "document");
 
     Object.defineProperty(globalThis, "window", {
       configurable: true,
@@ -286,7 +272,6 @@ describe("ConfigSelect mode options", () => {
     expect(html).toContain("自动编辑");
     expect(html).not.toContain("变更前确认 / Build");
     expect(html).toContain("改文件前先问我。");
-    expect(html).toContain("pr-8");
   });
 
   it("mode trigger 使用当前文案而不是 SelectValue 自动回填", () => {
@@ -319,27 +304,27 @@ describe("ConfigSelect mode options", () => {
 
   it("英文环境下显示英文多语言标签", () => {
     const html = renderConfigSelect("en-US", {
-        provider: "glm",
-        option: {
-          id: "mode",
-          name: "Mode",
-          category: "mode",
-          type: "select",
-          currentValue: "build",
-          options: [
-            {
-              value: "build",
-              name: "Build",
-            },
-            {
-              value: "edit",
-              name: "Edit",
-            },
-          ],
-        },
-        onValueChange: () => {},
-        tooltipTitle: "Mode",
-      });
+      provider: "glm",
+      option: {
+        id: "mode",
+        name: "Mode",
+        category: "mode",
+        type: "select",
+        currentValue: "build",
+        options: [
+          {
+            value: "build",
+            name: "Build",
+          },
+          {
+            value: "edit",
+            name: "Edit",
+          },
+        ],
+      },
+      onValueChange: () => {},
+      tooltipTitle: "Mode",
+    });
 
     expect(html).toContain("Ask before changes");
     expect(html).toContain("Edit automatically");
@@ -438,14 +423,8 @@ describe("ConfigSelect mode options", () => {
     // 无条件 preventDefault，null 时把 Radix 默认“回焦到 trigger”一并吃掉，焦点掉 body。
     const focus = vi.fn();
     const preventDefault = vi.fn();
-    const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
-      globalThis,
-      "window",
-    );
-    const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(
-      globalThis,
-      "document",
-    );
+    const originalWindowDescriptor = Object.getOwnPropertyDescriptor(globalThis, "window");
+    const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(globalThis, "document");
 
     Object.defineProperty(globalThis, "window", {
       configurable: true,

@@ -1,21 +1,29 @@
 // edit/retry 的 canonical intent 重发原语：rewind 截断之后，把 projection resolver 解析出的
 // canonical user intent（含附件引用、模型 Selection、goal 命令语义）重新发起为一轮。
-// 模型 Selection 语义分叉：retry 保留被 rewind 那轮 pin 的历史 Selection；edit 按新的主动
-// 发送处理，由调用方解析本次提交的 Selection（payload 显式 → 会话常驻）传入，不沿用旧模型。
 // 从 fork-edit-retry.ts 抽出：editUserQuery 与 retryTurn 共用，forkAssistant 不经过这里
 // （fork 只做 conversation-only copy，不 rewind、不重发）。
 import type { CommandEnvelope, CommandPayloadMap } from "@zcode/shared/zcode-protocol-v4";
-import { isHighspeedProviderId, type ModelSelection } from "@zcode/shared";
+import { isHighspeedProviderId } from "@zcode/shared";
+import type { ModelSelection } from "@zcode/shared";
 import type { mapAttachmentRefsToTurnAttachments } from "../attachment-refs.js";
-import { resolveSessionFallbackModelSelection } from "../input-admission.js";
+import {
+  resolveOrdinaryQueueModelSelection,
+  resolveSessionFallbackModelSelection,
+} from "../input-admission.js";
 import { inputIntentMetadataFromCanonical } from "../input-intent.js";
-import { startPromptTurn } from "../prompt-turn.js";
-import { createModelExecutionContext } from "../../../zcode-protocol/model-execution.js";
-import type { V4CommandCoreHost, V4QueuedTurnExecution, V4SessionRecordView } from "../types.js";
+import { preflightPromptTurn, startPreflightedPromptTurn } from "../prompt-turn.js";
+import { createModelExecutionContext } from "../../../session-execution/index.js";
+import type { V4CommandCoreHost, V4SessionRecordView, V4TurnExecution } from "../types.js";
 import { applyGoalCommand } from "./goal-compact.js";
 import type { ConversationEditTarget } from "../../product-projection.js";
 
 const EDIT_QUEUE_FALLBACK_REASON = "edit.admissionRace";
+
+type CanonicalHighspeed = {
+  card: NonNullable<CommandPayloadMap["editUserQuery"]["highspeedMeta"]>;
+  modelSelection: NonNullable<CommandPayloadMap["editUserQuery"]["modelSelection"]>;
+  execution: V4TurnExecution;
+};
 
 export function stableAttachmentRefs(editTarget: ConversationEditTarget) {
   return editTarget.intent.attachments?.flatMap((attachment) =>
@@ -23,21 +31,17 @@ export function stableAttachmentRefs(editTarget: ConversationEditTarget) {
   );
 }
 
-export async function startCanonicalIntent(
-  host: V4CommandCoreHost,
+function buildCanonicalIntent(
   record: V4SessionRecordView,
   envelope: CommandEnvelope,
   editTarget: ConversationEditTarget,
   text: string,
   attachmentRefs: ReturnType<typeof stableAttachmentRefs>,
-  attachments: Awaited<ReturnType<typeof mapAttachmentRefsToTurnAttachments>>,
-  highspeed?: {
-    card: NonNullable<CommandPayloadMap["editUserQuery"]["highspeedMeta"]>;
-    modelSelection: NonNullable<CommandPayloadMap["editUserQuery"]["modelSelection"]>;
-    execution: V4QueuedTurnExecution;
-  },
-  options?: { requireQueue?: boolean; modelSelection?: ModelSelection },
-): Promise<void> {
+  highspeed: CanonicalHighspeed | undefined,
+  requireQueue: boolean,
+  canRetainQueuedHighspeed: boolean,
+  modelSelectionOverride?: ModelSelection,
+) {
   const intent = inputIntentMetadataFromCanonical(
     envelope,
     {
@@ -54,11 +58,9 @@ export async function startCanonicalIntent(
       requestedDelivery: editTarget.intent.requestedDelivery,
       admittedDelivery: editTarget.intent.admittedDelivery,
       fallbackReasonCode: editTarget.intent.fallbackReasonCode,
-      // retry（无 options.modelSelection）沿用被 rewind 那轮 pin 的历史 Selection；
-      // edit 是新的一次发送，调用方传入本次提交解析出的 Selection（payload 显式 Selection →
-      // 会话常驻 Selection），不能沿用被 rewind 那轮的旧模型，否则用户切换模型后再编辑，
-      // 重发仍会跑回旧模型（与 sendText admission 同源语义）。
-      modelSelection: options?.modelSelection ?? editTarget.intent.modelSelection,
+      // HCode: edit 按新的主动发送处理，调用方传入本次提交的 Selection 时优先，
+      // 不沿用被 rewind 那轮 pin 的旧模型；retry 不传则保留历史 Selection。
+      modelSelection: modelSelectionOverride ?? editTarget.intent.modelSelection,
       mode: editTarget.intent.mode,
       planEnabled: editTarget.intent.planEnabled,
       attachmentRefs,
@@ -66,17 +68,16 @@ export async function startCanonicalIntent(
     },
     text,
   );
-  const requireQueue = options?.requireQueue === true;
-  const retainQueuedTurnExecution = host.retainQueuedTurnExecution;
-  // 入队路径的凭据只能驻留内存；宿主不提供暂存能力时必须整体退回会话模型，不留半程加速。
-  const canRetainQueuedHighspeed =
-    requireQueue && highspeed !== undefined && retainQueuedTurnExecution !== undefined;
   const appliesHighspeed = highspeed !== undefined && (!requireQueue || canRetainQueuedHighspeed);
   if (appliesHighspeed && highspeed) {
     intent.highspeed = highspeed.card;
-    // 编辑重发是新的一次发送：canonical intent 的模型要换成本次卡的 Selection，
-    // 不能沿用被 rewind 那轮的旧模型，否则提升时会拿加速凭据打普通端点。
-    intent.modelSelection = highspeed.modelSelection;
+    if (requireQueue) {
+      // Bug 根因：编辑重发进入队列时曾把临时 Highspeed Selection 写回 canonical intent，
+      // 后续撤回会污染 Composer。普通 Selection 在下方统一写入边界过滤。
+      intent.modelSelection = highspeed.execution.selectionFallback?.target;
+    } else {
+      intent.modelSelection = highspeed.modelSelection;
+    }
   } else if (isHighspeedProviderId(intent.modelSelection?.providerId)) {
     // Bug 根因：retry、卡过期/未重新抽到卡的 edit、宿主无法暂存凭据的入队 edit 都没有本轮执行材料，
     // 却沿用了被 rewind 那轮持久化的 account:*-highspeed-card Selection。加速 Selection 只有与同一轮
@@ -86,11 +87,78 @@ export async function startCanonicalIntent(
     intent.modelSelection = resolveSessionFallbackModelSelection(record);
   }
   if (requireQueue) {
+    intent.modelSelection = resolveOrdinaryQueueModelSelection(record, intent.modelSelection);
     intent.requestedDelivery = "queue";
     intent.admittedDelivery = "queue";
     intent.fallbackReasonCode = EDIT_QUEUE_FALLBACK_REASON;
+  }
+  return intent;
+}
+
+/** destructive edit/retry 在提交 branch cut 前调用；只检查模型，不接纳输入。 */
+export async function preflightCanonicalIntent(
+  host: V4CommandCoreHost,
+  record: V4SessionRecordView,
+  envelope: CommandEnvelope,
+  editTarget: ConversationEditTarget,
+  text: string,
+  attachmentRefs: ReturnType<typeof stableAttachmentRefs>,
+  attachments: Awaited<ReturnType<typeof mapAttachmentRefsToTurnAttachments>>,
+  highspeed?: CanonicalHighspeed,
+): Promise<void> {
+  if (editTarget.intent.kind === "sendGoalCommand") return;
+  const intent = buildCanonicalIntent(
+    record,
+    envelope,
+    editTarget,
+    text,
+    attachmentRefs,
+    highspeed,
+    false,
+    false,
+  );
+  await preflightPromptTurn(host, record, {
+    content: text,
+    inputId: envelope.commandId,
+    intent,
+    ...(highspeed ? { modelExecution: createModelExecutionContext(highspeed.execution) } : {}),
+    ...(attachments ? { attachments } : {}),
+  });
+}
+
+export async function startCanonicalIntent(
+  host: V4CommandCoreHost,
+  record: V4SessionRecordView,
+  envelope: CommandEnvelope,
+  editTarget: ConversationEditTarget,
+  text: string,
+  attachmentRefs: ReturnType<typeof stableAttachmentRefs>,
+  attachments: Awaited<ReturnType<typeof mapAttachmentRefsToTurnAttachments>>,
+  highspeed?: CanonicalHighspeed,
+  options?: { requireQueue?: boolean; modelSelection?: ModelSelection },
+): Promise<void> {
+  const requireQueue = options?.requireQueue === true;
+  const retainQueuedTurnExecution = host.retainQueuedTurnExecution;
+  // 入队路径的凭据只能驻留内存；宿主不提供暂存能力时必须整体退回会话模型，不留半程加速。
+  const canRetainQueuedHighspeed =
+    requireQueue && highspeed !== undefined && retainQueuedTurnExecution !== undefined;
+  const intent = buildCanonicalIntent(
+    record,
+    envelope,
+    editTarget,
+    text,
+    attachmentRefs,
+    highspeed,
+    requireQueue,
+    canRetainQueuedHighspeed,
+    options?.modelSelection,
+  );
+  if (requireQueue) {
     if (canRetainQueuedHighspeed && highspeed && retainQueuedTurnExecution) {
-      retainQueuedTurnExecution(record.app.sessionId, envelope.commandId, highspeed.execution);
+      retainQueuedTurnExecution(record.app.sessionId, envelope.commandId, {
+        modelSelection: highspeed.modelSelection,
+        modelExecution: highspeed.execution,
+      });
     }
   }
   if (editTarget.intent.kind === "sendGoalCommand") {
@@ -102,7 +170,7 @@ export async function startCanonicalIntent(
     return;
   }
   try {
-    const started = await startPromptTurn(host, record, {
+    const started = await startPreflightedPromptTurn(host, record, {
       content: text,
       inputId: envelope.commandId,
       intent,

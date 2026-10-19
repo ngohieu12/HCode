@@ -99,6 +99,7 @@ vi.mock("@/v4/OffPeakNewTaskEntry.js", () => ({
 }));
 
 vi.mock("@/hooks/useServices.js", () => ({
+  useComposerClientNamespace: () => "desktop",
   useServices: () => ({
     botsService: mocks.botsService,
     broadcastService: mocks.broadcastService,

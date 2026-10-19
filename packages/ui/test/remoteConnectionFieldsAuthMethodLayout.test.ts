@@ -1,6 +1,7 @@
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+// @vitest-environment jsdom
+import { createElement, type ComponentProps } from "react";
+import { cleanup, fireEvent, render, screen, within, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 import { PlatformProvider } from "@/hooks/usePlatform.js";
 import { ZCodeIntlProvider } from "@/i18n/IntlProvider.js";
@@ -80,6 +81,7 @@ function renderRemoteConnectionFields(locale: "vi-VN" | "en-US") {
           setServerName: vi.fn(),
           setServerToken: vi.fn(),
           setServerWorkspacePath: vi.fn(),
+          ...overrides,
         }),
       ),
     ),

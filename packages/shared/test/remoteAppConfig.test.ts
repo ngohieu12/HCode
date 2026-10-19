@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   getCommunityUrlFromConfig,
   getCommunityUrlFromConfigs,
-  getFeedbackUrlFromConfig,
   getForceUpdateMinimalVersionFromConfig,
 } from "../src/remoteAppConfig.js";
 
@@ -13,6 +12,29 @@ describe("remoteAppConfig", () => {
         feedback_url: "https://example.com/feedback",
       }),
     ).toBe("https://example.com/feedback");
+  it("越南语界面只读取对应社群地址", () => {
+    expect(
+      getCommunityUrlFromConfig(
+        {
+          community_urls: {
+            "vi-VN": "https://example.com/vi-community",
+            "en-US": "https://example.com/en-community",
+          },
+        },
+        "vi-VN",
+      ),
+    ).toBe("https://example.com/vi-community");
+
+    expect(
+      getCommunityUrlFromConfig(
+        {
+          community_urls: {
+            "en-US": "https://example.com/en-community",
+          },
+        },
+        "vi-VN",
+      ),
+    ).toBeUndefined();
   });
 
   it("英文界面只读取英文社群地址", () => {

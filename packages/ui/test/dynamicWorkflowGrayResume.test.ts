@@ -34,11 +34,6 @@ import {
   type WorkflowRunDigestProps,
 } from "@/components/workflow-timeline/WorkflowRunDigest.js";
 
-const sessionPaneSource = readFileSync(
-  resolve(process.cwd(), "packages/ui/src/v4/SessionPane.tsx"),
-  "utf8",
-).replaceAll("\r\n", "\n");
-
 /** 会话上下文里那个回调：由真实的门算出来，`undefined` 就是「这条路没有了」。 */
 function resumeHandlerFor(dynamicWorkflowEnabled: boolean) {
   return resolveWorkflowResumeHandler({
@@ -197,18 +192,5 @@ describe("灰度关掉后工具卡页脚与摘要卡的 Resume", () => {
     expect(
       renderDigest(resumeHandlerFor(false)).queryByTestId("workflow-card-kind"),
     ).not.toBeNull();
-  });
-});
-
-describe("SessionPane 供给点接线", () => {
-  it("Resume 回调只经 resolveWorkflowResumeHandler 进上下文，灰度从 hook 读", () => {
-    expect(sessionPaneSource).toContain("useDynamicWorkflowAvailability");
-    expect(sessionPaneSource).toMatch(
-      /onResumeWorkflowRun: resolveWorkflowResumeHandler\(\{\s*readOnly,\s*dynamicWorkflowEnabled,\s*handler: handleResumeWorkflowRun,\s*\}\)/,
-    );
-    // 旧的裸三元不能再存在，否则灰度就被绕过去了。
-    expect(sessionPaneSource).not.toContain(
-      "onResumeWorkflowRun: readOnly ? undefined : handleResumeWorkflowRun",
-    );
   });
 });

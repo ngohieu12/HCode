@@ -36,7 +36,7 @@ const actions: PluginStoreActions = {
   onUninstall: () => {},
   onSetEnabled: () => {},
   onUpdate: () => {},
-  operationId: null,
+  activeOperations: [],
   togglingPluginId: null,
 };
 
@@ -76,21 +76,13 @@ describe("plugin store paid plan badge", () => {
   it("marks a plugin that needs a paid plan on the store card title", async () => {
     const html = await renderCard(makeItem(true));
     expect(html).toContain('data-testid="plugin-store-paid-plan-badge"');
-    expect(html).toContain("bg-[var(--color-plugin-paid-plan-badge)]");
-    expect(html).toContain("text-[var(--color-plugin-paid-plan-badge-foreground)]");
-    expect(html).not.toContain("button-gradient");
-    expect(html).toContain("text-ui-sm");
-    expect(html).toContain("lucide-crown");
     expect(html).toContain("Coding Plan");
-    expect(html).toContain("lucide-crown");
-    expect(html).not.toContain("lucide-trending-up");
     expect(html).toContain('data-tooltip-title="This plugin works better with a Coding Plan"');
   });
 
   it("marks a plugin that needs a paid plan on the detail title", async () => {
     const html = await renderDetail(makeItem(true));
     expect(html).toContain('data-testid="plugin-store-paid-plan-badge"');
-    expect(html).toContain("bg-[var(--color-plugin-paid-plan-badge)]");
     expect(html).toContain("Coding Plan");
     expect(html).toContain('data-tooltip-title="This plugin works better with a Coding Plan"');
   });

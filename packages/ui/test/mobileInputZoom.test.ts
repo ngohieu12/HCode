@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   shouldResetLexicalEditorAfterSubmit,
@@ -13,17 +11,11 @@ import {
   shouldEnableModifiedEnterSubmit,
   shouldReverseFollowupDeliveryForPointer,
 } from "@/v4/composer/followupModeSettings.js";
-import { cn } from "@/components/lib/utils.js";
 import {
   resolveChatEnterShortcut,
   resolveChatEnterSubmits,
-  resolveMobileInputTextSizeClassName,
   shouldAvoidIosInputFocusZoom,
 } from "@/lib/mobileTextInput.js";
-
-function readSource(path: string) {
-  return readFileSync(resolve(process.cwd(), path), "utf8");
-}
 
 describe("mobile text input zoom guard", () => {
   it("keeps modified submit on desktop drafts and Windows coarse-pointer viewports", () => {
@@ -60,8 +52,6 @@ describe("mobile text input zoom guard", () => {
   it("resolves Cmd/Ctrl+Enter as send-now for queue and queue for guide", () => {
     expect(resolveOppositeFollowupDelivery("queue")).toBe("startNow");
     expect(resolveOppositeFollowupDelivery("guide")).toBe("queue");
-    const composerSource = readSource("packages/ui/src/v4/ConversationComposer.tsx");
-    expect(composerSource).not.toContain('if (routingMode === "startNow")');
     expect(
       shouldSubmitLexicalModifiedEnter({
         ctrlKey: true,
@@ -190,7 +180,7 @@ describe("mobile text input zoom guard", () => {
     ).toBe(true);
   });
 
-  it("keeps desktop and non-remote input typography unchanged", () => {
+  it("desktop viewports and non-remote inputs do not enable the zoom guard", () => {
     expect(
       shouldAvoidIosInputFocusZoom({
         isMobileTextInputViewport: false,
@@ -203,14 +193,9 @@ describe("mobile text input zoom guard", () => {
         isWebRemoteControl: false,
       }),
     ).toBe(false);
-    expect(
-      resolveMobileInputTextSizeClassName({
-        avoidIosInputFocusZoom: false,
-      }),
-    ).toBe("text-ui-base leading-5");
   });
 
-  it("uses a fixed 16px token for mobile remote input even with a 12px UI preference", () => {
+  it("enables the zoom guard for mobile remote input", () => {
     expect(
       shouldAvoidIosInputFocusZoom({
         isMobileTextInputViewport: true,

@@ -231,7 +231,7 @@ describe("botsService config", () => {
           "webhook-1": {
             botId: "webhook-1",
             workspacePath: "/tmp/workspace",
-            workspaceIdentity: "ssh://host/tmp/workspace",
+            workspaceIdentity: "remote:server:test-owner:/tmp/workspace",
             mode: "draft",
             activeTaskId: null,
             draftOptions: {
@@ -421,6 +421,7 @@ describe("botsService config", () => {
       lastWorkspaceSession: [{ kind: "local", workspacePath: "/tmp/workspace" }],
     });
     const service = f.createBotsService({
+      ...f.createBotProjectServices([{ workspacePath: "/tmp/workspace" }]),
       repo: repo as never,
       modelSelectionService: local,
       settingService,
@@ -458,8 +459,9 @@ describe("botsService config", () => {
           ...state.bots,
           [contextKey]: {
             ...original,
-            workspaceId: "ssh://other/tmp/workspace",
-            workspaceIdentity: "ssh://other/tmp/workspace",
+            workspaceId: JSON.stringify(["remote:server:other-owner", "project-0"]),
+            hostId: "remote:server:other-owner",
+            workspaceIdentity: "remote:server:other-owner:/tmp/workspace",
           },
         },
       });
@@ -468,7 +470,7 @@ describe("botsService config", () => {
       const unavailable = await menu();
       expect(getRemote).toHaveBeenCalledWith({
         workspacePath: "/tmp/workspace",
-        workspaceIdentity: "ssh://other/tmp/workspace",
+        workspaceIdentity: "remote:server:other-owner:/tmp/workspace",
       });
       expect(unavailable[0]?.text).toContain("Model provider not found");
       expect(unavailable[0]?.selection).toBeUndefined();

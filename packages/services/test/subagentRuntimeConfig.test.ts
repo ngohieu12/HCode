@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, rename, rm, writeFile } from "node:fs/promises";
 import * as fs from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, parse, resolve } from "node:path";
@@ -224,6 +224,40 @@ describe("Host incremental subagent snapshots", () => {
       ).toBe(false);
     },
   );
+
+  it("discards an in-flight file read when its directory is replaced", async () => {
+    const f = await fixture();
+    const path = join(f.userRoot, "a.md");
+    await writeFile(path, markdown("aaa", "initial"));
+    await f.cache.prepare(f.workspace);
+    const gate = Promise.withResolvers<string>();
+    vi.mocked(fs.readFile).mockImplementationOnce(
+      () => gate.promise as ReturnType<typeof fs.readFile>,
+    );
+    f.emit(path);
+    await until(() => expect(vi.mocked(fs.readFile).mock.results.at(-1)?.value).toBe(gate.promise));
+    const obsolete = initialWatcherFor(f.userRoot);
+    // 删除后立即 mkdir 可能复用 inode，未必构成该用例要验证的目录身份替换。
+    // 保留旧目录再建立新目录，确定性地产生不同身份，不依赖文件系统分配时序。
+    await rename(f.userRoot, `${f.userRoot}-obsolete`);
+    await mkdir(f.userRoot);
+    await writeFile(path, markdown("aaa", "replacement"));
+    // 快速替换时可能只有原生事件；路径仍存在，也必须关闭旧目录对象的监听。
+    for (const events of parentEvents.get(dirname(f.userRoot)) ?? [])
+      events.emit("change", { eventType: "rename", filename: "user" });
+    await until(() =>
+      expect((obsolete as unknown as { close: unknown }).close).toHaveBeenCalledOnce(),
+    );
+    gate.resolve(markdown("aaa", "obsolete"));
+    await until(async () =>
+      expect(await f.read()).toMatchObject({ profiles: [{ systemPrompt: "replacement" }] }),
+    );
+    expect(
+      vi
+        .mocked(shared.parseAgentProfileFromMarkdown)
+        .mock.calls.some(([input]) => input.content.includes("obsolete")),
+    ).toBe(false);
+  });
 
   it("rebinds before publishing child unlinks when the directory unlink notification is late", async () => {
     const f = await fixture();

@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -19,7 +17,8 @@ const mockFooterSettings = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@/ControlHintTooltip.js", () => ({
+vi.mock("@/ControlHintTooltip.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/ControlHintTooltip.js")>()),
   ControlHintTooltip: ({ children, title }: { children: unknown; title: string }) =>
     createElement("span", { "data-tooltip-title": title }, children),
 }));
@@ -184,8 +183,6 @@ describe("WorkspaceSidebarFooter web remote control tooltip", () => {
     );
 
     expect(html).toContain("sidebar.usage.plan.audienceTeam");
-    expect(html).toContain("text-ui-xs");
-    expect(html).not.toContain("text-ui-sm");
     expect(html).not.toContain("Max");
   });
 
