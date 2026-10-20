@@ -6,6 +6,10 @@ import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { prepareDevElectronAppBundle } from "./devElectronAppBundle.mjs";
+import {
+  formatLinuxSandboxWarning,
+  resolveLinuxElectronSandboxArgs,
+} from "./linuxElectronSandbox.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const mainBundle = resolve(root, "out/main/index.js");
@@ -129,7 +133,14 @@ if (process.platform === "darwin" && existsSync(electronBinary)) {
   console.log(`[dev] Prepared macOS ZCode Dev bundle: ${devBundle.appPath}`);
 }
 
-const electron = spawn(electronCommand, ["."], {
+const linuxSandbox = resolveLinuxElectronSandboxArgs({
+  electronBinary: existsSync(electronBinary) ? electronBinary : undefined,
+});
+if (linuxSandbox.args.length > 0) {
+  console.warn(formatLinuxSandboxWarning(linuxSandbox));
+}
+
+const electron = spawn(electronCommand, [...linuxSandbox.args, "."], {
   cwd: root,
   stdio: "inherit",
   env: { ...process.env, ELECTRON_RENDERER_URL: rendererUrl },
