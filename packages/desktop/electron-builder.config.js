@@ -17,12 +17,16 @@ import {
 } from "./scripts/node-pty-package-assets.mjs";
 import { cleanupPackagedSourcemaps } from "./scripts/packaged-sourcemap-cleanup.mjs";
 import { getTargetPlatform } from "./scripts/target-platform.mjs";
+import { resolveLinuxTargets } from "./scripts/linux-bundle-targets.mjs";
 import {
   resolveDesktopArtifactSuffix,
   resolveDesktopProductIdentity,
 } from "./scripts/desktop-product-identity.mjs";
 import { createWindowsPowerShellSecurityArgs } from "./scripts/powershell-command.mjs";
-import { isSharpRequiredByComputerUse, verifyStagedSharp } from "./scripts/sharp-package-assets.mjs";
+import {
+  isSharpRequiredByComputerUse,
+  verifyStagedSharp,
+} from "./scripts/sharp-package-assets.mjs";
 import { isRealComputerUseProducerInstalled } from "./scripts/computer-use-producer.mjs";
 import { verifyStagedKoffi } from "./scripts/koffi-package-assets.mjs";
 import {
@@ -867,7 +871,8 @@ export default {
       : {}),
   },
   linux: {
-    target: ["AppImage", "deb", "rpm", "pacman"],
+    // 默认 AppImage/deb/rpm/pacman；ZCODE_LINUX_TARGETS=AppImage,deb 可只打部分产物。
+    target: resolveLinuxTargets(process.env.ZCODE_LINUX_TARGETS),
     artifactName: buildDesktopArtifactName("linux"),
     // desktop 包名是 scoped package（@zcode/desktop），electron-builder 默认会把
     // Linux executable/Icon 推成 @zcodedesktop。部分桌面环境无法按这个 icon name 命中
