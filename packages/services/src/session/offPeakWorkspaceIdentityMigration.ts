@@ -1,5 +1,7 @@
-import { OFF_PEAK_TERMINAL_STATUSES } from "@zcode/shared";
 import type { DatabaseSync } from "node:sqlite";
+
+// HCode 已移除 Off-Peak 功能；旧库可能仍有 off_peak_tasks 表，身份迁移只需按终态过滤遗留行。
+const OFF_PEAK_TERMINAL_STATUSES = ["completed", "failed", "cancelled"] as const;
 
 const terminalStatuses = OFF_PEAK_TERMINAL_STATUSES.map((status) => `'${status}'`).join(", ");
 

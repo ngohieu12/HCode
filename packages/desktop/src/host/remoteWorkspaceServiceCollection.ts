@@ -44,31 +44,6 @@ import {
   type IServiceAccessor,
 } from "@zcode/services";
 import {
-  ConversationShareHttpClient,
-  ConversationShareService,
-  createSettingService,
-  createCredentialService,
-  createBroadcastService,
-  createNodeApiClient,
-  createHostApiNetworkTransport,
-  registerHostApiNetworkTransportForDispose,
-  createSettingsSyncService,
-  createBotsService,
-  createAppUsageService,
-  createMediaPreviewService,
-  createClientScenesService,
-  createServiceLogger,
-  createSubagentsService,
-  createMemoryService,
-  createOutputStyleService,
-  createRemoteConversationShareArtifactSource,
-} from "@zcode/services/node";
-import {
-  buildRuntimeZCodeApiUrl,
-  DEFAULT_ZCODE_MODEL_CONTEXT_BUDGET_STRATEGY,
-  type ZCodeSessionRuntimePreferencesResult,
-} from "@zcode/shared";
-import { assertLegacyRemoteWorkspaceRpcContract } from "./legacyRemoteWorkspaceRpcContract.js";
   REMOTE_WORKSPACE_RPC_CHANNELS,
   assertRemoteWorkspaceRpcContract,
 } from "./remoteWorkspaceRpcContract.js";
@@ -82,7 +57,6 @@ import {
   remoteHostIdFromWorkspaceIdentity,
 } from "@zcode/shared";
 import type { RemoteTarget } from "@zcode/shared";
-import {
 
 export const REMOTE_WORKSPACE_RPC_REGISTRATIONS = [
   ["fileService", IFileService],

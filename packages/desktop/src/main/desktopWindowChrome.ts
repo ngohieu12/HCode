@@ -14,7 +14,6 @@ import {
   desktopMenuMessageIds,
   getDesktopMenuMessage,
   isTrustedCodingPlanWebviewOrigin,
-  isTrustedRewardsUrl,
   PlatformChannels,
 } from "@zcode/shared";
 import { loadWindow, type WindowBootstrapOptions } from "./desktopHostProcess.js";
@@ -56,13 +55,10 @@ const embeddedBrowserJavaScriptDialogPreloadPath = join(
   import.meta.dirname,
   "../preload/embeddedBrowserJavaScriptDialog.cjs",
 );
-// Coding Plan 官网页专用 preload：挂 window.zcodeBridge 供官网回传购买完成信号。
-const codingPlanWebviewPreloadPath = join(import.meta.dirname, "../preload/codingPlanWebview.cjs");
 
 /**
  * 判断 webview 是否加载 Coding Plan 官网购买页（/coding-plan?...&embedded=app）。
- * 用于在 will-attach-webview 里把这种 webview 的 preload 切到 codingPlanWebviewPreloadPath，
- * 其余 webview（如内置浏览器）仍用 embeddedBrowserJavaScriptDialogPreloadPath。
+ * 仅用于给 guest 打上 codingPlan 种类，保留导航防护；preload 统一为原生 Dialog 桥。
  */
 function isCodingPlanEmbeddedWebviewSrc(src: string | undefined): boolean {
   if (!src) return false;
@@ -348,7 +344,6 @@ function attachEmbeddedBrowserWindowOpenHandler(options: {
   hostWebContents: WebContents;
   guestWebContents: WebContents;
   isCodingPlanGuest: boolean;
-  isRewardsGuest: boolean;
   resolveBrowserViewOwner?: (webContentsId: number) =>
     | {
         workspaceKey: string;
@@ -451,22 +446,6 @@ function attachEmbeddedBrowserWindowOpenHandler(options: {
   });
 
   options.guestWebContents.on("will-navigate", (event, url) => {
-    if (options.isRewardsGuest) {
-      if (
-        isTrustedRewardsUrl(url, {
-          dev: !app.isPackaged,
-          e2e: process.env.VITE_ZCODE_E2E_STORE_BRIDGE === "1",
-        })
-      )
-        return;
-      // 邀请页离开受信任路径必须外开，不能让第三方页面使用已注入凭据的容器。
-      event.preventDefault();
-      if (isAllowedEmbeddedBrowserNewWindowUrl(url))
-        void shell
-          .openExternal(url)
-          .catch(() => options.logger.warn("[rewards] external navigation failed"));
-      return;
-    }
     const guestUrl =
       typeof options.guestWebContents.getURL === "function"
         ? options.guestWebContents.getURL()
@@ -634,7 +613,7 @@ export function createBrowserWindow(options: {
   attachWindowsWindowRepaint(win);
   // will-attach 与 did-attach 按顺序配对；队列元素记录 guest 种类，did-attach 据此分派策略。
   const pendingWebviewGuestKinds: Array<
-    | { kind: "browser" | "codingPlan"; isRewards: boolean }
+    | { kind: "browser" | "codingPlan" }
     | { kind: "pluginSandbox"; sandboxId: string }
   > = [];
 
@@ -666,8 +645,6 @@ export function createBrowserWindow(options: {
     // Chromium NSAlert。固定 preload 在每个 frame 调用原生 API 前拦截，且隔离世界只
     // 暴露 alert/confirm 同步桥；网页主世界仍没有 Node 或任意 IPC 能力。
     //
-    // Coding Plan 官网页例外：它需要 window.zcodeBridge 回传购买完成信号，
-    // 改用专用 preload（codingPlanWebview.ts），其余 webview 保持原生 Dialog 桥。
     const targetUrl = params.src ?? "about:blank";
     // 插件 UI 沙箱 guest：独立分支，不走内置浏览器的 preload / allowpopups / 协议白名单。
     if (isPluginSandboxSrc(targetUrl)) {
@@ -688,21 +665,8 @@ export function createBrowserWindow(options: {
       return;
     }
     const isCodingPlanWebview = isCodingPlanEmbeddedWebviewSrc(targetUrl);
-    webPreferences.preload = isCodingPlanWebview
-      ? codingPlanWebviewPreloadPath
-      : embeddedBrowserJavaScriptDialogPreloadPath;
-    const isRewardsWebview = isTrustedRewardsUrl(targetUrl, {
-      dev: !app.isPackaged,
-      e2e: process.env.VITE_ZCODE_E2E_STORE_BRIDGE === "1",
-    });
-    if (isRewardsWebview) {
-      webPreferences.preload = join(import.meta.dirname, "../preload/rewardsWebview.cjs");
-      if (!app.isPackaged)
-        webPreferences.additionalArguments = [
-          ...(webPreferences.additionalArguments ?? []),
-          "--zcode-rewards-dev",
-        ];
-    }
+    // HCode 已移除 Coding Plan 购买桥与 Rewards 页：所有 webview 统一走原生 Dialog 桥 preload。
+    webPreferences.preload = embeddedBrowserJavaScriptDialogPreloadPath;
     webPreferences.contextIsolation = true;
     webPreferences.nodeIntegration = false;
     webPreferences.nodeIntegrationInSubFrames = true;
@@ -731,14 +695,12 @@ export function createBrowserWindow(options: {
 
     pendingWebviewGuestKinds.push({
       kind: isCodingPlanWebview ? "codingPlan" : "browser",
-      isRewards: isRewardsWebview,
     });
   });
 
   win.webContents.on("did-attach-webview", (_event, guestWebContents) => {
     const guestKind = pendingWebviewGuestKinds.shift() ?? {
       kind: "browser" as const,
-      isRewards: false,
     };
     if (guestKind.kind === "pluginSandbox") {
       getPluginSandboxHost()?.attachGuest({
@@ -755,7 +717,6 @@ export function createBrowserWindow(options: {
       // PayPal/relay 的 30x 重定向不保证逐跳触发 will-navigate。
       // Coding Plan guest 身份必须按初始 src 粘住，不能由当前 URL 解防护。
       isCodingPlanGuest: guestKind.kind === "codingPlan",
-      isRewardsGuest: guestKind.isRewards,
       logger: options.logger,
     });
     // 蓝牙设备选择事件挂在 guest WebContents 上（Session 只覆盖 hid/usb/serial）；

@@ -62,16 +62,14 @@ async function sendText(
     inputId: envelope.commandId,
   });
   // Bug 根因：Highspeed admission 与 automation 派发来自不同上游；契约漂移时可能把
-  // automationId、highspeedMeta 和加速执行材料同时送到同一轮。定时执行身份必须优先：
+  // automationId 和加速执行材料同时送到同一轮。定时执行身份必须优先：
   // 既不能拿加速卡凭据发请求，也不能把普通模型输出持久化成 Highspeed 消息。
   const dropsHighspeed =
     activeAutomationId !== undefined &&
-    (rawPayload.highspeedMeta !== undefined ||
-      isHighspeedProviderId(rawPayload.modelSelection?.providerId));
+    isHighspeedProviderId(rawPayload.modelSelection?.providerId);
   const payload: CommandPayloadMap["sendText"] = dropsHighspeed
     ? {
         ...rawPayload,
-        highspeedMeta: undefined,
         modelSelection: undefined,
         modelExecution: undefined,
       }

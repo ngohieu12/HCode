@@ -41,13 +41,6 @@ export function createProviderRuntimeHeadersPort(
             workspace,
             modelSelection: { providerId: input.providerId, modelId: input.modelId },
             providerId: input.providerId,
-            ...(input.accountAccess ? { accountAccess: input.accountAccess } : {}),
-            ...(input.expectedAccountScope
-              ? { expectedAccountScope: input.expectedAccountScope }
-              : {}),
-            ...(input.rejectedProjectTokenFingerprint
-              ? { rejectedProjectTokenFingerprint: input.rejectedProjectTokenFingerprint }
-              : {}),
             reason: input.reason,
           },
           zcodeProviderRuntimeHeadersResponseSchema,
@@ -90,9 +83,6 @@ export function createProviderRuntimeHeadersPort(
             "Provider runtime headers were not applied before model request attempt.",
           {
             providerId: input.providerId,
-            ...(input.rejectedProjectTokenFingerprint
-              ? { rejectedProjectTokenFingerprint: input.rejectedProjectTokenFingerprint }
-              : {}),
             reason: input.reason,
             workspaceKey: workspace.workspaceKey,
           },

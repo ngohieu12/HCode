@@ -2003,7 +2003,7 @@ export function SettingsPage({
                               }
                             />
                           ) : activeSection === "shortcuts" ? (
-                            <ShortcutSettingsSection isDesktop={Boolean(isDesktop)} />
+                            <ShortcutSettingsSection />
                           ) : activeSection === "modelProvider" ? (
                             <ServiceProvider services={localHostServices}>
                               {/* 模型配置属于本机全局事实源；激活远端 workspace 时也不能注入远端 Host。 */}

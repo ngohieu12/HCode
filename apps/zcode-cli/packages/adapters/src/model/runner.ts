@@ -45,7 +45,6 @@ import {
 } from "./runner-runtime.js";
 import { resolveToolSearchCapability } from "./tool-search.js";
 import { createModel, type ModelExecutionRequest } from "./model.js";
-import { refreshOffPeakRequestAuth } from "./off-peak-request-auth.js";
 
 export type { AiSdkModelRetryOptions } from "./retry-policy.js";
 export type {
@@ -194,17 +193,7 @@ export class AiSdkModelAdapter {
                 `Model request auth is unavailable: ${resolved.providerId}/${resolved.modelId}`,
               );
             }
-            const refreshedAuth =
-              options.providerConfig.access.type === "zhipu-account" &&
-              options.providerConfig.access.mode === "off-peak"
-                ? await refreshOffPeakRequestAuth({
-                    auth: requestAuth,
-                    input,
-                    accountAccess: options.providerConfig.access,
-                    refresh: contextRefreshRuntimeHeadersBeforeAttempt,
-                  })
-                : requestAuth;
-            return { headersApplied: true, requestAuth: refreshedAuth };
+            return { headersApplied: true, requestAuth };
           }
         : options.providerConfig.access.type === "zhipu-account"
           ? (contextRefreshRuntimeHeadersBeforeAttempt ??

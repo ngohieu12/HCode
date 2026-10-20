@@ -251,29 +251,17 @@ async function sendQueuedNow(
       leaseReleaseOwnedByBackground = goalContinuationWillStart;
     } else {
       const intent = inputIntentMetadataFromQueueItem(queueItem, queueItem.text);
-      // 手动提升允许 Renderer 为同一张卡补一份新执行材料；卡不同一律忽略，避免跨卡换凭据。
-      const refreshedHighspeedMatchesQueue =
-        payload.highspeedMeta !== undefined &&
-        queueItem.highspeed !== undefined &&
-        payload.highspeedMeta.cardId === queueItem.highspeed.cardId &&
-        payload.highspeedMeta.taskId === queueItem.highspeed.taskId;
       const ordinarySelection = isHighspeedProviderId(intent.modelSelection?.providerId)
         ? resolveSessionFallbackModelSelection(record)
         : intent.modelSelection;
       // Bug 根因：旧版本已把临时 Highspeed Selection 持久化到 QueueItem。进程升级后
       // execution bundle 必然丢失；若不在提升边界迁移，会继续用内部 Provider 并直接报错。
       intent.modelSelection = ordinarySelection;
-      if (refreshedHighspeedMatchesQueue && payload.highspeedMeta) {
-        intent.highspeed = payload.highspeedMeta;
-      }
-      // 凭据不入队列持久化面：先用本次补供的完整 bundle，其次取 CLI 内存暂存。
-      const refreshedExecution =
-        refreshedHighspeedMatchesQueue && payload.modelSelection && payload.modelExecution
-          ? { modelSelection: payload.modelSelection, modelExecution: payload.modelExecution }
-          : undefined;
-      const stagedExecution =
-        refreshedExecution ??
-        host.readQueuedTurnExecution?.(record.app.sessionId, queueItem.sourceCommandId);
+      // 凭据不入队列持久化面：只取 CLI 内存暂存。
+      const stagedExecution = host.readQueuedTurnExecution?.(
+        record.app.sessionId,
+        queueItem.sourceCommandId,
+      );
       // Bug 根因：QueueItem.modelSelection 同时承担普通模型和临时加速模型，导致编辑恢复与
       // 降级目标互相污染。提升边界才临时应用 bundle；失败时保留队列项自己的普通 Selection。
       const highspeedStillValid =

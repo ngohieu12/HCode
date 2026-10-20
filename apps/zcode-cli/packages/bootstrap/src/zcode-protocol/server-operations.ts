@@ -115,7 +115,6 @@ import { createWorkspaceZCodeApp, ensureSessionModelAvailable } from "./workspac
 import { buildAppUsageSnapshot, resolveTzOffsetMs } from "./usage-stats-builder.js";
 import { createProtocolInteractionBroker } from "./interaction-broker.js";
 import { createProtocolAutomationPort } from "./automation-port.js";
-import { createProtocolOffPeakPort } from "./offpeak-port.js";
 import { createProtocolTopicResourcePort } from "./topic-resource-port.js";
 import { createProtocolBrowserControlBroker } from "./browser-control-broker.js";
 import { mapComputerUseOperationEvent } from "./computer-use-operation-event.js";
@@ -2070,6 +2069,9 @@ export async function sendPrompt(context: ZCodeProtocolAgentServerContext, rawPa
           },
         )
       : undefined;
+  // 联合类型展开保持 automationId 判别：有值时为 string，缺席时整体不带该字段。
+  const automationFields: { automationId: string } | { automationId?: undefined } =
+    params.automationId ? { automationId: params.automationId } : {};
   void runWithSessionResidencyFinalization(record, () =>
     runPromptTurnInBackground(context, record, {
       abortController,
@@ -2082,14 +2084,7 @@ export async function sendPrompt(context: ZCodeProtocolAgentServerContext, rawPa
         : undefined,
       queryId: (params.queryId ?? inputId) as QueryId | undefined,
       content: params.content,
-      ...(params.automationId
-        ? { automationId: params.automationId }
-        : params.offPeakTaskId
-          ? {
-              offPeakTaskId: params.offPeakTaskId,
-              ...(params.offPeakRunType ? { offPeakRunType: params.offPeakRunType } : {}),
-            }
-          : {}),
+      ...automationFields,
       toolDenylist: params.toolDenylist,
       botDeliveryTarget: params.botDeliveryTarget,
     }),
@@ -3468,7 +3463,7 @@ async function createRecord(
       parentSessionId,
       taskType,
       // 动态工作流灰度门（docs/dynamic-workflow/launch.md「Gray release」「On demand: activation」）：
-      // 与 offPeakPort 同一套读法——本次 create/resume 参数优先，缺席时读 Host 同步到进程的
+      // 本次 create/resume 参数优先，缺席时读 Host 同步到进程的
       // workspace 级结论。取值与「必须显式布尔」的理由收在 resolveDynamicWorkflowRuntimeGate。
       ...resolveDynamicWorkflowRuntimeGate(
         {
@@ -3512,12 +3507,6 @@ async function createRecord(
     permissionBroker: createProtocolInteractionBroker(context),
     automationPort: createProtocolAutomationPort(context, () => ownSessionRecord),
     topicResourcePort: createProtocolTopicResourcePort(context),
-    // 只接入 Host 已开放的工具面；缺省不注入。复用现行异步工厂，
-    // 不恢复旧 deferred ModelAdapter/Registry overlay，也不改变 Session Selection。
-    ...(("offPeakToolEnabled" in params && params.offPeakToolEnabled === true) ||
-    context.appRuntimePreferences.offPeakToolEnabled === true
-      ? { offPeakPort: createProtocolOffPeakPort(context, () => ownSessionRecord) }
-      : {}),
     resolveInitialBashShellSelection: startupPreferences.resolveInitialBashShellSelection,
     ...(startupPreferences.subagentRuntimeConfigEnabled &&
     !(workspace.workspaceIdentity && isRemoteWorkspaceIdentity(workspace.workspaceIdentity))
