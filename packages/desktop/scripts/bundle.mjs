@@ -292,7 +292,7 @@ function printHelp() {
   ZCODE_TARGET_OS              与 --os 等价
   ZCODE_TARGET_ARCH            与 --arch 等价
   ZCODE_LINUX_TARGETS          Linux 产物列表，如 AppImage,deb（默认 AppImage,deb,rpm,pacman；
-                               本机缺少 rpmbuild 时自动跳过 rpm）
+                               本机缺少 rpmbuild / bsdtar 时自动跳过 rpm / pacman）
 `);
 }
 

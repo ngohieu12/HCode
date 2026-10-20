@@ -38,10 +38,17 @@ function hasCommandOnPath(command) {
 }
 
 /**
- * 本机 Linux 打包时，rpm target 依赖 rpmbuild（Ubuntu/Debian 默认未安装）。
- * 用户未显式指定 ZCODE_LINUX_TARGETS 时自动跳过缺少工具链的 target，而不是让
- * electron-builder 打到一半失败。
+ * 本机 Linux 打包时各 target 需要宿主工具链（Ubuntu/Debian 默认都未安装）：
+ * - rpm → rpmbuild（apt install rpm）
+ * - pacman → bsdtar 生成 .MTREE、zstd 压缩 .pkg.tar.zst（apt install libarchive-tools zstd）
+ * 缺失时 electron-builder 会在 fpm 阶段以 exit 127 失败。用户未显式指定
+ * ZCODE_LINUX_TARGETS 时自动跳过缺少工具链的 target，而不是打到一半失败。
  */
+const LINUX_TARGET_HOST_REQUIREMENTS = {
+  rpm: { commands: ["rpmbuild"], aptPackages: ["rpm"] },
+  pacman: { commands: ["bsdtar", "zstd"], aptPackages: ["libarchive-tools", "zstd"] },
+};
+
 export function resolveHostLinuxTargetPlan({
   env = process.env,
   hasCommand = hasCommandOnPath,
@@ -51,11 +58,16 @@ export function resolveHostLinuxTargetPlan({
   }
   const skipped = [];
   const targets = DEFAULT_LINUX_TARGETS.filter((target) => {
-    if (target === "rpm" && !hasCommand("rpmbuild")) {
-      skipped.push({ target, reason: "rpmbuild not found (install the rpm package)" });
-      return false;
-    }
-    return true;
+    const requirement = LINUX_TARGET_HOST_REQUIREMENTS[target];
+    if (!requirement) return true;
+    const missing = requirement.commands.filter((command) => !hasCommand(command));
+    if (missing.length === 0) return true;
+    skipped.push({
+      target,
+      missing,
+      reason: `${missing.join(", ")} not found (sudo apt install ${requirement.aptPackages.join(" ")})`,
+    });
+    return false;
   });
   return { targets, skipped };
 }

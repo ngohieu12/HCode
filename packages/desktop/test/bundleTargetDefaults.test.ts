@@ -46,10 +46,30 @@ describe("linux bundle targets", () => {
   it("skips rpm when rpmbuild is missing on the host", () => {
     const plan = linuxTargets.resolveHostLinuxTargetPlan({
       env: {},
-      hasCommand: () => false,
+      hasCommand: (command: string) => command !== "rpmbuild",
     });
     expect(plan.targets).toEqual(["AppImage", "deb", "pacman"]);
     expect(plan.skipped.map((entry: { target: string }) => entry.target)).toEqual(["rpm"]);
+  });
+
+  it("skips pacman when bsdtar is missing (fpm .MTREE step exits 127)", () => {
+    const plan = linuxTargets.resolveHostLinuxTargetPlan({
+      env: {},
+      hasCommand: (command: string) => command !== "bsdtar",
+    });
+    expect(plan.targets).toEqual(["AppImage", "deb", "rpm"]);
+    expect(plan.skipped).toEqual([
+      expect.objectContaining({
+        target: "pacman",
+        missing: ["bsdtar"],
+        reason: expect.stringContaining("libarchive-tools"),
+      }),
+    ]);
+  });
+
+  it("keeps all targets when every host tool is available", () => {
+    const plan = linuxTargets.resolveHostLinuxTargetPlan({ env: {}, hasCommand: () => true });
+    expect(plan).toEqual({ targets: ["AppImage", "deb", "rpm", "pacman"], skipped: [] });
   });
 
   it("respects an explicit ZCODE_LINUX_TARGETS", () => {
