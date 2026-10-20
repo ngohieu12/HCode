@@ -3,6 +3,9 @@ import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import type { ISettingService } from "@zcode/services";
 import pkg, { CancellationToken } from "electron-updater";
 import semver from "semver";
+import { ensureValidDevAppVersion } from "./devAppVersion.js";
+// 必须在首次访问 pkg.autoUpdater 之前执行：该 getter 会立即用 app.version 构造 updater。
+ensureValidDevAppVersion();
 const { autoUpdater } = pkg;
 import {
   DEFAULT_LOCALE,
