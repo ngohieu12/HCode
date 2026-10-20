@@ -23,6 +23,7 @@ import {
   runCommandAndReadStdout,
 } from "../../../scripts/spawn-command.mjs";
 import { resolveIntranetDepsBaseUrl } from "../../../scripts/intranetDefaults.mjs";
+import { resolveHostLinuxTargetPlan } from "./linux-bundle-targets.mjs";
 
 const desktopRoot = resolve(import.meta.dirname, "..");
 const workspaceRoot = resolve(desktopRoot, "../..");
@@ -39,8 +40,31 @@ const runtimeModuleLookupRoots = [
   resolve(workspaceRoot, "node_modules", ".pnpm", "node_modules"),
 ];
 const pnpmCommand = "pnpm";
-const DEFAULT_TARGET_OS = "mac";
-const DEFAULT_TARGET_ARCH = "arm64";
+const hostTargetOsByPlatform = { darwin: "mac", win32: "win", linux: "linux" };
+const hostTargetArchByArch = { x64: "x64", arm64: "arm64" };
+
+/** 未显式指定 --os 时默认打当前宿主平台的包，避免 Linux/Windows 上误走 macOS DMG 流程。 */
+export function resolveDefaultTargetOs(platform = process.platform) {
+  return hostTargetOsByPlatform[platform] ?? "mac";
+}
+
+export function resolveDefaultTargetArch(arch = process.arch) {
+  return hostTargetArchByArch[arch] ?? "arm64";
+}
+
+/**
+ * macOS 产物（DMG、codesign、dmg-license 依赖的 iconv-corefoundation 原生模块）只能在
+ * macOS 上构建；在 Linux 上执行会在 electron-builder 内部以 "invalid ELF header" 失败。
+ * 提前给出可操作的错误，而不是先跑完 prepare/build 再崩。
+ */
+export function assertTargetOsSupportedOnHost(os, platform = process.platform) {
+  if (os === "mac" && platform !== "darwin") {
+    throw new Error(
+      `macOS 安装包只能在 macOS 上打包（当前宿主 ${platform}）。` +
+        `请在本机打 ${resolveDefaultTargetOs(platform)} 包，例如: pnpm bundle:desktop -- ${resolveDefaultTargetOs(platform)} ${resolveDefaultTargetArch()}`,
+    );
+  }
+}
 const desktopDistDir = process.env.ZCODE_DESKTOP_DIST_DIR || "dist";
 const desktopDistRoot = resolve(desktopRoot, desktopDistDir);
 const desktopProductIdentity = resolveDesktopProductIdentity(process.env);
@@ -257,8 +281,8 @@ function printHelp() {
   pnpm bundle:desktop -- linux arm64
 
 参数:
-  --os, -o <mac|win|linux>     目标操作系统，默认 mac
-  --arch, -a <x64|arm64>       目标 CPU 架构，默认 arm64
+  --os, -o <mac|win|linux>     目标操作系统，默认当前宿主平台
+  --arch, -a <x64|arm64>       目标 CPU 架构，默认当前宿主架构
   --skip-prepare               跳过 prepare:runtime-assets
   --skip-build                 跳过 pnpm build
   --dry-run                    只打印最终命令，不执行打包
@@ -267,6 +291,8 @@ function printHelp() {
 环境变量:
   ZCODE_TARGET_OS              与 --os 等价
   ZCODE_TARGET_ARCH            与 --arch 等价
+  ZCODE_LINUX_TARGETS          Linux 产物列表，如 AppImage,deb（默认 AppImage,deb,rpm,pacman；
+                               本机缺少 rpmbuild 时自动跳过 rpm）
 `);
 }
 
@@ -359,8 +385,8 @@ function parseArgs(argv) {
     throw new Error(`参数过多: ${options.positionals.join(" ")}`);
   }
 
-  const resolvedOs = normalizeOs(options.os ?? positionalOs ?? DEFAULT_TARGET_OS);
-  const resolvedArch = normalizeArch(options.arch ?? positionalArch ?? DEFAULT_TARGET_ARCH);
+  const resolvedOs = normalizeOs(options.os ?? positionalOs ?? resolveDefaultTargetOs());
+  const resolvedArch = normalizeArch(options.arch ?? positionalArch ?? resolveDefaultTargetArch());
 
   return {
     os: resolvedOs,
@@ -708,6 +734,9 @@ function verifyPackagedRuntimeDependencies(os, arch) {
 
 async function main() {
   const { os, arch, skipPrepare, skipBuild, dryRun } = parseArgs(process.argv.slice(2));
+  if (!dryRun) {
+    assertTargetOsSupportedOnHost(os);
+  }
   const buildArgs = [
     "exec",
     "electron-builder",
@@ -726,6 +755,15 @@ async function main() {
     ...createElectronRuntimeMirrorEnv(resolveElectronMirror()),
     ...createElectronBuilderBinariesMirrorEnv(resolveElectronBuilderBinariesMirror()),
   };
+
+  if (os === "linux" && process.platform === "linux") {
+    const linuxTargetPlan = resolveHostLinuxTargetPlan();
+    for (const { target, reason } of linuxTargetPlan.skipped) {
+      console.warn(`[bundle] skip linux target ${target}: ${reason}`);
+    }
+    buildEnv.ZCODE_LINUX_TARGETS = linuxTargetPlan.targets.join(",");
+    console.log(`[bundle] linux targets=${buildEnv.ZCODE_LINUX_TARGETS}`);
+  }
 
   if (dryRun) {
     console.log(`[bundle] dry-run: ${pnpmCommand} ${buildArgs.join(" ")}`);
