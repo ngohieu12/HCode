@@ -1,4 +1,5 @@
-import { ZCODE_AGENT_PROVIDER, type PlanIdentitySnapshot, type ZCodeProvider } from "@zcode/shared";
+import { type PlanIdentitySnapshot } from "@/lib/legacyAccountProviderCompat.js";
+import { ZCODE_AGENT_PROVIDER, type ZCodeProvider } from "@zcode/shared";
 import { buildPromptTelemetryExtraDetail } from "@/lib/messageTelemetry.js";
 import { encodeCustomModelValue } from "@/lib/zcodeCustomModelValue.js";
 import {

@@ -1,8 +1,5 @@
-import {
-  BUILTIN_MODEL_PROVIDER_IDS,
-  type ProviderFamilyDomain,
-  type UsageEntitlementSnapshot,
-} from "@zcode/shared";
+import { type ProviderFamilyDomain } from "@/lib/legacyAccountProviderCompat.js";
+import { BUILTIN_MODEL_PROVIDER_IDS, type UsageEntitlementSnapshot } from "@zcode/shared";
 import type { CodingPlanUsageAvailableProvider } from "@/CodingPlanUsageRemainingPanel.js";
 import type { SidebarUsageCodingPlanProviderId } from "@/lib/sidebarUsageCodingPlanProviderPreference.js";
 

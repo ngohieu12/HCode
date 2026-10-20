@@ -2,18 +2,17 @@
 import { useEffect, useMemo } from "react";
 import type { ProviderSettingsFormProvider } from "@/lib/providerSettingsFormTypes.js";
 import { getProviderFormLabel } from "@/lib/providerSettingsFormTypes.js";
-import type {
-  ProviderFamilyConnectionSelection,
-  ProviderFamilyConnectionSelectionSettings,
-  ProviderFamilyDomain,
-} from "@zcode/shared";
 import {
-  BUILTIN_MODEL_PROVIDER_IDS,
+  type ProviderFamilyDomain,
   isStartPlanModelProviderId,
   resolveModelProviderFamilySpecByProviderId,
   resolveProviderFamilyDomainFromOAuthProvider,
-  type OAuthProviderId,
+} from "@/lib/legacyAccountProviderCompat.js";
+import type {
+  ProviderFamilyConnectionSelection,
+  ProviderFamilyConnectionSelectionSettings,
 } from "@zcode/shared";
+import { BUILTIN_MODEL_PROVIDER_IDS, type OAuthProviderId } from "@zcode/shared";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import {
   CODING_PLAN_PROVIDER_SPECS,

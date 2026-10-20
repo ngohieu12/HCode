@@ -1,7 +1,5 @@
-import {
-  BUILTIN_MODEL_PROVIDER_IDS,
-  resolveModelProviderFamilyIdByProviderId,
-} from "@zcode/shared";
+import { resolveModelProviderFamilyIdByProviderId } from "@/lib/legacyAccountProviderCompat.js";
+import { BUILTIN_MODEL_PROVIDER_IDS } from "@zcode/shared";
 import type { IntlInstance } from "@/i18n/IntlProvider.js";
 import type { ModelSelectGroup } from "@/ModelConfigSelect.js";
 

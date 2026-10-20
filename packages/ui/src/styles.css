@@ -2250,6 +2250,8 @@ html[data-document-hidden] *::after {
 /* 没有右侧 side pane 时，居中草稿的问候语与输入框放开到整列宽度；有 side pane 时保留 max-w-2xl。 */
 [data-workspace-side-pane-hidden="true"] [data-centered-draft="true"] {
   max-width: none;
+}
+
 /* 文件视图保留任务面板用于位移动效，延伸横线必须随原面板一起隐藏。 */
 [data-workspace-shell]:has([data-project-sidebar-panel="navigation"][aria-hidden="true"])
   [data-sidebar-divider-extension] {

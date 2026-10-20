@@ -1,5 +1,6 @@
 import type { IServiceAccessor } from "@zcode/services";
-import type { EnterpriseCodingPlanPricingProduct, ProviderFamilyDomain } from "@zcode/shared";
+import { type ProviderFamilyDomain } from "@/lib/legacyAccountProviderCompat.js";
+import type { EnterpriseCodingPlanPricingProduct } from "@zcode/shared";
 import { logger } from "@/logger.js";
 
 type EnterprisePricingProductsResult =

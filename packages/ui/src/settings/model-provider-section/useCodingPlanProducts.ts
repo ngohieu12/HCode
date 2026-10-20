@@ -1,14 +1,16 @@
 /* eslint-disable max-lines -- Coding Plan 套餐需要集中处理静态套餐、远端试算、缓存与登录态回退，避免把共享状态拆散。 */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  BUILTIN_MODEL_PROVIDER_IDS,
   CODING_PLAN_SYSTEM_BUSY,
+  isZaiCodingPlanProviderId,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
+  BUILTIN_MODEL_PROVIDER_IDS,
   type CodingPlanBatchPreviewResponse,
   type CodingPlanProductPreviewPayment,
   type CodingPlanStaticProduct,
   type CodingPlanStaticProductsConfig,
   type StartPlanPreviewConfig,
-  isZaiCodingPlanProviderId,
 } from "@zcode/shared";
 import { useOptionalServices } from "@/hooks/useServices.js";
 import { logger } from "@/logger.js";
@@ -272,9 +274,7 @@ function buildStaticProductsSnapshot(providerId: CodingPlanProviderId): CodingPl
   return buildStaticProductsSnapshotFromList(providerId, []);
 }
 
-function buildZaiStartStaticProducts(
-  preview: StartPlanPreviewConfig,
-): CodingPlanStaticProduct[] {
+function buildZaiStartStaticProducts(preview: StartPlanPreviewConfig): CodingPlanStaticProduct[] {
   const previewName = preview.name.trim() || "Z.ai Start";
   const equityList = preview.entitlements.map((entitlement) => ({
     productEquityTitle: entitlement.showName,

@@ -18,6 +18,7 @@ import {
   type ZCodeAutomation,
   type ZCodeOffPeakTask,
 } from "@zcode/shared";
+import { TID_OFFPEAK_CREATE_BUTTON, TID_OFFPEAK_TAB } from "@/lib/legacyAccountProviderCompat.js";
 import {
   TID_AUTOMATION_ACTION_DELETE,
   TID_AUTOMATION_ACTION_TOGGLE,
@@ -25,8 +26,6 @@ import {
   TID_AUTOMATION_CARD_MENU,
   TID_AUTOMATIONS_LIST,
   TID_AUTOMATIONS_STATUS_FILTER,
-  TID_OFFPEAK_CREATE_BUTTON,
-  TID_OFFPEAK_TAB,
 } from "@zcode/shared/test-ids";
 import { Button } from "@/components/ui/button.js";
 import {

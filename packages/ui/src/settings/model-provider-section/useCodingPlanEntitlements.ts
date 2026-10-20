@@ -4,10 +4,12 @@ import type { ProviderSettingsView } from "@zcode/services";
 import {
   getModelProviderFamilySpec,
   type ModelProviderFamilySpec,
+  type ZCodeProviderAccountAccess,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
   type ProviderFamilyConnectionSelection,
   type ProviderFamilyConnectionSelectionSettings,
   type ZCodeAccountAccess,
-  type ZCodeProviderAccountAccess,
 } from "@zcode/shared";
 import {
   useUsageEntitlement,

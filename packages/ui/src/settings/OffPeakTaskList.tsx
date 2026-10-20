@@ -20,7 +20,7 @@ import {
   TID_OFFPEAK_CARD,
   TID_OFFPEAK_CARD_SESSION,
   TID_OFFPEAK_CARD_MENU,
-} from "@zcode/shared/test-ids";
+} from "@/lib/legacyAccountProviderCompat.js";
 import {
   DropdownMenu,
   DropdownMenuContent,

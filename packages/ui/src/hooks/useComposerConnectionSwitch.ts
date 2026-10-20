@@ -11,7 +11,8 @@ import { chooseConnectionModel, type ComposerConnection } from "@/lib/composerPl
 import { buildRegistryModelSelectGroups } from "@/lib/modelSelectionGroups.js";
 import { decodeCustomModelValue } from "@/lib/zcodeCustomModelValue.js";
 import { logger } from "@/logger.js";
-import { resolveModelProviderFamilySpecByProviderId, type ZCodeProvider } from "@zcode/shared";
+import { resolveModelProviderFamilySpecByProviderId } from "@/lib/legacyAccountProviderCompat.js";
+import { type ZCodeProvider } from "@zcode/shared";
 
 export function useComposerConnectionSwitch({
   workspacePath,

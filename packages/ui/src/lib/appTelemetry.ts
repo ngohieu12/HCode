@@ -1,9 +1,11 @@
 import {
   BIGMODEL_PROVIDER_ID,
-  BUILTIN_MODEL_PROVIDER_IDS,
   ZAI_PROVIDER_ID,
-  collectTelemetryRendererContext,
   isZaiCodingPlanProviderId,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
+  BUILTIN_MODEL_PROVIDER_IDS,
+  collectTelemetryRendererContext,
   sanitizeTelemetryEventDetail,
   type BuiltinModelProviderId,
   type IPlatformService,

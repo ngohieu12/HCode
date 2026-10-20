@@ -21,6 +21,7 @@ import type {
   UserInfo,
   ZCodeInteractionBehavior,
   ComposerEnterBehavior,
+  DesktopCloseToTrayCapability,
 } from "@zcode/shared";
 import { DEFAULT_COMPOSER_ENTER_BEHAVIOR } from "@zcode/shared";
 import { BUILTIN_MODEL_PROVIDER_IDS } from "@zcode/shared";
@@ -50,6 +51,7 @@ import {
   consumePendingSettingsSourceServerDetails,
   consumePendingSettingsPluginOrigin,
   consumePendingSettingsPluginScopeKey,
+  consumePendingSettingsPluginTab,
   consumePendingSettingsModelProviderTarget,
   consumePendingSettingsUsageTab,
   resolveSettingsSection,
@@ -291,6 +293,7 @@ export function SettingsPage({
   isDesktop,
   isWindowsDesktop,
   isMacDesktop,
+  isWebRemoteControl = false,
   windowsWindowControlsRightPaddingPx: _windowsWindowControlsRightPaddingPx,
   captionWorkspacePath,
   onBack,
@@ -305,6 +308,7 @@ export function SettingsPage({
   isDesktop?: boolean;
   isWindowsDesktop?: boolean;
   isMacDesktop?: boolean;
+  isWebRemoteControl?: boolean;
   windowsWindowControlsRightPaddingPx?: number;
   captionWorkspacePath?: string | null;
   onBack?: () => void;
@@ -384,17 +388,6 @@ export function SettingsPage({
           linuxCloseToTrayCapability.gnomeLikeWithoutTray,
       }
     : undefined;
-  const marketingRequest = useStore(marketingNavigation, (state) => state.request);
-  useEffect(() => {
-    if (marketingRequest?.target.page !== "settings") return;
-    const target = marketingRequest.target;
-    const section = target.section ? marketingSettingsSections[target.section] : activeSection;
-    if (!settingsSections.some((item) => item.id === section)) {
-      finishMarketingNavigation(marketingRequest.id, new Error("marketing_navigation_unavailable"));
-    } else if (activeSection === section && !target.provider_id) {
-      finishMarketingNavigation(marketingRequest.id);
-    }
-  }, [activeSection, marketingRequest, settingsSections]);
   const [pluginNavigationOrigin, setPluginNavigationOrigin] = useState(() =>
     consumePendingSettingsPluginOrigin(),
   );
@@ -1749,8 +1742,6 @@ export function SettingsPage({
                           {activeSection === "general" ? (
                             <GeneralSectionContent
                               localePreference={localePreference}
-                              interfaceMode={interfaceMode}
-                              setInterfaceMode={setInterfaceMode}
                               isDesktop={isDesktop}
                               isWindowsDesktop={isWindowsDesktop}
                               isLinuxDesktop={isLinuxDesktop}
@@ -1863,18 +1854,6 @@ export function SettingsPage({
                               onAskUserQuestionAutoResolutionEnabledChange={
                                 handleAskUserQuestionAutoResolutionEnabledChange
                               }
-                              onOpenOnboardingDialog={() =>
-                                runUserAction({
-                                  input: {
-                                    featureId: "settings.navigation",
-                                    action: "open_onboarding",
-                                    trigger: "button",
-                                  },
-                                  operation: requestOnboardingDialog,
-                                  completed: { resultSource: "local_commit" },
-                                  failureStage: "dialog_open",
-                                })
-                              }
                             />
                           ) : activeSection === "remoteDevices" ? (
                             sharedSettings && isDesktop && sourceManagement ? (
@@ -1981,8 +1960,7 @@ export function SettingsPage({
                             )
                           ) : activeSection === "appearance" ? (
                             <AppearanceSectionContent
-                              codePreviewSettings={codePreviewSettings}
-                              setCodePreviewSettings={handleCodePreviewSettingsChange}
+                              isDesktop={Boolean(isDesktop)}
                               theme={theme}
                               setTheme={(nextTheme) => handleFooterThemeChange(nextTheme)}
                               uiFontSizePx={uiFontSizePx}

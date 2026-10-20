@@ -1,8 +1,5 @@
-import {
-  BUILTIN_MODEL_PROVIDER_IDS,
-  isStartPlanModelProviderId,
-  type UsageEntitlementSnapshot,
-} from "@zcode/shared";
+import { isStartPlanModelProviderId } from "@/lib/legacyAccountProviderCompat.js";
+import { BUILTIN_MODEL_PROVIDER_IDS, type UsageEntitlementSnapshot } from "@zcode/shared";
 import type {
   GlmQuotaBannerBusinessCode,
   StartPlanConcurrentLimitBannerReason,

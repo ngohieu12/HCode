@@ -1,4 +1,5 @@
-import { isBuiltinModelProviderId, isStartPlanModelProviderId } from "@zcode/shared";
+import { isStartPlanModelProviderId } from "@/lib/legacyAccountProviderCompat.js";
+import { isBuiltinModelProviderId } from "@zcode/shared";
 import type { ProviderSettingsView } from "@zcode/services";
 import { logger } from "@/logger.js";
 

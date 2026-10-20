@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { type ZCodeProviderAccountAccess } from "@/lib/legacyAccountProviderCompat.js";
 import type {
   AppUsageRange,
   AppUsageSnapshot,
@@ -7,7 +8,6 @@ import type {
   UsageStatsRange,
   UsageStatsSnapshot,
   ZCodeAccountAccess,
-  ZCodeProviderAccountAccess,
 } from "@zcode/shared";
 import { logger } from "@/logger.js";
 import { useServices } from "@/hooks/useServices.js";

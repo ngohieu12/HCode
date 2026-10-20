@@ -3,7 +3,7 @@ import {
   type ProviderFamilyDomain,
   resolveModelProviderFamilyIdByProviderId,
   resolveProviderFamilyDomainFromOAuthProvider,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
 import { logger } from "@/logger.js";
 
 function inferProviderFamilyDomainFromSelection(

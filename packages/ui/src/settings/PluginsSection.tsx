@@ -83,14 +83,17 @@ import {
 import { useServices } from "@/hooks/useServices.js";
 
 type PluginTabTarget = "plugins" | "mcps" | "skills" | "commands";
+type PluginTab = Exclude<PluginTabTarget, "commands">;
 
-/** 页头标题的 i18n 键：每个分区只展示自己的能力，不再在插件页内切换 MCP / Skills。 */
-const PLUGIN_SECTION_LABEL_IDS: Record<PluginTabTarget, string> = {
-  plugins: "settings.plugin.tab.plugins",
-  mcps: "settings.plugin.tab.mcps",
-  skills: "settings.plugin.tab.skills",
-  commands: "settings.plugin.tab.commands",
-};
+function normalizePluginTab(tab: PluginTabTarget): PluginTab {
+  return tab === "commands" ? "plugins" : tab;
+}
+
+function getPluginTabCountClass(tab: PluginTabTarget, selectedTab: PluginTabTarget): string {
+  return tab === selectedTab
+    ? "text-ui-sm text-foreground-subtle"
+    : "text-ui-sm text-foreground-subtlest";
+}
 
 type PluginScope =
   | { kind: "user"; key: "user" }
@@ -106,6 +109,8 @@ interface PluginsSectionProps {
   isDesktop?: boolean;
   isMacDesktop?: boolean;
   isWindowsDesktop?: boolean;
+  isWebRemoteControl?: boolean;
+  initialTab?: PluginTabTarget;
   initialScopeKey?: string;
   mode?: "plugin" | "market" | "mcp" | "skill" | "command";
   workspacePath?: string | null;
@@ -130,6 +135,7 @@ function PluginList({
   isDesktop,
   isMacDesktop,
   isWindowsDesktop,
+  isWebRemoteControl,
   onAdd,
   onCreateTask,
   onDetailOpenChange,
@@ -147,6 +153,7 @@ function PluginList({
   isDesktop: boolean;
   isMacDesktop: boolean;
   isWindowsDesktop: boolean;
+  isWebRemoteControl: boolean;
   onAdd?: () => void;
   onCreateTask?: (request?: CreateTaskRequest) => void;
   onDetailOpenChange?: (open: boolean) => void;
@@ -201,7 +208,7 @@ function PluginList({
     shouldShowRemoteSyncActions({
       remoteSessionId: target?.remoteSessionId,
       remoteTarget: target?.remoteTarget,
-      clientMode: "desktop-continuous" as const,
+      clientMode: isWebRemoteControl ? "web-remote-replayable" : "desktop-continuous",
       hasLocalSourceService: Boolean(baseServices.pluginSyncService),
     }) &&
     target?.workspacePath
@@ -816,6 +823,7 @@ function PluginList({
                 <PluginAddMenu
                   testId="plugin-settings-add"
                   onCreateTask={onCreateTask}
+                  isWebRemoteControl={isWebRemoteControl}
                   onAddMarketplace={() => onOpenPluginStore(undefined, "add-marketplace")}
                 />
               </>
@@ -948,6 +956,8 @@ export function PluginsSection({
   isDesktop = false,
   isMacDesktop = false,
   isWindowsDesktop = false,
+  isWebRemoteControl = false,
+  initialTab = "plugins",
   initialScopeKey,
   mode = "plugin",
   workspacePath,
@@ -1014,6 +1024,7 @@ export function PluginsSection({
   useEffect(() => {
     setPickedScopeKey(initialScopeKey?.trim() || "user");
   }, [initialScopeKey]);
+  const selectedTab = fixedTab ?? interactiveTab;
   const [searchQueries, setSearchQueries] = useState<Record<PluginTabTarget, string>>({
     plugins: "",
     mcps: "",

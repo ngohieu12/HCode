@@ -1,15 +1,11 @@
 /* eslint-disable max-lines -- Coding Plan 用量视图集中维护来源选择、额度投影和重置入口；本阶段只迁移 Account Access，不拆分既有 UI 结构。 */
-import type {
-  UsageEntitlementSnapshot,
-  ZCodeAccountAccess,
-  ZCodeProviderAccountAccess,
-} from "@zcode/shared";
 import {
+  type ZCodeProviderAccountAccess,
   BIGMODEL_PROVIDER_ID,
-  BUILTIN_MODEL_PROVIDER_IDS,
-  type OAuthProviderId,
   ZAI_PROVIDER_ID,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
+import type { UsageEntitlementSnapshot, ZCodeAccountAccess } from "@zcode/shared";
+import { BUILTIN_MODEL_PROVIDER_IDS, type OAuthProviderId } from "@zcode/shared";
 import { ChevronRightIcon, Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button.js";

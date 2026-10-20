@@ -1,4 +1,5 @@
-import { CRON_DEFAULT_GROUP_ID, OFF_PEAK_DEFAULT_GROUP_ID } from "@zcode/shared";
+import { OFF_PEAK_DEFAULT_GROUP_ID } from "@/lib/legacyAccountProviderCompat.js";
+import { CRON_DEFAULT_GROUP_ID } from "@zcode/shared";
 
 /** 系统分组标题按语言环境本地化展示，忽略 DB 里存的固定占位标题（'cron' / 'off-peak'）。 */
 function getTaskGroupDisplayTitle(

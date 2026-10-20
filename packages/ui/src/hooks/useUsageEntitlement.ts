@@ -1,10 +1,7 @@
 /* eslint-disable max-lines -- entitlement hook 集中处理缓存、共享 in-flight、轮询和 Team Plan 上下文，后续拆分需保持刷新策略一致。 */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type {
-  UsageEntitlementSnapshot,
-  ZCodeAccountAccess,
-  ZCodeProviderAccountAccess,
-} from "@zcode/shared";
+import { type ZCodeProviderAccountAccess } from "@/lib/legacyAccountProviderCompat.js";
+import type { UsageEntitlementSnapshot, ZCodeAccountAccess } from "@zcode/shared";
 import type { IUsageStatsService } from "@zcode/services";
 import { useOptionalBaseWorkspaceServices } from "@/hooks/useWorkspaceServices.js";
 import { useStableAccountAccess } from "@/hooks/useStableAccountAccess.js";

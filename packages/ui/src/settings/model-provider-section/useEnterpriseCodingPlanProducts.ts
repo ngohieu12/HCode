@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   getModelProviderFamilySpec,
+  type ProviderFamilyDomain,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
   type CodingPlanStaticTeamProduct,
   type EnterpriseCodingPlanPricingResponse,
-  type ProviderFamilyDomain,
 } from "@zcode/shared";
 import { useOptionalServices } from "@/hooks/useServices.js";
 import { isRemoteWorkspaceDisconnectedError } from "@/lib/remoteWorkspaceServiceError.js";

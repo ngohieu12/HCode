@@ -1,15 +1,12 @@
 import type { IServiceAccessor } from "@zcode/services";
 import type { AccountProviderState } from "@zcode/provider";
-import type {
-  OAuthProviderId,
-  UsageEntitlementSnapshot,
-  ZCodeAccountAccess,
-  ZCodeProviderAccountAccess,
-} from "@zcode/shared";
 import {
+  type ZCodeProviderAccountAccess,
   getModelProviderFamilySpec,
   resolveProviderFamilyDomainFromOAuthProvider,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
+import type { OAuthProviderId, UsageEntitlementSnapshot, ZCodeAccountAccess } from "@zcode/shared";
+
 import { logger } from "@/logger.js";
 import { resolveAccountProviderInspectionAccess } from "@/lib/accountProviderAccess.js";
 import {

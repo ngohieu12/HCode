@@ -817,7 +817,7 @@ export function useAppPanels(options: {
       );
       return next;
     });
-  }, [isOfficeMode, commitOpenedSidePaneState, revealSidePaneForCurrentOwner, workspaceAbsPath]);
+  }, [commitOpenedSidePaneState, revealSidePaneForCurrentOwner, workspaceAbsPath]);
 
   const handleOpenGit = useCallback(() => {
     commitOpenedSidePaneState((current) => {
@@ -1583,12 +1583,7 @@ export function useAppPanels(options: {
   const handleReopenClosedSidePaneTab = useCallback(
     (tabId: string) => {
       const item = allRecentClosedSidePaneTabs.find((entry) => entry.tab.id === tabId);
-      if (
-        !item ||
-        !isSidePaneTabVisibleInScope(item.tab, currentSidePaneScope()) ||
-        (isOfficeMode && (item.tab.type === "terminal" || item.tab.type === "git"))
-      )
-        return;
+      if (!item || !isSidePaneTabVisibleInScope(item.tab, currentSidePaneScope())) return;
 
       // 交互说明：最近关闭列表里的 tab 被点回打开时，需要同步展开右侧面板。
       // 否则 tab 状态已经恢复，但用户看到的还是折叠态，会误以为点击没有生效。
@@ -1638,15 +1633,13 @@ export function useAppPanels(options: {
 
   const recentClosedSidePaneTabs = useMemo(
     () =>
-      allRecentClosedSidePaneTabs.filter(
-        (item) =>
-          isSidePaneTabVisibleInScope(item.tab, {
-            workspaceKey: activeWorkspaceKey,
-            ownerTaskId: sidePaneOwnerId,
-          }) &&
-          (!isOfficeMode || (item.tab.type !== "terminal" && item.tab.type !== "git")),
+      allRecentClosedSidePaneTabs.filter((item) =>
+        isSidePaneTabVisibleInScope(item.tab, {
+          workspaceKey: activeWorkspaceKey,
+          ownerTaskId: sidePaneOwnerId,
+        }),
       ),
-    [activeWorkspaceKey, sidePaneOwnerId, allRecentClosedSidePaneTabs, isOfficeMode],
+    [activeWorkspaceKey, sidePaneOwnerId, allRecentClosedSidePaneTabs],
   );
 
   return {
