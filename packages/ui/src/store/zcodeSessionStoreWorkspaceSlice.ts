@@ -230,7 +230,6 @@ export function createWorkspaceSlice(set: SetFn) {
       );
     },
 
-    setActiveTaskId: (workspacePath: string, id: string | null, workspaceIdentity?: string) => {
     setActiveTaskId: (
       workspacePath: string,
       id: string | null,

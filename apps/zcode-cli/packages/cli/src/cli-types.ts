@@ -10,8 +10,6 @@ import type {
   createZCodeApp,
   CreateDefaultProviderEndpointRoutingPortOptions,
   CreateModelAdapterOptions,
-  configureCodingPlanApiKey,
-  ConfigureCodingPlanApiKeyOptions,
   inspectZCodeSkill,
   inspectWorkspaceHookTrust,
   grantWorkspaceHookTrust,
@@ -19,10 +17,6 @@ import type {
   inspectZCodeCustomCommand,
   InspectZCodeCustomCommandOptions,
   InspectZCodeSkillOptions,
-  loginZCodeCli,
-  loginBigmodelCodingPlan,
-  LoginBigmodelCodingPlanOptions,
-  LoginZCodeCliOptions,
   listZCodeCustomCommands,
   ListZCodeCustomCommandsOptions,
   loadZCodeCustomCommand,
@@ -30,8 +24,6 @@ import type {
   listZCodeSkills,
   ListZCodeSessionsOptions,
   ListZCodeSkillsOptions,
-  logoutZCodeCli,
-  LogoutZCodeCliOptions,
   resolveLatestSession,
   ResolveLatestSessionOptions,
   RunZCodeProtocolAgentOptions,
@@ -78,13 +70,6 @@ export interface RunDependencies extends PluginsCommandOverrides {
   inspectCustomCommand?: (
     options: InspectZCodeCustomCommandOptions,
   ) => ReturnType<typeof inspectZCodeCustomCommand>;
-  loginZCodeCli?: (options?: LoginZCodeCliOptions) => ReturnType<typeof loginZCodeCli>;
-  loginBigmodelCodingPlan?: (
-    options?: LoginBigmodelCodingPlanOptions,
-  ) => ReturnType<typeof loginBigmodelCodingPlan>;
-  configureCodingPlanApiKey?: (
-    options: ConfigureCodingPlanApiKeyOptions,
-  ) => ReturnType<typeof configureCodingPlanApiKey>;
   loadDotenv?: (options?: LoadCliDotenvOptions) => DotenvLoadResult;
   prepareZCodeTelemetryEnv?: typeof prepareZCodeTelemetryEnv;
   projectConfigPath?: string;
@@ -103,7 +88,6 @@ export interface RunDependencies extends PluginsCommandOverrides {
   resolveLatestSession?: (
     options: ResolveLatestSessionOptions,
   ) => ReturnType<typeof resolveLatestSession>;
-  logoutZCodeCli?: (options?: LogoutZCodeCliOptions) => ReturnType<typeof logoutZCodeCli>;
   runZCodeProtocolAgent?: (options?: RunZCodeProtocolAgentOptions) => Promise<void>;
   skipUserConfig?: boolean;
   userConfigPath?: string;

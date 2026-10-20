@@ -9,7 +9,6 @@ import { PERMISSION_FULL_ACCESS_OPTION_ID } from "@zcode/shared/zcode-protocol-v
 // compact marker、goal 状态机、fork marker。传输外壳（TopicFrame/subscribe）在后续片。
 import type {
   AssistantFeedbackUpdatedPayload,
-  HighspeedMetricsUpdatedPayload,
   CompactLifecyclePayload,
   DynamicWorkflowRunProgressPayload,
   HookRunLifecyclePayload,
@@ -345,8 +344,7 @@ export type ConversationRowTargetAction =
   | "applyFileRewind"
   | "fileChanges"
   | "fileRewindPreview"
-  | "setAssistantFeedback"
-  | "setHighspeedMetrics";
+  | "setAssistantFeedback";
 
 export type ConversationRowTargetResolution =
   | {
@@ -859,17 +857,6 @@ export class ProductProjection {
       }
       return { ok: true, action, row, messageId };
     }
-    if (action === "setHighspeedMetrics") {
-      const messageId = this.messageIdByRowId.get(row.rowId);
-      if (row.kind !== "userInput" || !row.highspeed || !messageId) {
-        return {
-          ok: false,
-          status: "rejected",
-          reasonCode: "guard.actionUnavailable",
-        };
-      }
-      return { ok: true, action, row, messageId };
-    }
     if (row.kind !== "turnHeader") {
       return {
         ok: false,
@@ -1062,9 +1049,7 @@ export class ProductProjection {
     const reduced =
       event.type === SessionEventType.AssistantFeedbackUpdated
         ? this.onAssistantFeedbackUpdated(event)
-        : event.type === SessionEventType.HighspeedMetricsUpdated
-          ? this.onHighspeedMetricsUpdated(event)
-          : event.type === SessionEventType.TurnExecutionModelFallback
+        : event.type === SessionEventType.TurnExecutionModelFallback
             ? this.onTurnExecutionModelFallback(event)
             : (() => {
                 const fact = normalizeConversationEvent(event, {
@@ -2157,7 +2142,6 @@ export class ProductProjection {
         ...(fact.conversationQuotes ? { conversationQuotes: fact.conversationQuotes } : {}),
         ...(fact.botGroupSource ? { botGroupSource: fact.botGroupSource } : {}),
         ...(fact.clientId ? { clientId: fact.clientId } : {}),
-        ...(fact.highspeed ? { highspeed: fact.highspeed } : {}),
         ...(fact.workflowLaunch ? { workflowLaunch: fact.workflowLaunch } : {}),
         ...(fact.epilogueStart === undefined ? {} : { epilogueStart: fact.epilogueStart }),
         ...(attachments && attachments.length > 0 ? { attachments } : {}),
@@ -2777,24 +2761,6 @@ export class ProductProjection {
     return [{ op: "row.upserted", row: { ...row, feedback: payload.feedback } }];
   }
 
-  private onHighspeedMetricsUpdated(event: SessionEvent): ConversationDelta[] {
-    const payload = event.payload as HighspeedMetricsUpdatedPayload;
-    const row = this.snapshot.rows.window.find(
-      (candidate): candidate is UserInputRow =>
-        candidate.kind === "userInput" && candidate.entityId === payload.entityId,
-    );
-    if (!row) return [];
-    // Bug 根因：终态指标更新曾整体替换 row.highspeed。payload 来自 transcript 原始 metadata + 耗时字段，
-    // 不含 live 投影刚由 TurnExecutionModelFallback 写入的 fallbackAt；降级 Toast 依赖的字段被清空，
-    // live 与 cold/replay 的结果也不一致。指标更新是增量补充：字段级合并、只增不删（spec §5）。
-    return [
-      {
-        op: "row.upserted",
-        row: { ...row, highspeed: { ...row.highspeed, ...payload.highspeed } },
-      },
-    ];
-  }
-
   private onTurnExecutionModelFallback(event: SessionEvent): ConversationDelta[] {
     const payload = event.payload as TurnExecutionModelFallbackPayload;
     // Bug 根因：fallback 会作废当前 assistant attempt，但旧投影只更新输入行元数据，仍把旧模型的
@@ -2807,33 +2773,7 @@ export class ProductProjection {
           ...this.closeOpenToolRows(event, "cancelled", (row) => row.status === "inputStreaming"),
         ]
       : [];
-    // 卡过期与其他加速请求失败都投影到同一张加速输入行：fallbackAt 触发一次性提示，
-    // fallbackReason 让 Renderer 区分“卡已到期”与“加速服务不可用”两种文案。
-    const turnId = this.turnIdOf(event);
-    const row = this.snapshot.rows.window.find(
-      (candidate): candidate is UserInputRow =>
-        candidate.kind === "userInput" &&
-        // Bug 根因：cold hydration 会重建 product turnId，不能再拿 runtime turnId
-        // 关联已持久化的输入；inputId/sourceCommandId 才是跨恢复稳定身份。
-        (candidate.turnId === turnId ||
-          (payload.inputId !== undefined && candidate.sourceCommandId === payload.inputId)) &&
-        candidate.highspeed !== undefined,
-    );
-    if (!row?.highspeed) return discardedStreamDeltas;
-    return [
-      ...discardedStreamDeltas,
-      {
-        op: "row.upserted",
-        row: {
-          ...row,
-          highspeed: {
-            ...row.highspeed,
-            fallbackAt: event.timestamp.getTime(),
-            fallbackReason: payload.reason,
-          },
-        },
-      },
-    ];
+    return discardedStreamDeltas;
   }
 
   private openReasoningRow(
@@ -3682,8 +3622,6 @@ export class ProductProjection {
       payload.intent?.requestedDelivery ?? existing?.delivery.requested ?? admittedDelivery;
     const fallbackReasonCode =
       payload.intent?.fallbackReasonCode ?? existing?.delivery.fallbackReasonCode;
-    // Bug 根因：队列投影曾漏掉 intent.highspeed，自动和手动提升都因此把有效卡误判为不存在。
-    const highspeed = payload.intent?.highspeed ?? existing?.highspeed;
     const nextItem: QueueItem = {
       queueItemId,
       kind:
@@ -3742,7 +3680,6 @@ export class ProductProjection {
               ? { state: "steering" }
               : { state: "notRequested" },
       dispatch: { state: "queued" },
-      ...(highspeed ? { highspeed } : {}),
       ...(payload.toolDisallowlist ? { toolDisallowlist: [...payload.toolDisallowlist] } : {}),
       admittedAt: payload.intent?.admittedAt ?? existing?.admittedAt ?? this.ms(event),
     };
@@ -3910,7 +3847,6 @@ export class ProductProjection {
           : {}),
         ...(item.intent?.botGroupSource ? { botGroupSource: item.intent.botGroupSource } : {}),
         ...(item.intent?.clientId ? { clientId: item.intent.clientId } : {}),
-        ...(item.intent?.highspeed ? { highspeed: item.intent.highspeed } : {}),
         ...(item.intent?.attachmentRefs?.length ? { attachments: item.intent.attachmentRefs } : {}),
         ...(item.intent?.source ? { source: item.intent.source } : {}),
       };

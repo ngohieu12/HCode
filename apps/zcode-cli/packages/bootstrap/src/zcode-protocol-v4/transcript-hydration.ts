@@ -427,11 +427,7 @@ function inputIntentOfMessage(message: MessageWithParts): TurnInputIntentMetadat
         ? { fallbackReasonCode: value.delivery.fallbackReasonCode }
         : {}),
       ...(value.attachments.length > 0 ? { attachmentRefs: value.attachments } : {}),
-      ...(value.highspeed
-        ? { highspeed: value.highspeed }
-        : persistedHighspeed.success
-          ? { highspeed: persistedHighspeed.data }
-          : {}),
+      ...(persistedHighspeed.success ? { highspeed: persistedHighspeed.data } : {}),
       ...(value.inputOrigin ? { inputOrigin: value.inputOrigin } : {}),
       ...(value.conversationQuotes ? { conversationQuotes: value.conversationQuotes } : {}),
       ...(value.botGroupSource ? { botGroupSource: value.botGroupSource } : {}),
