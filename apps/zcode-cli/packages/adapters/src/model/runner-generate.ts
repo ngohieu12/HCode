@@ -92,7 +92,7 @@ export async function runGenerateText(input: {
   const isDev = isDevelopmentModelIOEnv(input.env);
   let requestMessages = input.request.messages;
   let signatureRepairAttempted = false;
-  const authRetry = new AccountRequestRetry(input.request, input.resolved, input.logger);
+  const authRetry = new AccountRequestRetry(input.request, input.resolved);
   let emptyCompletionRetryCount = 0;
 
   for (
@@ -161,7 +161,7 @@ export async function runGenerateText(input: {
       resolved = await resolveModelForAttempt({
         attempt,
         reason: authRetry.takeReason(),
-        request: authRetry.prepareRequest(attemptRequest),
+        request: attemptRequest,
         resolveModel: input.resolveModel,
       });
       const anthropicMetadataUserId = await resolveAnthropicRequestMetadataUserId({
