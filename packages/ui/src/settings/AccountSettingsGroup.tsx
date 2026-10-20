@@ -8,7 +8,7 @@ import {
   TID_LOGIN_MENU_ITEM,
   TID_LOGOUT_BUTTON,
   TID_SIDEBAR_CODING_PLAN_USAGE_BUTTON,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
 import { Button } from "@/components/ui/button.js";
 import {
   useWorkspaceSidebarFooterUsageSummaryState,

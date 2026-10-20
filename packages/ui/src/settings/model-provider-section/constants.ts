@@ -1,12 +1,14 @@
 import {
   BIGMODEL_PROVIDER_ID,
-  buildBigModelApiUrl,
   buildBigModelCodingPlanPersonalManageUrl,
+  ZAI_PROVIDER_ID,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
+  buildBigModelApiUrl,
   BUILTIN_MODEL_PROVIDER_IDS,
   createUuid,
   type OAuthProviderId,
   ZCODE_ENV,
-  ZAI_PROVIDER_ID,
   type BuiltinModelProviderId,
   type UsageQuotaLimit,
   type UsageEntitlementSubscriptionDetail,

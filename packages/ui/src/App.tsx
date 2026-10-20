@@ -840,7 +840,6 @@ export function App({
   const [openAutomationTab, setOpenAutomationTab] = useState<NonNullable<
     AutomationsNavigationTarget["automationTab"]
   > | null>(null);
-  const [pluginStoreOpenVersion, setPluginStoreOpenVersion] = useState(0);
   const handleNavigateToTaskMain = useCallback(() => {
     setWorkspaceMainView("chat");
   }, []);
@@ -862,11 +861,6 @@ export function App({
     },
     [handleOpenSettingsSection],
   );
-  const handleNavigateToPluginStoreMain = useCallback(() => {
-    setPluginStoreOpenVersion((version) => version + 1);
-    preserveNextSettingsExit();
-    setWorkspaceMainView("plugin-store");
-  }, [preserveNextSettingsExit]);
   const handleOpenAutomationConsumed = useCallback(() => {
     setOpenAutomationId(null);
     setOpenAutomationTab(null);
@@ -916,12 +910,9 @@ export function App({
   );
   const handleOpenPluginStoreForScope = useCallback(
     (_target: PluginStoreOpenTarget = {}) => {
-      // 管理范围由市场内视图持有，重复打开只重置市场导航。
-      if (workspaceMainView === "plugin-store") {
-        setPluginStoreOpenVersion((version) => version + 1);
-        return;
-      }
-      handleOpenPluginStore();
+      // 插件市场已迁入设置页，入口统一切到「插件市场」分区。Workspace scope 已收敛为全局，
+      // 旧事件中的 scope 不再使用；具体 intent 由 requestPluginStoreOpen 的 pendingTarget 在分区挂载时消费。
+      handleOpenSettingsSection("pluginStore");
     },
     [handleOpenSettingsSection],
   );
@@ -973,9 +964,8 @@ export function App({
   const handleSelectNextConversation = useCallback(() => {
     handleSelectAdjacentConversation("next");
   }, [handleSelectAdjacentConversation]);
-  const handlePrimaryNavigationBack =
-    workspaceMainView === "plugin-store" ? handleNavigateToTaskMain : handleTaskNavBack;
-  const canPrimaryNavigationBack = workspaceMainView === "plugin-store" || canTaskNavBack;
+  const handlePrimaryNavigationBack = handleTaskNavBack;
+  const canPrimaryNavigationBack = canTaskNavBack;
   const shellPanelIds = useMemo(() => ["sidebar", "content"], []);
 
   useAppKeyboard({

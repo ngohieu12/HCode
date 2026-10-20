@@ -131,7 +131,6 @@ import {
   createServerRemoteWorkspaceServiceCollection,
   resolveServerProjectService,
 } from "./remoteWorkspaceServiceCollection.js";
-import { createRemotePromptAttachmentTransferService } from "./promptAttachmentTransferService.js";
 import {
   createSourceSettingsServiceCollection,
   shouldDetachSourceSettingsAttachment,

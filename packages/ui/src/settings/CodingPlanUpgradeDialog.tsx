@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { resolveModelProviderFamilyIdByProviderId } from "@zcode/shared";
+import { resolveModelProviderFamilyIdByProviderId } from "@/lib/legacyAccountProviderCompat.js";
 import { useProviderSettingsView } from "@/hooks/useProviderSettingsView.js";
 import { useServices } from "@/hooks/useServices.js";
 import { type CodingPlanProviderId } from "@/settings/model-provider-section/constants.js";
@@ -63,7 +63,11 @@ export async function closeAndRefreshCodingPlanUpgradeFromWebview(params: {
   }
 }
 
-export function CodingPlanUpgradeDialog({ target, onClose, onOpenResult }: CodingPlanUpgradeDialogProps) {
+export function CodingPlanUpgradeDialog({
+  target,
+  onClose,
+  onOpenResult,
+}: CodingPlanUpgradeDialogProps) {
   const { providerSettingsService, credentialService, codingPlanSubscriptionService } =
     useServices();
   const providerSettingsRead = useProviderSettingsView();

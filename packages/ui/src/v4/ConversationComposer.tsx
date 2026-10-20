@@ -1,6 +1,9 @@
 import { ComposerSubmissionPendingContext } from "@/project-sidebar/index.js";
 /* oxlint-disable eslint(max-lines) -- composer 集中收口输入区 wiring（附件/草稿/历史/mention），拆分会打散收口粒度。 */
-import { useIsMobileTextInputViewport, shouldAvoidIosInputFocusZoom } from "@/lib/mobileTextInput.js";
+import {
+  useIsMobileTextInputViewport,
+  shouldAvoidIosInputFocusZoom,
+} from "@/lib/mobileTextInput.js";
 import { useRemoteProjectReconnect } from "@/hooks/RemoteProjectPresentationContext.js";
 import { useOptionalRemoteWorkspaceController } from "@/remote/useRemoteWorkspaceController.js";
 import { useOptionalTabStore } from "@/store/TabStoreProvider.js";
@@ -35,11 +38,8 @@ import {
 import { cn } from "@/components/lib/utils.js";
 import { HighspeedComposerBackground } from "@/highspeed/HighspeedActivationVisual.js";
 import { useHighspeedComposerEntrance } from "@/highspeed/useHighspeedComposerEntrance.js";
-import {
-  type HighspeedCardSnapshot,
-  type PlanIdentitySnapshot,
-  type ZCodeProvider,
-} from "@zcode/shared";
+import { type PlanIdentitySnapshot } from "@/lib/legacyAccountProviderCompat.js";
+import { type HighspeedCardSnapshot, type ZCodeProvider } from "@zcode/shared";
 import {
   TID_CHAT_ATTACHMENT_BUTTON,
   TID_CHAT_ATTACHMENT_MENU_ITEM,
@@ -1844,15 +1844,6 @@ function ConversationComposerImpl({
     };
   }, [listenAddToChatEvents, updateText, workspaceIdentity, workspacePath]);
 
-  // 动态 placeholder（旧 chatViewPlaceholder 语义）：无历史 → newTask；
-  // 有历史空闲 → followUpAsk；有历史处理中 → followUpQueue。
-  const normalPlaceholder = intl.formatMessage({
-    id: resolveChatPlaceholderKey({
-      hasHistoryMessages: (snapshot?.rows.totalCount ?? 0) > 0,
-      isTaskProcessing: canStop,
-      compactNewTask: compactMobilePlaceholder,
-    }),
-  });
   const sendTooltipTitle = intl.formatMessage({
     id: mode === "enqueue" ? "chat.queue.enqueue" : "chat.send",
   });
@@ -2609,11 +2600,6 @@ function ConversationComposerImpl({
           workspaceIdentity={workspaceIdentity}
           taskId={sessionId}
           skillCatalogSessionId={skillCatalogSessionId}
-          placeholder={
-            remoteAvailable
-              ? normalPlaceholder
-              : intl.formatMessage({ id: "remote.conversation.sendUnavailable" })
-          }
           disabled={disabled || mode === "reject"}
           submitting={pending}
           submitDisabled={

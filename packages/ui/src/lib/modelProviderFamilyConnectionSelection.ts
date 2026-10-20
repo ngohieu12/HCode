@@ -1,10 +1,13 @@
+import {
+  type ProviderFamilyDomain,
+  getModelProviderFamilySpec,
+} from "@/lib/legacyAccountProviderCompat.js";
 import type {
   EnterpriseCodingPlanPricingProduct,
   ProviderFamilyConnectionSelection,
-  ProviderFamilyDomain,
   UsageEntitlementSnapshot,
 } from "@zcode/shared";
-import { getModelProviderFamilySpec } from "@zcode/shared";
+
 import { hasActiveUsageEntitlementSnapshot } from "@/lib/codingPlanProvider.js";
 
 export type ModelProviderFamilyConnectionSelection = ProviderFamilyConnectionSelection;

@@ -1,11 +1,13 @@
 import {
-  BUILTIN_MODEL_PROVIDER_IDS,
   getModelProviderFamilySpec,
   resolveModelProviderFamilySpecByProviderId,
-  type ProviderFamilyConnectionSelectionSettings,
   type ProviderFamilyDomain,
-  type ZCodeAccountAccess,
   type ZCodeProviderAccountAccess,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
+  BUILTIN_MODEL_PROVIDER_IDS,
+  type ProviderFamilyConnectionSelectionSettings,
+  type ZCodeAccountAccess,
 } from "@zcode/shared";
 import {
   resolveEnterpriseCodingPlanProductFamily,

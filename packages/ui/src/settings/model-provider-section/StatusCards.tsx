@@ -4,10 +4,12 @@ import {
   BIGMODEL_PROVIDER_ID,
   isStartPlanModelProviderId,
   resolveModelProviderFamilySpecByProviderId,
+  type ZCodeProviderAccountAccess,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
   type UsageEntitlementSubscriptionDetail,
   type UsageQuotaLimit,
   type ZCodeAccountAccess,
-  type ZCodeProviderAccountAccess,
 } from "@zcode/shared";
 import { InfoIcon, Loader2Icon } from "lucide-react";
 import { useState, type ReactNode } from "react";

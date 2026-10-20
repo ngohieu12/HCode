@@ -15,7 +15,7 @@ import { createPortal } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { Hash, Maximize2, Minimize2 } from "lucide-react";
-import { OFF_PEAK_DEFAULT_GROUP_ID } from "@zcode/shared";
+import { OFF_PEAK_DEFAULT_GROUP_ID } from "@/lib/legacyAccountProviderCompat.js";
 import { Button } from "@/components/ui/button.js";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";
 import { TaskRenameDialog } from "@/TaskRenameDialog.js";

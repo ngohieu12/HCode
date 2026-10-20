@@ -1,10 +1,9 @@
 import {
-  isZCodeAgentProvider,
   resolveModelProviderFamilySpecByProviderId,
   zcodeProviderAccountAccessSchema,
   type ZCodeProviderAccountAccess,
-  type ZCodeProvider,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
+import { isZCodeAgentProvider, type ZCodeProvider } from "@zcode/shared";
 import type { ModelSelectionView } from "@zcode/services";
 import type { ModelSelectGroup } from "@/ModelConfigSelect.js";
 import { decodeCustomModelValue, encodeCustomModelValue } from "@/lib/zcodeCustomModelValue.js";

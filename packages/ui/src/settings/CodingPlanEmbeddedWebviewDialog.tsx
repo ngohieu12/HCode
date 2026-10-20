@@ -28,12 +28,8 @@ import {
   type CodingPlanPurchaseAudience,
   CODING_PLAN_WEBVIEW_OVERRIDE_ENV_KEY,
 } from "@/settings/model-provider-section/codingPlanEmbeddedWebview.js";
-import {
-  CodingPlanWebviewChannels,
-  type CodingPlanPurchaseCompletePayload,
-  ZCODE_ENV,
-  ZCODE_VERSION,
-} from "@zcode/shared";
+import { CodingPlanWebviewChannels } from "@/lib/legacyAccountProviderCompat.js";
+import { type CodingPlanPurchaseCompletePayload, ZCODE_ENV, ZCODE_VERSION } from "@zcode/shared";
 
 interface CodingPlanEmbeddedWebviewDialogProps {
   credentialService: {

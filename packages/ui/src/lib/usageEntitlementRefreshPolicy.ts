@@ -1,10 +1,9 @@
-import { isStartPlanModelProviderId } from "@zcode/shared";
+import {
+  isStartPlanModelProviderId,
+  type ZCodeProviderAccountAccess,
+} from "@/lib/legacyAccountProviderCompat.js";
 import type { IUsageStatsService } from "@zcode/services";
-import type {
-  UsageEntitlementSnapshot,
-  ZCodeAccountAccess,
-  ZCodeProviderAccountAccess,
-} from "@zcode/shared";
+import type { UsageEntitlementSnapshot, ZCodeAccountAccess } from "@zcode/shared";
 
 export interface UsageEntitlementRequestOptions {
   invalidateBalanceCache?: boolean;

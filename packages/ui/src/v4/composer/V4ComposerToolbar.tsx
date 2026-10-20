@@ -19,16 +19,18 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlarmClockIcon } from "lucide-react";
 import { cn } from "@/components/lib/utils.js";
 import {
-  BUILTIN_MODEL_PROVIDER_IDS,
   getModelProviderFamilySpec,
   resolveModelProviderFamilySpecByProviderId,
+  type ProviderFamilyDomain,
+  type ZCodeProviderAccountAccess,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
+  BUILTIN_MODEL_PROVIDER_IDS,
   ZCODE_AGENT_PROVIDER,
   type ProviderFamilyConnectionSelection,
   type ProviderFamilyConnectionSelectionSettings,
-  type ProviderFamilyDomain,
   type UsageEntitlementSnapshot,
   type ZCodeAccountAccess,
-  type ZCodeProviderAccountAccess,
   type ZCodeConfigOption,
   type ZCodeProvider,
 } from "@zcode/shared";

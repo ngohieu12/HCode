@@ -4,10 +4,10 @@ import { useCodingPlanEntryGate } from "@/settings/CodingPlanEntryButton.js";
    provider 选择与 family 过滤上下文，拆文件会让 zai/bigmodel 对称性难以追踪。 */
 import { useEffect, useMemo } from "react";
 import {
-  BUILTIN_MODEL_PROVIDER_IDS,
   normalizeProviderFamilyDomain,
   resolveModelProviderFamilyIdByProviderId,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
+import { BUILTIN_MODEL_PROVIDER_IDS } from "@zcode/shared";
 import { TID_SIDEBAR_CODING_PLAN_USAGE_BUTTON } from "@zcode/shared/test-ids";
 import { BarChart3Icon, RocketIcon } from "lucide-react";
 import { DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu.js";

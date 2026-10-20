@@ -5,9 +5,9 @@ import {
   normalizeProviderFamilyDomain,
   resolvePlanIdentitySnapshot,
   type PlanIdentitySnapshot,
-  type ProviderFamilyConnectionSelection,
   type ProviderFamilyDomain,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
+import { type ProviderFamilyConnectionSelection } from "@zcode/shared";
 import type { IUsageStatsService } from "@zcode/services";
 import { useUsageEntitlementWithService } from "@/hooks/useUsageEntitlement.js";
 import { useProviderSettingsView } from "@/hooks/useProviderSettingsView.js";

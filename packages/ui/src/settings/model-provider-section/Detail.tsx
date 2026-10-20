@@ -2,14 +2,16 @@ import { useCodingPlanEntryGate } from "@/settings/CodingPlanEntryButton.js";
 /* eslint-disable max-lines -- Model Provider 详情页当前集中编排 Plan Card、API Key 表单和 OAuth 套餐态；后续稳定后再按 family/API/OAuth 拆分。 */
 import {
   BIGMODEL_PROVIDER_ID,
-  BUILTIN_MODEL_PROVIDER_IDS,
   ZAI_PROVIDER_ID,
-  type BuiltinModelProviderId,
-  type ProviderFamilyConnectionSelectionSettings,
-  type StartPlanPreviewConfig,
   isStartPlanModelProviderId,
   isIndividualCodingPlanModelProviderId,
   resolveModelProviderFamilySpecByProviderId,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
+  BUILTIN_MODEL_PROVIDER_IDS,
+  type BuiltinModelProviderId,
+  type ProviderFamilyConnectionSelectionSettings,
+  type StartPlanPreviewConfig,
   type ModelConnectivityResult,
   type OAuthProviderId,
 } from "@zcode/shared";

@@ -8,19 +8,21 @@ import {
 } from "@/lib/providerSettingsFormTypes.js";
 import {
   BIGMODEL_PROVIDER_ID,
-  BUILTIN_MODEL_PROVIDER_IDS,
-  DesktopCommandIds,
   isStartPlanModelProviderId,
-  type BuiltinModelProviderId,
-  type ModelConnectivityResult,
-  type ProviderFamilyConnectionSelection,
-  type ProviderFamilyConnectionSelectionSettings,
   type ProviderFamilyDomain,
-  type OAuthProviderId,
   resolveModelProviderFamilyIdByProviderId,
   resolveModelProviderFamilySpecByProviderId,
   resolveProviderFamilyDomainFromOAuthProvider,
   ZAI_PROVIDER_ID,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
+  BUILTIN_MODEL_PROVIDER_IDS,
+  DesktopCommandIds,
+  type BuiltinModelProviderId,
+  type ModelConnectivityResult,
+  type ProviderFamilyConnectionSelection,
+  type ProviderFamilyConnectionSelectionSettings,
+  type OAuthProviderId,
 } from "@zcode/shared";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { Button } from "@/components/ui/button.js";

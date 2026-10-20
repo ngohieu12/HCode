@@ -1,13 +1,15 @@
 import {
   BIGMODEL_PROVIDER_ID,
+  isZaiCodingPlanProviderId,
+  ZAI_PROVIDER_ID,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
   BUILTIN_MODEL_PROVIDER_IDS,
   DEFAULT_ZCODE_ENDPOINT_ORIGIN,
   isTrustedCodingPlanWebviewOrigin,
-  isZaiCodingPlanProviderId,
   normalizeZCodeEndpointOrigin,
   type ZCodeEnv,
   ZCODE_ENV,
-  ZAI_PROVIDER_ID,
 } from "@zcode/shared";
 import type { CodingPlanWebviewLocale } from "@zcode/shared";
 import type { CodingPlanFunnelContext } from "@/lib/codingPlanFunnelTelemetry.js";

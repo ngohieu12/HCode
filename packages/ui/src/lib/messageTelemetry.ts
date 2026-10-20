@@ -4,9 +4,9 @@ import {
   legacyTelemetryModelValue,
   legacyTelemetryProviderId,
 } from "@/lib/providerTelemetryIdentity.js";
+import { type PlanIdentitySnapshot } from "@/lib/legacyAccountProviderCompat.js";
 import type {
   InputId,
-  PlanIdentitySnapshot,
   ZCodeContextCompactionTimelineMeta,
   ZCodePersistedFileChange,
   ZCodeProvider,

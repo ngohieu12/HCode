@@ -1,8 +1,8 @@
 import {
   resolveModelProviderFamilySpecByProviderId,
   isStartPlanModelProviderId,
-  type ProviderFamilyConnectionSelectionSettings,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
+import { type ProviderFamilyConnectionSelectionSettings } from "@zcode/shared";
 import {
   TID_MODEL_PROVIDER_CONNECTION_MODE_ITEM,
   TID_MODEL_PROVIDER_CONNECTION_MODE_TRIGGER,

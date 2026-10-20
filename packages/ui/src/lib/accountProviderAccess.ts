@@ -1,5 +1,8 @@
 import type { ProviderSettingsView } from "@zcode/services";
-import { type ZCodeProviderAccountAccess, zcodeProviderAccountAccessSchema } from "@zcode/shared";
+import {
+  type ZCodeProviderAccountAccess,
+  zcodeProviderAccountAccessSchema,
+} from "@/lib/legacyAccountProviderCompat.js";
 
 export interface EntitledAccountProviderAccess {
   readonly providerId: string;

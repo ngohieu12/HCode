@@ -1,4 +1,5 @@
-import { CRON_DEFAULT_GROUP_ID, OFF_PEAK_DEFAULT_GROUP_ID } from "@zcode/shared";
+import { OFF_PEAK_DEFAULT_GROUP_ID } from "@/lib/legacyAccountProviderCompat.js";
+import { CRON_DEFAULT_GROUP_ID } from "@zcode/shared";
 import type {
   GroupTaskRef,
   ProjectTask,

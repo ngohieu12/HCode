@@ -1,5 +1,6 @@
 import { useRef } from "react";
-import type { ZCodeAccountAccess, ZCodeProviderAccountAccess } from "@zcode/shared";
+import { type ZCodeProviderAccountAccess } from "@/lib/legacyAccountProviderCompat.js";
+import type { ZCodeAccountAccess } from "@zcode/shared";
 
 type StableAccountAccess = ZCodeProviderAccountAccess | ZCodeAccountAccess;
 

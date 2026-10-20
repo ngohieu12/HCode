@@ -1,11 +1,10 @@
 import {
   BIGMODEL_PROVIDER_ID,
-  BUILTIN_MODEL_PROVIDER_IDS,
   isCodingPlanModelProviderId,
   isZaiCodingPlanProviderId,
-  type OAuthProviderId,
   ZAI_PROVIDER_ID,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
+import { BUILTIN_MODEL_PROVIDER_IDS, type OAuthProviderId } from "@zcode/shared";
 import { type CodingPlanProviderId } from "@/settings/model-provider-section/constants.js";
 
 export type CodingPlanPurchaseAuthStatus =

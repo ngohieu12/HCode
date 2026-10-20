@@ -1,6 +1,6 @@
 import { create } from "zustand";
+import { normalizeProviderFamilyDomain } from "@/lib/legacyAccountProviderCompat.js";
 import {
-  normalizeProviderFamilyDomain,
   type AppSettings,
   type OffPeakCodingPlanSupport,
   type OffPeakTaskCreateResult,

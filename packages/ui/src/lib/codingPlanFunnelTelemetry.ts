@@ -1,8 +1,10 @@
 import {
   BIGMODEL_PROVIDER_ID,
-  BUILTIN_MODEL_PROVIDER_IDS,
   isZaiCodingPlanProviderId,
   ZAI_PROVIDER_ID,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
+  BUILTIN_MODEL_PROVIDER_IDS,
   type IPlatformService,
   type UsageEntitlementSnapshot,
 } from "@zcode/shared";

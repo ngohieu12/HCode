@@ -1,9 +1,11 @@
 import { USAGE_ENTITLEMENT_ACCESS_REFRESH_MS } from "@/lib/usageEntitlementRefreshPolicy.js";
 import { validateModelSelectionOptions, type ModelSelectionView } from "@zcode/provider";
 import {
-  isBuiltinModelProviderId,
   isStartPlanModelProviderId,
   resolveModelProviderFamilySpecByProviderId,
+} from "@/lib/legacyAccountProviderCompat.js";
+import {
+  isBuiltinModelProviderId,
   type ModelSelection,
   type UsageEntitlementSnapshot,
 } from "@zcode/shared";

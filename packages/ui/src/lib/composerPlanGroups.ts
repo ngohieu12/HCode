@@ -2,9 +2,8 @@ import type { ModelSelectionView, ProviderSettingsView } from "@zcode/services";
 import {
   resolveModelProviderFamilySpecByProviderId,
   type ProviderFamilyDomain,
-  type ProviderFamilyConnectionSelection,
-  type ZCodeProvider,
-} from "@zcode/shared";
+} from "@/lib/legacyAccountProviderCompat.js";
+import { type ProviderFamilyConnectionSelection, type ZCodeProvider } from "@zcode/shared";
 import type { ModelSelectGroup, ModelSelectGroupItem } from "@/ModelConfigSelect.js";
 import {
   buildRegistryModelSelectGroups,

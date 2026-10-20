@@ -19,12 +19,11 @@ export function formatConversationWorkDuration(
   const seconds = totalSeconds % 60;
   const parts: string[] = [];
 
-  if (days > 0) parts.push(formatDurationUnit(days, "chat.history.duration.day", intl, locale));
-  if (hours > 0) parts.push(formatDurationUnit(hours, "chat.history.duration.hour", intl, locale));
-  if (minutes > 0)
-    parts.push(formatDurationUnit(minutes, "chat.history.duration.minute", intl, locale));
+  if (days > 0) parts.push(formatDurationUnit(days, "chat.history.duration.day", intl));
+  if (hours > 0) parts.push(formatDurationUnit(hours, "chat.history.duration.hour", intl));
+  if (minutes > 0) parts.push(formatDurationUnit(minutes, "chat.history.duration.minute", intl));
   if (seconds > 0 || parts.length === 0) {
-    parts.push(formatDurationUnit(seconds, "chat.history.duration.second", intl, locale));
+    parts.push(formatDurationUnit(seconds, "chat.history.duration.second", intl));
   }
 
   return parts.slice(0, 2).join(" ");

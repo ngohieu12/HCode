@@ -246,7 +246,7 @@ export function WorkspaceHeaderTitleSection({
   const showRemoteSkillSyncAction = shouldShowRemoteSkillSyncAction({
     remoteSessionId,
     remoteTarget,
-    clientMode: isWebRemoteControl ? "web-remote-replayable" : "desktop-continuous",
+    clientMode: "desktop-continuous",
     hasLocalSourceService: Boolean(
       baseServices.skillSyncService &&
       baseServices.mcpSyncService &&
@@ -463,8 +463,8 @@ export function WorkspaceHeaderTitleSection({
                                 presentation.recovery.values,
                               )
                             : intl.formatMessage({ id: presentation.shortMessageId })}
-                    </span>
-                  ) : null}
+                        </span>
+                      ) : null}
                     </span>
                   ) : null}
                   {workspaceContextOpen && isRemoteWorkspace ? (
@@ -531,17 +531,17 @@ export function WorkspaceHeaderTitleSection({
         </ControlHintTooltip>
       ) : null}
       {!isDraftNewTask ? (
-      <h1
-        data-testid={TID_WORKSPACE_TITLE}
-        className={cn(
-          "flex min-w-12 max-w-100 shrink items-center gap-2 truncate font-semibold text-foreground @max-[560px]/workspace-header:max-w-[30vw] @max-[420px]/workspace-header:max-w-[22vw]",
-          simplifyForNarrowRemote && "max-md:max-w-[42vw]",
-          compact ? "text-[0.92rem]" : "text-ui-base",
-        )}
-        title={activeTaskTitle}
-      >
-        <span className="min-w-0 truncate">{activeTaskTitle}</span>
-        {/* {activeTaskChangeSummary ? (
+        <h1
+          data-testid={TID_WORKSPACE_TITLE}
+          className={cn(
+            "flex min-w-12 max-w-100 shrink items-center gap-2 truncate font-semibold text-foreground @max-[560px]/workspace-header:max-w-[30vw] @max-[420px]/workspace-header:max-w-[22vw]",
+            simplifyForNarrowRemote && "max-md:max-w-[42vw]",
+            compact ? "text-[0.92rem]" : "text-ui-base",
+          )}
+          title={activeTaskTitle}
+        >
+          <span className="min-w-0 truncate">{activeTaskTitle}</span>
+          {/* {activeTaskChangeSummary ? (
           <>
             {activeTaskChangeSummary.added > 0 ? (
               <span className="text-diff-added">
@@ -555,7 +555,7 @@ export function WorkspaceHeaderTitleSection({
             ) : null}
           </>
         ) : null} */}
-      </h1>
+        </h1>
       ) : null}
       <div className="flex min-w-0 shrink-0 items-center gap-1">
         {!isDraftNewTask ? (
@@ -592,7 +592,6 @@ export function WorkspaceHeaderTitleSection({
                 taskSessionFile={taskSessionFile}
                 activeSessionId={activeSessionId}
                 taskNativeSessionLogFile={taskNativeSessionLogFile}
-                providerConfigFile={providerConfigFile}
                 disableTaskTargetActions={disableTaskTargetActions || taskMenuMembershipLoading}
                 disableTaskActions={Boolean(readOnlyReason)}
                 disabledReason={readOnlyReason}
@@ -717,9 +716,6 @@ export function WorkspaceHeaderTitleSection({
                       }
                     : undefined
                 }
-                onOpenProviderConfig={() => {
-                  void handleOpenProviderConfig();
-                }}
               />
             </DropdownMenuContent>
           </DropdownMenu>
