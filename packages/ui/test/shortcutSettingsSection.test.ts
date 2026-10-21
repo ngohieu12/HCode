@@ -24,10 +24,10 @@ afterEach(async () => {
   if (root) await act(() => root.unmount());
   vi.clearAllMocks();
 });
-async function mount() {
+async function mount(isDesktop = true) {
   container = document.createElement("div");
   root = createRoot(container);
-  await act(() => root.render(createElement(ShortcutSettingsSection, { isDesktop: true })));
+  await act(() => root.render(createElement(ShortcutSettingsSection, { isDesktop })));
 }
 function button(id: string) {
   return container.querySelector<HTMLButtonElement>(`[data-testid="${id}"]`)!;
