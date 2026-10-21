@@ -242,9 +242,9 @@ describe("bashHandler", () => {
   });
 
   it.each([
-    "sqlite3 /Users/test/.zcode/v2/tasks-index.sqlite .tables",
-    "cd ~/.zcode/v2 && sqlite3 tasks-index.sqlite .tables",
-    'db=~/.zcode/v2/tasks-index.sqlite; sqlite3 "$db" .tables',
+    "sqlite3 /Users/test/.hcode/v2/tasks-index.sqlite .tables",
+    "cd ~/.hcode/v2 && sqlite3 tasks-index.sqlite .tables",
+    'db=~/.hcode/v2/tasks-index.sqlite; sqlite3 "$db" .tables',
   ])(
     "does not present shell text matching as a task database security boundary: %s",
     async (command) => {

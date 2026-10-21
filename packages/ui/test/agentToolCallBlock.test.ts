@@ -277,7 +277,7 @@ describe("AgentToolCallBlock", () => {
           description: "Explore workspace",
           systemPrompt: "Explore",
           color: "red",
-          path: "/workspace/.zcode/agents/explore.md",
+          path: "/workspace/.hcode/agents/explore.md",
           scope: "user",
           source: "user",
           enabled: true,

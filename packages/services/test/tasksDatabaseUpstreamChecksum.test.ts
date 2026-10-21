@@ -12,7 +12,7 @@ import {
 import { OFFICIAL_GLM_SELECTION_MIGRATION_SQL } from "../src/session/tasksDatabase/official-glm-selection-v3.js";
 
 const sha256 = (input: unknown) => createHash("sha256").update(JSON.stringify(input)).digest("hex");
-// ZCode（上游）写入 0003 的 checksum，与 HCode 共用 ~/.zcode/v2/tasks 数据库。
+// ZCode（上游）写入 0003 的 checksum，与 HCode 共用 ~/.hcode/v2/tasks 数据库。
 const UPSTREAM_0003_CHECKSUM = sha256([OFFICIAL_GLM_SELECTION_MIGRATION_SQL]);
 // 旧版 HCode 写入 0003 的 checksum。
 const LEGACY_HCODE_0003_CHECKSUM = sha256(["official-glm-selection-v3"]);

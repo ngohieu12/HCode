@@ -28,14 +28,14 @@ describe("buildWebRemoteControlWorkspaceTargets", () => {
           createWorkspaceTab({
             id: "conversation",
             label: "default",
-            workspacePath: "/Users/demo/.zcode/workspace/default",
+            workspacePath: "/Users/demo/.hcode/workspace/default",
             workspacePurpose: "conversation",
           }),
         ],
       }),
     ).toEqual([
       {
-        workspacePath: "/Users/demo/.zcode/workspace/default",
+        workspacePath: "/Users/demo/.hcode/workspace/default",
         label: "default",
         kind: "local",
         workspacePurpose: "conversation",

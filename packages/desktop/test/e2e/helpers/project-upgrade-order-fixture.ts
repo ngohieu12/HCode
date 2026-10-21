@@ -41,7 +41,7 @@ export function seedLegacyProviderTasks(db: DatabaseSync, workspacePath: string)
 export async function seedProjectUpgradeOrderFixture(home: string, settingsFile: string) {
   const workspace = join(home, "ZCodeProject");
   const root = join(workspace, ".zcode-e2e", "project-upgrade-order");
-  const defaultPath = join(home, ".zcode", "workspace", "default");
+  const defaultPath = join(home, ".hcode", "workspace", "default");
   await mkdir(defaultPath, { recursive: true });
   const paths = [
     ...SAVED_PROJECT_NAMES,
@@ -66,7 +66,7 @@ export async function seedProjectUpgradeOrderFixture(home: string, settingsFile:
     }),
   );
   // node:sqlite 仅有同步连接；此时 app/Host 尚未启动，数据库没有并发写者。
-  const db = new DatabaseSync(join(home, ".zcode", "v2", "tasks-index.sqlite"));
+  const db = new DatabaseSync(join(home, ".hcode", "v2", "tasks-index.sqlite"));
   try {
     db.exec(`CREATE TABLE tasks (
       workspace_key TEXT NOT NULL, workspace_path TEXT NOT NULL, workspace_identity TEXT,

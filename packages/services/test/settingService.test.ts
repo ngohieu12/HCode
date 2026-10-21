@@ -70,7 +70,7 @@ describe("settingService", () => {
       process.env.ZCODE_DESKTOP_HOME_DIR = taskHome;
       const { createSettingService } = await import("#src/setting/settingService.js");
       const service = createSettingService();
-      const file = join(taskHome, ".zcode/v2/setting.json");
+      const file = join(taskHome, ".hcode/v2/setting.json");
       const retained = {
         recentProjects: ["/example/project"],
         memoryEnabled: true,
@@ -85,7 +85,7 @@ describe("settingService", () => {
           },
         ],
       };
-      await mkdir(join(taskHome, ".zcode/v2"), { recursive: true });
+      await mkdir(join(taskHome, ".hcode/v2"), { recursive: true });
       await writeFile(
         file,
         JSON.stringify({
@@ -122,10 +122,10 @@ describe("settingService", () => {
     await second.update({ locale: "en-US" });
     await first.update({ memoryEnabled: true });
     expect(
-      JSON.parse(readFileSync(join(firstHome, ".zcode/v2/setting.json"), "utf8")),
+      JSON.parse(readFileSync(join(firstHome, ".hcode/v2/setting.json"), "utf8")),
     ).toMatchObject({ locale: "zh-CN", memoryEnabled: true });
     expect(
-      JSON.parse(readFileSync(join(secondHome, ".zcode/v2/setting.json"), "utf8")),
+      JSON.parse(readFileSync(join(secondHome, ".hcode/v2/setting.json"), "utf8")),
     ).toMatchObject({ locale: "en-US", memoryEnabled: false });
   });
 
@@ -155,7 +155,7 @@ describe("settingService", () => {
     }));
     await owner.service.get();
     expect(
-      JSON.parse(readFileSync(join(home, ".zcode/v2/setting.json"), "utf8")).recentProjects,
+      JSON.parse(readFileSync(join(home, ".hcode/v2/setting.json"), "utf8")).recentProjects,
     ).toEqual(paths);
     paths = [];
     await owner.service.update({
@@ -171,7 +171,7 @@ describe("settingService", () => {
 
   it("Main 保存窗口尺寸与 Host 记录远程目录交错时保留两份补丁", async () => {
     const taskHome = makeTempHome();
-    const settingsDir = join(taskHome, ".zcode", "v2");
+    const settingsDir = join(taskHome, ".hcode", "v2");
     const settingsFile = join(settingsDir, "setting.json");
     mkdirSync(settingsDir, { recursive: true });
     writeFileSync(settingsFile, JSON.stringify({ sourceServerWorkspaceHistory: [] }), "utf8");
@@ -261,8 +261,8 @@ describe("settingService", () => {
     const service = await createSettingServiceInHome(ordinaryHome);
     // providerFamilyDomain 已随内置供应商体系删除，改用仍然存在的设置字段做隔离探针。
     await service.update({ locale: "en-US" });
-    expect(existsSync(join(desktopHome, ".zcode", "v2", "setting.json"))).toBe(true);
-    expect(existsSync(join(ordinaryHome, ".zcode", "v2", "setting.json"))).toBe(false);
+    expect(existsSync(join(desktopHome, ".hcode", "v2", "setting.json"))).toBe(true);
+    expect(existsSync(join(ordinaryHome, ".hcode", "v2", "setting.json"))).toBe(false);
     expect((await service.get()).locale).toBe("en-US");
   });
   it("缺少 setting.json 时返回默认值", async () => {
@@ -288,7 +288,7 @@ describe("settingService", () => {
 
   it("旧配置默认开启提问自动继续，并持久化显式关闭", async () => {
     const home = makeTempHome();
-    const settingsDir = join(home, ".zcode", "v2");
+    const settingsDir = join(home, ".hcode", "v2");
     mkdirSync(settingsDir, { recursive: true });
     writeFileSync(join(settingsDir, "setting.json"), JSON.stringify({ locale: "vi-VN" }), "utf-8");
 
@@ -305,7 +305,7 @@ describe("settingService", () => {
 
   it("首次读取旧关闭到托盘配置时统一开启并持久化，之后保留用户关闭选择", async () => {
     const home = makeTempHome();
-    const settingsDir = join(home, ".zcode", "v2");
+    const settingsDir = join(home, ".hcode", "v2");
     const settingsFile = join(settingsDir, "setting.json");
     mkdirSync(settingsDir, { recursive: true });
     writeFileSync(
@@ -337,7 +337,7 @@ describe("settingService", () => {
 
   it("首次读取旧 reasoning 配置时统一开启并持久化，之后保留用户关闭选择", async () => {
     const home = makeTempHome();
-    const settingsDir = join(home, ".zcode", "v2");
+    const settingsDir = join(home, ".hcode", "v2");
     const settingsFile = join(settingsDir, "setting.json");
     mkdirSync(settingsDir, { recursive: true });
     writeFileSync(
@@ -374,7 +374,7 @@ describe("settingService", () => {
 
   it("一次性设置迁移写盘会进入设置更新队列，避免覆盖并发设置更新", async () => {
     const home = makeTempHome();
-    const settingsDir = join(home, ".zcode", "v2");
+    const settingsDir = join(home, ".hcode", "v2");
     const settingsFile = join(settingsDir, "setting.json");
     mkdirSync(settingsDir, { recursive: true });
     writeFileSync(
@@ -439,7 +439,7 @@ describe("settingService", () => {
 
   it("设置进入原子提交后会等待 rename 收口再保存后续语言偏好", async () => {
     const home = makeTempHome();
-    const settingsDir = join(home, ".zcode", "v2");
+    const settingsDir = join(home, ".hcode", "v2");
     const settingsFile = join(settingsDir, "setting.json");
     let firstSettingsRenameStarted: (() => void) | undefined;
     let releaseFirstSettingsWrite: (() => void) | undefined;
@@ -541,7 +541,7 @@ describe("settingService", () => {
 
   it("设置提交前写入超时会释放队列且晚到旧写不能覆盖语言偏好", async () => {
     const home = makeTempHome();
-    const settingsDir = join(home, ".zcode", "v2");
+    const settingsDir = join(home, ".hcode", "v2");
     const settingsFile = join(settingsDir, "setting.json");
     let firstSettingsWriteStarted: (() => void) | undefined;
     let releaseFirstSettingsWrite: (() => void) | undefined;
@@ -623,7 +623,7 @@ describe("settingService", () => {
 
   it("读取会等待已入队的设置更新，Session 启动偏好不会拿到旧值", async () => {
     const home = makeTempHome();
-    const settingsFile = join(home, ".zcode", "v2", "setting.json");
+    const settingsFile = join(home, ".hcode", "v2", "setting.json");
     let releaseSettingsWrite: (() => void) | undefined;
     let settingsWriteStarted: (() => void) | undefined;
     const settingsWriteStartedPromise = new Promise<void>((resolve) => {
@@ -672,7 +672,7 @@ describe("settingService", () => {
 
   it("setting.json 不是合法 JSON 时会隔离坏文件并在后续写回合法配置", async () => {
     const home = makeTempHome();
-    const settingsDir = join(home, ".zcode", "v2");
+    const settingsDir = join(home, ".hcode", "v2");
     const settingsFile = join(settingsDir, "setting.json");
     mkdirSync(settingsDir, { recursive: true });
     writeFileSync(settingsFile, ":wq\n", "utf-8");
@@ -701,7 +701,7 @@ describe("settingService", () => {
 
   it("读取 setting.json 遇到短暂 JSON parse fail 时会重试并保留会话配置", async () => {
     const home = makeTempHome();
-    const settingsDir = join(home, ".zcode", "v2");
+    const settingsDir = join(home, ".hcode", "v2");
     const settingsFile = join(settingsDir, "setting.json");
     mkdirSync(settingsDir, { recursive: true });
     writeFileSync(settingsFile, '{"lastWorkspaceSession":[', "utf-8");
@@ -772,7 +772,7 @@ describe("settingService", () => {
 
   it("支持清空非生产 ZCode endpoint override", async () => {
     const home = makeTempHome();
-    const settingsFile = join(home, ".zcode", "v2", "setting.json");
+    const settingsFile = join(home, ".hcode", "v2", "setting.json");
     const service = await createSettingServiceInHome(home);
 
     await service.update({ zcodeEndpointOrigin: "https://zcode.z.ai/path" });
@@ -790,7 +790,7 @@ describe("settingService", () => {
 
   it("忽略损坏的 ZCode endpoint override，保留其它 settings", async () => {
     const home = makeTempHome();
-    const settingsDir = join(home, ".zcode", "v2");
+    const settingsDir = join(home, ".hcode", "v2");
     const settingsFile = join(settingsDir, "setting.json");
     mkdirSync(settingsDir, { recursive: true });
     writeFileSync(
@@ -829,8 +829,8 @@ describe("settingService", () => {
 
   it("旧自动归档配置在首轮扫描前关闭，重新开启后跨服务重建保留", async () => {
     const home = makeTempHome();
-    const file = join(home, ".zcode/v2/setting.json");
-    await mkdir(join(home, ".zcode/v2"), { recursive: true });
+    const file = join(home, ".hcode/v2/setting.json");
+    await mkdir(join(home, ".hcode/v2"), { recursive: true });
     await writeFile(
       file,
       JSON.stringify({
@@ -883,8 +883,8 @@ describe("settingService", () => {
 
   it("迟到的旧配置读取不会覆盖另一个设置服务刚提交的重新开启", async () => {
     const home = makeTempHome();
-    const file = join(home, ".zcode/v2/setting.json");
-    await mkdir(join(home, ".zcode/v2"), { recursive: true });
+    const file = join(home, ".hcode/v2/setting.json");
+    await mkdir(join(home, ".hcode/v2"), { recursive: true });
     await writeFile(file, JSON.stringify({ taskAutoArchiveEnabled: true }));
     const captured = Promise.withResolvers<void>();
     const release = Promise.withResolvers<void>();
@@ -925,9 +925,9 @@ describe("settingService", () => {
     const firstHome = makeTempHome();
     const secondHome = makeTempHome();
     for (const home of [firstHome, secondHome]) {
-      await mkdir(join(home, ".zcode/v2"), { recursive: true });
+      await mkdir(join(home, ".hcode/v2"), { recursive: true });
       await writeFile(
-        join(home, ".zcode/v2/setting.json"),
+        join(home, ".hcode/v2/setting.json"),
         JSON.stringify({ taskAutoArchiveEnabled: true }),
       );
     }
@@ -941,8 +941,8 @@ describe("settingService", () => {
 
   it("自动归档迁移写入失败时扫描不执行归档", async () => {
     const home = makeTempHome();
-    const file = join(home, ".zcode/v2/setting.json");
-    await mkdir(join(home, ".zcode/v2"), { recursive: true });
+    const file = join(home, ".hcode/v2/setting.json");
+    await mkdir(join(home, ".hcode/v2"), { recursive: true });
     await writeFile(
       file,
       JSON.stringify({
@@ -982,7 +982,7 @@ describe("settingService", () => {
 
   it("保存 setting.json 时可以注入磁盘/权限类写入错误", async () => {
     const home = makeTempHome();
-    const settingsFile = join(home, ".zcode", "v2", "setting.json");
+    const settingsFile = join(home, ".hcode", "v2", "setting.json");
     process.env.ZCODE_ENV = "test";
     process.env.ZCODE_E2E_FS_FAULTS = JSON.stringify([
       {
@@ -1245,8 +1245,8 @@ describe("settingService", () => {
 
   it("读取旧版 settings 时会迁移 lastOpenTabs 和 remoteWorkspaceHistory", async () => {
     const home = makeTempHome();
-    const settingsFile = join(home, ".zcode", "v2", "setting.json");
-    mkdirSync(join(home, ".zcode", "v2"), { recursive: true });
+    const settingsFile = join(home, ".hcode", "v2", "setting.json");
+    mkdirSync(join(home, ".hcode", "v2"), { recursive: true });
     writeFileSync(
       settingsFile,
       JSON.stringify({

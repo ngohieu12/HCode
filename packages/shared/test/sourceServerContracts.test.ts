@@ -44,7 +44,7 @@ describe("R3 Source Server contracts", () => {
     const base = { profileId, state: "needs-install", updatedAt: 1 };
     const installPreview = {
       version: "3.12.2",
-      installPath: "/home/dev/.zcode/server",
+      installPath: "/home/dev/.hcode/server",
       sizeBytes: 4194304,
     };
     const runningTasks = [

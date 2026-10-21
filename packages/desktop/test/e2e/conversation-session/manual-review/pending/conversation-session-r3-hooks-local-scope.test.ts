@@ -168,10 +168,10 @@ describe(`${CASE_MARKER}: 远端项目激活时钩子按选中的 scope 落盘`,
     this.timeout(20 * 60_000);
     const config = readSSHRuntimeConfig(CASE_MARKER);
     const [workspaceA] = config.workspacePaths;
-    const localConfigPath = join(DEFAULT_WORKSPACE, ".zcode", "config.json");
+    const localConfigPath = join(DEFAULT_WORKSPACE, ".hcode", "config.json");
     await prepareSSHConnectionPage(CASE_MARKER);
     await prepareV4ConversationE2E({ skipProvider: true });
-    await runSSHCommand(config, `rm -f "${workspaceA}/.zcode/config.json"`);
+    await runSSHCommand(config, `rm -f "${workspaceA}/.hcode/config.json"`);
 
     // 活动工作区切到远端项目 A。
     await startNewV4Draft();
@@ -201,7 +201,7 @@ describe(`${CASE_MARKER}: 远端项目激活时钩子按选中的 scope 落盘`,
     expect(localConfig).toContain(LOCAL_MARKER);
     const remoteAfterLocal = await runSSHCommand(
       config,
-      `grep -rl "${LOCAL_MARKER}" "$HOME/.zcode" "${workspaceA}" 2>/dev/null; echo END`,
+      `grep -rl "${LOCAL_MARKER}" "$HOME/.hcode" "${workspaceA}" 2>/dev/null; echo END`,
     );
     facts.remoteAfterLocal = remoteAfterLocal.stdout.trim();
     expect(remoteAfterLocal.stdout.trim()).toBe("END");
@@ -215,7 +215,7 @@ describe(`${CASE_MARKER}: 远端项目激活时钩子按选中的 scope 落盘`,
     await browser.waitUntil(
       async () => {
         remoteConfig = (
-          await runSSHCommand(config, `cat "${workspaceA}/.zcode/config.json" 2>/dev/null`)
+          await runSSHCommand(config, `cat "${workspaceA}/.hcode/config.json" 2>/dev/null`)
         ).stdout;
         return remoteConfig.includes(REMOTE_MARKER);
       },

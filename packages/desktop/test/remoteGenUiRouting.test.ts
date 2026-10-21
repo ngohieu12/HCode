@@ -10,7 +10,7 @@ const target = {
   workspacePath: "/workspace/project",
   workspaceIdentity: "ssh:example.test:/workspace/project",
   sessionId: "fork-session",
-  path: "/root/.zcode/v2/visualizations/parent/view.html",
+  path: "/root/.hcode/v2/visualizations/parent/view.html",
 };
 
 function genUiService(): IGenUiService {

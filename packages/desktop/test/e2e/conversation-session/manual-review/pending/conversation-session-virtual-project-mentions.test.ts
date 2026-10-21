@@ -246,7 +246,7 @@ describe("虚拟项目 Composer 候选", () => {
       }
     });
     const readOwnership = () => {
-      const db = new DatabaseSync(join(home, ".zcode", "v2", "tasks-index.sqlite"), {
+      const db = new DatabaseSync(join(home, ".hcode", "v2", "tasks-index.sqlite"), {
         readOnly: true,
       });
       try {

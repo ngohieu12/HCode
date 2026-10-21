@@ -35,7 +35,7 @@ vi.mock("@zcode/shared", () => ({
     bundledResourceDir: "glm",
     version: "0.0.0-test",
     spawnArgs: ["app-server", "--stdio"],
-    nativeConfigDir: ".zcode/cli",
+    nativeConfigDir: ".hcode/cli",
     nativeConfigFileName: "config.json",
     missingBinaryMessage: "[HCode Agent] missing test binary",
     resolveEntrySegments: (platform: string) => [

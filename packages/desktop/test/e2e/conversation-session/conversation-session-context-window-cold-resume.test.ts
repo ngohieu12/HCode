@@ -243,7 +243,7 @@ describe("上下文窗口与输出预算冷恢复 E2E", () => {
 
 function patchFixtureSelection(sessionId: string, unknownModel: boolean): void {
   // node:sqlite 仅有同步 API；这里只写测试专属库中指定 session 的新字段。
-  const database = new DatabaseSync(join(paths.homeDir, ".zcode", "cli", "db", "db.sqlite"));
+  const database = new DatabaseSync(join(paths.homeDir, ".hcode", "cli", "db", "db.sqlite"));
   try {
     const result = database
       .prepare(`UPDATE session_entry
@@ -444,7 +444,7 @@ async function waitForModelIoSequence(
 }
 
 async function readSuccessfulModelIo(sessionId: string): Promise<ModelIoMatch[]> {
-  const debugDir = join(paths.homeDir, ".zcode", "cli", "debug");
+  const debugDir = join(paths.homeDir, ".hcode", "cli", "debug");
   const files = (await readdir(debugDir).catch(() => []))
     .filter((name) => name.startsWith("model-io-") && name.endsWith(".jsonl"))
     .sort();

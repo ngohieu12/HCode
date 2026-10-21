@@ -98,7 +98,7 @@ describe.skipIf(isWindows)("doctor-macos-release-app.sh", () => {
     const binDir = join(workspaceDir, "bin");
     const toolLog = join(workspaceDir, "tool.log");
     const { appPath } = createReleaseApp(workspaceDir, "ZCode Preview");
-    const zcodeHome = join(workspaceDir, ".zcode");
+    const zcodeHome = join(workspaceDir, ".hcode");
     const helperAppPath = createZcodeHomeHelper(zcodeHome, "preview");
 
     mkdirSync(binDir, { recursive: true });
@@ -123,7 +123,7 @@ describe.skipIf(isWindows)("doctor-macos-release-app.sh", () => {
     const binDir = join(workspaceDir, "bin");
     const toolLog = join(workspaceDir, "tool.log");
     const { appPath } = createReleaseApp(workspaceDir);
-    const zcodeHome = join(workspaceDir, ".zcode");
+    const zcodeHome = join(workspaceDir, ".hcode");
 
     mkdirSync(binDir, { recursive: true });
     writeFakeTool(binDir, "codesign", toolLog);
@@ -144,7 +144,7 @@ describe.skipIf(isWindows)("doctor-macos-release-app.sh", () => {
     const binDir = join(workspaceDir, "bin");
     const toolLog = join(workspaceDir, "tool.log");
     const { appPath } = createReleaseApp(workspaceDir);
-    const zcodeHome = join(workspaceDir, ".zcode");
+    const zcodeHome = join(workspaceDir, ".hcode");
     const helperAppPath = createZcodeHomeHelper(zcodeHome);
 
     mkdirSync(binDir, { recursive: true });
@@ -171,7 +171,7 @@ describe.skipIf(isWindows)("doctor-macos-release-app.sh", () => {
     const binDir = join(workspaceDir, "bin");
     const toolLog = join(workspaceDir, "tool.log");
     const { appPath } = createReleaseApp(workspaceDir);
-    const zcodeHome = join(workspaceDir, ".zcode");
+    const zcodeHome = join(workspaceDir, ".hcode");
     const helperAppPath = createZcodeHomeHelper(zcodeHome);
 
     mkdirSync(binDir, { recursive: true });
@@ -193,7 +193,7 @@ describe.skipIf(isWindows)("doctor-macos-release-app.sh", () => {
     const binDir = join(workspaceDir, "bin");
     const toolLog = join(workspaceDir, "tool.log");
     const { appPath } = createReleaseApp(workspaceDir);
-    const zcodeHome = join(workspaceDir, ".zcode");
+    const zcodeHome = join(workspaceDir, ".hcode");
 
     mkdirSync(binDir, { recursive: true });
     writeFakeTool(binDir, "codesign", toolLog);
@@ -231,7 +231,7 @@ describe.skipIf(isWindows)("doctor-macos-release-app.sh", () => {
     const binDir = join(workspaceDir, "bin");
     const toolLog = join(workspaceDir, "tool.log");
     const { appPath } = createReleaseApp(workspaceDir);
-    const zcodeHome = join(workspaceDir, ".zcode");
+    const zcodeHome = join(workspaceDir, ".hcode");
     const helperAppPath = createZcodeHomeHelper(zcodeHome);
 
     mkdirSync(binDir, { recursive: true });
@@ -256,7 +256,7 @@ describe.skipIf(isWindows)("doctor-macos-release-app.sh", () => {
     const binDir = join(workspaceDir, "bin");
     const toolLog = join(workspaceDir, "tool.log");
     const { appPath } = createReleaseApp(workspaceDir);
-    const zcodeHome = join(workspaceDir, ".zcode");
+    const zcodeHome = join(workspaceDir, ".hcode");
     const helperAppPath = createZcodeHomeHelper(zcodeHome);
     writeExecutable(join(helperAppPath, "Contents", "MacOS", HELPER_DISPLAY_NAME), "#!/bin/bash\n");
 

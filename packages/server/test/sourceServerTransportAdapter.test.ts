@@ -291,13 +291,13 @@ function contract(name: string, target: RemoteTarget): void {
       );
       expect(backend.uploads).toHaveLength(1);
       expect(backend.uploads[0]?.remotePath).toMatch(
-        /^~\/\.zcode\/server\/\.bootstrap-[^/]+\/zcode-server\.tar\.gz$/u,
+        /^~\/\.hcode\/server\/\.bootstrap-[^/]+\/zcode-server\.tar\.gz$/u,
       );
       expect(backend.uploads[0]?.remotePath).not.toContain("/tmp/");
       const prepareCommand = backend.commands.find(
         (command) => command.includes("mkdir -p") && command.includes(".bootstrap-"),
       );
-      expect(prepareCommand).toContain('"$HOME/.zcode/server"/.bootstrap-*');
+      expect(prepareCommand).toContain('"$HOME/.hcode/server"/.bootstrap-*');
       expect(prepareCommand).toContain("1800000");
       expect(prepareCommand).toContain("date +%s");
       const updateCommand = backend.commands.find((command) =>
@@ -458,7 +458,7 @@ it("preserves a public archive update guard from CLI JSON", async () => {
   expect(updateCommand).toContain(".bootstrap-");
   expect(updateCommand).toContain("zcode-server.tar.gz");
   expect(updateCommand).not.toContain("/tmp/zcode-server-bootstrap-");
-  expect(updateCommand).toContain('"$HOME/.zcode/server"/.bootstrap-');
+  expect(updateCommand).toContain('"$HOME/.hcode/server"/.bootstrap-');
 });
 
 it.each(targets)(
@@ -660,7 +660,7 @@ it("uploads an explicitly resolved local development archive despite the SSH dow
     {
       localPath: "/tmp/current-development-source-server.tar.gz",
       remotePath: expect.stringMatching(
-        /^~\/\.zcode\/server\/\.bootstrap-[^/]+\/zcode-server\.tar\.gz$/u,
+        /^~\/\.hcode\/server\/\.bootstrap-[^/]+\/zcode-server\.tar\.gz$/u,
       ),
     },
   ]);

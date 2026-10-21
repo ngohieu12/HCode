@@ -79,7 +79,7 @@ const ENTRY: ZCodeSavedWorkflowEntry = {
   name: "pr-review",
   description: "分层评审",
   scope: "project",
-  path: "/repo/.zcode/workflows/pr-review.dwf.ts",
+  path: "/repo/.hcode/workflows/pr-review.dwf.ts",
 };
 
 function withIntl(node: ReactNode, locale: "en-US" | "vi-VN" = "en-US") {
@@ -140,7 +140,7 @@ describe("WorkflowSavePopover", () => {
     expect(name.value).toBe("pr-review");
     expect(document.activeElement).toBe(name);
     expect(screen.getByTestId("workflow-save-consequence").textContent).toContain(
-      ".zcode/workflows/pr-review.dwf.ts",
+      ".hcode/workflows/pr-review.dwf.ts",
     );
     expect(screen.getByTestId("workflow-save-submit").textContent).toBe("直接保存");
   });

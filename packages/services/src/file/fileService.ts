@@ -101,7 +101,8 @@ function isProbablyBinary(buffer: Buffer): boolean {
   }
   return suspiciousBytes / buffer.length > 0.3;
 }
-const SCRATCH_WORKSPACE_ROOT_NAME = "ZCodeProject";
+// HCode 与 ZCode 可并排安装：草稿工作区根目录按产品区分，避免两者共用 ~/ZCodeProject。
+const SCRATCH_WORKSPACE_ROOT_NAME = "HCodeProject";
 function validateScratchWorkspaceName(name: string): string {
   const trimmedName = name.trim();
   if (!trimmedName) {

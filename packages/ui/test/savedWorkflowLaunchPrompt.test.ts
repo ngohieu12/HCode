@@ -11,10 +11,10 @@ describe("revise / create prompts", () => {
     expect(
       buildSavedWorkflowRevisePrompt({
         name: "x",
-        path: "/repo/.zcode/workflows/x.dwf.ts",
+        path: "/repo/.hcode/workflows/x.dwf.ts",
         locale: "vi-VN",
       }),
-    ).toBe('Please revise the saved workflow "x" (/repo/.zcode/workflows/x.dwf.ts): ');
+    ).toBe('Please revise the saved workflow "x" (/repo/.hcode/workflows/x.dwf.ts): ');
   });
 
   it("global revise adds keep scope: global; project does not", () => {
@@ -49,13 +49,13 @@ describe("revise / create prompts", () => {
 describe("promote prompt", () => {
   const input = {
     name: "release-check",
-    path: "/repo/.zcode/workflows/release-check.dwf.ts",
+    path: "/repo/.hcode/workflows/release-check.dwf.ts",
     locale: "vi-VN",
   };
 
   it("carries name and path, requires scope global, allows rename, keeps original file, allows refusal", () => {
     const prompt = buildSavedWorkflowPromotePrompt(input);
-    expect(prompt).toContain('"release-check" (/repo/.zcode/workflows/release-check.dwf.ts)');
+    expect(prompt).toContain('"release-check" (/repo/.hcode/workflows/release-check.dwf.ts)');
     expect(prompt).toContain('scope: "global"');
     expect(prompt).toContain("`args`");
     expect(prompt).toContain("Keep the name or pick a better one");

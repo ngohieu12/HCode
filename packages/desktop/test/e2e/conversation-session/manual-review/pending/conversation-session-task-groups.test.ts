@@ -499,7 +499,7 @@ describe("任务分组独立视图", () => {
     const home = process.env.ZCODE_E2E_HOME_DIR;
     if (!home || !basename(home).startsWith(".e2e-home-desktop-e2e-") || !cwd)
       throw new Error("隔离 HOME 和真实任务目录 required");
-    const db = new DatabaseSync(join(home, ".zcode/v2/tasks-index.sqlite"));
+    const db = new DatabaseSync(join(home, ".hcode/v2/tasks-index.sqlite"));
     try {
       db.exec("BEGIN IMMEDIATE");
       const task = db.prepare(

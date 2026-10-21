@@ -94,7 +94,7 @@ async function clearAllDataAndRelaunch(options: {
     title: "Clear All Data",
     message: "Clear all data?",
     detail:
-      "This deletes ~/.zcode/v2 (settings, credentials, logs) and browser storage (localStorage). This cannot be undone; the app restarts afterwards.",
+      "This deletes ~/.hcode/v2 (settings, credentials, logs) and browser storage (localStorage). This cannot be undone; the app restarts afterwards.",
   });
   if (response !== 1) {
     return;
@@ -104,9 +104,9 @@ async function clearAllDataAndRelaunch(options: {
   const { rm } = await import("node:fs/promises");
   try {
     await rm(options.credentialsDir, { recursive: true, force: true });
-    options.logger.info("[clear-all-data] deleted ~/.zcode/v2");
+    options.logger.info("[clear-all-data] deleted ~/.hcode/v2");
   } catch (error) {
-    options.logger.error("[clear-all-data] failed to delete ~/.zcode/v2:", error);
+    options.logger.error("[clear-all-data] failed to delete ~/.hcode/v2:", error);
   }
 
   for (const win of BrowserWindow.getAllWindows()) {

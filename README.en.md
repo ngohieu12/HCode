@@ -77,8 +77,10 @@ The root [.env.example](.env.example) provides sample service URLs and build con
 
 | Setting                              | Purpose                                                                                 |
 | ------------------------------------ | --------------------------------------------------------------------------------------- |
-| `ZCODE_DATA_BASE_DIR`                | Base directory for application data, stored under its `.zcode/` subdirectory            |
+| `ZCODE_DATA_BASE_DIR`                | Base directory for application data, stored under its `.hcode/` subdirectory            |
 | `ZCODE_BUILTIN_PROVIDER_CONFIG_FILE` | Path to a local provider configuration file; uses the built-in configuration when unset |
+
+HCode keeps its own data in `~/.hcode` (settings, tasks, workspaces, CLI database) and in the project-level `<project>/.hcode` directory; new scratch projects live in `~/HCodeProject`. This lets HCode be installed side by side with ZCode (`~/.zcode`) without sharing data.
 
 Runtime variables can be set explicitly in the environment of the startup command. See [config/README.md](config/README.md) for the default configuration shipped with the client.
 

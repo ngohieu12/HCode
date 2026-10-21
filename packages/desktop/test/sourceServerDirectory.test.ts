@@ -87,7 +87,7 @@ describe("SourceServerDirectory", () => {
   });
 
   it("stores a Source-scoped conversation backing path outside strict project history", async () => {
-    const conversationPath = "/home/dev/.zcode/workspace/default";
+    const conversationPath = "/home/dev/.hcode/workspace/default";
     const realProject = {
       profileId,
       sourceServerId,

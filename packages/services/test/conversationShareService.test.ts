@@ -1128,7 +1128,7 @@ describe("ConversationShareService", () => {
         origin: "realUser",
         attachments: [
           {
-            ref: "/data/.zcode/tmp/paste-attachments/pasted.txt",
+            ref: "/data/.hcode/tmp/paste-attachments/pasted.txt",
             fileName: "pasted.txt",
             mime: "text/plain",
             bytes: 11,

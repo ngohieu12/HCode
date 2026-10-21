@@ -1198,7 +1198,7 @@ describe("SourceServerConnectionManager", () => {
       platform: "linux",
       arch: "x64",
       installed: false,
-      installPath: "/srv/custom-home/.zcode/server",
+      installPath: "/srv/custom-home/.hcode/server",
     });
     const resolveRelease = vi.fn(async () => createRelease("3.8.0"));
     const manager = new SourceServerConnectionManager({
@@ -1213,7 +1213,7 @@ describe("SourceServerConnectionManager", () => {
       state: "needs-install",
       installPreview: {
         version: "3.8.0",
-        installPath: "/srv/custom-home/.zcode/server",
+        installPath: "/srv/custom-home/.hcode/server",
         sizeBytes: 1024,
       },
     });

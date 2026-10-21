@@ -1,5 +1,5 @@
 // 冻结的上游 0003 SQL 文本，仅作为 checksum 输入：HCode 已移除内置供应商，不再执行它。
-// 不能修改该文本——与 ZCode 共用 ~/.zcode 数据目录的数据库账本按它的 sha256 校验。
+// 不能修改该文本——与 ZCode 共用 ~/.hcode 数据目录的数据库账本按它的 sha256 校验。
 export const OFFICIAL_GLM_SELECTION_MIGRATION_SQL = `
 UPDATE automations
 SET model_selection = json_set(model_selection, '$.modelId',

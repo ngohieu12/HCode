@@ -2590,7 +2590,7 @@ const enUS: Record<string, string> = {
   "remote.connectingConfirmTitle": "Stop the current connection?",
   "remote.sourceServerInstallTitle": "ZCode Server installation required",
   "remote.sourceServerInstallDescription":
-    "ZCode will upload the matching release, install it under ~/.zcode/server, and start the background daemon. Existing legacy remote files will be preserved.",
+    "ZCode will upload the matching release, install it under ~/.hcode/server, and start the background daemon. Existing legacy remote files will be preserved.",
   "remote.sourceServerInstallConfirm": "Install and continue",
   "remote.installTarget": "Target account",
   "remote.installVersion": "Install version",
@@ -3275,7 +3275,7 @@ const enUS: Record<string, string> = {
   "settings.taskAutoArchiveDays.option.30": "Archive after 30 days",
   "settings.dataBaseDir": "Data storage path",
   "settings.dataBaseDirDescription":
-    "Root directory for app data (defaults to user home directory). Existing data will be copied to the new location. The .zcode/v2 suffix cannot be changed.",
+    "Root directory for app data (defaults to user home directory). Existing data will be copied to the new location. The .hcode/v2 suffix cannot be changed.",
   "settings.dataBaseDirPlaceholder": "Default: user home directory",
   "settings.dataBaseDirBrowse": "Choose folder",
   "settings.dataBaseDirSave": "Save",
@@ -6641,7 +6641,7 @@ const enUS: Record<string, string> = {
   "chat.toolCall.workflow.run.artifacts.nextVersion": "Next version",
   "chat.toolCall.workflow.run.artifacts.open": "Open artifact",
   // 动作。「下载」（存到用户挑的位置）仍缺席；「作为文件打开」
-  // 落的是宿主 ~/.zcode/tmp 下的副本，不是用户挑的位置。
+  // 落的是宿主 ~/.hcode/tmp 下的副本，不是用户挑的位置。
   "chat.toolCall.workflow.run.artifacts.reveal": "Reveal in workspace",
   "chat.toolCall.workflow.run.artifacts.copy": "Copy",
   "chat.toolCall.workflow.run.artifacts.copied": "Copied",

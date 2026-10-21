@@ -35,7 +35,7 @@ Run `npm run bootstrap` after cloning the repository. It checks the local Node.j
 
 zcode plugins are local bundles that can contribute skills, custom commands, and MCP servers. The plugin surface is compatible with the Claude Code plugin layout, so existing plugin content can be reused with minimal changes.
 
-Plugin state lives under `~/.zcode/cli/plugins`:
+Plugin state lives under `~/.hcode/cli/plugins`:
 
 - `cache/`: installed marketplace plugin code and static files.
 - `data/<plugin-id>/`: persistent plugin data. MCP servers should write runtime output here, not into the plugin source directory.
@@ -154,7 +154,7 @@ Keep reusable content in Claude-compatible locations. Add a `.zcode-plugin/plugi
 
 ## MCP Configuration
 
-zcode reads MCP servers from the main JSON config. The default user config path is `~/.zcode/cli/config.json`; MCP entries live under `mcp.servers`. MCP is enabled by default, so `features.mcp` only needs to be set when you want an explicit on/off switch. The current CLI does not auto-discover standalone `mcp.json` or `.mcp.json` files outside enabled plugins.
+zcode reads MCP servers from the main JSON config. The default user config path is `~/.hcode/cli/config.json`; MCP entries live under `mcp.servers`. MCP is enabled by default, so `features.mcp` only needs to be set when you want an explicit on/off switch. The current CLI does not auto-discover standalone `mcp.json` or `.mcp.json` files outside enabled plugins.
 
 ```json
 {
@@ -197,7 +197,7 @@ MCP tools are registered before the first model request and exposed as `mcp__<se
 
 ## Hooks Configuration
 
-zcode reads hooks from the same main JSON config file as MCP, usually `~/.zcode/cli/config.json`. Hooks are disabled by default; set `hooks.enabled` to `true` and add process hooks under `hooks.events`.
+zcode reads hooks from the same main JSON config file as MCP, usually `~/.hcode/cli/config.json`. Hooks are disabled by default; set `hooks.enabled` to `true` and add process hooks under `hooks.events`.
 
 Supported hook events:
 

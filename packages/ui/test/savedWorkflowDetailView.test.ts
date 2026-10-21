@@ -47,7 +47,7 @@ const ENTRY: ZCodeSavedWorkflowEntry = {
   description: "发布前检查",
   whenToUse: "发版前",
   scope: "project",
-  path: "/repo/.zcode/workflows/release-check.dwf.ts",
+  path: "/repo/.hcode/workflows/release-check.dwf.ts",
   args: { branch: { type: "string", required: true } },
 };
 const detailResult: { current: ZCodeWorkflowsGetResult } = {

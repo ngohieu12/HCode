@@ -67,7 +67,7 @@ describe("useWorkspaceHookInlineTrust Source authority", () => {
         declarationEnabled: false,
         runtimeHooksEnabled: true,
         configuredEnabled: false,
-        sourcePath: ".zcode/config.json",
+        sourcePath: ".hcode/config.json",
         trustState: "pending_trust",
       },
     };

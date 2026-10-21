@@ -539,7 +539,7 @@ describe("Hooks settings page", () => {
       location: {
         source: "zcode",
         scope: "project",
-        directoryPath: "/ancestor/.zcode",
+        directoryPath: "/ancestor/.hcode",
         projectPath: "/workspace",
       },
     };
@@ -723,7 +723,7 @@ function configuredHook(): Hook {
     location: {
       source: "zcode",
       scope: "project",
-      directoryPath: "/workspace/.zcode",
+      directoryPath: "/workspace/.hcode",
       projectPath: "/workspace",
     },
   };
@@ -744,7 +744,7 @@ function workspaceConfiguredHook(
       declarationEnabled: true,
       runtimeHooksEnabled: true,
       configuredEnabled: true,
-      sourcePath: ".zcode/config.json",
+      sourcePath: ".hcode/config.json",
       trustState,
     },
   };

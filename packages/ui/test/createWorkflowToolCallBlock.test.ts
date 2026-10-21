@@ -438,7 +438,7 @@ describe("CreateWorkflowToolCallBlock 静态形态（编过、未联接 run）",
         saved: {
           name: "fan-out-review",
           scope: "project",
-          path: "/workspace/.zcode/workflows/fan-out-review.dwf.ts",
+          path: "/workspace/.hcode/workflows/fan-out-review.dwf.ts",
         },
       },
       raw: { display: { ...OK_DISPLAY, causalityGraph: FLAT_GRAPH } },
@@ -577,7 +577,7 @@ describe("CreateWorkflowToolCallBlock 编译反馈", () => {
           saved: {
             name: "release-notes",
             scope: "project",
-            path: ".zcode/workflows/release-notes.ts",
+            path: ".hcode/workflows/release-notes.ts",
           },
         },
       },
@@ -1827,14 +1827,14 @@ describe("CreateWorkflowToolCallBlock as AmendWorkflow", () => {
     // `path` 修订（docs/dynamic-workflow/launch.md「Script files」的常态）同样不带 `script`，但它交上来的
     // 是一份**改过的**脚本：说「脚本不变」就是对用户撒谎。
     expect(
-      readWorkflowAmendScriptInherited({ run_id: "r", path: ".zcode/workflow-drafts/x.dwf.ts" }),
+      readWorkflowAmendScriptInherited({ run_id: "r", path: ".hcode/workflow-drafts/x.dwf.ts" }),
     ).toBe(false);
     // 沿用脚本且前驱的文件仍可记：回填的入参同时带 `path` 与 flag，flag 说了算。
     expect(
       readWorkflowAmendScriptInherited({
         run_id: "r",
         script: "x",
-        path: "/abs/.zcode/workflow-drafts/x.dwf.ts",
+        path: "/abs/.hcode/workflow-drafts/x.dwf.ts",
         predecessor: { status: "completed", script_inherited: true },
       }),
     ).toBe(true);
@@ -1892,7 +1892,7 @@ describe("CreateWorkflowToolCallBlock as AmendWorkflow", () => {
     ],
     // 带了脚本来源：这次修订要编译，不是就地生效的形状。
     [{ run_id: "r", max_concurrency: 4, script: "phase('a')" }, undefined],
-    [{ run_id: "r", max_concurrency: 4, path: ".zcode/workflow-drafts/x.dwf.ts" }, undefined],
+    [{ run_id: "r", max_concurrency: 4, path: ".hcode/workflow-drafts/x.dwf.ts" }, undefined],
     // 还改了模型或名字：那要换一条 run，不是就地生效。
     [{ run_id: "r", max_concurrency: 4, subagent_model: "zhipu/glm-5.3" }, undefined],
     [{ run_id: "r", max_concurrency: 4, name: "Research pipeline" }, undefined],

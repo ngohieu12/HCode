@@ -255,7 +255,7 @@ process.stdin.on("data", (chunk) => {
     if (msg.method === "v4/attachment/previewSource" && msg.id !== undefined) {
       send({ id: msg.id, result: {
         kind: "local_path",
-        path: "/tmp/.zcode/video-cache/demo.mp4",
+        path: "/tmp/.hcode/video-cache/demo.mp4",
         mediaType: "video/mp4"
       } });
     }
@@ -1465,7 +1465,7 @@ describe("zcodeAgentService v4 conversation channel", () => {
       });
       expect(authorizeLocalMediaPreviewPath).toHaveBeenCalledOnce();
       expect(authorizeLocalMediaPreviewPath).toHaveBeenCalledWith(
-        "/tmp/.zcode/video-cache/demo.mp4",
+        "/tmp/.hcode/video-cache/demo.mp4",
       );
       await expect(mobile.service.attachmentPreviewSourceV4(input)).resolves.toEqual({
         kind: "chunked",

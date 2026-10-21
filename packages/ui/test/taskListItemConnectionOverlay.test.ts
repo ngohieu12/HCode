@@ -25,9 +25,9 @@ function renderRemoteTask(variant: "default" | "timeline") {
     taskId: "remote-task",
     traceId: "remote-trace",
     title: "Remote task",
-    workspacePath: "/home/dev/.zcode/workspace/default",
+    workspacePath: "/home/dev/.hcode/workspace/default",
     workspaceIdentity:
-      "remote:server:source-1:/home/dev/.zcode/workspace/default",
+      "remote:server:source-1:/home/dev/.hcode/workspace/default",
     createdAt: 1,
     updatedAt: 1,
     mode: "default",

@@ -21,7 +21,7 @@ export function resolveApprovedPlanFilePath(input: {
 }): string {
   return join(
     input.workspaceRoot,
-    ".zcode",
+    ".hcode",
     "plans",
     `plan-${sanitizePlanFileSessionId(input.sessionId)}.md`,
   );

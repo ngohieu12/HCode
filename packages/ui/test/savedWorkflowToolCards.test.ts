@@ -21,7 +21,7 @@ import { SaveWorkflowToolCallBlock } from "@/ToolCallBlocks/renderers/save-workf
 import type { ToolCallBlockRenderContext } from "@/ToolCallBlocks/shared.js";
 
 const SCRIPT = 'const r = await agent("a").ask<string>("检查");';
-const SAVED_PATH = "/workspace/.zcode/workflows/release-check.dwf.ts";
+const SAVED_PATH = "/workspace/.hcode/workflows/release-check.dwf.ts";
 
 const LIST_RESULT = {
   workflows: [
@@ -37,10 +37,10 @@ const LIST_RESULT = {
       name: "translate-docs",
       description: "批量翻译文档目录",
       scope: "project",
-      path: "/workspace/.zcode/workflows/translate-docs.dwf.ts",
+      path: "/workspace/.hcode/workflows/translate-docs.dwf.ts",
     },
   ],
-  invalid: [{ path: "/workspace/.zcode/workflows/broken.dwf.ts", reason: "yaml_invalid" }],
+  invalid: [{ path: "/workspace/.hcode/workflows/broken.dwf.ts", reason: "yaml_invalid" }],
 };
 
 function buildContext(
@@ -397,7 +397,7 @@ describe("ListSavedWorkflowsToolCallBlock", () => {
               argNames: ["target", "skipTests"],
             },
           ],
-          invalid: [{ path: "/workspace/.zcode/workflows/broken.dwf.ts", reason: "yaml_invalid" }],
+          invalid: [{ path: "/workspace/.hcode/workflows/broken.dwf.ts", reason: "yaml_invalid" }],
         },
       },
     };
@@ -432,7 +432,7 @@ describe("ListSavedWorkflowsToolCallBlock", () => {
     renderCard(ListSavedWorkflowsToolCallBlock, buildContext(buildListToolCall()));
 
     expect(screen.getByText("1 file could not be read")).toBeTruthy();
-    expect(screen.getByText("/workspace/.zcode/workflows/broken.dwf.ts")).toBeTruthy();
+    expect(screen.getByText("/workspace/.hcode/workflows/broken.dwf.ts")).toBeTruthy();
     // 坏文件不该把好文件挤掉。
     expect(screen.getByText("release-check")).toBeTruthy();
   });
@@ -475,7 +475,7 @@ describe("ListSavedWorkflowsToolCallBlock", () => {
           name: "deep-research",
           description: "深度调研",
           scope: "global",
-          path: "/home/.zcode/workflows/deep-research.dwf.ts",
+          path: "/home/.hcode/workflows/deep-research.dwf.ts",
         },
       ],
       invalid: [],

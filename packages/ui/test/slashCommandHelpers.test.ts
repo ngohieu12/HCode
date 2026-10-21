@@ -205,7 +205,7 @@ describe("slashCommandHelpers", () => {
           id: "glm:workspace:code-review",
           name: "code-review",
           description: "review code",
-          path: "/repo/.zcode/skills/code-review/SKILL.md",
+          path: "/repo/.hcode/skills/code-review/SKILL.md",
           scope: "workspace",
           pluginName: undefined,
         },
@@ -222,7 +222,7 @@ describe("slashCommandHelpers", () => {
         description: "Workspace · review code",
         keywords: ["code-review", "review code", "workspace", "skill", "skills"],
         data: {
-          path: "/repo/.zcode/skills/code-review/SKILL.md",
+          path: "/repo/.hcode/skills/code-review/SKILL.md",
           scope: "workspace",
         },
       },

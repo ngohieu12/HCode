@@ -20,9 +20,9 @@ async function fixture() {
   return root;
 }
 const paths = [
-  "/workspace/.zcode/agents/reviewer.md",
-  String.raw`D:\workspace\.zcode\agents\reviewer.md`,
-  String.raw`\\server\share\workspace\.zcode\agents\reviewer.md`,
+  "/workspace/.hcode/agents/reviewer.md",
+  String.raw`D:\workspace\.hcode\agents\reviewer.md`,
+  String.raw`\\server\share\workspace\.hcode\agents\reviewer.md`,
 ];
 const message = (path: string, pid = 42) =>
   [

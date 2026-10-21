@@ -60,7 +60,7 @@ function createParentContextSourcePort() {
           sources: [
             {
               scope: "user" as const,
-              filePath: "/Users/test/.zcode/AGENTS.md",
+              filePath: "/Users/test/.hcode/AGENTS.md",
               fileName: "AGENTS.md",
               content: USER_AGENTS_INSTRUCTION,
               bytesRead: USER_AGENTS_INSTRUCTION.length,

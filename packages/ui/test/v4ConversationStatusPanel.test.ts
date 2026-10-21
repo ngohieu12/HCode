@@ -515,13 +515,13 @@ describe("ConversationStatusPanel", () => {
         toolCallId: "plan-9",
         markdown: "# 最新计划",
         title: "最新计划",
-        planFilePath: "/repo/.zcode/plans/latest.md",
+        planFilePath: "/repo/.hcode/plans/latest.md",
       }),
     ).toEqual({
       parentSessionId: "parent-session",
       toolCallId: "plan-9",
       markdown: "# 最新计划",
-      planFilePath: "/repo/.zcode/plans/latest.md",
+      planFilePath: "/repo/.hcode/plans/latest.md",
     });
   });
 

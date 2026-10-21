@@ -58,7 +58,7 @@ export async function prepareCliProviderRuntimeEnv(
       entrypoint: options.entrypoint ?? process.argv[1],
     }));
   const personalFilePath =
-    explicitPersonal ?? join(dataBaseDir, ".zcode", "v2", PERSONAL_PROVIDER_CONFIG_FILE_NAME);
+    explicitPersonal ?? join(dataBaseDir, ".hcode", "v2", PERSONAL_PROVIDER_CONFIG_FILE_NAME);
   // 内置 Provider 只使用随包发布的基线文件，不再物化 CDN Active 缓存，也不再下载覆盖。
   return {
     [ZCODE_BUILTIN_PROVIDER_CONFIG_FILE_ENV]: zcodeBuiltinFilePath,
