@@ -39,6 +39,18 @@ function createServices(params: {
 }
 
 describe("ensureProviderFamilyDomainMigration", () => {
+  it("HCode 未装配 OAuth 服务时不抛错，并标记迁移完成", async () => {
+    const { oauthService: _removed, ...services } = createServices({
+      selectableProviderIds: ["custom-provider"],
+    });
+
+    await expect(ensureProviderFamilyDomainMigration(services)).resolves.toBeUndefined();
+
+    expect(services.update).toHaveBeenCalledWith(
+      expect.objectContaining({ providerFamilyDomainMigrated: true }),
+    );
+  });
+
   it("从旧 active OAuth provider 迁移 providerFamilyDomain", async () => {
     const services = createServices({ activeProvider: "zai" });
 

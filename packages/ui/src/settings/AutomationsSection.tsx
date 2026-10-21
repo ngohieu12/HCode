@@ -41,6 +41,7 @@ import { cn } from "@/components/lib/utils.js";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { useServices } from "@/hooks/useServices.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog.js";
 import { usePlatform } from "@/hooks/usePlatform.js";
 import {
@@ -494,7 +495,10 @@ export function AutomationsSection({
 }: AutomationsSectionProps) {
   const { intl, locale } = useZCodeIntl();
   const platform = usePlatform();
-  const { clientScenesService, offPeakTaskService, zcodeAgentService } = useServices();
+  const services = useServices();
+  const { clientScenesService, zcodeAgentService } = services;
+  // HCode 不装配闲时任务服务：缺失时不读取/轮询闲时任务，避免把“服务不存在”写成 store.error。
+  const offPeakTaskService = getRemovedAccountService(services, "offPeakTaskService");
   const confirmDialog = useConfirmDialog();
   const { openCodingPlanUpgrade } = useCodingPlanUpgradeDialog();
   const providerSettingsRead = useProviderSettingsView();
@@ -714,6 +718,7 @@ export function AutomationsSection({
   useEffect(() => {
     const nextTakeAt = offPeakTakeNumberAvailability?.nextTakeAt;
     if (offPeakTakeNumberAvailability?.canTakeNumber !== false || nextTakeAt === undefined) return;
+    if (!offPeakTaskService) return;
     const delay = Math.max(0, nextTakeAt - Date.now()) + 100;
     const timer = setTimeout(() => {
       setNow(Date.now());
@@ -737,7 +742,7 @@ export function AutomationsSection({
 
   // 位次/状态轮询刷新（host offPeakTaskSync 写库，renderer 每 10s 读快照；无任务不轮）。
   useEffect(() => {
-    if (view.mode !== "list" || offPeakTasks.length === 0) return;
+    if (view.mode !== "list" || offPeakTasks.length === 0 || !offPeakTaskService) return;
     const timer = setInterval(() => {
       void offPeakRefresh(offPeakTaskService);
     }, 10_000);
@@ -749,8 +754,12 @@ export function AutomationsSection({
     try {
       await Promise.all([
         refresh(zcodeAgentService),
-        offPeakRefresh(offPeakTaskService),
-        ...(offPeakGrayEnabled ? [offPeakRefreshCodingPlanSupport(offPeakTaskService)] : []),
+        ...(offPeakTaskService
+          ? [
+              offPeakRefresh(offPeakTaskService),
+              ...(offPeakGrayEnabled ? [offPeakRefreshCodingPlanSupport(offPeakTaskService)] : []),
+            ]
+          : []),
       ]);
       setNow(Date.now());
     } finally {
@@ -842,7 +851,8 @@ export function AutomationsSection({
   useEffect(() => {
     if (!isOffPeakDetailNavigationId(openAutomationId)) return;
     let disposed = false;
-    void offPeakRefresh(offPeakTaskService).finally(() => {
+    const ready = offPeakTaskService ? offPeakRefresh(offPeakTaskService) : Promise.resolve();
+    void ready.finally(() => {
       if (disposed) return;
       // review：refresh 不 reject，失败只写 store.error；把它随就绪信号一起带出。
       setOffPeakNavRefreshed({

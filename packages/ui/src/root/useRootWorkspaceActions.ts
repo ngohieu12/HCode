@@ -44,6 +44,7 @@ import {
 import { resolveWorkbenchNewTaskTarget } from "@/conversation-workspace-target/workbenchTarget.js";
 import type { WorkbenchNewTaskTarget } from "@/conversation-workspace-target/workbenchTarget.js";
 import { useWorkbenchGroupStore } from "@/v4/workbenchGroupStore.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 import {
   persistV4ComposerDraft,
   readV4ComposerDraft,
@@ -428,6 +429,8 @@ export function useRootWorkspaceActions({
     setWorkspaceActionError,
   });
 
+  // HCode 不装配 OAuth 服务；退出仍清理本地展示态与 Provider 选择。
+  const oauthService = getRemovedAccountService(services, "oauthService");
   const handleLogout = useCallback(async () => {
     let runningAgentSessionCount: number | null = null;
     try {
@@ -473,7 +476,7 @@ export function useRootWorkspaceActions({
     const nextProviderFamilyDomain = resolveLogoutProviderFamilyDomain({
       currentDomain: settingsBeforeLogout.providerFamilyDomain,
     });
-    await services.oauthService.logout();
+    await oauthService?.logout();
     await updateAppSettings({
       providerFamilyDomain: (nextProviderFamilyDomain ?? "") as AppSettings["providerFamilyDomain"],
       providerFamilyDomainUpdatedAt: Date.now(),
@@ -497,7 +500,7 @@ export function useRootWorkspaceActions({
     refreshProviderState,
     onProviderFamilyDomainClearedAfterLogout,
     platform,
-    services.oauthService,
+    oauthService,
     services.modelSelectionService,
     services.settingService,
     setOAuthError,

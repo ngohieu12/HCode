@@ -1,6 +1,10 @@
 import type { StartPlanPreviewConfig } from "@zcode/shared";
 import { useCallback, useEffect, useState } from "react";
 import { useOptionalServices } from "@/hooks/useServices.js";
+import {
+  getRemovedAccountService,
+  type RemovedAccountService,
+} from "@/lib/removedAccountServices.js";
 import { logger } from "@/logger.js";
 import { normalizeErrorMessage as normalizeCodingPlanErrorMessage } from "@/settings/model-provider-section/useCodingPlanProducts.js";
 
@@ -16,7 +20,7 @@ let previewRequest: Promise<StartPlanPreviewConfig | null> | null = null;
 
 export function useStartPlanPreview(options?: { enabled?: boolean }) {
   const services = useOptionalServices();
-  const service = services?.codingPlanSubscriptionService;
+  const service = getRemovedAccountService(services, "codingPlanSubscriptionService");
   const enabled = options?.enabled !== false;
   const [state, setState] = useState<StartPlanPreviewState>({
     preview: previewCache?.preview ?? null,
@@ -85,9 +89,7 @@ export function clearStartPlanPreviewCacheForTest() {
   previewRequest = null;
 }
 
-export function primeStartPlanPreviewCacheForTest(
-  preview: StartPlanPreviewConfig | null,
-) {
+export function primeStartPlanPreviewCacheForTest(preview: StartPlanPreviewConfig | null) {
   previewCache = {
     preview,
     expiresAt: Date.now() + START_PLAN_PREVIEW_CACHE_TTL_MS,
@@ -96,7 +98,7 @@ export function primeStartPlanPreviewCacheForTest(
 }
 
 async function loadStartPlanPreview(
-  service: NonNullable<ReturnType<typeof useOptionalServices>>["codingPlanSubscriptionService"],
+  service: RemovedAccountService,
 ): Promise<StartPlanPreviewConfig | null> {
   const now = Date.now();
   if (previewCache && previewCache.expiresAt > now) {

@@ -15,6 +15,7 @@ import { useConfirmDialogStore } from "@/store/confirmDialogStore.js";
 import { resolveStartPlanRecommendation } from "@/lib/startPlanRecommendation.js";
 import { toast } from "@/components/ui/toast.js";
 import { logger } from "@/logger.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 /** 推荐只编辑本次提交的选择；设置与额度仍由 App/Host 的原服务拥有。 */
 export function useStartPlanRecommendation(
@@ -27,14 +28,17 @@ export function useStartPlanRecommendation(
   // Registry 已完成登录品牌、权益、模型配置校验，不从展示名称推测执行身份。
   const start = view?.providers.find((provider) => isStartPlanModelProviderId(provider.providerId));
   const settings = useProviderSettingsView();
-  const entitlement = useUsageEntitlementWithService(services?.usageStatsService, {
-    ...buildStartPlanEntitlementOptions(
-      settings.state.status === "ready" ? settings.state.view : null,
-      start?.providerId ?? "",
-    ),
-    refreshOnMount: true,
-    mountRefreshReason: "access",
-  });
+  const entitlement = useUsageEntitlementWithService(
+    getRemovedAccountService(services, "usageStatsService"),
+    {
+      ...buildStartPlanEntitlementOptions(
+        settings.state.status === "ready" ? settings.state.view : null,
+        start?.providerId ?? "",
+      ),
+      refreshOnMount: true,
+      mountRefreshReason: "access",
+    },
+  );
   return useCallback(
     async (selection: ModelSelection): Promise<ModelSelection | null> => {
       // 提交不等待网络；过期额度跳过推荐，访问刷新沿用一分钟节流与失败退避。

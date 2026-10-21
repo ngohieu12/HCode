@@ -36,6 +36,7 @@ import type {
   CodingPlanQuotaResetAutoPlayedSlot,
 } from "@/store/codingPlanQuotaResetState.js";
 import { useZCodeStoreWithDefault } from "@/store/StoreProvider.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 const STATUS_FRESHNESS_MS = 1_500;
 const USE_STATUS_RETRY_DELAYS_MS = [0, 250, 750, 1_500] as const;
@@ -373,7 +374,7 @@ export function useCodingPlanQuotaResetUi({
 }): CodingPlanQuotaResetUiController {
   const { intl } = useZCodeIntl();
   const services = useOptionalBaseWorkspaceServices();
-  const usageStatsService = services?.usageStatsService;
+  const usageStatsService = getRemovedAccountService(services, "usageStatsService");
   const stableAccountAccess = useStableAccountAccess(accountAccess);
   const scope = useMemo<CodingPlanResetScopeRequest | null>(() => {
     const normalizedProviderId = preferredProviderId?.trim();

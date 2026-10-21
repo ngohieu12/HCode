@@ -13,6 +13,7 @@ import {
 } from "@/settings/codingPlanUpgradeLoginRecovery.js";
 import { CodingPlanEmbeddedWebviewDialog } from "@/settings/CodingPlanEmbeddedWebviewDialog.js";
 import { logger } from "@/logger.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 export { isCodingPlanPurchaseAuthPending } from "@/settings/model-provider-section/codingPlanPurchaseAuth.js";
 export {
@@ -68,8 +69,13 @@ export function CodingPlanUpgradeDialog({
   onClose,
   onOpenResult,
 }: CodingPlanUpgradeDialogProps) {
-  const { providerSettingsService, credentialService, codingPlanSubscriptionService } =
-    useServices();
+  const services = useServices();
+  const { providerSettingsService, credentialService } = services;
+  // HCode 不装配 Coding Plan 订阅服务：购买完成后不再刷新团队套餐。
+  const codingPlanSubscriptionService = getRemovedAccountService(
+    services,
+    "codingPlanSubscriptionService",
+  );
   const providerSettingsRead = useProviderSettingsView();
   const providerSettingsView =
     providerSettingsRead.state.status === "ready" ? providerSettingsRead.state.view : null;
@@ -99,7 +105,7 @@ export function CodingPlanUpgradeDialog({
           refreshCodingPlanEntitlements,
           refreshProviderState,
           refreshTeamPlanProducts:
-            teamPlanFamily !== null
+            teamPlanFamily !== null && codingPlanSubscriptionService
               ? () =>
                   // 购买完成后会先关闭 webview 弹窗，弹窗内 hook 随即卸载。
                   // 这里直接走 service 拉取当前 family 的团队项目，避免刷新请求被卸载时序吞掉。

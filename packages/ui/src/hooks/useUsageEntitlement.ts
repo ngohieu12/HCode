@@ -27,6 +27,7 @@ import {
   type UsageEntitlementRefreshReason,
   type UsageEntitlementRequestOptions,
 } from "@/lib/usageEntitlementRefreshPolicy.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 interface UsageEntitlementState {
   snapshot: UsageEntitlementSnapshot | null;
@@ -145,7 +146,10 @@ export interface UseUsageEntitlementOptions {
 
 export function useUsageEntitlement(options: UseUsageEntitlementOptions = {}) {
   const services = useOptionalBaseWorkspaceServices();
-  return useUsageEntitlementWithService(services?.usageStatsService, options);
+  return useUsageEntitlementWithService(
+    getRemovedAccountService(services, "usageStatsService"),
+    options,
+  );
 }
 
 export function useUsageEntitlementWithService(

@@ -8,6 +8,7 @@ import {
 import type { OAuthProviderId, UsageEntitlementSnapshot, ZCodeAccountAccess } from "@zcode/shared";
 
 import { logger } from "@/logger.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 import { resolveAccountProviderInspectionAccess } from "@/lib/accountProviderAccess.js";
 import {
   type ModelProviderFamilyConnectionSelection,
@@ -28,8 +29,11 @@ async function getUsageEntitlementSnapshotOrNull(params: {
   providerId: string;
   accountAccess?: ZCodeProviderAccountAccess | ZCodeAccountAccess;
 }): Promise<UsageEntitlementSnapshot | null> {
+  const usageStatsService = getRemovedAccountService(params.services, "usageStatsService");
+  // HCode 不装配用量/权益服务：没有可读的权益快照。
+  if (!usageStatsService) return null;
   try {
-    return await params.services.usageStatsService.getEntitlementSnapshot({
+    return await usageStatsService.getEntitlementSnapshot({
       includeSubscription: true,
       preferredProviderId: params.providerId,
       accountAccess: params.accountAccess,

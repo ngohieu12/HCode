@@ -6,6 +6,7 @@ import {
 } from "@/lib/remoteWorkspaceServiceError.js";
 import { buildConversationShareItems } from "@/v4/conversationShareItems.js";
 import { resolveSelectionSideInheritedModel } from "@/lib/selectionSideInheritedModel.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 import { useStartPlanRecommendation } from "@/hooks/useStartPlanRecommendation.js";
 import type { SessionCreateSource } from "@zcode/shared";
 import { reportSessionCreate } from "@/lib/sessionCreateTelemetry.js";
@@ -675,14 +676,12 @@ export function SessionPane({
     fileRewindPreview,
   } = useV4Conversation();
   const platform = useOptionalPlatform();
-  const {
-    conversationShareService,
-    highspeedCardService,
-    modelSelectionService,
-    usageStatsService,
-    zcodeSessionService,
-    zcodeTaskService,
-  } = useServices();
+  const services = useServices();
+  const { conversationShareService, modelSelectionService, zcodeSessionService, zcodeTaskService } =
+    services;
+  // HCode 不装配高速卡 / 用量服务：缺失时不抽卡、不查快照，本轮按普通模型发送。
+  const highspeedCardService = getRemovedAccountService(services, "highspeedCardService");
+  const usageStatsService = getRemovedAccountService(services, "usageStatsService");
   const { intl, locale } = useZCodeIntl();
   const slashCommands = useSlashCommands(workspacePath, workspaceIdentity);
   const baseWorkspaceServices = useBaseWorkspaceServices();
@@ -1189,7 +1188,7 @@ export function SessionPane({
   );
   const invalidateActiveHighspeedCard = useCallback(
     (cardId: string, failureKey: string) => {
-      if (!claimHighspeedCardInvalidation(failureKey)) return;
+      if (!highspeedCardService || !claimHighspeedCardInvalidation(failureKey)) return;
       void highspeedCardService
         .invalidateCard(cardId)
         .then(() => {
@@ -1289,7 +1288,7 @@ export function SessionPane({
   }
   useEffect(() => {
     let disposed = false;
-    if (!sessionId) {
+    if (!sessionId || !highspeedCardService) {
       setActiveHighspeedCard(null);
       return () => undefined;
     }
@@ -1448,7 +1447,11 @@ export function SessionPane({
     }
 
     const autoShareNow = Date.now();
-    for (const card of listExpiredHighspeedCardsAwaitingTps(sessionId, autoShareNow)) {
+    const expiredCardsAwaitingTps = highspeedCardService
+      ? listExpiredHighspeedCardsAwaitingTps(sessionId, autoShareNow)
+      : [];
+    for (const card of expiredCardsAwaitingTps) {
+      if (!highspeedCardService) break;
       if (!claimHighspeedHealthyAttempt(card.cardId, card.allTurnsCompleted)) {
         // 诊断（debug）：每卡到期一次 + 完成后补查一次，机会用尽仍无 TPS 时分享链路必然停摆。
         logger.debug("[highspeed] 卡级 healthy 查询机会已用尽，仍无有效 TPS", {
@@ -1860,7 +1863,7 @@ export function SessionPane({
   const codingPlanUpgradeDialog = useOptionalCodingPlanUpgradeDialog();
   const openSettingsTab = useOptionalTabStore((state) => state.openSettingsTab);
   const billingDiscount = useCodingPlanBillingDiscountFromService(
-    baseWorkspaceServices.codingPlanSubscriptionService,
+    getRemovedAccountService(baseWorkspaceServices, "codingPlanSubscriptionService"),
   );
   const projectDirectory = useOptionalProjectDirectory();
   const commitCreatedTask = projectDirectory?.commitCreatedTask;
@@ -1982,7 +1985,7 @@ export function SessionPane({
     sharedSettings?.providerFamilyDomain
       ? sharedSettings.providerFamilyConnectionSelections?.[sharedSettings.providerFamilyDomain]
       : undefined,
-    baseWorkspaceServices.usageStatsService,
+    getRemovedAccountService(baseWorkspaceServices, "usageStatsService"),
   );
   const appFollowupMode = resolveAppFollowupMode(sharedSettings);
   const messageStreamShowReasoning = sharedSettings?.messageStreamShowReasoning ?? true;
@@ -3393,6 +3396,7 @@ export function SessionPane({
         // 不完整报 "Reasoning level is required" 让整轮发送失败。优先取提交选择的 options，
         // 再回落 thought（CLI 投影的生效档位）；空串表示该模型无档位，交给 service 省略 options。
         const { provider, model, reasoningLevel } = selection;
+        if (!highspeedCardService) return null;
         try {
           const sendStartedAt = Date.now();
           const result = await highspeedCardService.prepareTurn({
@@ -4928,7 +4932,7 @@ export function SessionPane({
     phase: snapshot?.control.phase ?? null,
     providerId: snapshot?.config.provider ?? null,
     modelId: snapshot?.config.model ?? null,
-    usageStatsService: baseWorkspaceServices.usageStatsService,
+    usageStatsService: getRemovedAccountService(baseWorkspaceServices, "usageStatsService"),
     mcpUnavailableNotice,
   });
   const composerError =

@@ -16,6 +16,7 @@ import {
   type EnterpriseCodingPlanProductDisplay,
 } from "@/settings/model-provider-section/enterpriseCodingPlanProducts.js";
 import { normalizeErrorMessage } from "@/settings/model-provider-section/useCodingPlanProducts.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 interface EnterpriseCodingPlanProductsState {
   snapshot: EnterpriseCodingPlanProductsSnapshot | null;
@@ -100,7 +101,7 @@ export function useEnterpriseCodingPlanProducts({
   family?: ProviderFamilyDomain;
 }) {
   const services = useOptionalServices();
-  const service = services?.codingPlanSubscriptionService;
+  const service = getRemovedAccountService(services, "codingPlanSubscriptionService");
   const authScope = useZCodeStoreWithDefault(
     (state) => (state.user ? state.user.id + ":" + state.authSessionSeq : "signed-out"),
     "unscoped",

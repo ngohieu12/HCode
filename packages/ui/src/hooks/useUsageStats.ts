@@ -11,6 +11,7 @@ import type {
 } from "@zcode/shared";
 import { logger } from "@/logger.js";
 import { useServices } from "@/hooks/useServices.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 import { useStableAccountAccess } from "@/hooks/useStableAccountAccess.js";
 import { USAGE_ENTITLEMENT_ACCESS_REFRESH_MS } from "@/lib/usageEntitlementRefreshPolicy.js";
 
@@ -80,11 +81,12 @@ export function useUsageStats(
     allowEnvApiKey?: boolean;
   } = {},
 ) {
-  const { usageStatsService } = useServices();
+  // HCode 不装配用量/权益服务：缺失时等同于禁用查询，展示空快照。
+  const usageStatsService = getRemovedAccountService(useServices(), "usageStatsService");
   const [state, setState] = useState<UsageStatsState>(INITIAL_STATE);
   const requestVersionRef = useRef(0);
   const dataSource = options.dataSource;
-  const enabled = options.enabled ?? true;
+  const enabled = (options.enabled ?? true) && usageStatsService !== undefined;
   const preferredProviderId = options.preferredProviderId;
   const accountAccess = useStableAccountAccess(options.accountAccess);
   const requirePreferredProvider = options.requirePreferredProvider === true;
@@ -99,7 +101,7 @@ export function useUsageStats(
   const lastRequestScopeRef = useRef(requestScope);
 
   const refresh = useCallback(async () => {
-    if (!enabled) {
+    if (!enabled || !usageStatsService) {
       return;
     }
 
@@ -250,7 +252,8 @@ export function useCodingPlanUsageStats(
     customEndDate?: string | null;
   },
 ) {
-  const { usageStatsService } = useServices();
+  // HCode 不装配用量/权益服务：缺失时等同于禁用查询，展示空快照。
+  const usageStatsService = getRemovedAccountService(useServices(), "usageStatsService");
   const requestScopeKey = [
     range,
     options.preferredProviderId ?? "",
@@ -258,7 +261,9 @@ export function useCodingPlanUsageStats(
     options.customStartDate?.trim() ?? "",
     options.customEndDate?.trim() ?? "",
   ].join("\0");
-  const cachedUsage = codingPlanUsageAccessCache.get(usageStatsService)?.get(requestScopeKey);
+  const cachedUsage = usageStatsService
+    ? codingPlanUsageAccessCache.get(usageStatsService)?.get(requestScopeKey)
+    : undefined;
   const [state, setState] = useState<CodingPlanUsageStatsState>({
     snapshot: cachedUsage?.snapshot ?? null,
     loading: false,
@@ -279,7 +284,7 @@ export function useCodingPlanUsageStats(
 
   const refresh = useCallback(
     async (refreshOptions: { force?: boolean } = {}) => {
-      if (!enabled || !preferredProviderId || !accountAccess) {
+      if (!enabled || !usageStatsService || !preferredProviderId || !accountAccess) {
         latestSnapshotRef.current = null;
         setState({ snapshot: null, loading: false, error: null });
         return;
