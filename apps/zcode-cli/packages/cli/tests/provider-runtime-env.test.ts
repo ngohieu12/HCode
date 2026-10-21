@@ -58,7 +58,7 @@ test("resolves the bundled ZCode Built-in Config and the shared Personal Config"
   );
   assert.equal(
     prepared[ZCODE_PERSONAL_PROVIDER_CONFIG_FILE_ENV],
-    join(root, "home/.zcode/v2/provider_config.json"),
+    join(root, "home/.hcode/v2/provider_config.json"),
   );
 
   for (const argv of [["login"], ["logout"]]) {

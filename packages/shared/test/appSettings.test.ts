@@ -71,7 +71,7 @@ describe("app settings", () => {
   it("round-trips Source-scoped conversation backing paths without extending strict project history", () => {
     const record = {
       "11111111-1111-4111-8111-111111111111": {
-        workspacePath: "/home/dev/.zcode/workspace/default",
+        workspacePath: "/home/dev/.hcode/workspace/default",
         lastResolvedAt: 123,
       },
     };
@@ -89,7 +89,7 @@ describe("app settings", () => {
       appSettingsSchema.safeParse({
         remoteConversationWorkspaceBySourceServerId: {
           "11111111-1111-4111-8111-111111111111": {
-            workspacePath: "/home/dev/.zcode/workspace/default",
+            workspacePath: "/home/dev/.hcode/workspace/default",
             lastResolvedAt: -1,
           },
         },

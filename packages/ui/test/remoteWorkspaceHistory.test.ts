@@ -41,7 +41,7 @@ describe("remoteWorkspaceHistory helpers", () => {
   });
 
   it("restores a rollback conversation identity from its bound Source profile", () => {
-    const workspacePath = "/home/dev/.zcode/workspace/default";
+    const workspacePath = "/home/dev/.hcode/workspace/default";
     const legacyIdentity = `remote:ssh:localhost:2222:dev:${workspacePath}`;
     const stableIdentity = `remote:server:source-1:${workspacePath}`;
 
@@ -91,7 +91,7 @@ describe("remoteWorkspaceHistory helpers", () => {
   });
 
   it("keeps an ambiguous rollback conversation identity fail-closed", () => {
-    const workspacePath = "/home/dev/.zcode/workspace/default";
+    const workspacePath = "/home/dev/.hcode/workspace/default";
     const legacyIdentity = `remote:ssh:localhost:2222:dev:${workspacePath}`;
     const target = {
       kind: "ssh" as const,

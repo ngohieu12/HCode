@@ -36,7 +36,7 @@ pnpm --filter @zcode/prompt-trajectory derive -- \
   --out /tmp/zcode-prompt-trajectory/basic-live
 
 pnpm --filter @zcode/prompt-trajectory model-io -- \
-  --input ~/.zcode/cli/rollout/model-io-<session>.jsonl \
+  --input ~/.hcode/cli/rollout/model-io-<session>.jsonl \
   --out /tmp/zcode-prompt-trajectory/model-io-session
 ```
 

@@ -79,7 +79,7 @@ describe("V4 conversation E2E preparation", () => {
   });
 
   it.each([
-    { path: "/Users/dev/e2e/.zcode/workspace/generated", project: "" },
+    { path: "/Users/dev/e2e/.hcode/workspace/generated", project: "" },
     { session: "existing-session" },
     { text: "unsent draft from previous case" },
   ])("returns to the fixture project before checking its cwd: %j", async (state) => {

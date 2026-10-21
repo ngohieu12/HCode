@@ -811,15 +811,15 @@ describe("SourceServerManagementPanel", () => {
             },
             {
               sourceServerId: "source-1",
-              workspacePath: "/remote/.zcode/workspace/default",
-              workspaceIdentity: "remote:server:source-1:/remote/.zcode/workspace/default",
+              workspacePath: "/remote/.hcode/workspace/default",
+              workspaceIdentity: "remote:server:source-1:/remote/.hcode/workspace/default",
             },
           ],
         } as never,
         "source-1",
         {
           "source-1": {
-            workspacePath: "/remote/.zcode/workspace/default",
+            workspacePath: "/remote/.hcode/workspace/default",
             lastResolvedAt: 1,
           },
         },

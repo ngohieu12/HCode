@@ -21,7 +21,7 @@ function workspaceHook(trustState: WorkspaceHookReviewTrustState): Hook {
     location: {
       source: "zcode",
       scope: "project",
-      directoryPath: "/workspace/.zcode",
+      directoryPath: "/workspace/.hcode",
       projectPath: "/workspace",
     },
     workspaceHook: {
@@ -29,7 +29,7 @@ function workspaceHook(trustState: WorkspaceHookReviewTrustState): Hook {
       declarationEnabled: true,
       runtimeHooksEnabled: true,
       configuredEnabled: true,
-      sourcePath: "/workspace/.zcode/config.json",
+      sourcePath: "/workspace/.hcode/config.json",
       reviewItemId: `review-${trustState}`,
       workspaceIdentity: "/workspace",
       bundleDigest: "a".repeat(64),

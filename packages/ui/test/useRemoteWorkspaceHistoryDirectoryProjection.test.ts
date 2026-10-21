@@ -18,7 +18,7 @@ import { createTabStore, isWorkspaceTab } from "@/store/tabStore.js";
 
 const PROFILE_ID = "69d675cc-7753-4fa2-a1a1-594281f2c833";
 const SOURCE_SERVER_ID = "82d727a5-8e58-4b82-b374-8081e7855666";
-const DEFAULT_PATH = "/home/dev/.zcode/workspace/default";
+const DEFAULT_PATH = "/home/dev/.hcode/workspace/default";
 const DEV_PATH = "/home/dev";
 const defaultLegacyIdentity = `remote:ssh:localhost:2222:dev:${DEFAULT_PATH}`;
 const devLegacyIdentity = `remote:ssh:localhost:2222:dev:${DEV_PATH}`;

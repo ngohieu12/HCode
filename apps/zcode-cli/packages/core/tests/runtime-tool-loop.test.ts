@@ -11270,7 +11270,7 @@ describe("AgentRuntime tool loop", () => {
       },
       handler: async () => ({
         content: "- 喜欢吃炸鸡\n",
-        filePath: "C:\\Users\\dev\\.zcode\\cli\\memories\\projects\\z-code\\memory\\MEMORY.md",
+        filePath: "C:\\Users\\dev\\.hcode\\cli\\memories\\projects\\z-code\\memory\\MEMORY.md",
         originalFile: null,
         structuredPatch: [
           {

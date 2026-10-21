@@ -83,8 +83,10 @@ Tệp [.env.example](.env.example) ở thư mục gốc cung cấp ví dụ về
 
 | Cấu hình                             | Mục đích                                                              |
 | ------------------------------------ | --------------------------------------------------------------------- |
-| `ZCODE_DATA_BASE_DIR`                | Thư mục gốc lưu dữ liệu ứng dụng; dữ liệu ghi vào `.zcode/` bên trong |
+| `ZCODE_DATA_BASE_DIR`                | Thư mục gốc lưu dữ liệu ứng dụng; dữ liệu ghi vào `.hcode/` bên trong |
 | `ZCODE_BUILTIN_PROVIDER_CONFIG_FILE` | Đường dẫn tệp cấu hình Provider cục bộ; dùng cấu hình tích hợp khi không đặt |
+
+HCode lưu dữ liệu riêng tại `~/.hcode` (cấu hình, task, workspace, CSDL CLI) và thư mục cấp dự án `<dự án>/.hcode`; dự án nháp mới nằm trong `~/HCodeProject`. Nhờ vậy HCode có thể cài song song với ZCode (`~/.zcode`) mà không dùng chung dữ liệu.
 
 Các biến runtime có thể đặt tường minh trong môi trường của lệnh khởi chạy. Cấu hình mặc định đi kèm client xem tại [config/README.md](config/README.md).
 

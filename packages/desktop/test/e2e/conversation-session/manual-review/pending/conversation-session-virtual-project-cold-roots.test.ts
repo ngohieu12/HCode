@@ -33,13 +33,13 @@ describe("虚拟项目多目录冷恢复", () => {
     for (const [i, root] of roots.entries()) {
       const name = ["A", "B", "C"][i];
       await mkdir(join(root, ".agents", "skills", "probe"), { recursive: true });
-      await mkdir(join(root, ".zcode", "agents"), { recursive: true });
+      await mkdir(join(root, ".hcode", "agents"), { recursive: true });
       await writeFile(
         join(root, ".agents", "skills", "probe", "SKILL.md"),
         `---\nname: probe\ndescription: E2E_VP16_SKILL_${name}\n---\nFixture skill.\n`,
       );
       await writeFile(
-        join(root, ".zcode", "agents", "review.md"),
+        join(root, ".hcode", "agents", "review.md"),
         `---\nname: review\ndescription: E2E_VP16_SUBAGENT_${name}\n---\nFixture agent.\n`,
       );
       await writeFile(

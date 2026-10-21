@@ -3,7 +3,7 @@
 set -euo pipefail
 
 APP_PATH="${1:-${ZCODE_MACOS_RELEASE_APP_PATH:-/Applications/ZCode.app}}"
-ZCODE_HOME_DIR="${ZCODE_HOME:-${HOME:+$HOME/.zcode}}"
+ZCODE_HOME_DIR="${ZCODE_HOME:-${HOME:+$HOME/.hcode}}"
 CUA_HELPER_INSTALL_VARIANT="${ZCODE_CUA_HELPER_INSTALL_VARIANT:-}"
 # 安装包身份与后端环境分轴：ZCODE_PREVIEW_IDENTITY=1 让生产后端的构建仍是 ZCode Preview。
 # 只认 "1"，与 CI workflow / release 门的精确比较同一套语义（其它拼写由 resolve_zcode_env 拒绝）。
@@ -50,7 +50,7 @@ same codesign/spctl checks and a local notarization staple check.
 
 Helper lookup order:
   1. ZCODE_CUA_HELPER_APP_PATH (CI passes the Helper bundled inside ZCode.app)
-  2. ${ZCODE_HOME:-$HOME/.zcode}/computer-use/<optional variant>/ZCode Computer Use.app
+  2. ${ZCODE_HOME:-$HOME/.hcode}/computer-use/<optional variant>/ZCode Computer Use.app
 
 CI release acceptance validates the copy actually shipped at
 ZCode.app/Contents/Resources/cua-helper/ZCode Computer Use.app. Post-install checks

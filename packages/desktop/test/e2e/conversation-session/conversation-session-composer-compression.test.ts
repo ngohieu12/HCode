@@ -192,7 +192,7 @@ describe("Composer 五档压缩", () => {
             localePreference: "en-US",
           }),
         );
-        const configFile = join(paths.homeDir, ".zcode", "cli", "config.json");
+        const configFile = join(paths.homeDir, ".hcode", "cli", "config.json");
         const config = JSON.parse(
           await readFile(configFile, "utf8").catch((error: NodeJS.ErrnoException) => {
             if (error.code === "ENOENT") return "{}";

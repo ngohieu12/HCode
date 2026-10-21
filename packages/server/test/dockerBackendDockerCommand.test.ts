@@ -107,7 +107,7 @@ describe("DockerBackend docker command resolution", () => {
     async (container) => {
       const backend = new DockerBackend({ kind: "docker", container });
       await expect(backend.exec("printf ok")).rejects.toThrow("Invalid Docker container reference");
-      await expect(backend.readFile("~/.zcode/ingress-token")).rejects.toThrow(
+      await expect(backend.readFile("~/.hcode/ingress-token")).rejects.toThrow(
         "Invalid Docker container reference",
       );
       expect(mocks.spawn).not.toHaveBeenCalled();
@@ -121,7 +121,7 @@ describe("DockerBackend docker command resolution", () => {
     async (container) => {
       const backend = new DockerBackend({ kind: "docker", container });
       await backend.exec("printf ok");
-      await backend.readFile("~/.zcode/ingress-token");
+      await backend.readFile("~/.hcode/ingress-token");
       expect(mocks.spawn).toHaveBeenCalledOnce();
       expect(mocks.execFile).toHaveBeenCalledOnce();
       expect(mocks.spawn.mock.calls[0]![1][2]).toBe(container.trim());
@@ -155,11 +155,11 @@ describe("DockerBackend docker command resolution", () => {
     });
     const backend = createBackend();
 
-    await backend.upload(fileURLToPath(import.meta.url), "~/.zcode/server/server.tgz");
+    await backend.upload(fileURLToPath(import.meta.url), "~/.hcode/server/server.tgz");
 
     expect(mocks.spawn).toHaveBeenCalledWith(
       RESOLVED_DOCKER_COMMAND,
-      ["exec", "-i", "zcode-dev", "sh", "-lc", "cat > '/root/.zcode/server/server.tgz'"],
+      ["exec", "-i", "zcode-dev", "sh", "-lc", "cat > '/root/.hcode/server/server.tgz'"],
       expect.any(Object),
     );
     expect(mocks.execFile.mock.calls.some((call) => (call[1] as string[])[0] === "cp")).toBe(false);
@@ -193,7 +193,7 @@ describe("DockerBackend docker command resolution", () => {
   it("直接读取 home 相对文件时不预跑 Docker 可用性、容器列表或 home 探测", async () => {
     const backend = createBackend();
 
-    await expect(backend.readFile("~/.zcode/server/run/ingress-token")).resolves.toBe(
+    await expect(backend.readFile("~/.hcode/server/run/ingress-token")).resolves.toBe(
       "test-ingress-token\n",
     );
 
@@ -202,7 +202,7 @@ describe("DockerBackend docker command resolution", () => {
     expect(mocks.execFile).toHaveBeenCalledTimes(1);
     expect(mocks.execFile).toHaveBeenCalledWith(
       RESOLVED_DOCKER_COMMAND,
-      ["exec", "-i", "zcode-dev", "sh", "-lc", "cat \"$HOME\"/'.zcode/server/run/ingress-token'"],
+      ["exec", "-i", "zcode-dev", "sh", "-lc", "cat \"$HOME\"/'.hcode/server/run/ingress-token'"],
       expect.any(Object),
       expect.any(Function),
     );
@@ -221,13 +221,13 @@ describe("DockerBackend docker command resolution", () => {
     const backend = createBackend();
     const progress: Array<{ uploadedBytes: number; totalBytes: number }> = [];
 
-    await backend.upload(localPath, "~/.zcode/tmp/attachment.bin", {
+    await backend.upload(localPath, "~/.hcode/tmp/attachment.bin", {
       onProgress: (event) => progress.push(event),
     });
 
     expect(mocks.spawn).toHaveBeenCalledWith(
       RESOLVED_DOCKER_COMMAND,
-      ["exec", "-i", "zcode-dev", "sh", "-lc", "cat > '/root/.zcode/tmp/attachment.bin'"],
+      ["exec", "-i", "zcode-dev", "sh", "-lc", "cat > '/root/.hcode/tmp/attachment.bin'"],
       expect.any(Object),
     );
     expect(progress.at(-1)).toEqual({

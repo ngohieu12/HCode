@@ -2604,7 +2604,7 @@ describe("restoreSourceRemoteWorkspaceGroup", () => {
 describe("resolveSourceRemoteConversationWorkspaceProjection", () => {
   it("ensures a missing Source conversation path and self-heals an exact open entry", async () => {
     const sourceServerId = "11111111-1111-4111-8111-111111111111";
-    const conversationPath = "/home/dev/.zcode/workspace/default";
+    const conversationPath = "/home/dev/.hcode/workspace/default";
     const conversation = createRemoteWorkspaceSessionEntry({
       workspacePath: conversationPath,
       workspaceIdentity: `remote:server:${sourceServerId}:${conversationPath}`,

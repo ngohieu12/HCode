@@ -121,7 +121,7 @@ function createMcpSyncServiceStub(): IMcpSyncService {
     })),
     checkRemoteUserMcpWriteAccess: vi.fn(async () => ({
       ok: true,
-      path: "/home/dev/.zcode/cli",
+      path: "/home/dev/.hcode/cli",
     })),
     importMcpServers: vi.fn(async () => ({ results: [] })),
   };
@@ -140,7 +140,7 @@ describe("RemoteMcpSyncDialog helpers", () => {
               config: { type: "stdio", command: "npx" },
               enabled: true,
               source: "zcode",
-              path: "/Users/alice/.zcode/cli/config.json",
+              path: "/Users/alice/.hcode/cli/config.json",
             },
           ],
         },
@@ -165,7 +165,7 @@ describe("RemoteMcpSyncDialog helpers", () => {
           config: { type: "stdio", command: "npx" },
           enabled: true,
           source: "zcode",
-          path: "/Users/me/.zcode/cli/config.json",
+          path: "/Users/me/.hcode/cli/config.json",
         },
         {
           id: "docs-id",
@@ -173,7 +173,7 @@ describe("RemoteMcpSyncDialog helpers", () => {
           config: { type: "http", url: "https://mcp.example.com/mcp" },
           enabled: true,
           source: "zcode",
-          path: "/Users/me/.zcode/cli/config.json",
+          path: "/Users/me/.hcode/cli/config.json",
         },
       ],
       [{ name: "docs", exists: true }],
@@ -261,7 +261,7 @@ describe("RemoteMcpSyncDialog", () => {
           config: { type: "stdio", command: "npx" },
           enabled: true,
           source: "zcode",
-          path: "/Users/me/.zcode/cli/config.json",
+          path: "/Users/me/.hcode/cli/config.json",
         },
       ],
       [],
@@ -276,6 +276,6 @@ describe("RemoteMcpSyncDialog", () => {
     );
 
     expect(html).toContain('aria-labelledby="remote-mcp-sync-filesystem-id-label"');
-    expect(html).toContain("/Users/me/.zcode/cli/config.json");
+    expect(html).toContain("/Users/me/.hcode/cli/config.json");
   });
 });

@@ -191,7 +191,7 @@ describe("desktop e2e process cleanup", () => {
       { command: "chromedriver --port=55089", pid: 10, ppid: 9 },
       { command: "ZCode E2E", pid: 11, ppid: 10 },
       {
-        command: `Electron Helper (Renderer) --user-data-dir=/repo/.e2e-cache/run-a/chromium-profiles/0-51 --config=${currentHome}/.zcode/config.json`,
+        command: `Electron Helper (Renderer) --user-data-dir=/repo/.e2e-cache/run-a/chromium-profiles/0-51 --config=${currentHome}/.hcode/config.json`,
         pid: 12,
         ppid: 11,
       },
@@ -220,7 +220,7 @@ describe("desktop e2e process cleanup", () => {
       { command: "chromedriver --port=55089", pid: 10, ppid: 9 },
       { command: "ZCode E2E", pid: 11, ppid: 10 },
       {
-        command: `Electron Helper (Renderer) --config=${currentHome}/.zcode/config.json`,
+        command: `Electron Helper (Renderer) --config=${currentHome}/.hcode/config.json`,
         pid: 12,
         ppid: 11,
       },
@@ -251,7 +251,7 @@ describe("desktop e2e process cleanup", () => {
       { command: "Electron Helper", pid: 13, ppid: 11 },
       { command: "node zcode-agent", pid: 14, ppid: 13 },
       {
-        command: "chrome_crashpad_handler --database=/tmp/zcode-e2e-run-a/.zcode/crash",
+        command: "chrome_crashpad_handler --database=/tmp/zcode-e2e-run-a/.hcode/crash",
         pid: 15,
         ppid: 1,
       },
@@ -326,7 +326,7 @@ describe("desktop e2e process cleanup", () => {
       { command: "ZCode E2E", pid: 11, ppid: 10 },
       {
         command:
-          "Electron Helper --user-data-dir=/repo/.e2e-cache/run-a/chromium-profiles/0-51 --config=/tmp/zcode-e2e-run-a/.zcode/config.json",
+          "Electron Helper --user-data-dir=/repo/.e2e-cache/run-a/chromium-profiles/0-51 --config=/tmp/zcode-e2e-run-a/.hcode/config.json",
         pid: 12,
         ppid: 11,
       },
@@ -438,7 +438,7 @@ describe("desktop e2e process cleanup", () => {
         pid: 101,
       },
       {
-        command: "node.exe --config=C:/e2e/shards/current/.zcode/cli/config.json",
+        command: "node.exe --config=C:/e2e/shards/current/.hcode/cli/config.json",
         parentPid: 101,
         pid: 102,
       },

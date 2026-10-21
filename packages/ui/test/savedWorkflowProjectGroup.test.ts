@@ -40,7 +40,7 @@ const fileWatcherService = {
 
 function makeAgent() {
   const listResult: { current: ZCodeWorkflowsListResult } = {
-    current: { workflows: [], invalid: [], dir: "/beta/.zcode/workflows" },
+    current: { workflows: [], invalid: [], dir: "/beta/.hcode/workflows" },
   };
   const runsResult: { current: ZCodeSavedWorkflowRun[] } = { current: [] };
   const agent = {
@@ -50,7 +50,7 @@ function makeAgent() {
     listSavedWorkflowRuns: vi.fn(async () => ({ runs: runsResult.current })),
     deleteSavedWorkflow: vi.fn(async () => ({
       ok: true as const,
-      path: "/beta/.zcode/workflows/x.dwf.ts",
+      path: "/beta/.hcode/workflows/x.dwf.ts",
     })),
     getSavedWorkflow: vi.fn(),
     updateSavedWorkflowMeta: vi.fn(),
@@ -188,7 +188,7 @@ function entry(
     name,
     description: `${name} 的说明`,
     scope: "project",
-    path: `/beta/.zcode/workflows/${name}.dwf.ts`,
+    path: `/beta/.hcode/workflows/${name}.dwf.ts`,
     ...overrides,
   };
 }
@@ -235,9 +235,9 @@ function mount(props: Partial<Parameters<typeof SavedWorkflowProjectGroup>[0]> =
 describe("SavedWorkflowProjectGroup", () => {
   beforeEach(() => {
     resetSavedWorkflowStoreForTests();
-    agentBeta.listResult.current = { workflows: [], invalid: [], dir: "/beta/.zcode/workflows" };
+    agentBeta.listResult.current = { workflows: [], invalid: [], dir: "/beta/.hcode/workflows" };
     agentBeta.runsResult.current = [];
-    agentRepo.listResult.current = { workflows: [], invalid: [], dir: "/repo/.zcode/workflows" };
+    agentRepo.listResult.current = { workflows: [], invalid: [], dir: "/repo/.hcode/workflows" };
     agentRepo.runsResult.current = [];
     changeListener = null;
     vi.clearAllMocks();
@@ -323,13 +323,13 @@ describe("SavedWorkflowProjectGroup", () => {
   it("坏文件条列出路径与原因，组仍出现", async () => {
     agentBeta.listResult.current = {
       workflows: [entry("ok")],
-      invalid: [{ path: "/beta/.zcode/workflows/bad.dwf.ts", reason: "invalid_yaml" }],
+      invalid: [{ path: "/beta/.hcode/workflows/bad.dwf.ts", reason: "invalid_yaml" }],
     };
     const { container } = mount();
     await screen.findByTestId(testId(TID_WORKFLOW_CARD, "ok"));
     const strip = container.querySelector('[data-workflows-invalid="true"]');
     expect(strip?.textContent).toContain("1 个文件无法读取");
-    expect(strip?.textContent).toContain("/beta/.zcode/workflows/bad.dwf.ts");
+    expect(strip?.textContent).toContain("/beta/.hcode/workflows/bad.dwf.ts");
   });
 
   it("refreshSeq 变化时绕过缓存重拉；目录变更去抖后刷新；卸载拆监听", async () => {
@@ -358,7 +358,7 @@ describe("SavedWorkflowProjectGroup", () => {
     );
     await waitFor(() => expect(agentBeta.listSavedWorkflows).toHaveBeenCalledTimes(2));
 
-    expect(fileWatcherService.watch).toHaveBeenCalledWith({ path: "/beta/.zcode/workflows" });
+    expect(fileWatcherService.watch).toHaveBeenCalledWith({ path: "/beta/.hcode/workflows" });
     await waitFor(() => expect(changeListener).not.toBeNull());
     changeListener?.();
     await waitFor(() => expect(agentBeta.listSavedWorkflows).toHaveBeenCalledTimes(3), {
@@ -415,7 +415,7 @@ describe("SavedWorkflowProjectGroup", () => {
     agentBeta.listResult.current = {
       workflows: [entry("x")],
       invalid: [],
-      dir: "/beta/.zcode/workflows",
+      dir: "/beta/.hcode/workflows",
     };
     mount();
     await screen.findByTestId(testId(TID_WORKFLOW_CARD, "x"));
@@ -424,7 +424,7 @@ describe("SavedWorkflowProjectGroup", () => {
     expect(promoteMock.mock.calls[0]?.[0]).toEqual({ workspacePath: "/beta" });
     expect(promoteMock.mock.calls[0]?.[1]).toEqual({
       name: "x",
-      path: "/beta/.zcode/workflows/x.dwf.ts",
+      path: "/beta/.hcode/workflows/x.dwf.ts",
       locale: "vi-VN",
     });
     expect(toastMock).not.toHaveBeenCalled();
@@ -436,7 +436,7 @@ describe("SavedWorkflowProjectGroup", () => {
     agentBeta.listResult.current = {
       workflows: [entry("x")],
       invalid: [],
-      dir: "/beta/.zcode/workflows",
+      dir: "/beta/.hcode/workflows",
     };
     promoteMock.mockResolvedValueOnce({
       ok: false,
@@ -454,7 +454,7 @@ describe("SavedWorkflowProjectGroup", () => {
     agentBeta.listResult.current = {
       workflows: [entry("x")],
       invalid: [],
-      dir: "/beta/.zcode/workflows",
+      dir: "/beta/.hcode/workflows",
     };
     mount({ project: { ...BETA, remoteSessionId: "remote-1" } });
     await screen.findByTestId(testId(TID_WORKFLOW_CARD, "x"));

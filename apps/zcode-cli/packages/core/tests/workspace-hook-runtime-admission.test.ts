@@ -40,10 +40,10 @@ function snapshot(
     discoveredAt: "2026-08-06T00:00:00.000Z",
     sourceFiles: [
       {
-        canonicalPath: "/workspace/.zcode/config.json",
+        canonicalPath: "/workspace/.hcode/config.json",
         baseDir: "/workspace",
         discoveryOrder: 0,
-        configFileKind: ".zcode/config.json",
+        configFileKind: ".hcode/config.json",
         explicitProjectConfig: false,
         editable: true,
         hooksRoot: { enabled: true },
@@ -56,7 +56,7 @@ function snapshot(
         matcherIndex: 0,
         hookIndex: 0,
         sourceFileIndex: 0,
-        sourceRelativePath: ".zcode/config.json",
+        sourceRelativePath: ".hcode/config.json",
         matcher: input.matcher === undefined ? "startup" : input.matcher,
         type: "command",
         command: input.command ?? "echo project",

@@ -27,7 +27,7 @@ const ENTRY: ZCodeSavedWorkflowEntry = {
   name: "release-check",
   description: "发布前检查",
   scope: "project",
-  path: "/repo/.zcode/workflows/release-check.dwf.ts",
+  path: "/repo/.hcode/workflows/release-check.dwf.ts",
   args: {
     branch: { type: "string", required: true, description: "目标分支" },
     count: { type: "number", default: 3 },
@@ -40,7 +40,7 @@ const GLOBAL_ENTRY: ZCodeSavedWorkflowEntry = {
   name: "deep-research",
   description: "深度调研",
   scope: "global",
-  path: "/home/.zcode/workflows/deep-research.dwf.ts",
+  path: "/home/.hcode/workflows/deep-research.dwf.ts",
 };
 
 // 实参很多的声明（40 个）：第 13 个是无默认值的必填项，第 31 个是 json，其余都有默认值。
@@ -61,7 +61,7 @@ const MANY_ARGS_ENTRY: ZCodeSavedWorkflowEntry = {
   name: "arg-overflow",
   description: "实参很多",
   scope: "global",
-  path: "/home/.zcode/workflows/arg-overflow.dwf.ts",
+  path: "/home/.hcode/workflows/arg-overflow.dwf.ts",
   args: MANY_ARGS,
 };
 

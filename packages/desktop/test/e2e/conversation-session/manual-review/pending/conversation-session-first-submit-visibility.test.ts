@@ -110,7 +110,7 @@ describe("草稿首发列表与详情同步", () => {
           .every((frame) => frame.newRows === 0),
       ).toBe(true);
       const db = new DatabaseSync(
-        join(process.env.ZCODE_E2E_HOME_DIR!, ".zcode/v2/tasks-index.sqlite"),
+        join(process.env.ZCODE_E2E_HOME_DIR!, ".hcode/v2/tasks-index.sqlite"),
         { readOnly: true },
       );
       try {

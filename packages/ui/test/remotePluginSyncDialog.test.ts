@@ -28,7 +28,7 @@ function makeCandidate(overrides: Partial<PluginSyncCandidate>): PluginSyncCandi
     name: "remote-tools",
     pluginId: "remote-tools@inline",
     directoryName: "remote-tools",
-    path: "/Users/me/.zcode/plugins/remote-tools",
+    path: "/Users/me/.hcode/plugins/remote-tools",
     sizeBytes: 128,
     enabled: true,
     componentTypes: ["skills"],
@@ -210,7 +210,7 @@ describe("RemotePluginSyncDialog helpers", () => {
           enabled: false,
           scope: "workspace",
           version: "2.0.0",
-          installPath: "/Users/me/.zcode/cli/plugins/cache/team-market/formatter/2.0.0",
+          installPath: "/Users/me/.hcode/cli/plugins/cache/team-market/formatter/2.0.0",
           componentTypes: ["command", "skill"],
         },
       ]),
@@ -371,7 +371,7 @@ describe("RemotePluginSyncDialog helpers", () => {
           expect(params.archive).toBe(archive);
           return {
             marketplaceId: "team-market",
-            path: "/remote/.zcode/plugins/marketplace-sources/team-market-hash",
+            path: "/remote/.hcode/plugins/marketplace-sources/team-market-hash",
             status: "synced",
           };
         },
@@ -450,7 +450,7 @@ describe("RemotePluginSyncDialog helpers", () => {
     expect(calls).toEqual([
       "export:team-market:formatter",
       "import",
-      "add:/remote/.zcode/plugins/marketplace-sources/team-market-hash",
+      "add:/remote/.hcode/plugins/marketplace-sources/team-market-hash",
       "install:formatter@team-market",
       "enabled:formatter@team-market:true",
     ]);

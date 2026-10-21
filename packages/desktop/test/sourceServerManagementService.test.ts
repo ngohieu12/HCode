@@ -138,7 +138,7 @@ describe("SourceServerManagementService", () => {
     const recordConversationWorkspace = vi.fn(async () => undefined);
     let nextDirectory = 0;
     const prepareSession = vi.fn(async () => ({
-      workspacePath: `/home/dev/.zcode/workspace/task-${++nextDirectory}`,
+      workspacePath: `/home/dev/.hcode/workspace/task-${++nextDirectory}`,
       projectId: null,
       additionalDirectories: [],
     }));
@@ -172,16 +172,16 @@ describe("SourceServerManagementService", () => {
     });
 
     await expect(service.ensureConversationWorkspace(sourceServerId)).resolves.toEqual({
-      path: "/home/dev/.zcode/workspace/task-1",
+      path: "/home/dev/.hcode/workspace/task-1",
       created: true,
       workspacePurpose: "conversation",
     });
     expect(recordConversationWorkspace).toHaveBeenCalledWith(
       sourceServerId,
-      "/home/dev/.zcode/workspace/task-1",
+      "/home/dev/.hcode/workspace/task-1",
     );
     await expect(service.ensureConversationWorkspace(sourceServerId)).resolves.toMatchObject({
-      path: "/home/dev/.zcode/workspace/task-2",
+      path: "/home/dev/.hcode/workspace/task-2",
     });
     expect(prepareSession).toHaveBeenCalledWith();
     service.dispose();

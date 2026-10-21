@@ -41,7 +41,7 @@ function status(overrides: Partial<WorkspaceHookTrustCliStatus> = {}): Workspace
         event: "SessionStart",
         matcher: "startup",
         displayCommand: "./start.sh",
-        sourcePath: ".zcode/config.json",
+        sourcePath: ".hcode/config.json",
         configuredEnabled: true,
         hookDeclarationDigest: "a".repeat(64),
         trustState: "pending_trust",

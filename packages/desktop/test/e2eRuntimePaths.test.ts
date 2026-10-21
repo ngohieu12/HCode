@@ -25,7 +25,7 @@ const REMOTE_TMP_ASSERTION_SOURCES = new Set([
 ]);
 // 只匹配作为绝对路径起点的系统 /tmp：前面不能紧跟路径字符，后面不能继续是单词字符。
 // 缺陷原因：此前用 includes("/tmp") 子串匹配，把远端 Source 的私有 staging 目录
-// "$HOME/.zcode/tmp/prompt-attachments" 也当成了系统 /tmp（R3 attachments 用例被误报）。
+// "$HOME/.hcode/tmp/prompt-attachments" 也当成了系统 /tmp（R3 attachments 用例被误报）。
 const SYSTEM_TMP_PATH_PATTERN = /(?<![\w.\-~}$])\/tmp(?![\w-])/u;
 
 describe("Desktop E2E runtime paths", () => {
@@ -70,10 +70,10 @@ describe("Desktop E2E runtime paths", () => {
     ).toBe(resolve("root", "explicit-home"));
   });
 
-  it("keeps the E2E CLI storage under the legacy .zcode directory", () => {
+  it("keeps the E2E CLI storage under the legacy .hcode directory", () => {
     const homeDir = resolve("root", "isolated-e2e-home");
 
-    expect(resolveE2EStorageRoot(homeDir)).toBe(join(homeDir, ".zcode"));
+    expect(resolveE2EStorageRoot(homeDir)).toBe(join(homeDir, ".hcode"));
   });
 
   it("does not allow raw system /tmp paths in Desktop E2E runtime sources", () => {
