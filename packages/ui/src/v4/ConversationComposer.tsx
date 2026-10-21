@@ -417,6 +417,13 @@ export interface ConversationComposerProps {
   contextHeader?: ReactNode;
   /** 居中草稿布局（旧 shouldUseCenteredDraftChatLayout）：收窄 max-w-2xl、去 sticky。 */
   centered?: boolean;
+  /** 输入框布局，见 ChatPromptEditor；inline 是 Side Pane 完整视图浮窗的单行形态。 */
+  layout?: "stacked" | "inline";
+  /**
+   * 单行布局下对话运行中的工作时长（与流式消息「工作中 N 秒」同值）。
+   * HCode 输入框不显示占位文字，该值仅为保持调用方接口兼容而保留，当前不使用。
+   */
+  workingDurationMs?: number;
   /**
    * v4 bottom dock 阻塞交互 id。存在时 composer 只隐藏不卸载，保留草稿、附件与编辑器实例。
    */
@@ -545,6 +552,7 @@ function ConversationComposerImpl({
   telemetryDraftConfig,
   contextHeader,
   centered = false,
+  layout = "stacked",
   blockingRequestId = null,
   disabled: disabledProp = false,
   onRetryInitialization,
@@ -2635,6 +2643,7 @@ function ConversationComposerImpl({
           enableMentionPanel
           leadingActions={leadingActionsNode}
           submitControl={submitControlNode}
+          layout={layout}
           className="p-0"
           shellClassName={
             highspeedCard

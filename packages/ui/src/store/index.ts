@@ -61,6 +61,26 @@ export interface LoginEntryAttempt {
 }
 
 const PERFORMANCE_MODE_STORAGE_KEY = "zcode-performance-mode";
+export const FILE_MANAGER_NAVIGATION_PREFERENCES_STORAGE_KEY =
+  "zcode-file-manager-navigation-preferences";
+
+function loadFileManagerNavigationPreferences(): Record<string, boolean> {
+  try {
+    const raw = readSafeLocalStorage(FILE_MANAGER_NAVIGATION_PREFERENCES_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+
+    return Object.fromEntries(
+      Object.entries(parsed).filter(
+        (entry): entry is [string, boolean] =>
+          entry[0].trim().length > 0 && typeof entry[1] === "boolean",
+      ),
+    );
+  } catch {
+    return {};
+  }
+}
 
 function loadPerformanceMode(): boolean {
   return readSafeLocalStorage(PERFORMANCE_MODE_STORAGE_KEY) === "true";
@@ -81,6 +101,10 @@ export interface ZCodeState {
 
   /** 代码预览设置（固定为默认值，设置页不再提供修改） */
   codePreviewSettings: CodePreviewSettings;
+
+  /** 各 workspace 的文件导航显隐偏好；缺席时默认展开。 */
+  fileManagerNavigationOpenByWorkspace: Record<string, boolean>;
+  setFileManagerNavigationOpen: (workspaceKey: string, open: boolean) => void;
 
   /** UI 根 rem 字号（px） */
   uiFontSizePx: number;
@@ -172,9 +196,15 @@ export interface ZCodeState {
 // 需要广播的字段 —— 只有这些字段的变更会发送给其他窗口
 // ============================================================================
 
-const BROADCAST_FIELDS = new Set(["theme", "locale", "uiFontSizePx"]);
+const BROADCAST_FIELDS = new Set(["theme", "locale", "uiFontSizePx", "notificationEnabled"]);
 
-type BroadcastField = "theme" | "locale" | "uiFontSizePx";
+type BroadcastField =
+  | "theme"
+  | "locale"
+  | "uiFontSizePx"
+  // 任务通知开关跨窗口同步：角标是应用级表面，A 窗口关通知而 B 窗口仍上报未读时，
+  // 主进程 max 聚合会让任务栏/托盘继续亮，设置与提醒状态错位。
+  | "notificationEnabled";
 
 /** 广播频道名前缀 */
 const STATE_CHANNEL_PREFIX = "state:";
@@ -222,6 +252,23 @@ export function createZCodeStore(
     // 代码显示固定使用默认设置（行号开、不换行、12px）。设置页已移除代码显示选项，
     // 不再读取 localStorage 中的旧值，避免存量数据让代码显示偏离默认模式。
     codePreviewSettings: DEFAULT_CODE_PREVIEW_SETTINGS,
+
+    fileManagerNavigationOpenByWorkspace: loadFileManagerNavigationPreferences(),
+    setFileManagerNavigationOpen: (workspaceKey, open) => {
+      const normalizedWorkspaceKey = workspaceKey.trim();
+      if (!normalizedWorkspaceKey) return;
+      set((state) => {
+        const next = {
+          ...state.fileManagerNavigationOpenByWorkspace,
+          [normalizedWorkspaceKey]: open,
+        };
+        writeSafeLocalStorage(
+          FILE_MANAGER_NAVIGATION_PREFERENCES_STORAGE_KEY,
+          JSON.stringify(next),
+        );
+        return { fileManagerNavigationOpenByWorkspace: next };
+      });
+    },
 
     uiFontSizePx: loadUiFontSizePx(),
     setUiFontSizePx: (fontSizePx: number) => {
@@ -409,6 +456,8 @@ export function createZCodeStore(
         state.setLocale(msg.payload);
       } else if (field === "uiFontSizePx" && typeof msg.payload === "number") {
         state.setUiFontSizePx(msg.payload);
+      } else if (field === "notificationEnabled" && typeof msg.payload === "boolean") {
+        state.setNotificationEnabled(msg.payload);
       }
     } finally {
       applyingBroadcast = false;
