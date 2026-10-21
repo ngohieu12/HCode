@@ -19,7 +19,8 @@ function notifiableStatus(status: ZCodeOffPeakTaskStatus): "completed" | "failed
 }
 
 export function useOffPeakTaskNotifications(params: {
-  offPeakTaskService: IOffPeakTaskService;
+  /** HCode 不装配闲时任务服务时为 undefined，此时不轮询。 */
+  offPeakTaskService: IOffPeakTaskService | undefined;
   platform: Pick<IPlatformService, "showTaskNotification"> | null | undefined;
   enabled: boolean;
   formatMessage: IntlInstance["formatMessage"];
@@ -29,7 +30,7 @@ export function useOffPeakTaskNotifications(params: {
   const seenStatusRef = useRef(new Map<string, ZCodeOffPeakTaskStatus>());
 
   useEffect(() => {
-    if (!enabled || !platform) return;
+    if (!enabled || !platform || !offPeakTaskService) return;
     let disposed = false;
 
     const tick = async () => {

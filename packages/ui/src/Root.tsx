@@ -73,6 +73,7 @@ import { useRootProviderStateRefresh } from "@/root/useRootProviderStateRefresh.
 import { useModelSelectionServiceView } from "@/hooks/useModelSelectionView.js";
 import { useRootProviderSettingsSnapshot } from "@/root/useRootProviderSettingsSnapshot.js";
 import { useWebRemoteControlAuthSync } from "@/web-remote-control/app/useWebRemoteControlAuthSync.js";
+import type { WebRemoteControlAuthEvents } from "@/web-remote-control/contract.js";
 import { useRootOAuthEffects } from "@/root/useRootOAuthEffects.js";
 import { useDesktopNativeThemeSync } from "@/root/useDesktopNativeThemeSync.js";
 import { useRootPlatformEffects } from "@/root/useRootPlatformEffects.js";
@@ -103,6 +104,7 @@ import { RootStartupLoading } from "@/root/RootStartupLoading.js";
 import { resolveProviderAvailabilityState } from "@/lib/modelProviderAvailability.js";
 import { useProviderAvailabilityLoginEntryGuard } from "@/root/useProviderAvailabilityLoginEntryGuard.js";
 import { ensureProviderFamilyDomainMigration } from "@/lib/providerFamilyDomainMigration.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 import { useSettings } from "@/hooks/useSettingService.js";
 import { CLOSE_ACTIVE_CONTEXT_REQUEST_EVENT } from "@/lib/closeActiveContext.js";
 import { AssistantCodeCommentFeatureProvider } from "@/AssistantCodeCommentFeatureProvider.js";
@@ -230,7 +232,9 @@ function RootInner({
   // 动态工作流灰度快照的唯一取数点：
   // 放在 app 级 ServiceProvider 这一层取一次，自动化页与 run 面板只读。消费方可能位于
   // 工作区级 ServiceProvider 内（远程 Host 的 accessor），由它们取数会拿到另一台 Host 的答案。
-  useDynamicWorkflowAvailabilityLoader(services.codingPlanSubscriptionService);
+  useDynamicWorkflowAvailabilityLoader(
+    getRemovedAccountService(services, "codingPlanSubscriptionService"),
+  );
 
   const { intl, locale } = useZCodeIntl();
   const handleRemoteConnectionTargetChange = useSourceServerUpdateNotifications({
@@ -240,7 +244,12 @@ function RootInner({
   const theme = useZCodeStore((state) => state.theme);
   const user = useZCodeStore((state) => state.user);
   const isRestoringOAuthSession = useZCodeStore((state) => state.isRestoringOAuthSession);
-  useWebRemoteControlAuthSync(platform, services.oauthService, user?.id, isRestoringOAuthSession);
+  useWebRemoteControlAuthSync(
+    platform,
+    getRemovedAccountService(services, "oauthService") as WebRemoteControlAuthEvents | undefined,
+    user?.id,
+    isRestoringOAuthSession,
+  );
   const setUser = useZCodeStore((state) => state.setUser);
   const setIsRestoringOAuthSession = useZCodeStore((state) => state.setIsRestoringOAuthSession);
   const setOAuthError = useZCodeStore((state) => state.setOAuthError);

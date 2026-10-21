@@ -25,7 +25,7 @@ export function useDynamicWorkflowAvailability(): DynamicWorkflowAvailabilitySna
  * 取数与失败重试的规则见 dynamicWorkflowAvailabilityStore。
  */
 export function useDynamicWorkflowAvailabilityLoader(
-  service: ICodingPlanSubscriptionService,
+  service: ICodingPlanSubscriptionService | undefined,
 ): void {
   const ensureLoaded = useDynamicWorkflowAvailabilityStore((state) => state.ensureLoaded);
   useEffect(() => {
@@ -45,7 +45,7 @@ export function useDynamicWorkflowUserModeSync(params: {
   settingsLoaded: boolean;
   userMode: DynamicWorkflowMode | undefined;
   zcodeAgentService: Pick<IZCodeAgentService, "syncDynamicWorkflowUserMode">;
-  codingPlanSubscriptionService: ICodingPlanSubscriptionService;
+  codingPlanSubscriptionService: ICodingPlanSubscriptionService | undefined;
 }): void {
   const { settingsLoaded, userMode, zcodeAgentService, codingPlanSubscriptionService } = params;
   const reload = useDynamicWorkflowAvailabilityStore((state) => state.reload);

@@ -10,6 +10,7 @@ import {
   type RewardsContext,
 } from "@zcode/shared";
 import { useServices } from "@/hooks/useServices.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 import { usePlatform } from "@/hooks/usePlatform.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { useZCodeStore } from "@/store/StoreProvider.js";
@@ -19,7 +20,10 @@ import { Button } from "@/components/ui/button.js";
 import { EmbeddedWebsiteHeader } from "@/components/EmbeddedWebsiteHeader.js";
 
 export function RewardsWebview({ onClose }: { onClose: () => void }) {
-  const { credentialService, oauthService } = useServices();
+  const services = useServices();
+  const { credentialService } = services;
+  // HCode 不装配 OAuth 服务：注入身份时没有 provider。
+  const oauthService = getRemovedAccountService(services, "oauthService");
   const platform = usePlatform();
   const { intl, locale: appLocale } = useZCodeIntl();
   const locale = toMarketingLocale(appLocale);
@@ -93,7 +97,7 @@ export function RewardsWebview({ onClose }: { onClose: () => void }) {
         );
         injectedIdentity.current = identity;
       }
-      const rawProvider = identity ? await oauthService.getActiveProvider() : null;
+      const rawProvider = identity && oauthService ? await oauthService.getActiveProvider() : null;
       const provider =
         rawProvider === "zai" ? "zai" : rawProvider === "bigmodel" ? "bigmodel" : null;
       const [oauth, jwt] = provider

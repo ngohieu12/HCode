@@ -47,6 +47,7 @@ import {
 import { prepareMarketingHero } from "@/components/marketing-touch/marketingResources.js";
 
 import { MarketingRefreshContext } from "@/components/marketing-touch/useMarketingTaskCompletionRefresh.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 const Context = createContext<MarketingTouchController | null>(null);
 
@@ -84,7 +85,7 @@ export function MarketingTouchProvider({
   const locale = toMarketingLocale(appLocale);
   const startEntitlement = useStartPlanEntitlement(
     BUILTIN_MODEL_PROVIDER_IDS.bigmodelStartPlan,
-    services.usageStatsService,
+    getRemovedAccountService(services, "usageStatsService"),
   );
   const refreshStartEntitlementRef = useRef(startEntitlement.refresh);
   refreshStartEntitlementRef.current = startEntitlement.refresh;
@@ -247,10 +248,16 @@ export function MarketingTouchProvider({
           requestLogin();
           return { status: "cancelled" };
         }
+        // HCode 不装配 Coding Plan 订阅服务：无法领取套餐，按取消处理。
+        const codingPlanSubscriptionService = getRemovedAccountService(
+          services,
+          "codingPlanSubscriptionService",
+        );
+        if (!codingPlanSubscriptionService) return { status: "cancelled" };
         let submitted = false;
         try {
           const proof = await prepareRequestVerificationClaim(
-            services.codingPlanSubscriptionService,
+            codingPlanSubscriptionService,
             signal,
             () => phase("verifying"),
           );
@@ -261,7 +268,7 @@ export function MarketingTouchProvider({
             };
           phase("submitting");
           submitted = true;
-          const result = await services.codingPlanSubscriptionService.claimManualPlan({
+          const result = await codingPlanSubscriptionService.claimManualPlan({
             planId: action.args.plan_id,
             ...proof,
           });

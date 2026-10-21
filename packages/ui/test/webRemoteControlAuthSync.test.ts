@@ -38,3 +38,15 @@ it("没有桌面平台通知能力时不订阅远端 OAuth 事件", () => {
   renderHook(() => useWebRemoteControlAuthSync({}, { onDidChangeSession }, "user", false));
   expect(onDidChangeSession).not.toHaveBeenCalled();
 });
+
+it("HCode 未装配 OAuth 服务时不崩溃，只按 userId 投影一次未登录态", () => {
+  const notifyWebRemoteControlAuthStateChanged = vi.fn();
+  const platform = { notifyWebRemoteControlAuthStateChanged };
+  const { rerender } = renderHook(
+    ({ restoring }) => useWebRemoteControlAuthSync(platform, undefined, undefined, restoring),
+    { initialProps: { restoring: true } },
+  );
+  expect(notifyWebRemoteControlAuthStateChanged).not.toHaveBeenCalled();
+  rerender({ restoring: false });
+  expect(notifyWebRemoteControlAuthStateChanged.mock.calls).toEqual([[{ state: "signed-out" }]]);
+});

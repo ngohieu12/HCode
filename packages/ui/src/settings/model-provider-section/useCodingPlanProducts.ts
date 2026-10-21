@@ -13,6 +13,10 @@ import {
   type StartPlanPreviewConfig,
 } from "@zcode/shared";
 import { useOptionalServices } from "@/hooks/useServices.js";
+import {
+  getRemovedAccountService,
+  type RemovedAccountService,
+} from "@/lib/removedAccountServices.js";
 import { logger } from "@/logger.js";
 import {
   normalizeCodingPlanCardCopyItems,
@@ -67,7 +71,7 @@ export function useCodingPlanProducts(
   options?: { remotePreviewEnabled?: boolean },
 ) {
   const services = useOptionalServices();
-  const service = services?.codingPlanSubscriptionService;
+  const service = getRemovedAccountService(services, "codingPlanSubscriptionService");
   const supportedProvider =
     providerId === BUILTIN_MODEL_PROVIDER_IDS.bigmodelIndividualCodingPlan ||
     isZaiCodingPlanProviderId(providerId);
@@ -167,7 +171,7 @@ export function useCodingPlanProducts(
 
 export async function loadCodingPlanProductsForTest(
   providerId: CodingPlanProviderId,
-  service: NonNullable<ReturnType<typeof useOptionalServices>>["codingPlanSubscriptionService"],
+  service: RemovedAccountService,
   force: boolean,
   staticProducts?: CodingPlanStaticProduct[],
 ): Promise<CodingPlanProductsSnapshot> {
@@ -213,7 +217,7 @@ export async function loadCodingPlanProductsForTest(
 
 export async function loadCodingPlanStaticProductsSnapshotForTest(
   providerId: CodingPlanProviderId,
-  service: NonNullable<ReturnType<typeof useOptionalServices>>["codingPlanSubscriptionService"],
+  service: RemovedAccountService,
 ): Promise<CodingPlanProductsSnapshot> {
   const staticProducts = await loadCodingPlanStaticProductListForTest(providerId, service);
   return buildStaticProductsSnapshotFromList(providerId, staticProducts);
@@ -247,7 +251,7 @@ function invalidateCodingPlanProductsCache(providerId: CodingPlanProviderId, ser
 
 async function loadBatchPreviewWithStaticProducts(
   providerId: CodingPlanProviderId,
-  service: NonNullable<ReturnType<typeof useOptionalServices>>["codingPlanSubscriptionService"],
+  service: RemovedAccountService,
   staticProducts: CodingPlanStaticProduct[],
 ): Promise<CodingPlanProductsSnapshot> {
   const previewSnapshot = await service.batchPreview({ providerId });
@@ -384,7 +388,7 @@ function buildStaticProductDisplayList(
 
 export async function loadCodingPlanStaticProductListForTest(
   providerId: CodingPlanProviderId,
-  service: NonNullable<ReturnType<typeof useOptionalServices>>["codingPlanSubscriptionService"],
+  service: RemovedAccountService,
 ): Promise<CodingPlanStaticProduct[]> {
   try {
     const config = await loadCodingPlanStaticProductsConfig(service);
@@ -439,7 +443,7 @@ function filterCodingPlanPurchaseProducts<
 }
 
 async function loadCodingPlanStaticProductsConfig(
-  service: NonNullable<ReturnType<typeof useOptionalServices>>["codingPlanSubscriptionService"],
+  service: RemovedAccountService,
 ): Promise<CodingPlanStaticProductsConfig> {
   const now = Date.now();
   const cached = staticProductsConfigCache.get(service);

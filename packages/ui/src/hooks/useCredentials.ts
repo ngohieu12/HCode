@@ -3,6 +3,7 @@
  */
 import { useCallback } from "react";
 import { useServices } from "./useServices.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 /** 凭据管理的基础 hook */
 export function useCredentials() {
@@ -20,10 +21,13 @@ export function useCredentials() {
 
 /** active provider access_token 专用便捷 hook */
 export function useAuthToken() {
-  const { credentialService, oauthService } = useServices();
+  const services = useServices();
+  const { credentialService } = services;
+  // HCode 不装配 OAuth 服务：没有 active provider。
+  const oauthService = getRemovedAccountService(services, "oauthService");
 
   const getToken = useCallback(async () => {
-    const activeProvider = await oauthService.getActiveProvider();
+    const activeProvider = await oauthService?.getActiveProvider();
     if (!activeProvider) {
       return null;
     }
@@ -43,7 +47,7 @@ export function useAuthToken() {
   }, [credentialService, oauthService]);
   const setToken = useCallback(
     async (token: string) => {
-      const activeProvider = await oauthService.getActiveProvider();
+      const activeProvider = await oauthService?.getActiveProvider();
       if (!activeProvider) {
         throw new Error("当前没有 active provider，无法写入 auth token");
       }
@@ -52,7 +56,7 @@ export function useAuthToken() {
     [credentialService, oauthService],
   );
   const clearToken = useCallback(async () => {
-    const activeProvider = await oauthService.getActiveProvider();
+    const activeProvider = await oauthService?.getActiveProvider();
     if (!activeProvider) {
       return;
     }

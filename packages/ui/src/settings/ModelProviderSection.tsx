@@ -69,6 +69,7 @@ import {
   type SettingsModelProviderTarget,
 } from "@/lib/settingsNavigation.js";
 import { useEnterpriseCodingPlanProducts } from "@/settings/model-provider-section/useEnterpriseCodingPlanProducts.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 export {
   fuzzyMatch,
@@ -252,7 +253,10 @@ export function ModelProviderSection({
   const { intl, locale } = useZCodeIntl();
   const confirmDialog = useConfirmDialog();
   const platform = usePlatform();
-  const { modelSelectionService, oauthService, credentialService } = useServices();
+  const services = useServices();
+  const { modelSelectionService, credentialService } = services;
+  // HCode 不装配 OAuth 服务：解绑只清理本地 Provider 选择。
+  const oauthService = getRemovedAccountService(services, "oauthService");
   const {
     modelProviders,
     providerTemplates,
@@ -838,7 +842,7 @@ export function ModelProviderSection({
         const nextProviderFamilyDomain = resolveLogoutProviderFamilyDomain({
           currentDomain: sharedSettings?.providerFamilyDomain,
         });
-        await oauthService.logout(providerId);
+        await oauthService?.logout(providerId);
         // Coding Plan 官网 webview 使用独立持久 partition，provider Unlink 也属于账号边界。
         if (typeof platform.executeDesktopCommand === "function") {
           await platform.executeDesktopCommand(DesktopCommandIds.ClearCodingPlanWebviewStorage);

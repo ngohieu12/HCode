@@ -4,6 +4,7 @@ import {
   resolveModelProviderFamilyIdByProviderId,
   resolveProviderFamilyDomainFromOAuthProvider,
 } from "@/lib/legacyAccountProviderCompat.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 import { logger } from "@/logger.js";
 
 function inferProviderFamilyDomainFromSelection(
@@ -24,16 +25,18 @@ function inferProviderFamilyDomainFromSelection(
 }
 
 export async function ensureProviderFamilyDomainMigration(
-  services: Pick<IServiceAccessor, "settingService" | "oauthService" | "modelSelectionService">,
+  services: Pick<IServiceAccessor, "settingService" | "modelSelectionService">,
 ): Promise<void> {
   const settings = await services.settingService.get();
   if (settings.providerFamilyDomain || settings.providerFamilyDomainMigrated) {
     return;
   }
 
-  let inferredDomain = resolveProviderFamilyDomainFromOAuthProvider(
-    await services.oauthService.getActiveProvider(),
-  );
+  // HCode 不装配 OAuth 服务：没有 active provider，直接走模型选择视图推断。
+  const oauthService = getRemovedAccountService(services, "oauthService");
+  let inferredDomain = oauthService
+    ? resolveProviderFamilyDomainFromOAuthProvider(await oauthService.getActiveProvider())
+    : null;
   let selectableProviders: readonly { readonly providerId: string }[] | null = null;
 
   if (!inferredDomain) {

@@ -8,6 +8,7 @@ import {
 import { hasActiveUsageEntitlementSnapshot } from "@/lib/codingPlanProvider.js";
 import { getEnterprisePricingProducts } from "@/root/oauthTeamPricing.js";
 import { logger } from "@/logger.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 /** 只计算建议，不替用户保存；闭包固定按钮展示的那个目标，点击时重新校验。 */
 export async function prepareAccountConnectionSwitch(
@@ -58,7 +59,10 @@ export async function prepareAccountConnectionSwitch(
     // 未选中的 Team 没有可复用的 current 事实。按按钮的具体组织/项目查询，
     // 不能把团队名单存在或另一个 Team 的权益当成目标可用。
     const { kind: planKind, ...identity } = selection;
-    const entitlement = await services.usageStatsService.getEntitlementSnapshot({
+    // HCode 不装配用量/权益服务：无法证明 Team 权益可用，按不可用处理。
+    const usageStatsService = getRemovedAccountService(services, "usageStatsService");
+    if (!usageStatsService) return false;
+    const entitlement = await usageStatsService.getEntitlementSnapshot({
       preferredProviderId: providerId,
       includeSubscription: true,
       accountAccess: { type: "zhipu-account", family, planKind, ...identity },

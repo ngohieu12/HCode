@@ -27,6 +27,7 @@ import {
 } from "@/root/oauthCachedSessionRestore.js";
 import { shouldApplyOAuthPollingFailure } from "@/root/oauthLoginAttemptGuard.js";
 import { useAccountConnectionLossNotification } from "@/root/useAccountConnectionLossNotification.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 export { refreshRestoredOAuthProviderFamilyAfterStartup } from "@/root/oauthProviderFamilySelectionRefresh.js";
 
@@ -138,6 +139,8 @@ export function useRootOAuthEffects({
   const oauthLoginSucceededRef = useRef(false);
   const oauthLoginSuccessInFlightRef = useRef(false);
   const oauthLoginSuccessOwnerRef = useRef<"polling" | "deep-link" | null>(null);
+  // HCode 不装配 OAuth 服务：启动恢复直接落定为未登录，轮询与回调不做任何处理。
+  const oauthService = getRemovedAccountService(services, "oauthService");
 
   useEffect(() => {
     let disposed = false;
@@ -147,25 +150,27 @@ export function useRootOAuthEffects({
       try {
         // 启动只读缓存及本地有效期；业务 token 已明确过期时直接重新登录，
         // 不把无 exp 的历史凭据或暂时断网误判成退出。
-        const result = await services.oauthService.restoreCachedSessionState();
+        const result = oauthService ? await oauthService.restoreCachedSessionState() : null;
 
         if (disposed) {
           return;
         }
 
-        hasRestoredUser = await applyCachedOAuthSessionRestoreResult({
-          result,
-          setUser,
-          requestAlert,
-          onReauthenticationRequired,
-          shouldReauthenticate: async () =>
-            !disposed && (await services.oauthService.getActiveProvider()) === null,
-          copy: {
-            title: intl.formatMessage({ id: "login.expired.title" }),
-            description: intl.formatMessage({ id: "login.expired.description" }),
-            actionLabel: intl.formatMessage({ id: "login.expired.action" }),
-          },
-        });
+        if (oauthService) {
+          hasRestoredUser = await applyCachedOAuthSessionRestoreResult({
+            result,
+            setUser,
+            requestAlert,
+            onReauthenticationRequired,
+            shouldReauthenticate: async () =>
+              !disposed && (await oauthService.getActiveProvider()) === null,
+            copy: {
+              title: intl.formatMessage({ id: "login.expired.title" }),
+              description: intl.formatMessage({ id: "login.expired.description" }),
+              actionLabel: intl.formatMessage({ id: "login.expired.action" }),
+            },
+          });
+        }
       } catch (error) {
         logger.error("[Root] 恢复 OAuth 本地登录态失败:", error);
         if (disposed) {
@@ -180,8 +185,8 @@ export function useRootOAuthEffects({
       setIsRestoringOAuthSession(false);
 
       try {
-        if (hasRestoredUser) {
-          const activeProvider = await services.oauthService.getActiveProvider();
+        if (hasRestoredUser && oauthService) {
+          const activeProvider = await oauthService.getActiveProvider();
           if (disposed) return;
           await refreshRestoredOAuthProviderFamilyAfterStartup({
             activeProvider,
@@ -231,7 +236,9 @@ export function useRootOAuthEffects({
           if (!disposed) onReauthenticationRequired();
         },
         shouldReauthenticate: async () =>
-          !disposed && (await services.oauthService.getActiveProvider()) === null,
+          !disposed &&
+          oauthService !== undefined &&
+          (await oauthService.getActiveProvider()) === null,
         copy: {
           title: intl.formatMessage({ id: "login.expired.title" }),
           description: intl.formatMessage({ id: "login.expired.description" }),
@@ -247,10 +254,17 @@ export function useRootOAuthEffects({
       disposed = true;
       disposable.dispose();
     };
-  }, [intl, onReauthenticationRequired, requestAlert, services.broadcastService, setUser]);
+  }, [
+    intl,
+    oauthService,
+    onReauthenticationRequired,
+    requestAlert,
+    services.broadcastService,
+    setUser,
+  ]);
 
   useEffect(() => {
-    if (!oauthPollingActive) {
+    if (!oauthPollingActive || !oauthService) {
       return;
     }
     oauthLoginSucceededRef.current = false;
@@ -262,7 +276,7 @@ export function useRootOAuthEffects({
         return;
       }
       pollInFlight = true;
-      void services.oauthService
+      void oauthService
         .pollPendingOAuth()
         .then(async (result) => {
           if (!result || result.kind !== "session") {
@@ -337,7 +351,8 @@ export function useRootOAuthEffects({
   useEffect(() => {
     const disposeOAuth = platform.onOAuthCallback(async (url) => {
       try {
-        const result = await services.oauthService.handleCallback(url);
+        // HCode 无 OAuth 服务：回调按失效处理（与下方空结果分支一致）。
+        const result = oauthService ? await oauthService.handleCallback(url) : null;
         // 取消或切换 flow 会使已接收的回调失效，正常空结果不能被当作登录异常。
         if (!result) {
           logger.info("[Root] 已忽略失效 OAuth 回调");

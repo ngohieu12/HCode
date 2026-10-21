@@ -7,6 +7,7 @@ import { BUILTIN_MODEL_PROVIDER_IDS, type EnterpriseCodingPlanPricingProduct } f
 import { buildOwnedEntryPlanList } from "@/lib/codingPlanOwnedEntryPlans.js";
 import { resolveAccountProviderInspectionAccess } from "@/lib/accountProviderAccess.js";
 import { logger } from "@/logger.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 
 export interface CodingPlanEntryInventory {
   entryPlanList: string;
@@ -18,7 +19,13 @@ export function useCodingPlanEntryPlanList(): CodingPlanEntryInventory {
   const { state, reload } = useProviderSettingsView();
   const providerSettingsView = state.status === "ready" ? state.view : null;
   const loading = state.status === "loading";
-  const { credentialService, codingPlanSubscriptionService } = useServices();
+  const services = useServices();
+  const { credentialService } = services;
+  // HCode 不装配 Coding Plan 订阅服务：没有团队套餐来源，按“确认无团队套餐”处理。
+  const codingPlanSubscriptionService = getRemovedAccountService(
+    services,
+    "codingPlanSubscriptionService",
+  );
   const user = useZCodeStore((state) => state.user);
   // 不传当前选中的团队上下文，四种 Start/个人连接分别使用已有权益缓存。
   const { entitlements, refresh } = useCodingPlanEntitlements({
@@ -47,7 +54,7 @@ export function useCodingPlanEntryPlanList(): CodingPlanEntryInventory {
           let token: string | null = null;
           try {
             token = (await credentialService.load(`oauth:${family}:access_token`))?.trim() || null;
-            if (!token) return { token, products: [] };
+            if (!token || !codingPlanSubscriptionService) return { token, products: [] };
             const result = await codingPlanSubscriptionService.getEnterprisePricing({
               authenticated: true,
               family,

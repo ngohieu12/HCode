@@ -6,13 +6,16 @@
  */
 import { useCallback } from "react";
 import { logger } from "../logger.js";
+import { getRemovedAccountService } from "../lib/removedAccountServices.js";
 import { useServices } from "./useServices.js";
 
 export function useTokenRefresh() {
-  const { oauthService } = useServices();
+  // HCode 不装配 OAuth 服务：没有可刷新的 token，也没有可清除的账号凭据。
+  const oauthService = getRemovedAccountService(useServices(), "oauthService");
 
   /** 尝试刷新 token，失败则返回 false */
   const tryRefresh = useCallback(async (): Promise<boolean> => {
+    if (!oauthService) return false;
     try {
       await oauthService.refreshToken();
       logger.info("[useTokenRefresh] token 刷新成功");
@@ -25,7 +28,7 @@ export function useTokenRefresh() {
 
   /** 清除所有 provider 凭据 */
   const clearCredentials = useCallback(async () => {
-    await oauthService.logoutAll();
+    await oauthService?.logoutAll();
   }, [oauthService]);
 
   return { tryRefresh, clearCredentials };

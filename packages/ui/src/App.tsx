@@ -19,6 +19,7 @@ import { isWorkspaceReadOnly, isWorkspaceTab } from "@/store/tabStore.js";
 import type { TaskChatMessage as TestChatMessage } from "@/lib/taskChatMessageTypes.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { getPathLeaf } from "@/lib/path.js";
+import { getRemovedAccountService } from "@/lib/removedAccountServices.js";
 import {
   addPluginStoreOpenListener,
   type PluginStoreOpenTarget,
@@ -294,7 +295,7 @@ export function App({
   });
   // 闲时任务终态/等确认通知：仅桌面本地链路，main 进程按 status:taskId 去重多窗口重复。
   useOffPeakTaskNotifications({
-    offPeakTaskService: services.offPeakTaskService,
+    offPeakTaskService: getRemovedAccountService(services, "offPeakTaskService"),
     platform,
     enabled: Boolean(notificationEnabled && isDesktop),
     formatMessage: intl.formatMessage,
