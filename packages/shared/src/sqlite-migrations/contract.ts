@@ -6,6 +6,11 @@ export interface SqliteMigration {
   id: string;
   /** 开发分支迁移后移时沿用旧记账；所有已存在别名必须具有相同 SQL checksum。 */
   previousIds?: readonly string[];
+  /**
+   * 历史上曾以不同 checksum 记账、但语义等价的版本（例如分叉发行版写入的旧 checksum）。
+   * 只用于接受已存在的账本行；新执行永远写入 sql 的 checksum。
+   */
+  legacyChecksums?: readonly string[];
   appVersion: string;
   sql: string;
   touchedTables: readonly string[];

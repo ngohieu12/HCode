@@ -9,6 +9,7 @@ import {
   OFF_PEAK_SCHEMA,
   TASK_INDEX_SCHEMA,
 } from "#src/session/tasksDatabase/schema-v1.js";
+import { OFFICIAL_GLM_SELECTION_MIGRATION_SQL } from "#src/session/tasksDatabase/official-glm-selection-v3.js";
 import { CONTROLLER_REMOTE_SCHEMA_SQL } from "#src/session/tasksDatabase/controller-remote-schema-v4.js";
 import {
   adoptSourceServerWorkspaceSchema,
@@ -55,6 +56,10 @@ const executionColumns = [
   ["off_peak_tasks", "additional_directories"],
 ] as const;
 
+// 0002/0003 在 HCode 中是空操作：runner 对没有 apply 的迁移会执行 sql 字段，
+// 而这里的 sql 是 checksum 输入 JSON，不是 SQL，所以必须显式给 no-op。
+const skipRemovedProviderMigration = (_db: DatabaseSync): void => {};
+
 // 与 Agent 同样是库级串行事务，但不跨域依赖其具体 adapter。TS 转换使用冻结语义版本，
 // 禁用 function.toString 哈希：Electron/SEA 打包会改变函数文本而非迁移语义。
 const definitions = [
@@ -86,13 +91,18 @@ const definitions = [
     // 保留迁移号（checksum 冻结）但空执行，用户下次手动重选模型。
     id: "0002_provider_selection",
     touchedTables: ["automations"],
+    apply: skipRemovedProviderMigration,
     checksumInput: ["legacy-automation-selection-v1", "no-provider-for-legacy-off-peak-v1"],
   },
   {
     id: "0003_official_glm_selection",
     touchedTables: ["automations"],
-    // 与 0002 相同：只改写已下线的内置供应商身份，保留为空操作（checksumInput 冻结）。
-    checksumInput: ["official-glm-selection-v3"],
+    // 与 0002 相同：只改写已下线的内置供应商身份，保留为空操作。
+    // checksumInput 必须与上游完全一致（冻结 SQL 文本），否则 ZCode 写过的库会报
+    // checksum_mismatch；旧版 HCode 曾写入 ["official-glm-selection-v3"]，作为历史别名接受。
+    apply: skipRemovedProviderMigration,
+    checksumInput: [OFFICIAL_GLM_SELECTION_MIGRATION_SQL],
+    legacyChecksumInputs: [["official-glm-selection-v3"]],
   },
   {
     id: "0004_project_execution_scopes",
@@ -164,8 +174,16 @@ function prepareMigrations(scope: TasksDatabaseMigrationScope) {
     sql: JSON.stringify(migration.checksumInput),
     touchedTables: migration.touchedTables,
     apply: migration.apply,
-    checksum: createHash("sha256").update(JSON.stringify(migration.checksumInput)).digest("hex"),
+    checksum: checksumOf(migration.checksumInput),
+    legacyChecksums:
+      "legacyChecksumInputs" in migration
+        ? migration.legacyChecksumInputs.map((input) => checksumOf(input))
+        : [],
   }));
+}
+
+function checksumOf(checksumInput: unknown): string {
+  return createHash("sha256").update(JSON.stringify(checksumInput)).digest("hex");
 }
 
 export async function runTasksDatabaseMigrations(
@@ -241,10 +259,15 @@ export async function runTasksDatabaseMigrations(
   }
 }
 
-function isMigrationApplied(db: DatabaseSync, id: string, checksum: string): boolean {
+function isMigrationApplied(
+  db: DatabaseSync,
+  id: string,
+  checksum: string,
+  legacyChecksums: readonly string[] = [],
+): boolean {
   const applied = db.prepare("SELECT checksum FROM tasks_schema_migration WHERE id=?").get(id);
   if (!applied) return false;
-  if (applied.checksum !== checksum)
+  if (applied.checksum !== checksum && !legacyChecksums.includes(String(applied.checksum)))
     throw Object.assign(new Error(`Task database migration checksum mismatch: ${id}`), {
       kind: "checksum_mismatch",
       migrationId: id,
@@ -263,7 +286,9 @@ export function areTasksDatabaseMigrationsApplied(
       .get()
   )
     return false;
-  return prepareMigrations(scope).every(({ id, checksum }) => isMigrationApplied(db, id, checksum));
+  return prepareMigrations(scope).every(({ id, checksum, legacyChecksums }) =>
+    isMigrationApplied(db, id, checksum, legacyChecksums),
+  );
 }
 
 /** 只读账本的展示预检，不授权执行；runner 拿锁后仍复查每一项。 */
@@ -275,8 +300,8 @@ export function inspectTasksMigrationKind(
     .prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='tasks_schema_migration'")
     .get();
   let pending = false;
-  for (const { id, checksum } of prepareMigrations(scope)) {
-    if (!hasLedger || !isMigrationApplied(db, id, checksum)) pending = true;
+  for (const { id, checksum, legacyChecksums } of prepareMigrations(scope)) {
+    if (!hasLedger || !isMigrationApplied(db, id, checksum, legacyChecksums)) pending = true;
   }
   if (!pending) return "none";
   return db
