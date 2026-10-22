@@ -39,6 +39,43 @@ vi.mock("@/i18n/IntlProvider.js", () => ({
 }));
 
 describe("ProviderTemplatePicker", () => {
+  it("HCode 不展示 Z.ai / BigModel 内置模板，也没有 Zhipu / Other 分组标题", () => {
+    const html = renderToStaticMarkup(
+      createElement(
+        TooltipProvider,
+        null,
+        createElement(ProviderTemplatePicker, {
+          templates: [
+            { templateId: "zai-api", templateNameMap: { "en-US": "Z.ai Coding Plan" }, config: {} },
+            { templateId: "bigmodel-api", templateNameMap: { "en-US": "BigModel" }, config: {} },
+            {
+              templateId: "zai-standard-api",
+              templateNameMap: { "en-US": "Z.ai API" },
+              config: {},
+            },
+            {
+              templateId: "bigmodel-standard-api",
+              templateNameMap: { "en-US": "BigModel API" },
+              config: {},
+            },
+            { templateId: "deepseek", templateNameMap: { "en-US": "DeepSeek" }, config: {} },
+          ],
+          onBack: vi.fn(),
+          onCreateFromTemplate: vi.fn(),
+          onCreateCustom: vi.fn(),
+          creating: false,
+        }),
+      ),
+    );
+
+    expect(html).not.toContain("Z.ai");
+    expect(html).not.toContain("BigModel");
+    expect(html).not.toContain("settings.modelProvider.templateGroup");
+    expect(html).not.toContain('data-provider-template-group="zhipu"');
+    expect(html).toContain(`data-testid="${testId(TID_MODEL_PROVIDER_TEMPLATE_ITEM, "custom")}"`);
+    expect(html).toContain("DeepSeek");
+  });
+
   it("按 Settings View 顺序展示本地化 Template，并提供同页自定义入口", () => {
     const html = renderToStaticMarkup(
       createElement(
@@ -70,9 +107,11 @@ describe("ProviderTemplatePicker", () => {
     expect(html).toContain(`data-testid="${testId(TID_MODEL_PROVIDER_TEMPLATE_ITEM, "custom")}"`);
     expect(html).toContain(`data-testid="${testId(TID_MODEL_PROVIDER_TEMPLATE_ITEM, "deepseek")}"`);
     expect(html).toContain("创建自定义供应商");
-    expect(html).toContain("深度求索");
+    // HCode 模板名固定用 en-US，不随界面语言显示中文名。
+    expect(html).toContain("DeepSeek");
+    expect(html).not.toContain("深度求索");
     expect(html).toContain("Alibaba Model Studio (International)");
-    expect(html.indexOf("深度求索")).toBeLessThan(
+    expect(html.indexOf("DeepSeek")).toBeLessThan(
       html.indexOf("Alibaba Model Studio (International)"),
     );
   });
@@ -94,7 +133,7 @@ describe("ProviderTemplatePicker", () => {
             templates: [
               {
                 templateId: "deepseek",
-                templateNameMap: { "vi-VN": "DeepSeek" },
+                templateNameMap: { "en-US": "DeepSeek" },
                 config: { logo: { type: "builtin", key: "deepseek" } },
               },
             ],
