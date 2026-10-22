@@ -29,6 +29,7 @@ import {
 } from "./constants.js";
 import { InlineEditableProviderCard } from "./InlineEditableProviderCard.js";
 import {
+  ModelProviderEmptyCard,
   ModelProviderLoadingCard,
   PresetProviderPlaceholderCard,
   CodingPlanStatusPanel,
@@ -235,6 +236,7 @@ export function ModelProviderSectionDetail({
   connectionSelections,
   startPlanSubscriptionCount = 0,
   presetLoading,
+  onAddProvider,
   codingPlanPurchaseTokenAuthenticatedByProviderId,
   codingPlanAuthError,
   presetSubscriptionProviderId,
@@ -263,6 +265,8 @@ export function ModelProviderSectionDetail({
   connectionSelections?: ProviderFamilyConnectionSelectionSettings;
   startPlanSubscriptionCount?: number;
   presetLoading: boolean;
+  /** HCode：没有任何 provider 时，空态卡片通过它打开“添加 provider”模板选择。 */
+  onAddProvider?: () => void;
   codingPlanPurchaseTokenAuthenticatedByProviderId: Partial<
     Record<BuiltinModelProviderId, boolean>
   >;
@@ -395,6 +399,11 @@ export function ModelProviderSectionDetail({
   }, [selectedItemKey]);
 
   if (!selectedNavItem) {
+    // HCode 不再内置 provider：加载结束后仍然没有任何导航项，说明用户还没添加 provider，
+    // 显示空态引导，而不是一直转圈。
+    if (!presetLoading && navigationItems.length === 0 && onAddProvider) {
+      return <ModelProviderEmptyCard onAddProvider={onAddProvider} />;
+    }
     return <ModelProviderLoadingCard loadingLabel={loadingLabel} />;
   }
 

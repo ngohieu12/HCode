@@ -178,6 +178,10 @@ const viVN: Record<string, string> = {
   "settings.usageTitle": "Thống kê sử dụng",
   "settings.browser.title": "Sử dụng trình duyệt",
   "settings.modelProviderTitle": "Cài đặt mô hình",
+  "settings.modelProvider.emptyAll.title": "Chưa có nhà cung cấp nào",
+  "settings.modelProvider.emptyAll.description":
+    "Thêm nhà cung cấp bằng API key của bạn để bắt đầu chọn mô hình khi trò chuyện.",
+  "settings.modelProvider.addProviderAction": "Thêm nhà cung cấp",
   "settings.mcpTitle": "Máy chủ MCP",
   "settings.skills.title": "Kỹ năng",
   "settings.subagents.title": "Tác nhân con",
@@ -267,7 +271,8 @@ const viVN: Record<string, string> = {
   "archives.count": "{count} phiên",
   "archives.delete": "Xóa",
   "archives.deleteAll": "Xóa tất cả",
-  "archives.deleteDescription": "Chỉ những phiên trong lựa chọn đã xác nhận này mới bị xóa. Bạn không thể khôi phục chúng trong ứng dụng.",
+  "archives.deleteDescription":
+    "Chỉ những phiên trong lựa chọn đã xác nhận này mới bị xóa. Bạn không thể khôi phục chúng trong ứng dụng.",
   "archives.deleteTask": "Xóa “{title}”",
   "archives.deleteTitle": "Xóa {count} phiên đã lưu trữ?",
   "archives.empty": "Không có phiên đã lưu trữ",
@@ -279,7 +284,8 @@ const viVN: Record<string, string> = {
   "archives.projectLabel": "Dự án",
   "archives.removed": "Đã gỡ bỏ",
   "archives.removedProject": "Dự án đã gỡ bỏ",
-  "archives.result": "Thành công: {succeeded}; thất bại: {failed}; bỏ qua do đã thay đổi: {skipped}",
+  "archives.result":
+    "Thành công: {succeeded}; thất bại: {failed}; bỏ qua do đã thay đổi: {skipped}",
   "archives.retry": "Thử lại",
   "archives.search": "Tìm phiên đã lưu trữ",
   "archives.showMore": "Hiển thị thêm",
@@ -292,7 +298,8 @@ const viVN: Record<string, string> = {
   "archives.unclassified": "Chưa phân loại",
   "archives.working": "Đang xử lý…",
   "chat.draft.suggestedPrompt.createPdf": "Tạo PDF",
-  "chat.draft.suggestedPrompt.createPdf.prompt": "Tạo một tài liệu PDF dựa trên nội dung của workspace hiện tại.",
+  "chat.draft.suggestedPrompt.createPdf.prompt":
+    "Tạo một tài liệu PDF dựa trên nội dung của workspace hiện tại.",
   "chat.draft.suggestedPrompt.plugin.documentSkills": "Kỹ năng tài liệu",
   "chat.draft.suggestedPrompt.plugin.github": "Github",
   "chat.draft.suggestedPrompt.pluginFlow.checking": "Đang kiểm tra trạng thái plugin…",
@@ -303,14 +310,18 @@ const viVN: Record<string, string> = {
   "chat.draft.suggestedPrompt.pluginFlow.enabling": "Đang bật plugin…",
   "chat.draft.suggestedPrompt.pluginFlow.installConfirmation": "Cài đặt plugin {pluginLabel}",
   "chat.draft.suggestedPrompt.pluginFlow.installFailed": "Cài đặt plugin thất bại",
-  "chat.draft.suggestedPrompt.pluginFlow.installFailureToast": "Không cài đặt được {pluginLabel}: {error}",
-  "chat.draft.suggestedPrompt.pluginFlow.installReturnedEmpty": "Không có plugin đã cài nào được trả về",
+  "chat.draft.suggestedPrompt.pluginFlow.installFailureToast":
+    "Không cài đặt được {pluginLabel}: {error}",
+  "chat.draft.suggestedPrompt.pluginFlow.installReturnedEmpty":
+    "Không có plugin đã cài nào được trả về",
   "chat.draft.suggestedPrompt.pluginFlow.installSucceeded": "Cài đặt thành công",
   "chat.draft.suggestedPrompt.pluginFlow.installTimedOut": "Cài đặt quá thời gian",
   "chat.draft.suggestedPrompt.pluginFlow.installing": "Đang cài đặt plugin…",
-  "chat.draft.suggestedPrompt.pluginUnavailable": "Plugin {pluginLabel} chưa được bật hoặc chưa cài đặt",
+  "chat.draft.suggestedPrompt.pluginUnavailable":
+    "Plugin {pluginLabel} chưa được bật hoặc chưa cài đặt",
   "chat.draft.suggestedPrompt.recentCommits": "Xem các commit trong 7 ngày qua",
-  "chat.draft.suggestedPrompt.recentCommits.prompt": "Xem các Git commit trong 7 ngày qua trong workspace này, tóm tắt các thay đổi chính và chỉ ra rủi ro tiềm ẩn.",
+  "chat.draft.suggestedPrompt.recentCommits.prompt":
+    "Xem các Git commit trong 7 ngày qua trong workspace này, tóm tắt các thay đổi chính và chỉ ra rủi ro tiềm ẩn.",
   "chat.initialization.failed": "Khởi tạo thất bại. Không thể gửi tin nhắn.",
   "chat.initialization.retry": "Thử lại",
   "chat.officeSuggestions.setting": "Gợi ý tác vụ chủ động",
@@ -328,7 +339,8 @@ const viVN: Record<string, string> = {
   "occupationOnboarding.back": "Quay lại",
   "occupationOnboarding.close": "Thoát hướng dẫn",
   "occupationOnboarding.coding": "Chế độ Lập trình",
-  "occupationOnboarding.codingDescription": "Tôi muốn xem code, đầu ra lệnh và chi tiết thay đổi trong suốt quá trình phát triển.",
+  "occupationOnboarding.codingDescription":
+    "Tôi muốn xem code, đầu ra lệnh và chi tiết thay đổi trong suốt quá trình phát triển.",
   "occupationOnboarding.continue": "Tiếp theo",
   "occupationOnboarding.creator": "Truyền thông / Sáng tạo nội dung",
   "occupationOnboarding.description": "Chọn lĩnh vực gần nhất với công việc hằng ngày của bạn.",
@@ -336,21 +348,24 @@ const viVN: Record<string, string> = {
   "occupationOnboarding.developer": "Phần mềm / Dữ liệu / AI",
   "occupationOnboarding.error": "Lưu thất bại. Vui lòng thử lại.",
   "occupationOnboarding.finance": "Tài chính / Kế toán / Tư vấn",
-  "occupationOnboarding.heroDescription": "Xử lý các mục tiêu phức tạp với nhiều agent.\\nLuôn nắm quyền kiểm soát, ở bất cứ đâu.",
+  "occupationOnboarding.heroDescription":
+    "Xử lý các mục tiêu phức tạp với nhiều agent.\\nLuôn nắm quyền kiểm soát, ở bất cứ đâu.",
   "occupationOnboarding.heroTitle": "Đơn giản, Nhanh chóng, Sẵn sàng Vibe!",
   "occupationOnboarding.independent": "Khởi nghiệp / Freelance / OPC",
   "occupationOnboarding.infrastructure": "QA / Vận hành / Bảo mật",
   "occupationOnboarding.legal": "Pháp lý / Hành chính / Nhân sự",
   "occupationOnboarding.marketing": "Marketing / Thương hiệu / PR",
   "occupationOnboarding.memory": "Bật bộ nhớ workspace",
-  "occupationOnboarding.memoryDescription": "Cho phép HCode ghi nhớ tùy chọn và ngữ cảnh công việc của bạn.",
+  "occupationOnboarding.memoryDescription":
+    "Cho phép HCode ghi nhớ tùy chọn và ngữ cảnh công việc của bạn.",
   "occupationOnboarding.migration": "Chuyển đổi hội thoại",
   "occupationOnboarding.migrationDescription": "Chuyển lịch sử hội thoại từ Claude Code",
   "occupationOnboarding.modeDescription": "Bạn muốn HCode trình bày công việc của nó như thế nào?",
   "occupationOnboarding.modeTitle": "Chọn chế độ giao diện",
   "occupationOnboarding.office": "Chuyên viên văn phòng",
   "occupationOnboarding.officeMode": "Chế độ Văn phòng",
-  "occupationOnboarding.officeModeDescription": "Tôi tập trung vào tiến độ và kết quả của tác vụ, không cần xem code, đầu ra lệnh hay các chi tiết kỹ thuật khác.",
+  "occupationOnboarding.officeModeDescription":
+    "Tôi tập trung vào tiến độ và kết quả của tác vụ, không cần xem code, đầu ra lệnh hay các chi tiết kỹ thuật khác.",
   "occupationOnboarding.operations": "Vận hành / Thương mại / Chăm sóc khách hàng",
   "occupationOnboarding.other": "Ngành nghề khác",
   "occupationOnboarding.preferences": "Cá nhân hóa trợ lý công việc của bạn",
@@ -364,15 +379,18 @@ const viVN: Record<string, string> = {
   "occupationOnboarding.stepRole": "Công việc của bạn",
   "occupationOnboarding.student": "Sinh viên / Giảng dạy / Nghiên cứu",
   "occupationOnboarding.suggestions": "Bật gợi ý tác vụ chủ động",
-  "occupationOnboarding.suggestionsDescription": "Hiển thị gợi ý trong hội thoại mới. Nhấn để điền vào ô soạn thảo.",
+  "occupationOnboarding.suggestionsDescription":
+    "Hiển thị gợi ý trong hội thoại mới. Nhấn để điền vào ô soạn thảo.",
   "occupationOnboarding.suggestionsHeading": "Tác vụ được gợi ý",
   "occupationOnboarding.title": "Bạn làm nghề gì?",
   "preview.image.actions": "Thao tác với hình ảnh",
-  "preview.image.addFailed": "Không thêm được hình ảnh. Trước tiên hãy mở một đoạn chat có thể chỉnh sửa trong workspace này.",
+  "preview.image.addFailed":
+    "Không thêm được hình ảnh. Trước tiên hãy mở một đoạn chat có thể chỉnh sửa trong workspace này.",
   "preview.image.added": "Đã thêm vào đoạn chat",
   "preview.image.copied": "Đã sao chép hình ảnh",
   "preview.image.copy": "Sao chép hình ảnh",
-  "preview.image.copyFailed": "Không sao chép được hình ảnh. Kiểm tra quyền truy cập clipboard và thử lại.",
+  "preview.image.copyFailed":
+    "Không sao chép được hình ảnh. Kiểm tra quyền truy cập clipboard và thử lại.",
   "project.actions": "Thao tác dự án",
   "project.add": "Thêm",
   "project.addFolder": "Thêm thư mục vào dự án",
@@ -390,11 +408,13 @@ const viVN: Record<string, string> = {
   "project.connect": "Kết nối",
   "project.connectAndBrowse": "Kết nối và chọn thư mục",
   "project.connectAndBrowseHint": "Trạng thái thiết bị: {status}. HCode sẽ kết nối trước.",
-  "project.connectionUnavailable": "Thiết bị này hiện không khả dụng. Hãy kết nối lại trong cài đặt.",
+  "project.connectionUnavailable":
+    "Thiết bị này hiện không khả dụng. Hãy kết nối lại trong cài đặt.",
   "project.create": "Tạo dự án",
   "project.createTask": "Tác vụ mới",
   "project.delete": "Xóa dự án",
-  "project.description": "Nhóm các thư mục trên cùng một máy. Các tác vụ hiện có giữ nguyên thư mục làm việc.",
+  "project.description":
+    "Nhóm các thư mục trên cùng một máy. Các tác vụ hiện có giữ nguyên thư mục làm việc.",
   "project.device": "Thiết bị",
   "project.deviceSettings": "Cài đặt thiết bị từ xa",
   "project.deviceStatus.connecting": "Đang kết nối",
@@ -450,7 +470,8 @@ const viVN: Record<string, string> = {
   "project.trustFolderTitle": "Tin cậy thư mục này?",
   "project.trustFoldersAndCreate": "Tin cậy và tạo",
   "project.trustFoldersAndRestore": "Tin cậy và khôi phục",
-  "project.trustFoldersDescription": "HCode có thể đọc, chỉnh sửa tệp trong các thư mục này và chạy lệnh trong giới hạn cài đặt quyền hiện tại của bạn. Chỉ tiếp tục khi bạn tin cậy mọi thư mục được liệt kê.",
+  "project.trustFoldersDescription":
+    "HCode có thể đọc, chỉnh sửa tệp trong các thư mục này và chạy lệnh trong giới hạn cài đặt quyền hiện tại của bạn. Chỉ tiếp tục khi bạn tin cậy mọi thư mục được liệt kê.",
   "project.trustFoldersTitle": "Tin cậy các thư mục này?",
   "project.type": "Loại dự án",
   "project.unpin": "Bỏ ghim",
@@ -459,7 +480,8 @@ const viVN: Record<string, string> = {
   "project.viewByProject": "Theo dự án",
   "project.viewRecentlyUpdated": "Mới cập nhật",
   "remote.conversation.draft": "Bản nháp chưa gửi",
-  "remote.conversation.placeholder": "Thiết bị đã ngắt kết nối. Kết nối lại để tiếp tục cuộc hội thoại này.",
+  "remote.conversation.placeholder":
+    "Thiết bị đã ngắt kết nối. Kết nối lại để tiếp tục cuộc hội thoại này.",
   "remote.conversation.reconnect": "Kết nối lại",
   "remote.conversation.sendUnavailable": "Thiết bị đã ngắt kết nối. Không thể gửi tin nhắn.",
   "remote.conversation.tasksContinue": "Các tác vụ đang chạy trên thiết bị sẽ tiếp tục.",
@@ -470,12 +492,15 @@ const viVN: Record<string, string> = {
   "settings.plugins.store.segment.public": "Công cộng",
   "settings.plugins.store.ui.capability": "Cung cấp các giao diện tương tác mở trong ngăn bên.",
   "settings.plugins.store.ui.chooseSurface": "Chọn một giao diện plugin",
-  "settings.plugins.store.ui.needsSession": "Mở plugin này trong một phiên khả dụng của dự án hiện tại.",
+  "settings.plugins.store.ui.needsSession":
+    "Mở plugin này trong một phiên khả dụng của dự án hiện tại.",
   "settings.plugins.store.ui.open": "Mở",
   "settings.plugins.store.ui.preview": "Phóng to xem trước",
   "settings.plugins.store.ui.title": "Plugin ứng dụng",
-  "settings.plugins.store.ui.unavailable": "Không có giao diện plugin nào khả dụng trong dự án này. Kiểm tra xem plugin đã được bật chưa.",
-  "settings.plugins.store.ui.unsupported": "Giao diện plugin chỉ khả dụng trong các dự án máy tính để bàn cục bộ.",
+  "settings.plugins.store.ui.unavailable":
+    "Không có giao diện plugin nào khả dụng trong dự án này. Kiểm tra xem plugin đã được bật chưa.",
+  "settings.plugins.store.ui.unsupported":
+    "Giao diện plugin chỉ khả dụng trong các dự án máy tính để bàn cục bộ.",
   "settings.shortcuts.saveFailed": "Lưu phím tắt thất bại. Vui lòng thử lại.",
   "taskList.remoteConnectionUnknown": "Kết nối từ xa không khả dụng",
 };

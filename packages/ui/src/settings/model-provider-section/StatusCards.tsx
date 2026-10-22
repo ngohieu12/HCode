@@ -117,6 +117,30 @@ export function ModelProviderLoadingCard({ loadingLabel }: { loadingLabel: strin
   );
 }
 
+/** HCode：没有任何 provider 时的空态，引导用户添加自己的 provider（BYOK）。 */
+export function ModelProviderEmptyCard({ onAddProvider }: { onAddProvider: () => void }) {
+  const { intl } = useZCodeIntl();
+
+  return (
+    <div
+      className="flex flex-col items-start gap-3 rounded-xl border border-border bg-surface p-4"
+      data-model-provider-empty="true"
+    >
+      <div>
+        <div className="text-ui-lg font-semibold text-foreground">
+          {intl.formatMessage({ id: "settings.modelProvider.emptyAll.title" })}
+        </div>
+        <div className="mt-1 text-ui-base text-foreground-subtle">
+          {intl.formatMessage({ id: "settings.modelProvider.emptyAll.description" })}
+        </div>
+      </div>
+      <Button type="button" size="sm" onClick={onAddProvider}>
+        {intl.formatMessage({ id: "settings.modelProvider.addProviderAction" })}
+      </Button>
+    </div>
+  );
+}
+
 export function PresetProviderPlaceholderCard({
   displayName,
   messageId = "settings.modelProvider.presetEmpty",

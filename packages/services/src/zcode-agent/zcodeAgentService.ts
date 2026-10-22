@@ -31,7 +31,7 @@ import {
 } from "@zcode/shared";
 /* oxlint-disable eslint(max-lines) -- ZCode Protocol transport、通知 wiring 和 app-facing session 方法必须共享同一个 client/emitter 上下文。 */
 import { ensureIndependentPlanSupport } from "./independentPlanSupport.js";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { createTopicResourceBridge } from "./topicResourceBridge.js";
 import { uploadTopicResourceToClient } from "./topicResourceUpload.js";
 import {
@@ -3239,7 +3239,7 @@ export function createZCodeAgentService(
           : payload.additionalDirectories;
       if (params.projectId !== undefined && !options?.prepareSessionCreation)
         throw new Error("project.creation-unavailable");
-      const offPeakToolEnabled = isOffPeakToolSupported(params);
+      // HCode 已移除闲时（off-peak）任务服务，新会话不再声明 off-peak 工具。
       return {
         ...envelope,
         payload: {
@@ -3247,7 +3247,6 @@ export function createZCodeAgentService(
           ...(dynamicWorkflowEnabled ? { dynamicWorkflowEnabled: true, dynamicWorkflowMode } : {}),
           ...(sessionId ? { sessionId } : {}),
           ...(additionalDirectories !== undefined ? { additionalDirectories } : {}),
-          ...(offPeakToolEnabled ? { offPeakToolEnabled: true } : {}),
         },
       };
     }
@@ -3453,10 +3452,7 @@ export function createZCodeAgentService(
         // 可选字段降级重试，避免 thoughtLevel/persistence 版本差阻塞首发创建。
         const snapshot = await client.request(
           zcodeProtocolMethods.sessionCreate,
-          buildSessionCreateParams(
-            { ...params, ...dynamicWorkflowFlags },
-            new Set(compatFields),
-          ),
+          buildSessionCreateParams({ ...params, ...dynamicWorkflowFlags }, new Set(compatFields)),
           zcodeSessionStateSnapshotSchema,
           sessionTraceId ? { trace: { traceId: sessionTraceId } } : undefined,
         );
@@ -3566,10 +3562,7 @@ export function createZCodeAgentService(
         });
         const snapshot = await client.request(
           zcodeProtocolMethods.sessionResume,
-          buildSessionResumeParams(
-            { ...params, ...dynamicWorkflowFlags },
-            new Set(compatFields),
-          ),
+          buildSessionResumeParams({ ...params, ...dynamicWorkflowFlags }, new Set(compatFields)),
           zcodeSessionStateSnapshotSchema,
         );
         const sessionTraceId = rememberSessionTrace(params, snapshot) ?? cachedTraceId;
