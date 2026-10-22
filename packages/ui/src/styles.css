@@ -839,6 +839,15 @@ html[data-document-hidden] *::after {
   --color-plugin-paid-plan-badge-foreground: #ffd8b8;
 }
 
+/* HCode：深色主题的面板背景是纯黑 #000000，而 ZCode 是 #161616。设置页里的列表容器
+   （MCP、插件、技能、命令、Hook、子代理、记忆……）用的是白色 5% 的 bg-surface，叠在纯黑上
+   几乎看不见，容器的灰底就像消失了。这里只在设置面板内把 surface 调到与 ZCode 相同的视觉灰度
+   （#000 上约等于 #232323），不影响弹层和工作区其他位置。 */
+.theme-zai-dark [data-settings-panel-frame="true"] {
+  --color-surface: rgba(255, 255, 255, 0.14);
+  --color-surface-hover: rgba(255, 255, 255, 0.175);
+}
+
 /*
  * 修复原因：之前只有 task 列表单独定制了滚动条，其他面板、下拉列表、代码区仍然保留系统默认样式，
  * 同一套界面里会出现粗细、圆角和轨道背景都不一致的问题。这里把这套透明轨道 + 圆角 thumb
