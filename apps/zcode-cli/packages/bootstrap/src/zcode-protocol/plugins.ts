@@ -53,6 +53,7 @@ import { getCliStorageRoot, getPluginStorageRoot } from "../app/paths.js";
 import { resolveOfficialPluginHostMcpServerNames } from "../app/official-plugin-definitions.js";
 import { createConfig, resolvePath, type ConfigResult } from "@zcode/adapters/config";
 import { parseParams, type ZCodeProtocolAgentServerContext } from "./server-types.js";
+import { toProtocolUserConfig } from "./plugin-user-config.js";
 
 // 把 CLI 的 PluginMetadata 投影成协议可序列化的 ZCodePluginInfo (只保留 UI 需要的字段)。
 function toPluginInfo(plugin: PluginMetadata, configResult?: ConfigResult): ZCodePluginInfo {
@@ -62,6 +63,7 @@ function toPluginInfo(plugin: PluginMetadata, configResult?: ConfigResult): ZCod
       ([key]) => plugin.userConfig?.[key]?.sensitive !== true,
     ),
   );
+  const userConfig = toProtocolUserConfig(plugin.userConfig);
   const enabledSource = configResult?.sources.plugins.enabled[plugin.id];
   const optionSources = configResult?.sources.plugins.options[plugin.id];
   const rootSource =
@@ -101,7 +103,7 @@ function toPluginInfo(plugin: PluginMetadata, configResult?: ConfigResult): ZCod
     ...(hostMcpServerNames.length > 0 ? { hostMcpServerNames } : {}),
     hookDetails: plugin.hookDetails,
     rootPath: plugin.rootPath,
-    ...(plugin.userConfig ? { userConfig: plugin.userConfig } : {}),
+    ...(userConfig ? { userConfig } : {}),
     ...(Object.keys(configuredOptions).length > 0 ? { configuredOptions } : {}),
     ...(rootSource ? { rootSource } : {}),
     ...(enabledSource ? { enabledSource } : {}),
