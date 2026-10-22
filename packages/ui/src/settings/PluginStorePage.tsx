@@ -70,6 +70,8 @@ interface PluginStorePageProps {
   remoteSessionId?: string | null;
   embedded?: boolean;
   onBack?: () => void;
+  /** 设置页已经渲染分区标题时传 false，避免出现两个「插件市场」标题；顶栏动作仍保留。 */
+  showTitle?: boolean;
 }
 
 type PluginStoreView = "store" | "detail" | "manage";
@@ -86,6 +88,7 @@ export function PluginStorePage({
   remoteSessionId,
   embedded = false,
   onBack,
+  showTitle = true,
 }: PluginStorePageProps) {
   const platform = usePlatform();
   const { intl, locale } = useZCodeIntl();
@@ -574,12 +577,14 @@ export function PluginStorePage({
                 <ArrowLeft className="size-4" aria-hidden="true" />
               </Button>
             ) : null}
-            <h1
-              data-testid="plugin-store-title"
-              className="text-ui-xl font-semibold tracking-tight text-foreground"
-            >
-              {intl.formatMessage({ id: "workspace.openPluginsSettings" })}
-            </h1>
+            {showTitle ? (
+              <h1
+                data-testid="plugin-store-title"
+                className="text-ui-xl font-semibold tracking-tight text-foreground"
+              >
+                {intl.formatMessage({ id: "workspace.openPluginsSettings" })}
+              </h1>
+            ) : null}
           </div>
           {/* 顶栏动作：刷新 / 市场源管理 / 添加 / 插件管理。 */}
           <div className="flex flex-wrap items-center gap-2">
