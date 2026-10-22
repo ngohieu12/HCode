@@ -40,6 +40,12 @@
  * 通过独立平台 variant 使用真实 Window Controls Overlay 安全区；普通 Web 不继承该规则。 */
 @custom-variant platform-windows-desktop (&:where(.platform-windows-desktop, .platform-windows-desktop *));
 
+/* HCode：深色主题（theme-zai-dark）的页面背景是纯黑 #000000。上游 ZCode 的不少设置页容器
+ * （表格、表单、卡片）不设背景或用 bg-background，在 ZCode 的 #161616 上还能看出层次，
+ * 到了纯黑上就成了“只有边框的黑洞”。用这个 variant 只给 HCode 深色主题补上灰底，
+ * 浅色主题与普通 dark 主题不受影响。 */
+@custom-variant hcode-dark (&:where(.theme-zai-dark, .theme-zai-dark *));
+
 /*
  * 修复原因：当前 UI 直接使用了 shadcn 的 radix-mira 风格组件源码，这些组件大量依赖
  * data-active / data-horizontal / data-vertical 这类语义 variant。

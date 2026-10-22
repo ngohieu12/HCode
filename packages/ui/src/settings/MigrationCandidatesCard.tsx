@@ -45,7 +45,7 @@ function ImportIssuesList({
         {items.map((item) => (
           <div
             key={`${item.provider}-${item.sessionId}-${item.reason}`}
-            className="rounded-lg border border-border bg-background px-3 py-2"
+            className="rounded-lg border border-border bg-background hcode-dark:bg-surface px-3 py-2"
           >
             <div className="font-mono text-ui-base text-foreground">{item.sessionId}</div>
             {item.workspacePath ? (
@@ -214,7 +214,7 @@ export function MigrationCandidatesCard({
                     "w-full rounded-lg border px-3 py-3 text-left transition-colors",
                     isSelected
                       ? "border-primary bg-accent"
-                      : "border-border bg-background hover:bg-surface",
+                      : "border-border bg-background hover:bg-surface hcode-dark:bg-surface hcode-dark:hover:bg-surface-hover",
                   )}
                   onClick={() => onToggleSelection(candidate.sessionId)}
                 >
