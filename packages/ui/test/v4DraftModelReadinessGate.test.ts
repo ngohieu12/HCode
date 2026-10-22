@@ -106,9 +106,14 @@ describe("draft model readiness gate", () => {
       }),
     );
 
+    // HCode：被动检查只阻止启动，不在打开草稿时弹出缺模型横幅。
+    await waitFor(() => expect(result.current.agentStartupAllowed).toBe(false));
+    expect(result.current.error).toBeNull();
+    await act(async () => {
+      await expect(result.current.ensureReadyForSend()).resolves.toBe(false);
+    });
+    // 用户真正发送时才显示横幅，避免发送后没有反馈。
     await waitFor(() => expect(result.current.error).not.toBeNull());
-    expect(result.current.agentStartupAllowed).toBe(false);
-    await expect(result.current.ensureReadyForSend()).resolves.toBe(false);
   });
 
   it("does not let a stale initial read overwrite a newer Selection event", async () => {

@@ -289,10 +289,6 @@ export function createSettingServiceWithMigrations(): {
           ...validatedPatch,
         });
 
-        if (writesConnections) {
-          // 即使选择值相同也代表一次新操作，版本由同一写锁保证单调递增。
-        }
-
         // 打开工作区后会几乎同时写 recentProjects 和 lastWorkspaceSession。
         // 之前两个 update 都是基于各自读到的旧 settings 直接覆盖写回，
         // 后写入的补丁会把前一个字段整块抹掉，导致下次启动恢复不到会话。

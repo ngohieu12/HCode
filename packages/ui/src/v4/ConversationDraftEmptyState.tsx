@@ -1,9 +1,6 @@
 /*
- * 草稿态欢迎区只保留按本地时间变化的问候语；字号和窄屏换行交给设计令牌与浏览器排版。
+ * 草稿态欢迎区。HCode 不渲染问候语，只保留按本地时间选择文案 id 的工具函数。
  */
-import { useEffect, useState } from "react";
-import { useZCodeIntl } from "@/i18n/IntlProvider.js";
-
 const GREETING_BOUNDARY_HOURS = [5, 9, 12, 14, 18, 23] as const;
 
 export type ChatEmptyGreetingMessageId =
@@ -43,29 +40,11 @@ export function getNextChatEmptyGreetingDelayMs(date: Date = new Date()) {
   return Math.max(1, tomorrow.getTime() - date.getTime());
 }
 
+/**
+ * HCode：草稿态不再显示按时间变化的问候语（如 "Good afternoon! Leave the rest to me."）。
+ * 保留组件与问候语工具函数，供 SessionPane 的空态插槽和现有测试继续引用；
+ * 空态插槽本身仍然存在，因此草稿态 composer 的居中布局不受影响。
+ */
 export function ConversationDraftEmptyState() {
-  const { intl } = useZCodeIntl();
-  const [greetingDate, setGreetingDate] = useState(() => new Date());
-  const greeting = intl.formatMessage({
-    id: getChatEmptyGreetingMessageId(greetingDate),
-  });
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setGreetingDate(new Date());
-    }, getNextChatEmptyGreetingDelayMs(greetingDate));
-
-    return () => window.clearTimeout(timeout);
-  }, [greetingDate]);
-
-  return (
-    <div className="mb-6 w-full max-w-2xl">
-      <p
-        data-v4-draft-greeting="true"
-        className="px-4 text-center text-ui-xl leading-tight font-medium text-foreground"
-      >
-        {greeting}
-      </p>
-    </div>
-  );
+  return null;
 }

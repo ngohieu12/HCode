@@ -25,7 +25,7 @@ describe("chat empty time greeting i18n", () => {
     );
   });
 
-  it("renders one compact greeting with the shared UI type scale", () => {
+  it("HCode 草稿态不渲染问候语", () => {
     const html = renderToStaticMarkup(
       createElement(
         ZCodeIntlProvider,
@@ -34,10 +34,8 @@ describe("chat empty time greeting i18n", () => {
       ),
     );
 
-    expect(html).toContain('data-v4-draft-greeting="true"');
-    expect(html).toContain("text-ui-xl");
-    expect(html).toContain("mb-6");
-    expect(html).not.toContain("font-size");
+    expect(html).toBe("");
+    expect(html).not.toContain("Good afternoon");
   });
 
   it.each([
