@@ -4439,6 +4439,9 @@ const enUS: Record<string, string> = {
   "settings.modelProvider.slot.reasoning": "Reasoning (reasoning tasks)",
   "settings.modelProvider.mappingNotSet": "Not set",
   "settings.modelProvider.presetTitle": "Providers",
+  "settings.modelProvider.emptyAll.title": "No providers yet",
+  "settings.modelProvider.emptyAll.description":
+    "Add a provider with your own API key to start choosing models in chat.",
   "settings.usage.sectionTitle": "Usage stats",
   "settings.usage.sectionDescription": "Built from local app session history.",
   "settings.usage.tab.appUsage": "App usage",
@@ -8070,8 +8073,7 @@ const enUS: Record<string, string> = {
   "globalNotice.highspeed.relativeTaskDuration": "Relative generation time",
   "globalNotice.highspeed.speedSummary": "HighSpeed · {duration}",
   "globalNotice.highspeed.lessWaiting": "{percent}% less waiting",
-  "globalNotice.highspeed.copySummary":
-    "Working with HCode. https://github.com/ngohieu12/HCode",
+  "globalNotice.highspeed.copySummary": "Working with HCode. https://github.com/ngohieu12/HCode",
   "globalNotice.highspeed.imageSummary": "{tokens} tokens · {duration}s saved",
   "globalNotice.highspeed.close": "Close Highspeed share card",
   ...requestSecurityMessagesEnUS,

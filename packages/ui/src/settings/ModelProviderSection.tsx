@@ -34,6 +34,7 @@ import { useServices } from "@/hooks/useServices.js";
 import { useZCodeStore } from "@/store/StoreProvider.js";
 import { logger } from "@/logger.js";
 import {
+  HCODE_BUILTIN_PROVIDERS_VISIBLE,
   PRESET_PROVIDER_SPECS,
   PRESET_SUBSCRIPTION_TIMEOUT_MS,
   BIGMODEL_REGISTRATION_URL,
@@ -616,8 +617,10 @@ export function ModelProviderSection({
 
   const presetProviders = useMemo(
     () =>
-      PRESET_PROVIDER_SPECS.filter((preset) =>
-        shouldShowPresetProviderForActiveOAuth(preset.id, effectiveProviderFamilyDomain),
+      PRESET_PROVIDER_SPECS.filter(
+        (preset) =>
+          HCODE_BUILTIN_PROVIDERS_VISIBLE &&
+          shouldShowPresetProviderForActiveOAuth(preset.id, effectiveProviderFamilyDomain),
       ).map((preset) => ({
         ...preset,
         provider: modelProviders.find((provider) => provider.providerId === preset.id) ?? null,
@@ -1173,6 +1176,7 @@ export function ModelProviderSection({
               : (entitlement?.snapshot?.subscription?.details.length ?? 0);
           })()}
           presetLoading={presetLoading}
+          onAddProvider={() => setTemplatePickerOpen(true)}
           codingPlanAuthError={oauthError}
           codingPlanPurchaseTokenAuthenticatedByProviderId={
             codingPlanPurchaseTokenAuthenticatedByProviderId

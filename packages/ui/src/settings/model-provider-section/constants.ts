@@ -33,6 +33,13 @@ export interface PresetProviderSpec {
   oauthProviderId?: OAuthProviderId;
 }
 
+/**
+ * HCode：只保留用户自己添加的 provider（BYOK）。Z.ai / BigModel / Start Plan / Coding Plan
+ * 这些依赖 Z.AI 账号的内置 provider 不再出现在“模型设置”导航里。
+ * 规格表本身保留，供按 providerId 反查 OAuth 来源等旧数据兼容逻辑使用。
+ */
+export const HCODE_BUILTIN_PROVIDERS_VISIBLE = false;
+
 export const PRESET_PROVIDER_SPECS: PresetProviderSpec[] = [
   {
     id: BUILTIN_MODEL_PROVIDER_IDS.zaiStartPlan,

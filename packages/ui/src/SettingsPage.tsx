@@ -663,6 +663,14 @@ export function SettingsPage({
     },
     [activeSection],
   );
+  // HCode：插件市场是设置页分区，打开它只切换分区，不离开设置层。
+  const openPluginStoreSection = useCallback(
+    (target: PluginStoreOpenTarget = {}) => {
+      requestPluginStoreOpen({ ...target, returnScopeKey: "user" });
+      setActiveSettingsSection("pluginStore");
+    },
+    [setActiveSettingsSection],
+  );
   useEffect(() => {
     if (!isDesktop && activeSection === "remoteDevices") {
       setActiveSettingsSection("general");
@@ -1520,8 +1528,11 @@ export function SettingsPage({
                             trigger: "button",
                           },
                           operation: () => {
+                            // 插件页来自插件市场分区：返回时回到市场，而不是离开设置层。
                             if (pluginNavigationOrigin === "plugin-store") {
-                              requestPluginStoreOpen("user");
+                              setPluginNavigationOrigin(undefined);
+                              openPluginStoreSection();
+                              return;
                             }
                             onBack?.();
                           },
@@ -2036,10 +2047,28 @@ export function SettingsPage({
                               showMarketplaceBreadcrumb={pluginNavigationOrigin === "plugin-store"}
                               onCreateTask={onCreateTask}
                               onOpenPluginStore={(_returnScopeKey, intent) => {
-                                // 添加市场与浏览插件都先离开设置层，再显示商店。
-                                requestPluginStoreOpen({ returnScopeKey: "user", intent });
-                                onBack?.();
+                                // 添加市场与浏览插件都在设置页内切换到「插件市场」分区。
+                                openPluginStoreSection({ intent });
                               }}
+                            />
+                          ) : activeSection === "pluginStore" ? (
+                            <PluginStorePage
+                              key={`pluginStore:${settingsSectionNavigationVersion}`}
+                              isDesktop={Boolean(isDesktop)}
+                              isMacDesktop={Boolean(isMacDesktop)}
+                              isWindowsDesktop={Boolean(isWindowsDesktop)}
+                              isWebRemoteControl={isWebRemoteControl}
+                              workspacePath={activeWorkspacePath}
+                              workspaceIdentity={activeWorkspaceIdentity}
+                              onCreateTask={onCreateTask}
+                              showTitle={false}
+                            />
+                          ) : activeSection === "workflow" ? (
+                            <WorkflowSettingsSection
+                              key={`workflow:${settingsSectionNavigationVersion}`}
+                              workspacePath={activeWorkspacePath}
+                              workspaceIdentity={activeWorkspaceIdentity}
+                              onLeaveSettings={onBack}
                             />
                           ) : activeSection === "mcp" ? (
                             <PluginsSection
@@ -2050,9 +2079,8 @@ export function SettingsPage({
                               workspaceIdentity={activeWorkspaceIdentity}
                               onCreateTask={onCreateTask}
                               onOpenPluginStore={(_returnScopeKey, intent) => {
-                                // 添加市场与浏览插件都先离开设置层，再显示商店。
-                                requestPluginStoreOpen({ returnScopeKey: "user", intent });
-                                onBack?.();
+                                // 添加市场与浏览插件都在设置页内切换到「插件市场」分区。
+                                openPluginStoreSection({ intent });
                               }}
                             />
                           ) : activeSection === "skill" ? (
@@ -2064,9 +2092,8 @@ export function SettingsPage({
                               workspaceIdentity={activeWorkspaceIdentity}
                               onCreateTask={onCreateTask}
                               onOpenPluginStore={(_returnScopeKey, intent) => {
-                                // 添加市场与浏览插件都先离开设置层，再显示商店。
-                                requestPluginStoreOpen({ returnScopeKey: "user", intent });
-                                onBack?.();
+                                // 添加市场与浏览插件都在设置页内切换到「插件市场」分区。
+                                openPluginStoreSection({ intent });
                               }}
                             />
                           ) : activeSection === "migration" ? (
@@ -2114,9 +2141,8 @@ export function SettingsPage({
                               workspaceIdentity={activeWorkspaceIdentity}
                               onCreateTask={onCreateTask}
                               onOpenPluginStore={(_returnScopeKey, intent) => {
-                                // 添加市场与浏览插件都先离开设置层，再显示商店。
-                                requestPluginStoreOpen({ returnScopeKey: "user", intent });
-                                onBack?.();
+                                // 添加市场与浏览插件都在设置页内切换到「插件市场」分区。
+                                openPluginStoreSection({ intent });
                               }}
                             />
                           ) : activeSection === "hooks" ? (

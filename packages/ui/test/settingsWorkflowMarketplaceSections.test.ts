@@ -55,3 +55,21 @@ test("工作区动作桥：注册后可读取，卸载只清理自己注册的�
   unregisterSecond();
   assert.equal(getWorkspaceWorkflowActions(), null);
 });
+
+test("设置页为每个分区都渲染内容，插件市场分区挂载 PluginStorePage 且不离开设置层", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const source = await readFile(new URL("../src/SettingsPage.tsx", import.meta.url), "utf8");
+  const { settingsSections } = createSettingsPageConfig({ isDesktop: true, showWorkflow: true });
+  // 合并上游时曾丢掉 pluginStore / workflow 两个分支，点进去只剩标题、内容一片空白。
+  for (const section of settingsSections) {
+    assert.ok(
+      source.includes(`activeSection === "${section.id}"`),
+      `SettingsPage 缺少分区 ${section.id} 的内容分支`,
+    );
+  }
+  assert.match(source, /activeSection === "pluginStore" \? \(\s*<PluginStorePage/);
+  assert.doesNotMatch(
+    source,
+    /requestPluginStoreOpen\(\{ returnScopeKey: "user", intent \}\);\s*onBack/,
+  );
+});

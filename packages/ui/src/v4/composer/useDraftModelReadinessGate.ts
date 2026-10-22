@@ -73,13 +73,16 @@ export function useDraftModelReadinessGate(params: {
           : {
               scope,
               status,
+              // HCode：打开草稿时的被动检查不再弹出 "No model available" 横幅；
+              // 只有用户真正发送（ensureReadyForSend / Host 门禁 markProviderNotReady）
+              // 时才 revealMissing，避免点发送后没有任何反馈。
               dismissed:
                 status === "missing"
                   ? options.revealMissing
                     ? false
                     : current.status === "missing"
                       ? current.dismissed
-                      : false
+                      : true
                   : false,
             },
       );

@@ -74,6 +74,13 @@ import { type ModelProviderNavGroup } from "@/settings/model-provider-section/co
 import type { ModelProviderNavItem } from "@/settings/model-provider-section/constants.js";
 import type { ProviderSettingsView } from "@zcode/services";
 
+// HCode 默认隐藏 Z.ai / BigModel / Start Plan 内置 provider；这些用例验证的是保留下来的
+// 兼容代码路径，因此在这里显式打开可见性开关。
+vi.mock("@/settings/model-provider-section/constants.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/settings/model-provider-section/constants.js")>()),
+  HCODE_BUILTIN_PROVIDERS_VISIBLE: true,
+}));
+
 it("付费下拉按完整保存选择显示团队，不读取复制的个人 current", () => {
   const provider = createProvider({ id: BUILTIN_MODEL_PROVIDER_IDS.bigmodelIndividualCodingPlan });
   provider.accountState = { availability: "available", entitled: true, current: false };

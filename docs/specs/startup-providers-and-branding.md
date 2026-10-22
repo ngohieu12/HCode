@@ -20,6 +20,8 @@
 - 验收：
   - Provider 列表中只剩用户自建的 API Key Provider，没有 Z.AI / BigModel 条目。
   - 配置中不再有 `zai` / `bigmodel` 的模板或 providerRule。
+  - 设置 → 模型设置导航中不再出现 UI 侧硬编码的 Z.ai、BigModel、Start Plan、Coding Plan 入口。开关 `HCODE_BUILTIN_PROVIDERS_VISIBLE`（`packages/ui/src/settings/model-provider-section/constants.ts`）恒为 `false`。`PRESET_PROVIDER_SPECS` / `CODING_PLAN_PROVIDER_SPECS` 保留，仅供旧数据反查。空分组（含 “Providers”）不显示。
+  - 一个 provider 都没有时，详情区显示空态卡片（“Chưa có nhà cung cấp nào” + “Thêm nhà cung cấp”），不再无限 loading。
   - 测试与未验证项：以 `pnpm typecheck`、`pnpm lint`、`pnpm architecture:check --changed` 及相关 test 的实际结果为准（见本次交付说明）。
 
 ## 3. 应用显示名称改为 HCode，并与 ZCode 并存安装
