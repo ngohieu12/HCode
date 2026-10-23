@@ -468,6 +468,8 @@ export function PluginStorePage({
       setAddMarketplaceError(
         succeeded ? null : (usePluginManagementStore.getState().error ?? null),
       );
+      // 自定义市场不属于公开分段；添加成功后直接切到「个人」，让用户立刻看到刚加的来源。
+      if (succeeded) setSegment("personal");
       return succeeded;
     },
     [addMarketplace, operationService],
