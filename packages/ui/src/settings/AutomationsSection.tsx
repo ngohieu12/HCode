@@ -1602,7 +1602,7 @@ export function AutomationsSection({
                             }}
                             className={cn(
                               // 任务卡与模板卡曾分别使用 surface/border，跨主题下描边深浅不一致。
-                              "group relative flex h-full min-h-0 cursor-pointer gap-3 overflow-hidden rounded-xl border border-card-border bg-background p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused",
+                              "group relative flex h-full min-h-0 cursor-pointer gap-3 overflow-hidden rounded-xl border border-card-border bg-background hcode-dark:bg-surface hcode-dark:hover:bg-surface-hover p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused",
                               // 已完成任务保持静态弱化，不在 hover 时恢复透明度或改变背景。
                               status === "completed" ? "opacity-60" : "hover:bg-hover",
                             )}
@@ -1724,7 +1724,7 @@ export function AutomationsSection({
                 /* 空状态卡先于 Keep-awake，按钮组整体较卡片中心下移 8px。 */
                 <div
                   data-automations-empty-state
-                  className="flex h-[226px] w-full items-center justify-center rounded-2xl border border-card-border bg-background px-4"
+                  className="flex h-[226px] w-full items-center justify-center rounded-2xl border border-card-border bg-background hcode-dark:bg-surface px-4"
                 >
                   <div className="flex translate-y-2 flex-col items-center gap-5">
                     <p className="text-ui-base font-medium leading-5 text-foreground-subtlest">
@@ -1780,7 +1780,7 @@ export function AutomationsSection({
               ) : automationTemplates.offPeak.length === 0 ? (
                 <div
                   data-automation-template-empty-state
-                  className="flex min-h-[114px] w-full items-center justify-center rounded-xl border border-card-border bg-background p-3 text-center text-ui-base font-normal text-foreground-subtlest"
+                  className="flex min-h-[114px] w-full items-center justify-center rounded-xl border border-card-border bg-background hcode-dark:bg-surface p-3 text-center text-ui-base font-normal text-foreground-subtlest"
                 >
                   {intl.formatMessage({ id: "automations.templates.unavailable" })}
                 </div>
@@ -1820,7 +1820,7 @@ export function AutomationsSection({
                           });
                         }}
                         // Grid wrapper 虽已拉伸到行高，卡片本体仍需 h-full 才能继承同一行的最大高度；只设 min-height 时短文案卡会矮一截。
-                        className="flex h-full min-h-[114px] w-full flex-col gap-2 overflow-hidden rounded-xl border border-card-border bg-background p-3 text-left transition-colors hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
+                        className="flex h-full min-h-[114px] w-full flex-col gap-2 overflow-hidden rounded-xl border border-card-border bg-background hcode-dark:bg-surface hcode-dark:hover:bg-surface-hover p-3 text-left transition-colors hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
                       >
                         <div className="flex items-center gap-0.5 text-foreground">
                           <OffPeakTemplateIcon

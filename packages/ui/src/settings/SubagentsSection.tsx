@@ -1032,7 +1032,10 @@ function SubagentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded-xl border border-border p-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-3 rounded-xl border border-border p-4 hcode-dark:bg-surface"
+    >
       <div className="flex justify-end">
         <label className="flex min-w-0 flex-wrap items-center justify-end gap-2">
           <span className="shrink-0 text-ui-base text-foreground-subtle">

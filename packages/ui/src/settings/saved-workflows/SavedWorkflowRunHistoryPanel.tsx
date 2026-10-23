@@ -54,7 +54,7 @@ export function SavedWorkflowRunHistory({
   }
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden rounded-lg border border-border">
+      <div className="overflow-hidden rounded-lg border border-border hcode-dark:bg-surface">
         {runs.map((run, index) => {
           const kind = savedWorkflowRunBadgeKind(run.status);
           const project = resolveRunProject ? resolveRunProject(run) : null;

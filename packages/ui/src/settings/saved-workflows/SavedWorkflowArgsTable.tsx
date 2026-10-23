@@ -36,7 +36,7 @@ export function SavedWorkflowArgsTable({
   const { intl } = useZCodeIntl();
   const columns = "grid-cols-[minmax(0,1.4fr)_112px_64px_minmax(0,1fr)_minmax(0,1.6fr)_28px]";
   return (
-    <div className="overflow-hidden rounded-lg border border-border">
+    <div className="overflow-hidden rounded-lg border border-border hcode-dark:bg-surface">
       <div
         className={cn(
           "grid items-center gap-3 bg-surface px-3 py-1.5 text-ui-sm text-foreground-subtle",
