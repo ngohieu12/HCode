@@ -12,7 +12,8 @@ This change is the network-default and visible-branding phase, not a claim that 
 - The adapter endpoint-routing port returns the original user-selected URL without forwarding it to another origin. Transport owns request execution; it does not change authentication, body, streaming or cancellation semantics for a non-routed request.
 - Desktop remote-runtime downloads use only explicit build/deployment configuration, with no upstream CDN fallback.
 - Help defaults link to this fork's GitHub issues/discussions, not upstream forms or chat invitations.
-- Bundled plugin provenance remains unchanged. Upstream asset URLs default to reserved placeholders; local seed remains the source of bundled functionality.
+- Bundled plugin provenance remains unchanged. Local seed remains the source of bundled functionality.
+- Exception (user decision, 2026-10-23): the public plugin catalog keeps using the ZCode official plugin CDN (`https://cdn-zcode.z.ai/zcode/official-plugin/`). This covers the official marketplace manifest, plugin icons/assets and public plugin packages. These are anonymous public downloads; no account token, API key or model request is sent. Without it the Plugin Marketplace showed "fetch failed" and an empty Community tab. On startup, a stored official-marketplace source that still points at the old `.invalid` placeholder is migrated back to the CDN URL and its stale refresh failure is cleared. User-added marketplaces are never rewritten. Account, business, relay, OAuth and runtime CDN defaults stay on `.invalid` placeholders.
 - No new runtime state, model calls, review loops or token-consuming work is introduced.
 
 ```text
@@ -26,7 +27,7 @@ missing service config -> reserved placeholder / empty CDN candidate list
 1. Production and development env files contain no upstream service URL or OAuth client ID.
 2. Shared default endpoints use `.invalid`; explicit local/self-hosted overrides still resolve.
 3. Previously intercepted provider URLs, query strings and credentials are passed only to the selected provider, never the product gateway.
-4. No remote CDN candidates are returned without an explicit override or build configuration.
+4. No remote runtime CDN candidates are returned without an explicit override or build configuration. The plugin catalog CDN exception above is the only upstream default.
 5. Help defaults and desktop package homepage identify the HCode fork.
 6. Legal notices and plugin-author provenance are preserved.
 7. Run endpoint, routing, CDN and service-default regression tests, typecheck, lint and architecture checks. Report environment or baseline failures accurately.

@@ -9,6 +9,22 @@ export interface DefaultPluginMarketplace {
 
 export const ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_ID = "zcode-plugins-official";
 
+/** ZCode 官方插件目录的 CDN 地址（HCode 沿用，仅用于公开插件目录）。 */
+export const ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_SOURCE =
+  "https://cdn-zcode.z.ai/zcode/official-plugin/marketplace.json";
+
+/**
+ * 旧版 HCode 把官方目录改成了不可解析的 `.invalid` 占位地址，并写进了用户的
+ * known_marketplaces.json。刷新时会用记录里的 source，因此需要识别并迁移这些占位地址。
+ */
+export function isLegacyHCodePlaceholderMarketplaceSource(url: string): boolean {
+  try {
+    return new URL(url).hostname.endsWith(".invalid");
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Claude Code 官方市场（GitHub git 源）。它不是 ZCode 的强依赖：GitHub 不可达时刷新必然失败，
  * 该失败不应作为错误提示打扰用户，UI 侧按此 id 静默处理其刷新失败（任何原因）。
@@ -42,8 +58,11 @@ export const DEFAULT_PLUGIN_MARKETPLACES: DefaultPluginMarketplace[] = [
   {
     // ZCode 官方唯一市场：本地 seed 分片与 CDN 分片在 Agent storage 内合并。
     // CDN manifest 的 name 必须与该 canonical id 一致。
+    // HCode：插件目录（公开 / 社区插件）按用户决定沿用 ZCode 官方 CDN，只拉取公开的目录、图标与插件包，
+    // 不携带账号或 API Key。其他上游服务（账号、计费、中继）仍保持 .invalid 占位，见
+    // docs/specs/hcode-independent-services.md。
     id: ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_ID,
-    source: "https://assets.hcode.invalid/plugins/marketplace.json",
+    source: ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_SOURCE,
     name: ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_ID,
     description: "Official ZCode plugins marketplace: built-in and community plugins for ZCode.",
     pluginCount: 0,

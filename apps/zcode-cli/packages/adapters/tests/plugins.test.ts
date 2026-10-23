@@ -688,6 +688,57 @@ describe("NodePluginAdapter", () => {
     }
   });
 
+  it("migrates the legacy HCode .invalid official marketplace source back to the ZCode CDN", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "hcode-legacy-placeholder-marketplace-"));
+    const storageRoot = join(dir, "storage");
+
+    try {
+      await writeKnownMarketplaces(storageRoot, [
+        {
+          id: "zcode-plugins-official",
+          source: { source: "url", url: "https://assets.hcode.invalid/plugins/marketplace.json" },
+          name: "zcode-plugins-official",
+          addedAt: "2026-01-01T00:00:00.000Z",
+          lastRefreshFailure: {
+            code: "MARKETPLACE_INVALID",
+            failedAt: "2026-01-02T00:00:00.000Z",
+            message: "fetch failed",
+          },
+          pluginCount: 0,
+        },
+        {
+          id: "user-market",
+          source: { source: "url", url: "https://example.invalid/marketplace.json" },
+          name: "user-market",
+          addedAt: "2026-01-01T00:00:00.000Z",
+          pluginCount: 0,
+        },
+      ]);
+
+      const known = ensureDefaultPluginMarketplaces(storageRoot);
+      const official = known.find((record) => record.id === "zcode-plugins-official");
+      expect(official?.source).toEqual({
+        source: "url",
+        url: "https://cdn-zcode.z.ai/zcode/official-plugin/marketplace.json",
+      });
+      expect(official?.lastRefreshFailure).toBeUndefined();
+      // 用户自己添加的市场即使也是 .invalid 也不被改写。
+      expect(known.find((record) => record.id === "user-market")?.source).toEqual({
+        source: "url",
+        url: "https://example.invalid/marketplace.json",
+      });
+      const persisted = JSON.parse(
+        await readFile(join(storageRoot, "known_marketplaces.json"), "utf8"),
+      ) as { marketplaces: Array<{ id: string; source: { url?: string } }> };
+      expect(
+        persisted.marketplaces.find((record) => record.id === "zcode-plugins-official")?.source
+          .url,
+      ).toBe("https://cdn-zcode.z.ai/zcode/official-plugin/marketplace.json");
+    } finally {
+      await rm(dir, { force: true, recursive: true });
+    }
+  });
+
   it("lazy-loads a known marketplace manifest before installing", async () => {
     const dir = await mkdtemp(join(tmpdir(), "zcode-plugin-known-marketplace-install-"));
     const storageRoot = join(dir, "storage");
