@@ -17,18 +17,34 @@ test("checked-in endpoint environments have no upstream service defaults", async
 test("shared endpoint and desktop asset defaults do not use upstream services", async () => {
   for (const file of [
     "packages/shared/src/zcodeEndpoint.ts",
-    "apps/zcode-cli/packages/adapters/src/auth/coding-plan-api-key.ts",
     "apps/zcode-cli/packages/adapters/src/auth/cli-oauth.ts",
     "packages/ui/src/lib/productDocs.ts",
     "packages/desktop/src/main/remoteCdn.ts",
-    "packages/shared/src/plugin-marketplaces.ts",
-    "apps/zcode-cli/packages/bootstrap/src/app/official-plugin-definitions.ts",
-    "apps/zcode-cli/packages/adapters/src/plugins/marketplace.ts",
   ]) {
     // Author URLs are provenance, not a service default.
     const content = (await read(file)).replace(/^.*const ZAI_AUTHOR =.*$/gm, "");
     assert.doesNotMatch(content, upstream, file);
   }
+});
+
+// User decision (2026-10-23): the public plugin catalog (official + community plugins) keeps using
+// the ZCode official plugin CDN. Only the public catalog, icons and plugin packages are fetched there.
+test("plugin catalog uses only the ZCode official plugin CDN, not other upstream services", async () => {
+  const pluginCdn = "https://cdn-zcode.z.ai/zcode/official-plugin/";
+  for (const file of [
+    "packages/shared/src/plugin-marketplaces.ts",
+    "apps/zcode-cli/packages/bootstrap/src/app/official-plugin-definitions.ts",
+    "apps/zcode-cli/packages/adapters/src/plugins/marketplace.ts",
+  ]) {
+    const content = (await read(file))
+      .replace(/^.*const ZAI_AUTHOR =.*$/gm, "")
+      .replaceAll(pluginCdn, "");
+    assert.doesNotMatch(content, upstream, file);
+  }
+  assert.match(
+    await read("packages/shared/src/plugin-marketplaces.ts"),
+    /cdn-zcode\.z\.ai\/zcode\/official-plugin\/marketplace\.json/,
+  );
 });
 
 test("help defaults belong to the fork", async () => {

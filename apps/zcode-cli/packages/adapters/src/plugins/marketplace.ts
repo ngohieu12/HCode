@@ -6,7 +6,11 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { PluginDiagnostic, PluginManifest, PluginStoreListing } from "@zcode/contracts";
 import { isOfficialMarketplaceId, ZCODE_OFFICIAL_PLUGIN_MARKETPLACE } from "@zcode/contracts";
-import { DEFAULT_PLUGIN_MARKETPLACES, sanitizeZCodeRuntimeEnv } from "@zcode/shared";
+import {
+  DEFAULT_PLUGIN_MARKETPLACES,
+  isLegacyHCodePlaceholderMarketplaceSource,
+  sanitizeZCodeRuntimeEnv,
+} from "@zcode/shared";
 import { loadPluginMcpServerDefinitions, resolvePluginMcpServers } from "./mcp.js";
 import {
   appendPluginSourceCleanupError,
@@ -50,7 +54,8 @@ const INSTALLED_PLUGINS_FILE = "installed_plugins.json";
 const MARKETPLACE_FILE = "marketplace.json";
 const CLAUDE_OFFICIAL_MARKETPLACE = "claude-plugins-official";
 const PLUGIN_ICON_SOURCES_FILE = "icon-sources.json";
-const PLUGIN_ICON_ASSETS_BASE_URL = "https://assets.hcode.invalid/plugins/assets/";
+// HCode 沿用 ZCode 官方插件 CDN 的公开图标资源（与官方插件目录同源）。
+const PLUGIN_ICON_ASSETS_BASE_URL = "https://cdn-zcode.z.ai/zcode/official-plugin/assets/";
 const PLUGIN_ICON_SOURCES_URL = `${PLUGIN_ICON_ASSETS_BASE_URL}${PLUGIN_ICON_SOURCES_FILE}`;
 const MARKETPLACE_JSON_MAX_BYTES = 10 * 1024 * 1024;
 const MARKETPLACE_JSON_MAX_REDIRECTS = 5;
@@ -347,7 +352,7 @@ export function loadKnownMarketplacesSync(storageRoot: string): KnownMarketplace
 }
 
 export function ensureDefaultPluginMarketplaces(storageRoot: string): KnownMarketplaceRecord[] {
-  const known = loadKnownMarketplacesSync(storageRoot);
+  const known = repairLegacyPlaceholderMarketplaceSources(storageRoot);
   const existingIds = new Set(known.map((record) => record.id));
   const now = new Date().toISOString();
   const missing = DEFAULT_PLUGIN_MARKETPLACES.filter(
@@ -367,6 +372,28 @@ export function ensureDefaultPluginMarketplaces(storageRoot: string): KnownMarke
   const next = [...known, ...missing];
   writeKnownMarketplacesSync(storageRoot, next);
   return next;
+}
+
+/**
+ * 旧版 HCode 写入的默认市场 source 是 `.invalid` 占位地址，刷新必然报 "fetch failed"。
+ * 只修复默认市场 id 的记录：把占位 source 换回当前默认 source，并清掉因占位地址留下的刷新失败。
+ * 用户自己添加的市场不动。
+ */
+function repairLegacyPlaceholderMarketplaceSources(storageRoot: string): KnownMarketplaceRecord[] {
+  const known = loadKnownMarketplacesSync(storageRoot);
+  let changed = false;
+  const repaired = known.map((record) => {
+    if (record.source.source !== "url") return record;
+    if (!isLegacyHCodePlaceholderMarketplaceSource(record.source.url)) return record;
+    const defaults = DEFAULT_PLUGIN_MARKETPLACES.find((item) => item.id === record.id);
+    if (!defaults || isLegacyHCodePlaceholderMarketplaceSource(defaults.source)) return record;
+    changed = true;
+    const { lastRefreshFailure: _staleFailure, ...rest } = record;
+    return { ...rest, source: defaultMarketplaceSourceFromString(defaults.source) };
+  });
+  if (!changed) return known;
+  writeKnownMarketplacesSync(storageRoot, repaired);
+  return repaired;
 }
 
 export async function ensureMarketplaceManifestAvailable(input: {
